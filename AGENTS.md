@@ -8,7 +8,7 @@
 | Agent | Default role | Owns |
 | :--- | :--- | :--- |
 | **Codex** | Active implementer and final integrator | Repository structure, database migrations, ingestion pipelines, APIs, tests, debugging, and final merges. Sole owner of the main branch — performs the final merge even for a branch Claude implemented while activated as backup. |
-| **Claude** | Independent reviewer; backup implementer when explicitly activated | Reviews PRs against [PRODUCT_SPEC.md](./PRODUCT_SPEC.md) and [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md); inspects security and data-integrity decisions; maintains `README.md`, `PRODUCT_SPEC.md`, `IMPLEMENTATION_PLAN.md`, `ARCHITECTURE_DECISIONS.md`, and this file. Takes over active-implementer duties on the one live implementation branch only when the user explicitly activates backup mode (see Switching implementers below), and hands back to reviewer duties when deactivated. |
+| **Claude** | Independent reviewer; backup implementer when explicitly activated | Reviews PRs against [PRODUCT_SPEC.md](./PRODUCT_SPEC.md) and [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md); inspects security and data-integrity decisions; maintains `README.md`, `PRODUCT_SPEC.md`, `IMPLEMENTATION_PLAN.md`, `ARCHITECTURE_DECISIONS.md`, and this file. Takes over active-implementer duties on the one live implementation branch only when the user explicitly activates backup mode (see Switching implementers below), and hands back to reviewer duties when deactivated. `HANDOFF.md` is governed separately below because its temporary owner is whichever implementer is outgoing. |
 | **Gemini (Antigravity/Flash)** | Rapid prototyping and browser verification, ~10–20% of total usage | UI experiments, map interactions, responsive testing, browser-driven E2E checks, source research, and bounded parallel tasks — on isolated branches, gated until the relevant API contracts exist. |
 
 The point of this split is not picking a "best" model — it's having exactly one active implementer at any moment and exactly one final integrator (Codex, always). Whichever of Codex/Claude is not currently implementing is the independent reviewer of the one who is.
@@ -20,6 +20,7 @@ Neither agent can see its own or the other's remaining quota — only the user c
 - Switch when a provider's usage reaches roughly 75–80% of its available quota. Don't track exact token counts in this repository — quotas and task complexity vary too much for a number here to stay true.
 - Exactly one active implementation branch at a time. The agent being activated picks up that branch; it does not start a second, competing one.
 - Every switch requires a committed checkpoint, test results, a changed-file list, and a next-action note, written to `HANDOFF.md` before the outgoing implementer stops. The incoming implementer reads it before touching anything.
+- `HANDOFF.md` is temporarily owned by the outgoing active implementer for the sole purpose of preparing and committing a switch. The incoming implementer may verify it but does not rewrite that handoff; any discovered gap is reported, then corrected by the newly active implementer after the user confirms the switch. Git history preserves every prior handoff at the same path.
 - Codex performs the final merge regardless of who implemented. If Codex itself is fully unavailable (not just near-quota, but actually unreachable), the merge falls back to the user directly — this workflow has no third agent authorized to merge.
 - A practical starting allocation, advisory rather than enforced:
 
@@ -28,6 +29,15 @@ Neither agent can see its own or the other's remaining quota — only the user c
   | Active implementation | 60% |
   | Independent review / fix-loop | 25% |
   | Gemini UI/browser work | 15% |
+
+### Git interoperability
+
+The repository may be accessed by different Windows or sandbox accounts. Git can reject an otherwise valid repository when `.git` is owned by a different account. This is expected in the multi-agent workflow and does not imply repository corruption.
+
+- For this repository, agents use the exact-path command override `git -c safe.directory=C:/Users/jeeva/Projects/AusTechMap ...` whenever Git reports dubious ownership. Never disable the protection globally with a wildcard such as `safe.directory=*`.
+- The user may optionally trust this one repository persistently by running `git config --global --add safe.directory C:/Users/jeeva/Projects/AusTechMap` outside agent sandboxes. That machine-level choice belongs to the user; agents do not make it automatically.
+- No repository or global commit identity is assumed. Agent-authored commits use command-scoped identities: Codex uses `-c user.name=Codex -c user.email=codex@localhost`; Claude uses `-c user.name=Claude -c user.email=claude@localhost`; Gemini uses `-c user.name=Gemini -c user.email=gemini@localhost`.
+- A human-authored commit uses the user's own configured identity. Agents never persist or overwrite the user's local/global identity without explicit instruction.
 
 ## Tooling
 
