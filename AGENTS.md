@@ -1,0 +1,75 @@
+# Agent Workflow
+
+> Coding-agent roles, quality gates, and repository conventions for Australia Tech Map — anticipated in [PRODUCT_SPEC.md](./PRODUCT_SPEC.md) Appendix B.1. Read this before making any change in this repository.
+> Version 1.2 · 3 September 2026
+
+## Roles
+
+| Agent | Default role | Owns |
+| :--- | :--- | :--- |
+| **Codex** | Active implementer and final integrator | Repository structure, database migrations, ingestion pipelines, APIs, tests, debugging, and final merges. Sole owner of the main branch — performs the final merge even for a branch Claude implemented while activated as backup. |
+| **Claude** | Independent reviewer; backup implementer when explicitly activated | Reviews PRs against [PRODUCT_SPEC.md](./PRODUCT_SPEC.md) and [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md); inspects security and data-integrity decisions; maintains `README.md`, `PRODUCT_SPEC.md`, `IMPLEMENTATION_PLAN.md`, `ARCHITECTURE_DECISIONS.md`, and this file. Takes over active-implementer duties on the one live implementation branch only when the user explicitly activates backup mode (see Switching implementers below), and hands back to reviewer duties when deactivated. |
+| **Gemini (Antigravity/Flash)** | Rapid prototyping and browser verification, ~10–20% of total usage | UI experiments, map interactions, responsive testing, browser-driven E2E checks, source research, and bounded parallel tasks — on isolated branches, gated until the relevant API contracts exist. |
+
+The point of this split is not picking a "best" model — it's having exactly one active implementer at any moment and exactly one final integrator (Codex, always). Whichever of Codex/Claude is not currently implementing is the independent reviewer of the one who is.
+
+## Switching implementers
+
+Neither agent can see its own or the other's remaining quota — only the user can, from each provider's dashboard. A switch is always user-triggered; Codex and Claude don't decide it themselves.
+
+- Switch when a provider's usage reaches roughly 75–80% of its available quota. Don't track exact token counts in this repository — quotas and task complexity vary too much for a number here to stay true.
+- Exactly one active implementation branch at a time. The agent being activated picks up that branch; it does not start a second, competing one.
+- Every switch requires a committed checkpoint, test results, a changed-file list, and a next-action note, written to `HANDOFF.md` before the outgoing implementer stops. The incoming implementer reads it before touching anything.
+- Codex performs the final merge regardless of who implemented. If Codex itself is fully unavailable (not just near-quota, but actually unreachable), the merge falls back to the user directly — this workflow has no third agent authorized to merge.
+- A practical starting allocation, advisory rather than enforced:
+
+  | Work | Allocation |
+  | :--- | :--- |
+  | Active implementation | 60% |
+  | Independent review / fix-loop | 25% |
+  | Gemini UI/browser work | 15% |
+
+## Tooling
+
+| Tool | Status | Role |
+| :--- | :--- | :--- |
+| **Serena** (MCP, LSP-based code navigation) | Add during Phase 1 | Exact symbol definitions, references, callers, and safe code navigation. Used by Codex (implementation) and Claude (review — e.g. tracing every caller before approving a signature or schema change). |
+| **Graphify** (local, Tree-sitter-based code-knowledge graph) | Trial-gated, not yet added | Cross-file architecture, dependency paths, subsystem relationships, and visualization — closer to Claude's review role than to implementation. |
+| **Graphiti** (hosted temporal knowledge graph for agent memory) | Rejected | The markdown docs plus git history already serve as this workflow's shared, cross-session memory. Revisit only against a specific, demonstrated cross-session memory problem those can't solve. |
+| **Gemini Antigravity** | In use | The environment for Gemini's UI/browser/prototyping role above. |
+
+### Graphify adoption gate
+
+There's no meaningful codebase to graph yet — don't add it now. Reassess at Phase 3, or once the repository crosses roughly 20,000–30,000 lines, whichever comes first:
+
+1. Compare five real review/navigation questions using Serena alone vs. Serena plus Graphify.
+2. Keep it only if it materially improves call-path analysis, impact analysis, or review time.
+3. Treat its inferred edges as hints, not proof — confirm anything load-bearing through Serena or direct source inspection.
+4. Verify the exact package before pinning: the intended one is `graphifyy`; several similarly-named packages exist, so check publisher identity and source repo, not just the name string.
+5. Don't commit its generated output directory to git, and don't let a generated graph become a second source of truth alongside the docs above.
+6. Require a freshness check or rebuild before using it for any PR review — a stale graph is worse than no graph.
+
+## Rules
+
+1. **Codex owns the main branch.** Gemini and Claude never push directly to it.
+2. **Gemini works on isolated frontend/prototype branches**, started only after the API contracts those prototypes depend on already exist.
+3. **The independent reviewer reviews completed diffs without simultaneously editing them.** When Claude is reviewing, its edit lane is limited to the docs above — never application code, never while the active implementer has a branch in flight. When Codex is reviewing instead (Claude activated as backup implementer), the same separation applies in reverse.
+4. **The fix-loop runs through the active implementer, not the reviewer.** If a review finds an issue, the active implementer applies the fix — never the reviewer, regardless of which agent is in which seat. A reviewer who fixes things quietly becomes a second editor, which defeats the point of rule 5.
+5. **Only one agent edits migrations, shared contracts, or architecture files at a time.** This is the load-bearing rule; everything else is negotiable, this one isn't.
+6. **Every change passes automated tests and one independent AI review** before merging.
+7. **Implementation-time deviations from `ARCHITECTURE_DECISIONS.md` get written back into it**, not left as undocumented differences between what the docs say and what the code does. The active implementer notes the deviation (PR description is fine); the independent reviewer folds it into the ADR, whichever agent that is at the time. The docs are the only state genuinely shared across all three tools — none of them see each other's conversation history — so they have to stay current, not just accurate at the last phase gate.
+8. **Commit at every phase gate**, per [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) §12 (Governance and reporting).
+
+## Bootstrapping
+
+These repository rules apply immediately, including during Phase 0 and Phase 1 bootstrapping. Codex initializes the local git repository and establishes the first committed checkpoint. Branch, pull-request, and remote-merge rules become enforceable once the repository is pushed to a remote that all three tools can access. Pushing to or creating that remote requires the user to select and authorize the destination.
+
+The switching and handoff rules remain active throughout bootstrapping. A quota-driven or deliberate dry-run switch may therefore occur during Phase 1; it must use the same committed-checkpoint procedure as any later switch.
+
+## Phase 1 assignments
+
+These are the default assignments — subject to the switching protocol above if Codex's quota runs low mid-phase.
+
+- **Codex**: monorepo structure, PostgreSQL/PostGIS on Neon, migrations, the Python worker skeleton, CI.
+- **Gemini**: map/UI prototype and browser test scenarios, started once Phase 1's API contracts exist.
+- **Claude**: review the Phase 0 ADRs and the Phase 1 milestone output against [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)'s exit gate.

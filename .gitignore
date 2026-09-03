@@ -1,0 +1,38 @@
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# JavaScript / Next.js
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Generated agent/code-analysis output
+graphify-out/
+
+# Local logs and temporary output
+*.log
+tmp/
+temp/
+
+# Superseded source/conversion artifacts retained locally
+Australia_Tech_Map_Production_Implementation_Plan_UPDATED.docx
+extracted_doc.txt
