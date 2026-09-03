@@ -4,7 +4,7 @@ A map-first opportunity-intelligence platform for Australian technology employme
 
 ## Documents
 
-- **[PRODUCT_SPEC.md](./PRODUCT_SPEC.md)** — full product specification: vision, scope, data model, and policy. v2.2
+- **[PRODUCT_SPEC.md](./PRODUCT_SPEC.md)** — full product specification: vision, scope, data model, and policy. v2.3
 - **[IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)** — delivery phases, tasks, dependencies, and exit gates. v2.1
 - **[ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md)** — authoritative technology choices; overrides PRODUCT_SPEC.md's recommendations where they conflict. v2.1
 - **[AGENTS.md](./AGENTS.md)** — coding-agent roles (Codex/Claude/Gemini), tooling, quota-based switching, workflow rules, and quality gates. v1.2

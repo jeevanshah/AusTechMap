@@ -1,6 +1,6 @@
 # Australia Tech Map
 
-> **Product Specification (v2.2)**  
+> **Product Specification (v2.3)**
 > *A production-grade specification for building the definitive Australian technology-employment intelligence platform.*
 
 > [!IMPORTANT]
@@ -9,7 +9,7 @@
 | **Document field** | **Value** |
 | :--- | :--- |
 | Status | Updated for 10/10 product architecture |
-| Version | 2.2 |
+| Version | 2.3 |
 | Date | 31 August 2026 |
 | Primary audience | Founder, product lead, engineering agents, future contributors |
 | Initial market | Australia |
@@ -43,7 +43,7 @@
 - [17. Post-V1 Expansion](#17-post-v1-expansion)
 - [18. Opportunity Engine, Retention and Business Architecture](#18-opportunity-engine-retention-and-business-architecture)
 - [Appendix A. Initial Taxonomies](#appendix-a-initial-taxonomies)
-- [Appendix B. Suggested Repository Structure](#appendix-b-suggested-repository-structure)
+- [Appendix B. Repository Structure](#appendix-b-repository-structure)
 - [Appendix C. Source Register](#appendix-c-source-register)
 - [Appendix D. Scoring and Event Contracts](#appendix-d-scoring-and-event-contracts)
 
@@ -1135,52 +1135,54 @@ The product reaches the intended strategic state when users no longer describe i
 
 active | stale | superseded | rejected | needs_review
 
-## Appendix B. Suggested Repository Structure
+## Appendix B. Repository Structure
+
+This reflects the actual structure established by the Phase 1 foundation commit (`5100fe7`), not an aspiration — update it whenever the real layout changes so it doesn't drift the way this section previously did.
 
 ```text
 au-tech-map/
 |
 +-- apps/
-|   +-- web/
-|   +-- admin/
+|   +-- web/                       Next.js app (role-protected /admin routes land here in a later phase)
+|       +-- src/app/               App Router: pages, layout, /api/health
+|       +-- package.json, tsconfig.json, eslint.config.mjs, next.config.ts, postcss.config.mjs
 |
 +-- packages/
-|   +-- db/
-|   +-- ui/
-|   +-- types/
-|   +-- taxonomy/
-|   +-- config/
+|   +-- contracts/                 Shared Zod contracts (versioned response schemas, e.g. HealthResponseSchema)
 |
-+-- pipeline/
-|   +-- core/
-|   +-- importers/
-|   |   +-- abr/
-|   |   +-- abs/
-|   |   +-- home_affairs/
-|   |   +-- jsa/
-|   +-- crawlers/
-|   |   +-- ats/
-|   |   +-- generic/
-|   +-- enrichment/
-|   +-- geocoding/
++-- workers/
+|   +-- ingestion/                 Python ingestion worker
+|       +-- src/austechmap_ingestion/   Importers/crawlers/enrichment land here as their delivery phases begin
+|       +-- tests/
+|       +-- pyproject.toml, requirements-dev.lock
 |
-+-- migrations/
-+-- infrastructure/
-+-- docs/
-+-- tests/
++-- db/                            Versioned PostgreSQL migrations - empty until the remaining Phase 0
+|                                   database contracts close (see db/README.md)
++-- docs/                          Operational docs (development.md: local setup)
++-- tests/                         Reserved for cross-workspace integration/E2E tests (empty so far)
++-- .github/workflows/             CI: lint, format, typecheck, unit tests, build
 +-- AGENTS.md
++-- ARCHITECTURE_DECISIONS.md
++-- HANDOFF.md
++-- IMPLEMENTATION_PLAN.md
++-- PRODUCT_SPEC.md
 +-- README.md
 ```
 
-**B.1 Suggested documentation set**
+Not yet present: `apps/admin` stays inside `apps/web` per IMPLEMENTATION_PLAN.md rather than a separate app; `packages/ui`, `packages/taxonomy`, and `packages/config` haven't been needed yet; `workers/ingestion` gains importer, crawler, and enrichment subdirectories as the corresponding pipeline phases begin.
 
-- PRODUCT.md - vision, users, scope, product rules and non-goals.
-- ARCHITECTURE.md - system boundaries, runtime, data flow and deployment.
-- DATA_MODEL.md - tables, enums, provenance rules and migrations.
-- SOURCE_POLICY.md - permitted source classes, licences, crawl policies and attribution.
-- SPONSORSHIP_EVIDENCE.md - evidence categories, display language and review process.
-- IMPLEMENTATION_PLAN.md - task sequencing and acceptance criteria.
-- AGENTS.md - coding-agent instructions, quality gates and repository conventions.
+**B.1 Documentation set**
+
+- `README.md` - short project introduction and links to the documents below.
+- `PRODUCT_SPEC.md` - vision, users, scope, data model, and policy (this file).
+- `ARCHITECTURE_DECISIONS.md` - authoritative technology choices and their rationale; overrides this file's tech recommendations where they conflict.
+- `IMPLEMENTATION_PLAN.md` - phase sequencing, tasks, dependencies, and exit gates.
+- `AGENTS.md` - coding-agent roles, tooling, the quota-based switching protocol, and quality gates.
+- `HANDOFF.md` - the live implementer-switch record between Codex and Claude.
+- `db/README.md` - database status and what's gated pending Phase 0.
+- `docs/development.md` - local development setup.
+
+Not yet split into their own files - currently covered within this document's relevant sections, split out only if this document grows unwieldy: a dedicated `SOURCE_POLICY.md` (§5), `SPONSORSHIP_EVIDENCE.md` (§8), or `DATA_MODEL.md` (§6).
 
 ## Appendix C. Source Register
 
