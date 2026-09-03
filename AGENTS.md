@@ -1,7 +1,7 @@
 # Agent Workflow
 
 > Coding-agent roles, quality gates, and repository conventions for Australia Tech Map — anticipated in [PRODUCT_SPEC.md](./PRODUCT_SPEC.md) Appendix B.1. Read this before making any change in this repository.
-> Version 1.2 · 3 September 2026
+> Version 1.3 · 4 September 2026
 
 ## Roles
 
@@ -61,7 +61,7 @@ There's no meaningful codebase to graph yet — don't add it now. Reassess at Ph
 
 ## Rules
 
-1. **Codex owns the main branch.** Gemini and Claude never push directly to it.
+1. **Codex owns the main branch.** Gemini and Claude never push directly to it. This has no exception for documentation: Claude authors changes to its owned docs directly in the working tree, but Codex still reviews and commits them, the same as any other change.
 2. **Gemini works on isolated frontend/prototype branches**, started only after the API contracts those prototypes depend on already exist.
 3. **The independent reviewer reviews completed diffs without simultaneously editing them.** When Claude is reviewing, its edit lane is limited to the docs above — never application code, never while the active implementer has a branch in flight. When Codex is reviewing instead (Claude activated as backup implementer), the same separation applies in reverse.
 4. **The fix-loop runs through the active implementer, not the reviewer.** If a review finds an issue, the active implementer applies the fix — never the reviewer, regardless of which agent is in which seat. A reviewer who fixes things quietly becomes a second editor, which defeats the point of rule 5.
