@@ -5,8 +5,9 @@
 - Node.js 22 or newer and npm
 - Python 3.12 or newer
 
-Docker is not required for this initial foundation slice. Local PostGIS setup will be selected when
-the Phase 0 database-operating decisions are closed.
+Docker is not required for the initial foundation slice. Phase 0's database-operating decisions are
+closed; the repeatable local PostGIS workflow has not yet been provisioned and is the next Phase 1
+database slice.
 
 ## JavaScript workspace
 

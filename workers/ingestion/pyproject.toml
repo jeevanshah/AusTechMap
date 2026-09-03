@@ -5,7 +5,7 @@ description = "Independent ingestion worker for Australia Tech Map"
 requires-python = ">=3.12"
 
 [tool.pytest.ini_options]
-addopts = "--strict-config --strict-markers"
+addopts = "--strict-config --strict-markers -p no:cacheprovider"
 pythonpath = ["src"]
 testpaths = ["tests"]
 

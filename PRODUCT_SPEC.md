@@ -1,6 +1,6 @@
 # Australia Tech Map
 
-> **Product Specification (v2.3)**
+> **Product Specification (v2.4)**
 > *A production-grade specification for building the definitive Australian technology-employment intelligence platform.*
 
 > [!IMPORTANT]
@@ -9,8 +9,8 @@
 | **Document field** | **Value** |
 | :--- | :--- |
 | Status | Updated for 10/10 product architecture |
-| Version | 2.3 |
-| Date | 31 August 2026 |
+| Version | 2.4 |
+| Date | 4 September 2026 |
 | Primary audience | Founder, product lead, engineering agents, future contributors |
 | Initial market | Australia |
 | Primary user | Technology job seeker / career explorer |
@@ -266,7 +266,7 @@ Next.js Web Application
 
 **Import Australian Statistical Geography Standard (ASGS) Edition 3 boundaries into PostGIS. The ABS publishes SA1-SA4, Greater Capital City Statistical Areas, states/territories and non-ABS structures including Local Government Areas, Postal Areas and Suburbs and Localities. [S2]**
 
-**Use G-NAF for bulk Australian address geocoding. The February 2026 release describes more than 15.8 million addresses and includes geocodes; G-NAF is updated quarterly. [S3]**
+**Use G-NAF for bulk Australian address geocoding. The current August 2026 product documentation describes a national address index with coordinates, delivered as open-data PSV files; G-NAF is updated quarterly. [S3]**
 
 ```text
 Employer address
@@ -1156,9 +1156,9 @@ au-tech-map/
 |       +-- tests/
 |       +-- pyproject.toml, requirements-dev.lock
 |
-+-- db/                            Versioned PostgreSQL migrations - empty until the remaining Phase 0
-|                                   database contracts close (see db/README.md)
-+-- docs/                          Operational docs (development.md: local setup)
++-- db/                            Versioned PostgreSQL migrations - next Phase 1 database slice
+|                                   under the closed Phase 0 contracts (see db/README.md)
++-- docs/                          Operational docs (development.md; golden-queries.md)
 +-- tests/                         Reserved for cross-workspace integration/E2E tests (empty so far)
 +-- .github/workflows/             CI: lint, format, typecheck, unit tests, build
 +-- AGENTS.md
@@ -1179,8 +1179,9 @@ Not yet present: `apps/admin` stays inside `apps/web` per IMPLEMENTATION_PLAN.md
 - `IMPLEMENTATION_PLAN.md` - phase sequencing, tasks, dependencies, and exit gates.
 - `AGENTS.md` - coding-agent roles, tooling, the quota-based switching protocol, and quality gates.
 - `HANDOFF.md` - the live implementer-switch record between Codex and Claude.
-- `db/README.md` - database status and what's gated pending Phase 0.
+- `db/README.md` - database status and the next Phase 1 migration slice.
 - `docs/development.md` - local development setup.
+- `docs/golden-queries.md` - fixed Phase 0 discovery/relevance set and acceptance method.
 
 Not yet split into their own files - currently covered within this document's relevant sections, split out only if this document grows unwieldy: a dedicated `SOURCE_POLICY.md` (§5), `SPONSORSHIP_EVIDENCE.md` (§8), or `DATA_MODEL.md` (§6).
 
@@ -1204,7 +1205,7 @@ Official SA1-SA4, GCCSA, state/territory and non-ABS structures such as LGA, Pos
 
 https://data.gov.au/data/dataset/geocoded-national-address-file-g-naf
 
-National geocoded address dataset; February 2026 release lists 15,860,127 addresses and quarterly updates.
+National geocoded address dataset; current August 2026 product documentation confirms open-data PSV delivery and a quarterly release cycle.
 
 **[S4] Jobs and Skills Australia - NERO**
 

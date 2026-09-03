@@ -9,6 +9,7 @@ HANDOFF.md
 IMPLEMENTATION_PLAN.md
 PRODUCT_SPEC.md
 README.md
+docs/golden-queries.md
 workers/ingestion/.venv/
 workers/ingestion/.mypy_cache/
 workers/ingestion/.pytest_cache/

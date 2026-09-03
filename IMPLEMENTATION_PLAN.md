@@ -1,7 +1,7 @@
 # Australia Tech Map — Implementation Plan
 
 > Execution plan derived from [PRODUCT_SPEC.md](./PRODUCT_SPEC.md). [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) is authoritative for technology choices where it conflicts with either document.  
-> Version 2.1 · 3 September 2026
+> Version 2.2 · 4 September 2026
 
 ## 1. Objective
 
@@ -111,21 +111,23 @@ The original 24–34-week phase-summed figure describes a demonstration-quality 
 
 Goal: remove ambiguity before implementation.
 
-- [ ] Freeze V1 role-family, skill, employer-category, seniority, work-style, and evidence taxonomies.
-- [ ] Define canonical employer identity and merge rules.
-- [ ] Define source policy: allowed retrieval, attribution, retention, freshness, and disable procedure.
-- [ ] Define sponsorship evidence categories and prohibited claims.
-- [ ] Specify score methodology, sufficiency rules, version fields, and suppression behaviour.
-- [ ] Specify change-event, alert-deduplication, and notification-preference contracts.
-- [ ] Create 20–30 golden user queries covering role, skill, location, regional, remote, and sponsorship needs.
+- [x] Freeze V1 role-family, skill, employer-category, seniority, work-style, and evidence taxonomies. See PRODUCT_SPEC.md Appendix A and §8.1.
+- [x] Define canonical employer identity and merge rules. See PRODUCT_SPEC.md §§6.2–6.3.
+- [x] Define source policy: allowed retrieval, attribution, retention, freshness, and disable procedure. See PRODUCT_SPEC.md §§5, 7, and 12.3.
+- [x] Define sponsorship evidence categories and prohibited claims. See PRODUCT_SPEC.md §8.
+- [x] Specify score methodology, sufficiency rules, version fields, and suppression behaviour. See PRODUCT_SPEC.md §§9 and 18 plus Appendix D.
+- [x] Specify change-event, alert-deduplication, and notification-preference contracts. See PRODUCT_SPEC.md §6.8 and Appendix D.
+- [x] Create 20–30 golden user queries covering role, skill, location, regional, remote, and sponsorship needs. See [docs/golden-queries.md](./docs/golden-queries.md).
 - [x] Record architecture decisions for the database, map provider, storage, hosting, authentication, email, and analytics. See [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md).
-- [ ] Define p95 latency SLOs for map and search endpoints on desktop and mobile networks, and the relevance-acceptance method for golden queries.
-- [ ] Decide authentication roles, admin MFA enforcement, and the account-deletion procedure.
-- [ ] Specify production job scheduling: retry policy, lease/heartbeat model, and failure-recovery procedure for the import-run table.
-- [ ] Specify G-NAF storage, indexing, update cadence, and batch-processing procedure in enough detail to build against.
-- [ ] Decide database backup, restore, and retention policy, and its expected storage cost.
+- [x] Define p95 latency SLOs for map and search endpoints on desktop and mobile networks, and the relevance-acceptance method for golden queries. See ARCHITECTURE_DECISIONS.md §4.5 and [docs/golden-queries.md](./docs/golden-queries.md).
+- [x] Decide authentication roles, admin MFA enforcement, and the account-deletion procedure. See ARCHITECTURE_DECISIONS.md §4.1.
+- [x] Specify production job scheduling: retry policy, lease/heartbeat model, and failure-recovery procedure for the import-run table. See ARCHITECTURE_DECISIONS.md §4.2.
+- [x] Specify G-NAF storage, indexing, update cadence, and batch-processing procedure in enough detail to build against. See ARCHITECTURE_DECISIONS.md §4.3.
+- [x] Decide database backup, restore, and retention policy, and its expected storage cost. See ARCHITECTURE_DECISIONS.md §4.4.
 
-Exit gate: schemas and policies are approved, golden queries are documented, performance and relevance targets are recorded, the four architecture decisions above are resolved, and no unresolved decision blocks database work.
+Exit gate: schemas and policies are approved, golden queries are documented, performance and relevance targets are recorded, the five operational decisions above are resolved, and no unresolved decision blocks database work.
+
+Status: closed on 4 September 2026. Service provisioning and implementation-time verification remain Phase 1 work; they are not reopened product decisions unless evidence forces an ADR change.
 
 ### Phase 1 — Platform foundation
 
