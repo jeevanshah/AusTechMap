@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  ingestion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: workers/ingestion/requirements-dev.lock
+      - run: python -m pip install -r workers/ingestion/requirements-dev.lock
+      - run: python -m ruff check workers/ingestion
+      - run: python -m mypy --config-file workers/ingestion/pyproject.toml workers/ingestion/src workers/ingestion/tests
+      - run: python -m pytest -c workers/ingestion/pyproject.toml

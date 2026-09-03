@@ -1,0 +1,22 @@
+[project]
+name = "austechmap-ingestion"
+version = "0.1.0"
+description = "Independent ingestion worker for Australia Tech Map"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+addopts = "--strict-config --strict-markers"
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "src"

@@ -1,0 +1,24 @@
+{
+  "name": "australia-tech-map",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @austechmap/contracts && npm run build -w @austechmap/web",
+    "dev": "npm run build -w @austechmap/contracts && npm run dev -w @austechmap/web",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "npm run lint -w @austechmap/contracts && npm run lint -w @austechmap/web",
+    "test": "npm run test -w @austechmap/contracts && npm run test -w @austechmap/web",
+    "typecheck": "npm run build -w @austechmap/contracts && npm run typecheck -w @austechmap/web"
+  },
+  "devDependencies": {
+    "prettier": "3.9.6"
+  }
+}
