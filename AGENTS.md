@@ -1,7 +1,10 @@
 # Agent Workflow
 
 > Coding-agent roles, quality gates, and repository conventions for Australia Tech Map — anticipated in [PRODUCT_SPEC.md](./PRODUCT_SPEC.md) Appendix B.1. Read this before making any change in this repository.
-> Version 1.3 · 4 September 2026
+> Version 1.6 · 4 September 2026
+
+> [!IMPORTANT]
+> **Current status (4 September 2026):** Codex is unavailable (quota exhausted, duration unknown). **Claude is the active implementer**; Gemini continues its orchestration and UI/browser duties. This means there is currently **no independent third-party code reviewer** — Claude reviewing its own implementation work is a real gap, not a solved problem, until Codex returns or the user reviews directly. Per the fallback already defined in "Switching implementers" below, **merges go to the user directly**; no agent is currently authorized to merge. Update or remove this note once Codex resumes — the Roles table and Orchestration loop below still describe the default, steady-state assignment, not the current one.
 
 ## Roles
 
@@ -13,9 +16,33 @@
 
 The point of this split is not picking a "best" model — it's having exactly one active implementer at any moment and exactly one final integrator (Codex, always). Whichever of Codex/Claude is not currently implementing is the independent reviewer of the one who is.
 
+## Orchestration
+
+This runs locally inside Antigravity — a workspace agent, not separate hosted bots. The workspace agent lives at [`.agents/agents/austechmap-orchestrator/agent.md`](.agents/agents/austechmap-orchestrator/agent.md) (Antigravity's own discovery convention: `.agents/agents/{name}/agent.md`, YAML frontmatter + instructions, auto-discovered by `/agents`). Its scratch state for the run in progress lives under `.agents/runs/current/` (`TASK.md`, `CLAUDE_PLAN.md`, `CODEX_RESULT.md`, `TEST_RESULTS.md`, `CLAUDE_REVIEW.md`) — those are working files for one run, not a durable record; `HANDOFF.md` is still the durable record.
+
+Operating loop for one task:
+
+Gemini orchestrates → Claude plans/reviews → Codex implements → Gemini tests/browser-checks → Claude re-reviews → Codex integrates.
+
+This is the primary mechanism for coordinating the team going forward. The manual, user-triggered protocol in "Switching implementers" below remains the fallback — for whenever Antigravity itself is unavailable, and as the underlying mechanism Antigravity invokes to actually carry out a switch.
+
+Orchestration rules (the agent definition enforces these; they're restated here as the source of truth):
+
+- Claude runs read-only with respect to application code during orchestrated runs — planning and review only. This doesn't change Claude's existing docs-authoring exception (Rule 1 below): Claude may still author changes to its owned docs, Codex still commits them.
+- Codex is the only application-code writer and the only integrator — unchanged from the rest of this document.
+- Agents execute sequentially. Never two agents editing the same worktree concurrently.
+- Review findings go directly into the next Codex prompt. The orchestrator does not patch code itself, and does not let Claude patch code directly (Rule 4 still applies inside orchestration).
+- Maximum two fix loops before the orchestrator stops and asks the user for a decision, rather than looping indefinitely.
+- Destructive commands and merges always require explicit user approval, regardless of any autonomous-execution setting Antigravity itself offers (its `commandExecutionPolicy` gates its own notion of "high-risk," which may not match ours — don't rely on it alone for this).
+- Git history remains the permanent audit record: no rewriting commits, no squashing away a review trail.
+
+Both CLIs are invoked non-interactively so Antigravity can capture their output: `claude -p "<prompt>"` for Claude, `codex exec "<prompt>"` for Codex (add `--sandbox read-only` when Codex should only read, not write). Verify either is working with `claude -p "Reply only CLAUDE_OK"` and `codex exec --ephemeral --sandbox read-only "Reply only CODEX_OK"`.
+
+Antigravity's own UI/browser/prototyping duties (see Roles, above) are unaffected — orchestration is an additional function layered on top of that role, not a replacement for it.
+
 ## Switching implementers
 
-Neither agent can see its own or the other's remaining quota — only the user can, from each provider's dashboard. A switch is always user-triggered; Codex and Claude don't decide it themselves.
+Neither agent can see its own or the other's remaining quota. Antigravity, as orchestrator, may trigger a switch on the team's behalf (see Orchestration, above); absent Antigravity, a switch is user-triggered — Codex and Claude never decide it themselves.
 
 - Switch when a provider's usage reaches roughly 75–80% of its available quota. Don't track exact token counts in this repository — quotas and task complexity vary too much for a number here to stay true.
 - Exactly one active implementation branch at a time. The agent being activated picks up that branch; it does not start a second, competing one.
@@ -46,7 +73,7 @@ The repository may be accessed by different Windows or sandbox accounts. Git can
 | **Serena** (MCP, LSP-based code navigation) | Add during Phase 1 | Exact symbol definitions, references, callers, and safe code navigation. Used by Codex (implementation) and Claude (review — e.g. tracing every caller before approving a signature or schema change). |
 | **Graphify** (local, Tree-sitter-based code-knowledge graph) | Trial-gated, not yet added | Cross-file architecture, dependency paths, subsystem relationships, and visualization — closer to Claude's review role than to implementation. |
 | **Graphiti** (hosted temporal knowledge graph for agent memory) | Rejected | The markdown docs plus git history already serve as this workflow's shared, cross-session memory. Revisit only against a specific, demonstrated cross-session memory problem those can't solve. |
-| **Gemini Antigravity** | In use | The environment for Gemini's UI/browser/prototyping role above. |
+| **Gemini Antigravity** | In use | The environment for Gemini's UI/browser/prototyping role above, and — as of 4 September 2026 — the team's orchestrator (see Orchestration). |
 
 ### Graphify adoption gate
 
