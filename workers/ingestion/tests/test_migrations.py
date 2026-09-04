@@ -1,0 +1,173 @@
+from __future__ import annotations
+
+import os
+import uuid
+from pathlib import Path
+
+import psycopg
+import pytest
+
+from austechmap_ingestion.db.migrations import (
+    MigrationError,
+    apply_migrations,
+    discover_migrations,
+)
+
+REPOSITORY_ROOT = Path(__file__).parents[3]
+MIGRATIONS_DIRECTORY = REPOSITORY_ROOT / "db" / "migrations"
+
+
+def test_repository_migrations_are_contiguous_and_cover_foundation_contracts() -> None:
+    migrations = discover_migrations(MIGRATIONS_DIRECTORY)
+
+    assert [migration.version for migration in migrations] == [1, 2, 3]
+    combined_sql = "\n".join(migration.sql for migration in migrations)
+    assert "CREATE EXTENSION IF NOT EXISTS postgis" in combined_sql
+    assert "CREATE TABLE users" in combined_sql
+    assert "CREATE TABLE import_runs" in combined_sql
+    assert "CREATE TABLE raw_snapshots" in combined_sql
+    assert "CREATE TABLE audit_records" in combined_sql
+
+
+def test_discovery_rejects_a_gap_in_versions(tmp_path: Path) -> None:
+    (tmp_path / "0001_first.sql").write_text("SELECT 1;\n", encoding="utf-8")
+    (tmp_path / "0003_third.sql").write_text("SELECT 3;\n", encoding="utf-8")
+
+    with pytest.raises(MigrationError, match="contiguous"):
+        discover_migrations(tmp_path)
+
+
+def test_discovery_rejects_an_invalid_filename(tmp_path: Path) -> None:
+    (tmp_path / "migration.sql").write_text("SELECT 1;\n", encoding="utf-8")
+
+    with pytest.raises(MigrationError, match="Invalid migration filename"):
+        discover_migrations(tmp_path)
+
+
+@pytest.mark.integration
+def test_migrations_apply_idempotently_to_postgis() -> None:
+    database_url = os.environ.get("TEST_DATABASE_URL")
+    if not database_url:
+        pytest.skip("TEST_DATABASE_URL is not configured")
+
+    first_application = apply_migrations(database_url, MIGRATIONS_DIRECTORY)
+    second_application = apply_migrations(database_url, MIGRATIONS_DIRECTORY)
+
+    assert [migration.version for migration in first_application] in ([1, 2, 3], [])
+    assert second_application == ()
+
+    with psycopg.connect(database_url) as connection:
+        extensions = {
+            row[0]
+            for row in connection.execute(
+                """
+                SELECT extname
+                FROM pg_extension
+                WHERE extname IN ('postgis', 'pg_trgm', 'pgcrypto')
+                """
+            )
+        }
+        tables = {
+            row[0]
+            for row in connection.execute(
+                """
+                SELECT tablename
+                FROM pg_tables
+                WHERE schemaname = 'public'
+                  AND tablename IN ('users', 'import_runs', 'raw_snapshots', 'audit_records')
+                """
+            )
+        }
+
+    assert extensions == {"postgis", "pg_trgm", "pgcrypto"}
+    assert tables == {"users", "import_runs", "raw_snapshots", "audit_records"}
+
+
+@pytest.mark.integration
+def test_applied_migration_checksum_is_immutable(tmp_path: Path) -> None:
+    database_url = os.environ.get("TEST_DATABASE_URL")
+    if not database_url:
+        pytest.skip("TEST_DATABASE_URL is not configured")
+
+    apply_migrations(database_url, MIGRATIONS_DIRECTORY)
+    for source in MIGRATIONS_DIRECTORY.glob("*.sql"):
+        (tmp_path / source.name).write_bytes(source.read_bytes())
+    changed = tmp_path / "0002_auth_and_ingestion_foundation.sql"
+    changed.write_text(changed.read_text(encoding="utf-8") + "\n-- changed\n", encoding="utf-8")
+
+    with pytest.raises(MigrationError, match="checksum differs"):
+        apply_migrations(database_url, tmp_path)
+
+
+@pytest.mark.integration
+def test_ingestion_constraints_and_append_only_audit_log() -> None:
+    database_url = os.environ.get("TEST_DATABASE_URL")
+    if not database_url:
+        pytest.skip("TEST_DATABASE_URL is not configured")
+
+    apply_migrations(database_url, MIGRATIONS_DIRECTORY)
+    unique_suffix = uuid.uuid4().hex
+    with psycopg.connect(database_url, autocommit=True) as connection:
+        source_id = connection.execute(
+            """
+            INSERT INTO data_sources (source_key, name, kind)
+            VALUES (%s, %s, 'government_open_data')
+            RETURNING id
+            """,
+            (f"integration-{unique_suffix}", "Integration source"),
+        ).fetchone()
+        assert source_id is not None
+        run_id = connection.execute(
+            """
+            INSERT INTO import_runs (
+              run_type, source_id, idempotency_key, scheduled_for, available_at
+            )
+            VALUES ('integration', %s, %s, now(), now())
+            RETURNING id
+            """,
+            (source_id[0], unique_suffix),
+        ).fetchone()
+        assert run_id is not None
+
+        with pytest.raises(psycopg.errors.CheckViolation):
+            connection.execute(
+                "UPDATE import_runs SET status = 'running' WHERE id = %s",
+                (run_id[0],),
+            )
+
+        checksum = "a" * 64
+        for sequence in (1, 2):
+            connection.execute(
+                """
+                INSERT INTO raw_snapshots (
+                  source_id, import_run_id, object_key, sha256, content_type,
+                  byte_size, retrieved_at
+                )
+                VALUES (%s, %s, %s, %s, 'application/json', 2, now())
+                """,
+                (
+                    source_id[0],
+                    run_id[0],
+                    f"integration/{unique_suffix}/{sequence}.json",
+                    checksum,
+                ),
+            )
+
+        audit_id = connection.execute(
+            """
+            INSERT INTO audit_records (
+              actor_type, actor_id, action, target_type, target_id, request_id
+            )
+            VALUES ('worker', 'integration', 'created', 'import_run', %s, %s)
+            RETURNING id
+            """,
+            (str(run_id[0]), unique_suffix),
+        ).fetchone()
+        assert audit_id is not None
+        with pytest.raises(psycopg.errors.RaiseException, match="append-only"):
+            connection.execute(
+                "UPDATE audit_records SET action = 'changed' WHERE id = %s",
+                (audit_id[0],),
+            )
+        with pytest.raises(psycopg.errors.RaiseException, match="append-only"):
+            connection.execute("TRUNCATE audit_records")

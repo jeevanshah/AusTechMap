@@ -4,10 +4,11 @@
 
 - Node.js 22 or newer and npm
 - Python 3.12 or newer
+- Docker Desktop (or another Docker Compose implementation) for local PostGIS
 
-Docker is not required for the initial foundation slice. Phase 0's database-operating decisions are
-closed; the repeatable local PostGIS workflow has not yet been provisioned and is the next Phase 1
-database slice.
+The database workflow uses PostgreSQL 17 with PostGIS 3.5, matching CI. If Docker is unavailable,
+the non-integration worker tests still run; use a disposable Neon development database for live
+migration testing, never a shared or production database.
 
 ## JavaScript workspace
 
@@ -30,6 +31,22 @@ $env:PYTHONPATH = "workers/ingestion/src"
 workers/ingestion/.venv/Scripts/python.exe -m austechmap_ingestion health --run-id local
 ```
 
+## Database
+
+Use the local values from `.env.example`, then start PostGIS and apply the forward-only migrations:
+
+```powershell
+docker compose up -d postgres
+$env:DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/austechmap"
+$env:PYTHONPATH = "workers/ingestion/src"
+workers/ingestion/.venv/Scripts/python.exe -m austechmap_ingestion migrate
+```
+
+The migration runner takes a PostgreSQL advisory lock, applies each file in its own transaction,
+and records its SHA-256 checksum. Never edit an applied migration; add the next numbered SQL file.
+To stop the database, run `docker compose down`. The named volume preserves local data; use
+`docker compose down --volumes` only when you intentionally want to erase that local database.
+
 ## Quality checks
 
 ```powershell
@@ -41,3 +58,6 @@ workers/ingestion/.venv/Scripts/python.exe -m ruff check workers/ingestion
 workers/ingestion/.venv/Scripts/python.exe -m mypy --config-file workers/ingestion/pyproject.toml workers/ingestion/src workers/ingestion/tests
 workers/ingestion/.venv/Scripts/python.exe -m pytest -c workers/ingestion/pyproject.toml
 ```
+
+Integration tests run when `TEST_DATABASE_URL` is set. CI always runs them against its disposable
+PostGIS service. Locally, set it to the Compose URL above before running pytest.
