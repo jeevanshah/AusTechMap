@@ -2,7 +2,7 @@
 
 > Satisfies [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) Phase 0: "Record architecture decisions for the database, map provider, storage, hosting, authentication, email, and analytics."
 > This document is authoritative for technology choices — where it conflicts with [PRODUCT_SPEC.md](./PRODUCT_SPEC.md)'s recommendations, this document wins.
-> Version 3.0 · 4 September 2026
+> Version 3.1 · 4 September 2026
 
 ## 1. Decision summary
 
@@ -74,6 +74,8 @@ S3-compatible object storage for the immutable raw snapshot policy already defin
 Use Pro (~US$20/month) from Phase 0, not just from public launch. Vercel's Hobby tier is restricted to personal, non-commercial use — a private alpha of a company with a monetisation roadmap doesn't qualify even before it's public, so deferring Pro to launch was wrong in the earlier cost estimate. For an SEO-first, SSR-heavy product (map/search/employer/region pages), Vercel's zero-config ISR, image optimization, and edge caching are worth the fee relative to the developer time cost of replicating them elsewhere.
 
 **Reconsider if:** cost sensitivity is tight enough to justify hand-rolling image optimization and caching — Railway or Fly.io can run Next.js as a plain Node service for less, at the cost of owning that configuration yourself. Flagging this as the one deliberately-not-cheapest choice in the stack, made on a time-vs-money trade-off rather than a technical constraint.
+
+**Interim state (4 September 2026):** the Phase 1 exit-gate deployment was verified on Vercel's free Hobby tier, not Pro, on explicit cost grounds — the founder isn't paying for Pro yet. This is a deliberate, known deviation from the decision above, not an oversight: Hobby's terms restrict it to personal, non-commercial use, so this must be upgraded to Pro **before** any real alpha user, real employer data reaching the public product, or any commercial activity — whichever comes first. Don't treat Hobby as validated for anything beyond proving the deployment mechanism itself.
 
 ### 3.5 Map — Mapbox GL JS
 
