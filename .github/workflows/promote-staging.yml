@@ -18,6 +18,8 @@ jobs:
   migrate-staging:
     runs-on: ubuntu-latest
     environment: staging
+    env:
+      PYTHONPATH: workers/ingestion/src
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
