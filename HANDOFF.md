@@ -14,30 +14,32 @@
 ## Checkpoint
 
 - **Implementation branch:** `main`
-- **Implementation checkpoint commit:** `2863bd0` (docs: fix AGENTS.md version drift and add a version header to deployment.md)
+- **Implementation checkpoint commit:** `659a8ec` (fix: remove output: standalone from next.config.ts) plus doc updates on top closing out Phase 1 — verify with `git log --oneline -10` for the exact current tip.
 - **Handoff commit:** The commit containing this populated file; verify with `git rev-parse HEAD` after receiving the handoff
 - **Working-tree status at implementation checkpoint:** Clean
-- **Remote / pull request:** `origin/main` confirmed at the same commit (pushed directly by Claude, not through a GitHub PR merge button — no `gh` CLI in this environment). PR #3's branch (`feat/phase-1-observability-r2`) and the two other feature branches (`docs/orchestration-setup`, `feat/phase-1-staging-promotion`) are now fully merged into `main` but **still exist on `origin`** — not deleted. Cleaning those up is a small optional next step, not done here since deleting branches wasn't explicitly requested.
+- **Remote / pull request:** `origin/main` confirmed at the same commits (pushed directly by Claude, no `gh` CLI in this environment). PR #3's branch (`feat/phase-1-observability-r2`) and the two other feature branches (`docs/orchestration-setup`, `feat/phase-1-staging-promotion`) are fully merged into `main` but **still exist on `origin`** — not deleted, still an optional cleanup.
 
 ## Work completed
 
-Three branches merged into `main` this session, in this order, each verified individually and the full suite re-verified after all three landed:
+Three branches merged into `main` earlier this session (see git log around `1e2cfb0`, `4f12650`, `4da44a7` for details — not repeated here since this handoff now covers newer, more consequential work).
 
-1. **`docs/orchestration-setup`** (`1e2cfb0`) — Formalizes Gemini Antigravity as orchestrator (`AGENTS.md` now v1.6), adds the verified `.agents/agents/austechmap-orchestrator/agent.md` workspace agent (schema confirmed against Antigravity's own docs via WebSearch/WebFetch, not guessed), and records the Codex-quota-limit interim state.
-2. **`feat/phase-1-observability-r2`** / PR #3 (`4f12650`) — Worker observability (structured JSON logging, Sentry with PII/local-variable collection explicitly disabled) and R2-backed snapshot storage (conditional-write immutability) alongside the existing filesystem store. Independently reviewed by Claude before merge, no blocking findings.
-3. **`feat/phase-1-staging-promotion`** (`4da44a7`) — The `promote-staging.yml` manual workflow and `docs/deployment.md` setup guide for closing Phase 1's remaining exit-gate criteria. `IMPLEMENTATION_PLAN.md` (now v2.3) checks off the 8 of 10 Phase 1 items that are genuinely done.
+**Phase 1's exit gate is now closed**, with real infrastructure, not just tooling. Working with the user live against their actual Neon and Vercel accounts (Claude cannot hold or use those credentials directly — the user executed dashboard/UI steps and pasted back build logs and errors for diagnosis):
 
-Post-merge, caught and fixed one real inconsistency during verification: `README.md` still referenced AGENTS.md v1.5 after a later commit had bumped it to v1.6 without syncing that reference (`2863bd0`) — a concrete example of why the "no independent reviewer right now" gap matters; this was self-caught, not caught by a second party.
+1. **Neon staging promotion** — user provisioned a Neon project + `staging` branch, added `STAGING_DATABASE_URL` under a GitHub `staging` Environment, and ran "Promote staging." First run failed: `promote-staging.yml` never set `PYTHONPATH`, unlike `ci.yml`'s equivalent job — fixed in `162d0bb`. Second failure was user error, not code: the secret was added as an **Environment variable** instead of an **Environment secret**, so `${{ secrets.STAGING_DATABASE_URL }}` resolved empty — no code change needed, just redoing it under the right tab. Third run succeeded.
+2. **Vercel web deployment** — user connected the repo, root directory `apps/web`. First build failed: `Module not found: Can't resolve '@austechmap/contracts'` — root cause is that Vercel's Root Directory setting makes it run `apps/web`'s own `build` script directly, skipping the repo-root aggregate script that builds `@austechmap/contracts` (a `tsc`-compiled workspace package) first; CI never hit this because it always runs from the repo root. Fixed with `apps/web/vercel.json` overriding the build command (`9013291`). Second build failed differently: `ENOENT ... .next/next-server.js.nft.json` — root cause is `output: "standalone"` in `next.config.ts`, which is for self-hosted/Docker deployment and conflicts with Vercel's own build packaging; nothing in the repo used standalone mode, so it was just removed (`659a8ec`). Third build succeeded and is live at `aus-tech-map-web.vercel.app` — verified via WebFetch that both the homepage and `/api/health` (`{"service":"web","status":"ok","version":1}`) respond correctly, confirming the contracts import resolves at runtime too, not just at build time.
+3. **Known, recorded deviation**: Vercel is on the free **Hobby** tier, not Pro, per the user's explicit cost decision — `ARCHITECTURE_DECISIONS.md` §3.4 (now v3.1) has an "Interim state" note with a concrete upgrade trigger (before any real alpha user, public employer data, or commercial activity).
+4. Updated `IMPLEMENTATION_PLAN.md` (now v2.4) to check off Phase 1's remaining items and close its exit gate with a dated status line, and synced `README.md`'s version references and status summary.
 
-Full check suite re-run on the final merged `main` and confirmed green: `ruff`, `mypy --strict`, 61/67 Python tests (6 skipped — still the live-PostGIS integration tests, unaffected by any of this), `prettier`, `eslint`, `tsc`, JS tests, and `next build`.
+All three bugs above (the workflow's missing `PYTHONPATH`, the monorepo build-order gap, and the `standalone` output conflict) were found only by actually running the real infrastructure end-to-end, and were self-caught and self-fixed by Claude with no independent reviewer — the same gap flagged after the earlier merge, now demonstrated twice more.
 
 ## Work remaining
 
-- **Phase 1's exit gate is still open** — the staging-promotion mechanism exists and is documented, but has not been run against a real Neon staging branch, and Vercel is not yet connected. See `docs/deployment.md` for the exact steps; none of them are things an agent can do without real account credentials.
-- In Antigravity itself: confirm `austechmap-orchestrator` is discovered via `/agents`, and that both `claude -p` and `codex exec` are reachable from inside it — still unconfirmed.
-- No independent reviewer exists for Claude's own implementation work while Codex is out — still an open risk, not solved by this merge.
+- In Antigravity itself: confirm `austechmap-orchestrator` is discovered via `/agents`, and that both `claude -p` and `codex exec` are reachable from inside it — `claude -p "Reply only CLAUDE_OK"` has been confirmed reachable; Codex itself is still unavailable (quota).
+- No independent reviewer exists for Claude's own implementation work while Codex is out — still an open risk, demonstrated concretely by the three bugs above.
 - Optional cleanup: delete the three now-merged branches from `origin` if desired (not done — wasn't explicitly requested).
+- Before any real user/data/commercial activity: upgrade Vercel to Pro (`ARCHITECTURE_DECISIONS.md` §3.4) and consider rotating the Neon `neondb_owner` password (it was briefly visible in plaintext as a GitHub Environment *variable* before being corrected to a secret).
 - Resume Codex as active implementer once its quota resets, and revert `AGENTS.md`'s "Current status" banner accordingly.
+- Phase 2 ("Geographic foundation") planning has not started yet.
 
 ## Changed files
 
@@ -66,8 +68,10 @@ See the three merge commits above for the full per-branch file lists; this hando
 ## Known failures and risks
 
 - This review environment has no Docker and no GitHub CLI/API access, so live-database integration tests and CI/PR status still cannot be independently verified from here.
-- No independent code reviewer exists while Codex is out and Claude is the active implementer.
+- No independent code reviewer exists while Codex is out and Claude is the active implementer — concretely demonstrated by three real bugs (missing `PYTHONPATH` in `promote-staging.yml`, a monorepo build-order gap on Vercel, a conflicting `output: "standalone"`) that only surfaced when actually deploying against real infrastructure, not before.
 - Three feature branches remain on `origin` after merging, undeleted.
+- Vercel is on the Hobby tier, not Pro — a deliberate, recorded, but real deviation from `ARCHITECTURE_DECISIONS.md` §3.4 with a concrete upgrade trigger.
+- The Neon `neondb_owner` connection string was briefly visible in plaintext as a GitHub Environment *variable* (not secret) before being corrected — worth rotating before anything sensitive depends on it.
 - Line-ending warnings indicate Git may convert LF to CRLF on future Windows checkouts; no content corruption has been observed.
 
 ## Unsuccessful approaches
@@ -82,8 +86,9 @@ See the three merge commits above for the full per-branch file lists; this hando
 
 ## Next actions
 
-1. Provision the real Neon staging branch and Vercel connection per `docs/deployment.md`, then run the "Promote staging" workflow once to actually close Phase 1's exit gate.
-2. Confirm `ci.yml` is green on GitHub for the current `main` tip.
-3. Confirm the Antigravity workspace agent is discovered and both CLIs are reachable from inside it.
-4. Decide whether to delete the three now-merged branches from `origin`.
+1. Confirm `ci.yml` is green on GitHub for the current `main` tip.
+2. Confirm the Antigravity workspace agent is fully operable end-to-end (Codex reachability specifically, once its quota resets).
+3. Decide whether to delete the three now-merged branches from `origin`.
+4. Upgrade Vercel to Pro and consider rotating the Neon password before any real user/data/commercial activity.
 5. Resume Codex as active implementer once its quota resets, and revert `AGENTS.md`'s status banner.
+6. Start Phase 2 ("Geographic foundation") planning.

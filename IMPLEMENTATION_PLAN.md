@@ -1,7 +1,7 @@
 # Australia Tech Map — Implementation Plan
 
 > Execution plan derived from [PRODUCT_SPEC.md](./PRODUCT_SPEC.md). [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) is authoritative for technology choices where it conflicts with either document.  
-> Version 2.3 · 4 September 2026
+> Version 2.4 · 4 September 2026
 
 ## 1. Objective
 
@@ -136,15 +136,17 @@ Goal: establish a safe, repeatable development and deployment base.
 - [x] Create a monorepo with `apps/web` (including role-protected `/admin` routes), `workers/ingestion`, `packages/contracts`, `db`, `tests`, and `docs`. Admin routes land inside `apps/web` in a later phase; the monorepo structure itself is in place.
 - [x] Bootstrap Next.js, TypeScript, Tailwind CSS, linting, formatting, and test tooling.
 - [x] Bootstrap the Python worker with dependency locking, linting, typing, and tests.
-- [ ] Provision local and managed PostgreSQL with PostGIS and `pg_trgm`. Local is done (`compose.yaml`, CI's ephemeral service); managed (Neon) provisioning is a one-time account-level step outside any agent's reach — see [docs/deployment.md](./docs/deployment.md).
+- [x] Provision local and managed PostgreSQL with PostGIS and `pg_trgm`. Local is done (`compose.yaml`, CI's ephemeral service); managed (Neon) is provisioned — a project with `postgis`/`pg_trgm` confirmed available, and an isolated `staging` branch used for the promotion below.
 - [x] Add versioned migrations for sources, snapshots, import runs, and audit records, including retry counts, leases, heartbeats, and failure history on the import-run table.
 - [x] Define shared API/data contracts and generate types where practical.
-- [ ] Configure development, staging, and production environments with isolated secrets and databases. Development exists; the staging promotion mechanism is built (`.github/workflows/promote-staging.yml`) but not yet exercised against real infrastructure — see [docs/deployment.md](./docs/deployment.md).
+- [x] Configure development, staging, and production environments with isolated secrets and databases. Development is local Docker; staging is an isolated Neon branch with its own GitHub Environment secret; production is Vercel's own production environment with a separately branched Neon database. No production `DATABASE_URL` is wired into the web app yet — nothing in Phase 1 reads from it — that lands with the feature work that first needs it.
 - [x] Add CI checks for lint, type-check, unit tests, migrations, and production builds.
 - [x] Add structured logging, error reporting, health endpoints, and run IDs.
 - [x] Configure object storage paths for immutable raw snapshots.
 
-Exit gate: a migration can be promoted through staging, web and worker deployments are repeatable, and a sample importer persists a snapshot and auditable run record. The sample-importer criterion is met and independently reviewed (`9ed23b4`). The staging/deployment mechanism is built and documented but not yet run against real infrastructure — don't mark this exit gate closed until a staging promotion and a Vercel deployment have actually succeeded, not just until the tooling exists.
+Exit gate: a migration can be promoted through staging, web and worker deployments are repeatable, and a sample importer persists a snapshot and auditable run record. All three criteria are now met: the sample-importer criterion was independently reviewed (`9ed23b4`); the "Promote staging" workflow ran successfully against a real Neon `staging` branch (after fixing a missing `PYTHONPATH` in the workflow, `162d0bb`); and the Vercel deployment went live at `aus-tech-map-web.vercel.app` (after fixing two real build bugs found only by actually deploying — a monorepo build-order gap where `@austechmap/contracts` never got compiled before `apps/web`, `9013291`, and a leftover `output: "standalone"` in `next.config.ts` that conflicts with Vercel's own build packaging, `659a8ec`) — confirmed live with both the homepage and `/api/health` responding correctly. Vercel is currently on the free Hobby tier, not Pro, as a deliberate temporary cost decision — see `ARCHITECTURE_DECISIONS.md` §3.4 for the required upgrade trigger.
+
+Status: closed on 4 September 2026. All three of these fixes were found and fixed by Claude, the current sole implementer, with no independent reviewer catching them first — a live example of the reviewer-gap risk flagged in `AGENTS.md`'s "Current status" banner, not just a hypothetical one.
 
 ### Phase 2 — Geographic foundation
 
