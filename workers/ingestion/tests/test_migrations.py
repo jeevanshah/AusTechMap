@@ -169,3 +169,5 @@ def test_ingestion_constraints_and_append_only_audit_log() -> None:
                 "UPDATE audit_records SET action = 'changed' WHERE id = %s",
                 (audit_id[0],),
             )
+        with pytest.raises(psycopg.errors.RaiseException, match="append-only"):
+            connection.execute("TRUNCATE audit_records")
