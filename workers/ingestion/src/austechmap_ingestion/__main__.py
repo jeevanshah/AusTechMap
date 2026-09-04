@@ -7,6 +7,11 @@ from pathlib import Path
 import psycopg
 
 from austechmap_ingestion.db.migrations import MigrationError, apply_migrations
+from austechmap_ingestion.employers.seed import (
+    DEFAULT_FIXTURE_PATH,
+    SeedImportError,
+    run_seed_import,
+)
 from austechmap_ingestion.health import build_health
 from austechmap_ingestion.jobs import JobError, JobRepository
 from austechmap_ingestion.observability import (
@@ -42,6 +47,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="force filesystem storage at this path instead of RAW_SNAPSHOT_BACKEND",
     )
     sample_parser.add_argument("input", type=Path)
+    seed_parser = subparsers.add_parser(
+        "seed-employers", help="seed the alpha-cohort employer candidates into companies"
+    )
+    seed_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    seed_parser.add_argument(
+        "--fixture",
+        type=Path,
+        default=DEFAULT_FIXTURE_PATH,
+        help="candidate CSV to seed from (defaults to the alpha cohort fixture)",
+    )
     return parser
 
 
@@ -103,6 +118,32 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "created": result.created,
                     "runId": str(result.run_id),
                     "snapshotId": str(result.snapshot_id) if result.snapshot_id else None,
+                },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "seed-employers":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        try:
+            stats = run_seed_import(args.database_url, args.fixture)
+        except (SeedImportError, psycopg.Error) as error:
+            print(f"Seed import failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "created": stats.created,
+                    "matched": stats.matched,
+                    "review": stats.review,
+                    "skippedLowConfidence": list(stats.skipped_low_confidence),
+                    "errors": [
+                        {"name": name, "error": message} for name, message in stats.errors
+                    ],
                 },
                 separators=(",", ":"),
                 sort_keys=True,

@@ -1,7 +1,7 @@
 # Australia Tech Map — Implementation Plan
 
 > Execution plan derived from [PRODUCT_SPEC.md](./PRODUCT_SPEC.md). [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) is authoritative for technology choices where it conflicts with either document.  
-> Version 2.6 · 5 September 2026
+> Version 2.7 · 5 September 2026
 
 ## 1. Objective
 
@@ -175,10 +175,10 @@ Goal: create trustworthy canonical employer records and the first reviewed datas
 - [x] Route ambiguous or conflicting matches to review instead of auto-merging (`review_queue_items`, `employers/lifecycle.py::resolve_review_item`).
 - [x] Build admin screens to create, edit, merge, redirect, verify, and disable employers (`/admin/companies`, `/admin/review` — unauthenticated for now, see `ARCHITECTURE_DECISIONS.md` §4.1's interim-state note).
 - [x] Preserve aliases, evidence, and audit history through merges (companies are never deleted, only marked `merged`; every mutation writes an `audit_records` row).
-- [ ] Build a repeatable seed pipeline for a deliberately selected 100–200 employer alpha cohort (Sydney, Melbourne, Brisbane, and selected regional centres), expanding toward 1,000 in later phases (see Phase 8). The matching mechanism (`match_or_create_company`) is built and tested; the actual 100–200 employers are a curation task, not something to auto-generate — a candidate list is being researched separately (outside this repo) for the user to review before any seeding runs against a real database.
+- [x] Build a repeatable seed pipeline for a deliberately selected 100–200 employer alpha cohort (Sydney, Melbourne, Brisbane, and selected regional centres), expanding toward 1,000 in later phases (see Phase 8). The 135-candidate cohort was researched separately (outside this repo) and reviewed before use; it is recorded verbatim as `employers/fixtures/alpha_seed_cohort_20260905.csv` and run through `employers/seed.py::run_seed_import` (CLI: `seed-employers`), which calls the existing `match_or_create_company` engine per candidate, records an `employer_seed_research` evidence row for provenance, and skips the 2 candidates the research itself flagged `Low` confidence (known defunct/unverifiable entities) rather than importing them. Built and tested against a real PostGIS-backed database in CI; **not yet actually run against the real Neon database** — that run is a deliberate, separate step (see exit gate).
 - [ ] Produce duplicate, provenance, location, and enrichment coverage reports.
 
-Exit gate: 100–200 reviewed employers exist for the alpha cohort; fewer than 1% remain unresolved duplicates; more than 95% have usable locations; more than 98% have provenance. **Not yet closed** — same shape as Phase 2's gate: the matching/review/admin machinery is built and tested, but no real employers have actually been seeded into a real database yet.
+Exit gate: 100–200 reviewed employers exist for the alpha cohort; fewer than 1% remain unresolved duplicates; more than 95% have usable locations; more than 98% have provenance. **Not yet closed** — same shape as Phase 2's gate: the seed pipeline is built and tested, but it has not yet actually been run against the real Neon database, so no real employers exist there yet.
 
 ### Phase 4 — Map, search, and employer profiles
 
