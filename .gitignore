@@ -29,6 +29,10 @@ Thumbs.db
 # Generated agent/code-analysis output
 graphify-out/
 
+# Per-run orchestrator scratch state (ephemeral; HANDOFF.md is the durable record)
+.agents/runs/current/*
+!.agents/runs/current/.gitkeep
+
 # Local logs and temporary output
 *.log
 .local/
