@@ -59,7 +59,18 @@ workers/ingestion/.venv/Scripts/python.exe -m austechmap_ingestion sample-import
 
 The command is idempotent for the same source and content hash. Raw objects use
 `raw/{source_key}/{sha256_prefix}/{sha256}` keys, matching the content-addressed layout intended for
-R2. The local `.local/` directory is ignored by Git.
+R2. The local `.local/` directory is ignored by Git. Worker lifecycle events are emitted as
+privacy-safe JSON on stderr; set `LOG_LEVEL` to control their minimum level.
+
+To use a private Cloudflare R2 bucket instead, set `RAW_SNAPSHOT_BACKEND=r2`,
+`RAW_SNAPSHOT_BUCKET`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, and `R2_SECRET_ACCESS_KEY`. These are
+server-side credentials and must never use a `NEXT_PUBLIC_` prefix. Uploads use conditional writes,
+so an existing content-addressed object cannot be overwritten; an identical object is treated as an
+idempotent success. Passing `--snapshot-root` explicitly forces filesystem storage for that command.
+
+Set the server-side `SENTRY_DSN` to enable worker exception reporting. `APP_ENV` and `APP_RELEASE`
+label reports. Sentry's default PII collection and performance tracing are disabled; reports contain
+only the approved run, source, company, parser-version, and correlation identifiers.
 
 ## Quality checks
 
