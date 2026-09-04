@@ -5,14 +5,15 @@ A map-first opportunity-intelligence platform for Australian technology employme
 ## Documents
 
 - **[PRODUCT_SPEC.md](./PRODUCT_SPEC.md)** — full product specification: vision, scope, data model, and policy. v2.4
-- **[IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)** — delivery phases, tasks, dependencies, and exit gates. v2.2
+- **[IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)** — delivery phases, tasks, dependencies, and exit gates. v2.3
 - **[ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md)** — authoritative technology choices; overrides PRODUCT_SPEC.md's recommendations where they conflict. v3.0
 - **[AGENTS.md](./AGENTS.md)** — coding-agent roles (Codex/Claude/Gemini), tooling, quota-based switching, workflow rules, and quality gates. v1.3
 - **[docs/golden-queries.md](./docs/golden-queries.md)** — Phase 0 relevance fixtures and measurable search acceptance gates. v1.0
+- **[docs/deployment.md](./docs/deployment.md)** — staging promotion and web/worker deployment: what's built vs. what needs real account credentials.
 
 ## Status
 
-Implementation is underway. Phase 0 contracts are closed and the initial Phase 1 web/worker/CI foundation is merged; PostGIS provisioning and versioned migrations are next.
+Implementation is underway. Phase 0 contracts are closed. Phase 1's web/worker/CI foundation, database schema, fenced ingestion job lifecycle, and observability are merged; the sample importer persists a reviewed, audited snapshot. The staging-promotion mechanism is built but not yet run against real infrastructure — see IMPLEMENTATION_PLAN.md's Phase 1 exit gate.
 
 ## Delivery approach
 

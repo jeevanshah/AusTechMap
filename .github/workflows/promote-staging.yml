@@ -1,0 +1,32 @@
+name: Promote staging
+
+# Manually triggered, not automatic on every push - migrations are a deliberate action,
+# not something that should fire unattended before the team trusts the process. See
+# docs/deployment.md for the one-time setup this depends on (a Neon staging branch and
+# the STAGING_DATABASE_URL repository secret).
+#
+# Until that secret exists, this workflow will fail with a clear "required" message when
+# run - that is expected, not a bug, and is not wired to run automatically, so it will not
+# show up as a failing check on ordinary pushes/PRs.
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  migrate-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: workers/ingestion/requirements-dev.lock
+      - run: python -m pip install -r workers/ingestion/requirements-dev.lock
+      - name: Apply pending migrations to the staging database
+        env:
+          STAGING_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+        run: python -m austechmap_ingestion migrate --database-url "$STAGING_DATABASE_URL"
