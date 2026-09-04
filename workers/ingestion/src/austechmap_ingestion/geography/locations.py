@@ -189,8 +189,9 @@ def resolve_location(
             )
             VALUES (
               %(input_hash)s, %(input_text)s, %(status)s, %(method)s,
-              CASE WHEN %(longitude)s IS NULL THEN NULL
-                   ELSE ST_SetSRID(ST_MakePoint(%(longitude)s, %(latitude)s), 4326) END,
+              CASE WHEN %(longitude)s::float8 IS NULL THEN NULL
+                   ELSE ST_SetSRID(ST_MakePoint(%(longitude)s::float8, %(latitude)s::float8), 4326)
+                   END,
               %(sa1)s, %(sa2)s, %(sa3)s, %(sa4)s, %(lga)s, %(poa)s,
               %(migration_category)s, %(migration_dama_name)s
             )

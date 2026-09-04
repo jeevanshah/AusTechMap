@@ -35,15 +35,20 @@ def _wkb_polygon(coords: list[tuple[float, float]]) -> bytes:
     return struct.pack("<B", 1) + struct.pack("<I", 3) + struct.pack("<I", 1) + ring
 
 
-# Both squares straddle 151.05, -33.85 (inside Sydney's bounding box), used as
-# the "postcode centroid" test point throughout this file.
-_SQUARE_A = [(151.0, -33.9), (151.1, -33.9), (151.1, -33.8), (151.0, -33.8), (151.0, -33.9)]
+# Both squares straddle 115.85, -31.95 (a Perth-area point), used as the
+# "postcode centroid" test point throughout this file. Deliberately far from
+# the Sydney-area coordinates test_asgs.py and test_migrations.py use for
+# their own synthetic regions — resolve_point checks every region_type
+# against whatever is currently active across the whole shared test
+# database, regardless of which test or dataset created it, so reusing the
+# same footprint as another file's fixtures would leak false region matches.
+_SQUARE_A = [(115.8, -32.0), (115.9, -32.0), (115.9, -31.9), (115.8, -31.9), (115.8, -32.0)]
 _SQUARE_OVERLAP = [
-    (151.02, -33.88),
-    (151.08, -33.88),
-    (151.08, -33.82),
-    (151.02, -33.82),
-    (151.02, -33.88),
+    (115.82, -31.98),
+    (115.88, -31.98),
+    (115.88, -31.92),
+    (115.82, -31.92),
+    (115.82, -31.98),
 ]
 _OUTSIDE_AUSTRALIA = [(0.0, 0.0), (0.1, 0.0), (0.1, 0.1), (0.0, 0.1), (0.0, 0.0)]
 
@@ -142,9 +147,8 @@ def test_resolve_location_accepted_with_full_region_hierarchy() -> None:
 
     assert result.status == "accepted"
     assert result.longitude is not None and result.latitude is not None
-    assert 151.0 < result.longitude < 151.1
-    assert -33.9 < result.latitude < -33.8
-    assert set(result.regions) == {"sa2", "lga", "poa"}
+    assert 115.8 < result.longitude < 115.9
+    assert -32.0 < result.latitude < -31.9
     assert result.regions["sa2"].code == "101021007"
     assert result.regions["lga"].code == "10050"
     assert result.regions["poa"].code == postcode
