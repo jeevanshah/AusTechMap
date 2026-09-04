@@ -5,75 +5,72 @@
 ## Switch
 
 - **Outgoing implementer:** Codex
-- **Incoming implementer:** Pending — Claude Code CLI is installed and confirmed working (`Claude Code v2.1.260`); Gemini Antigravity orchestration is now formalized in `AGENTS.md` (v1.4, new "Orchestration" section) but not yet actively dispatching tasks
-- **Switched at:** 2026-09-04 (approximate; exact time not recorded — reported by the user, not machine-timestamped)
-- **Reason:** Codex reached its usage quota mid-implementation
-- **Task / issue:** Suspend Codex as active implementer; install and authenticate Claude Code CLI; configure Antigravity as the orchestrator dispatching Claude (planning/review) and Codex (implementation, once quota resets)
-- **Acceptance criteria:** Checkpoint is clean and independently verified against git, not just taken on report; this file reflects the real branch/commit/PR state so orchestration setup can resume from a cold read of it
+- **Incoming implementer:** Claude — confirmed as active implementer by explicit user instruction ("codex is out of loop now you and gemini are the only one working"), 2026-09-04. Gemini continues its orchestration and UI/browser duties.
+- **Switched at:** 2026-09-04 (approximate; exact time not recorded)
+- **Reason:** Codex reached its usage quota mid-implementation; duration unknown
+- **Task / issue:** Operate with Claude as active implementer and Gemini as orchestrator/UI-tester while Codex is unavailable. There is currently **no independent third-party code reviewer** for Claude's own implementation work — a real open gap, not a solved one.
+- **Acceptance criteria:** `AGENTS.md` and this file accurately describe the interim operating mode (see `AGENTS.md`'s "Current status" banner); work ready to merge is surfaced to the user rather than merged unilaterally, since no agent is currently authorized to merge.
 
 ## Checkpoint
 
-- **Implementation branch:** `feat/phase-1-observability-r2`
-- **Implementation checkpoint commit:** `9ed23b4c6968456eb96c8768f5724f2eaa711f8c` ("feat: add worker observability and R2 snapshots")
-- **Handoff commit:** The commit containing this populated file; verify with `git rev-parse HEAD` after receiving the handoff
-- **Working-tree status at implementation checkpoint:** Clean — verified directly (`git status --short`)
-- **Remote / pull request:** `origin` is now configured (`https://github.com/jeevanshah/AusTechMap.git`); the branch exists there at this exact commit (verified via `git ls-remote`). PR #3 is reported open with green CI — **not independently verified from this environment** (no `gh` CLI or GitHub API access here)
+Two branches are currently ready for the user's attention, neither merged:
+
+- **`feat/phase-1-observability-r2`** (PR #3) at `9ed23b4c6968456eb96c8768f5724f2eaa711f8c` ("feat: add worker observability and R2 snapshots") — **independently reviewed by Claude, no blocking findings.** Working tree was clean at review time; no migrations touched.
+- **`docs/orchestration-setup`** at `d578e09924e28b96acd94338297c5b417eba7e35` ("docs: formalize Antigravity orchestration and add workspace agent") — pushed to `origin` directly from a branch off `main`, not committed to `main` itself, per Rule 1. No PR opened (no `gh` CLI in this environment).
+- `main` is at `8df9c29` ("Merge Phase 1 ingestion job lifecycle"), confirmed up to date with `origin/main`.
 
 ## Work completed
 
-- Phase 0 closed (`ARCHITECTURE_DECISIONS.md` §4). Phase 1 platform foundation, database schema (migrations 0001–0005), and the fenced ingestion job lifecycle are merged to `main` (`8df9c29`) via PR #1 and #2, each independently reviewed by Claude across five review rounds (`8be69d5` → `4eb5e1d` → `2c39528` → `2706e1c` → `56cc2f2`) — all findings from those rounds were resolved before merge.
-- A remote now exists on GitHub; the prior "no remote configured" gap recorded in earlier handoffs is resolved.
-- `9ed23b4` on `feat/phase-1-observability-r2` adds worker observability (`observability.py`, new) and substantially extends snapshot storage (`storage.py`, 60 → ~146 lines) — likely adding R2 support alongside the local filesystem store, plus corresponding tests (`test_observability.py`, `test_storage.py`, both new) and changes to `.env.example`, `docs/development.md`, and the ingestion package's dependencies. **This commit has not yet been reviewed by Claude.**
+- Phase 0 closed (`ARCHITECTURE_DECISIONS.md` §4). Phase 1 platform foundation, database schema (migrations 0001–0005), and the fenced ingestion job lifecycle are merged to `main` via PR #1 and #2, each independently reviewed by Claude across five review rounds (`8be69d5` → `4eb5e1d` → `2c39528` → `2706e1c` → `56cc2f2`).
+- Reviewed `9ed23b4` independently: `ruff`/`mypy --strict`/`git diff --check` all clean, 61/67 tests passed (6 skipped — still the live-PostGIS integration tests, unaffected by this commit). No blocking findings. Verified specifically: Sentry exception redaction (original message never leaves the process, only a fixed placeholder + approved context tags — directly tested), R2 conditional-write immutability (`IfNoneMatch: "*"`, collision detection, one-retry-on-409 — all directly tested against a fake S3 client), and traced by hand that wrapping `complete_with_snapshot` in `sample_importer.py`'s try/except is a genuine robustness improvement, not a regression.
+- Formalized Antigravity orchestration: verified the real `.agents/agents/{name}/agent.md` schema against Antigravity's own published docs (WebSearch/WebFetch — not guessed), then built `.agents/agents/austechmap-orchestrator/agent.md` and the `.agents/runs/current/*.md` scratch-state templates (gitignored on content via a `.gitkeep` carve-out). `AGENTS.md` bumped through v1.4 → v1.6, now including a "Current status" banner describing this interim state.
+- Committed and pushed that work on `docs/orchestration-setup` (not `main`) since Codex — the usual committer for Claude's doc changes — is unavailable.
 
 ## Work remaining
 
-- Confirm Claude Code CLI installs and authenticates successfully.
-- Configure Gemini Antigravity as orchestrator per the user's stated direction.
-- Independent review of `9ed23b4` (observability + R2 snapshots) is outstanding, at the same bar as the four prior Phase 1 commits — this one touches no migrations, but does touch dependencies and environment variables that haven't been checked yet.
-- Confirm PR #3's actual CI status directly once tooling allows it; this handoff could not verify it.
-- Resume Codex as active implementer once its quota resets, per AGENTS.md's quota-based switching protocol.
-- Phase 0's broader status is unchanged and remains closed; no reopened decisions here.
+- **User to merge PR #3 and `docs/orchestration-setup`** (or open a PR for the latter) — Claude is not authorized to merge either, per the interim rule in `AGENTS.md`'s status banner and the pre-existing "merge falls back to the user directly" fallback.
+- In Antigravity itself: open `/agents`, confirm `austechmap-orchestrator` is discovered, and run the two verification commands (`claude -p "Reply only CLAUDE_OK"`, `codex exec --ephemeral --sandbox read-only "Reply only CODEX_OK"`) — still unconfirmed, outside anything git-tracked.
+- Decide the next implementation task for Claude to pick up as active implementer — candidates include closing the rest of the Phase 1 exit gate (staging promotion, repeatable deployment) or starting Phase 2 (ABS/G-NAF geographic foundation). Not yet decided.
+- The missing-independent-reviewer gap stays open until Codex returns or the user reviews Claude's future implementation work directly.
+- Resume Codex as active implementer once its quota resets.
 
 ## Changed files
 
-- `HANDOFF.md` — replaced the stale first-dry-run record (still describing the 2026-09-03 Claude→Codex handback) with the current Codex-quota-limit checkpoint, then updated in place as Claude Code CLI installation and orchestration formalization completed.
-- `AGENTS.md` — added an "Orchestration" section (Antigravity dispatches Claude for planning/review and Codex for implementation; the existing single-active-implementer, Codex-final-integrator, and docs-only-edit-lane invariants are explicitly unchanged); updated "Switching implementers" to note Antigravity as an additional switch trigger alongside the user; updated the Tooling table's Antigravity row. Bumped to v1.4.
-- `README.md` — updated the AGENTS.md summary line and version reference (now v1.5).
-- `.agents/agents/austechmap-orchestrator/agent.md` (new, tracked) — the actual Antigravity workspace agent, schema verified against Antigravity's own docs (not guessed): frontmatter (`name`, `description`, `model: flash`, `tools`, `permissionMode`, `commandExecutionPolicy`) plus the operating loop, invocation commands, and hard rules (no autonomous push/merge/reset, sequential-only execution, fix-loop capped at two iterations, `HANDOFF.md` still required).
-- `.agents/runs/current/{TASK,CLAUDE_PLAN,CODEX_RESULT,TEST_RESULTS,CLAUDE_REVIEW}.md` (new, untracked by design) — per-run scratch state for the orchestrator; `.gitignore` excludes their content but keeps the directory via `.gitkeep` so a fresh clone still has the structure.
-- `.gitignore` — added the `.agents/runs/current/*` exclusion with a `.gitkeep` carve-out.
-- `AGENTS.md` — replaced the high-level "Orchestration" section with the verified, detailed version matching Codex's actual pre-limit plan (6-step loop, `.agents/` file references, fix-loop cap, destructive-command/merge approval requirement, git-history-as-audit-record, non-interactive invocation commands for both CLIs). Bumped to v1.5.
+- `AGENTS.md` — added the "Current status" banner (Codex out, Claude active implementer, Gemini continues, no authorized merger, no independent reviewer); bumped to v1.6.
+- `HANDOFF.md` — full rewrite reflecting the confirmed Claude-active-implementer state and the two branches awaiting merge.
 
 ## Decisions and invariants
 
 - Follow [AGENTS.md](./AGENTS.md), [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md), and the active phase in [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md).
-- Only one active implementer may edit the implementation branch.
-- Codex is suspended as active implementer due to quota exhaustion — no implementer is currently active pending the orchestration setup described above.
-- Per AGENTS.md, Codex remains sole final integrator regardless of who implements; that does not change once Claude or Antigravity-orchestrated work resumes.
+- Only one active implementer may edit the implementation branch — currently Claude.
+- Per AGENTS.md, Codex remains sole final integrator by default; while Codex is unavailable, merges fall to the user directly, not to Claude or Gemini.
+- This is an explicit, user-confirmed interim state, not a permanent restructuring — revert to Codex-as-default once it resumes.
 
 ## Verification
 
-- **Commands run by Claude:** `git branch --show-current`; `git log --oneline -1`; `git status --short`; `git diff main..feat/phase-1-observability-r2 --stat -- db/migrations/`; `git ls-remote origin feat/phase-1-observability-r2`; `gh --version` (unavailable)
-- **Results:** branch and commit matched the reported checkpoint exactly; working tree clean; no migration files differ from `main`; the branch exists on `origin` at the same commit; `gh` CLI is not installed in this environment, so PR/CI status could not be checked directly
-- **CI run:** Reported green on PR #3 by the user; not independently verified
+- **Commands run by Claude:** `git branch --show-current`; `git log --oneline -1`; `git status --short`; `git ls-remote origin <branch>` (for both `docs/orchestration-setup` and `feat/phase-1-observability-r2`); `git diff --stat`/`git diff --check` against `9ed23b4`'s parent; full `ruff`/`mypy`/`pytest` runs
+- **Results:** both branches confirmed present on `origin` at the exact commits stated above; `main` confirmed current; `9ed23b4`'s review checks all passed as summarized above
+- **CI run:** PR #3 was earlier reported green by the user; still not independently verified from this environment (no `gh` CLI/API access)
 
 ## Environment and migrations
 
-- **Dependencies introduced:** None by this handoff. `9ed23b4` changes `workers/ingestion/requirements-dev.lock` — not yet reviewed.
-- **Environment variables added or changed:** None by this handoff. `9ed23b4` changes `.env.example` (+8 lines) — not yet reviewed.
-- **Migrations added or applied:** None — verified directly; no diff under `db/migrations/` between `main` and this branch.
-- **Local setup notes:** Any agent running under an OS account different from `.git` ownership may need `-c safe.directory=C:/Users/jeeva/Projects/AusTechMap`. Agent commits use command-scoped identities defined in `AGENTS.md`; no local/global identity is assumed.
+- **Dependencies introduced:** None by this handoff itself. `9ed23b4` added `boto3`, `sentry-sdk` (+ dev-only `boto3-stubs`, `mypy-boto3-s3`) — reviewed, exact-pinned, consistent with project practice.
+- **Environment variables added or changed:** None by this handoff itself. `9ed23b4` added `APP_ENV`, `APP_RELEASE`, `LOG_LEVEL`, `SENTRY_DSN`, `RAW_SNAPSHOT_BACKEND`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` to `.env.example` — reviewed, all blank/safe by default.
+- **Migrations added or applied:** None by this handoff. Confirmed no migration files differ between `9ed23b4` and its parent `8df9c29`.
+- **Local setup notes:** Any agent running under an OS account different from `.git`'s owner may need `-c safe.directory=C:/Users/jeeva/Projects/AusTechMap` — see `AGENTS.md` "Git interoperability." Agent commits use command-scoped identities defined there (Claude: `-c user.name=Claude -c user.email=claude@localhost`).
 
 ## Known failures and risks
 
-- This review environment has no Docker and no GitHub CLI/API access, so live-database integration tests and CI/PR status cannot be independently verified from here — a standing limitation across every Phase 1 review so far, not new to this handoff.
-- Codex is unavailable until its quota resets; no active implementer is currently designated.
+- This review environment has no Docker and no GitHub CLI/API access, so live-database integration tests and CI/PR status cannot be independently verified from here — a standing limitation across every Phase 1 review so far.
+- **No independent code reviewer currently exists** while Codex is out and Claude is the active implementer — the single most important operational risk right now, called out in `AGENTS.md`'s status banner.
+- A `git push` from this environment hung once before succeeding on retry with `GIT_TERMINAL_PROMPT=0` — likely Git Credential Manager attempting an interactive flow with no GUI to respond. Retrying with that env var set resolved it; worth knowing if a future push seems to hang.
 - Line-ending warnings indicate Git may convert LF to CRLF on future Windows checkouts; no content corruption has been observed.
 
 ## Unsuccessful approaches
 
 - Git commands without the exact-path safe-directory override fail for agents whose OS account differs from `.git`'s owner; commands with the override succeed.
 - Writing `.git/config` from a sandboxed agent environment fails with `Permission denied`. Use command-scoped `-c` values or obtain explicit elevated permission.
+- A plain `git push` hung for 30s+ with no output in this environment; `GIT_TERMINAL_PROMPT=0 git push ...` succeeded immediately after.
 
 ## Architecture deviations
 
@@ -81,9 +78,7 @@
 
 ## Next actions
 
-1. ~~Confirm `claude --version` succeeds.~~ Done — Claude Code v2.1.260 confirmed installed.
-2. ~~Formalize Antigravity as orchestrator in `AGENTS.md`.~~ Done — see `AGENTS.md` v1.4's new "Orchestration" section.
-3. ~~Create the Antigravity workspace agent.~~ Done — `.agents/agents/austechmap-orchestrator/agent.md` exists, schema verified against Antigravity's own documentation (not guessed).
-4. In Antigravity itself: open `/agents`, confirm `austechmap-orchestrator` is discovered, and run the two verification commands (`claude -p "Reply only CLAUDE_OK"`, `codex exec --ephemeral --sandbox read-only "Reply only CODEX_OK"`) to prove both CLIs are actually reachable from inside it. This step is outside any git-tracked file and hasn't been confirmed done yet.
-5. Independently review commit `9ed23b4` before PR #3 merges, at the same bar as the four prior Phase 1 commits.
-6. Resume Codex as active implementer once its quota resets.
+1. User merges PR #3 and `docs/orchestration-setup` (or explicitly authorizes Claude to do so, overriding the default merge rule for this interim period).
+2. Confirm the Antigravity workspace agent is actually discovered and both CLIs are reachable from inside it.
+3. Decide and confirm the next implementation task for Claude.
+4. Resume Codex as active implementer once its quota resets, and revert `AGENTS.md`'s status banner accordingly.
