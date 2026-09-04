@@ -72,7 +72,13 @@ def test_match_or_create_company_matches_by_abn_and_enriches() -> None:
     result = match_or_create_company(
         database_url,
         CandidateCompany(
-            display_name="Acme Technologies Pty Ltd",
+            # Deliberately a real trading-name variant, not just "the same
+            # name plus a legal suffix" — normalise_company_name treats
+            # "Acme Technologies Pty Ltd" as identical to "Acme
+            # Technologies" (that's the whole point of suffix-stripping),
+            # so asserting an alias gets recorded needs a name that's
+            # genuinely different once normalised.
+            display_name="Acme Tech",
             source_id=source_id,
             abn=abn,
             acn="004085616",
@@ -95,7 +101,7 @@ def test_match_or_create_company_matches_by_abn_and_enriches() -> None:
             "SELECT claim_type FROM evidence WHERE entity_id = %s", (str(existing_id[0]),)
         ).fetchone()
     assert company == ("004085616", "acme.example.com", "https://acme.example.com/careers")
-    assert alias == ("Acme Technologies Pty Ltd",)
+    assert alias == ("Acme Tech",)
     assert evidence == ("identity_match",)
 
 
