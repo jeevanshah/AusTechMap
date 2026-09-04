@@ -3,7 +3,11 @@ name = "austechmap-ingestion"
 version = "0.1.0"
 description = "Independent ingestion worker for Australia Tech Map"
 requires-python = ">=3.12"
-dependencies = ["psycopg[binary]==3.3.5"]
+dependencies = [
+    "boto3==1.43.88",
+    "psycopg[binary]==3.3.5",
+    "sentry-sdk==2.68.1",
+]
 
 [tool.pytest.ini_options]
 addopts = "--strict-config --strict-markers -p no:cacheprovider"

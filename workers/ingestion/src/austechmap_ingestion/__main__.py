@@ -9,8 +9,16 @@ import psycopg
 from austechmap_ingestion.db.migrations import MigrationError, apply_migrations
 from austechmap_ingestion.health import build_health
 from austechmap_ingestion.jobs import JobError, JobRepository
+from austechmap_ingestion.observability import (
+    build_error_reporter_from_env,
+    configure_structured_logging,
+)
 from austechmap_ingestion.sample_importer import run_sample_import
-from austechmap_ingestion.storage import FilesystemSnapshotStore, SnapshotStorageError
+from austechmap_ingestion.storage import (
+    FilesystemSnapshotStore,
+    SnapshotStorageError,
+    build_snapshot_store_from_env,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -31,7 +39,7 @@ def build_parser() -> argparse.ArgumentParser:
     sample_parser.add_argument(
         "--snapshot-root",
         type=Path,
-        default=Path(os.environ.get("RAW_SNAPSHOT_ROOT", ".local/raw-snapshots")),
+        help="force filesystem storage at this path instead of RAW_SNAPSHOT_BACKEND",
     )
     sample_parser.add_argument("input", type=Path)
     return parser
@@ -69,13 +77,22 @@ def main(argv: Sequence[str] | None = None) -> int:
             print("DATABASE_URL or --database-url is required")
             return 2
         try:
+            logger = configure_structured_logging()
+            reporter = build_error_reporter_from_env()
+            store = (
+                FilesystemSnapshotStore(args.snapshot_root)
+                if args.snapshot_root is not None
+                else build_snapshot_store_from_env()
+            )
             result = run_sample_import(
                 JobRepository(args.database_url),
-                FilesystemSnapshotStore(args.snapshot_root),
+                store,
                 source_key=args.source_key,
                 content=args.input.read_bytes(),
                 content_type=args.content_type,
                 worker_id=args.worker_id,
+                logger=logger,
+                error_reporter=reporter,
             )
         except (JobError, OSError, SnapshotStorageError, ValueError, psycopg.Error) as error:
             print(f"Sample import failed: {error}")
