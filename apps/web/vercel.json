@@ -1,0 +1,3 @@
+{
+  "buildCommand": "cd ../.. && npm run build -w @austechmap/contracts && cd apps/web && npm run build"
+}
