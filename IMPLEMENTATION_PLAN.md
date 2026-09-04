@@ -1,7 +1,7 @@
 # Australia Tech Map — Implementation Plan
 
 > Execution plan derived from [PRODUCT_SPEC.md](./PRODUCT_SPEC.md). [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) is authoritative for technology choices where it conflicts with either document.  
-> Version 2.2 · 4 September 2026
+> Version 2.3 · 4 September 2026
 
 ## 1. Objective
 
@@ -133,18 +133,18 @@ Status: closed on 4 September 2026. Service provisioning and implementation-time
 
 Goal: establish a safe, repeatable development and deployment base.
 
-- [ ] Create a monorepo with `apps/web` (including role-protected `/admin` routes), `workers/ingestion`, `packages/contracts`, `db`, `tests`, and `docs`.
-- [ ] Bootstrap Next.js, TypeScript, Tailwind CSS, linting, formatting, and test tooling.
-- [ ] Bootstrap the Python worker with dependency locking, linting, typing, and tests.
-- [ ] Provision local and managed PostgreSQL with PostGIS and `pg_trgm`.
-- [ ] Add versioned migrations for sources, snapshots, import runs, and audit records, including retry counts, leases, heartbeats, and failure history on the import-run table.
-- [ ] Define shared API/data contracts and generate types where practical.
-- [ ] Configure development, staging, and production environments with isolated secrets and databases.
-- [ ] Add CI checks for lint, type-check, unit tests, migrations, and production builds.
-- [ ] Add structured logging, error reporting, health endpoints, and run IDs.
-- [ ] Configure object storage paths for immutable raw snapshots.
+- [x] Create a monorepo with `apps/web` (including role-protected `/admin` routes), `workers/ingestion`, `packages/contracts`, `db`, `tests`, and `docs`. Admin routes land inside `apps/web` in a later phase; the monorepo structure itself is in place.
+- [x] Bootstrap Next.js, TypeScript, Tailwind CSS, linting, formatting, and test tooling.
+- [x] Bootstrap the Python worker with dependency locking, linting, typing, and tests.
+- [ ] Provision local and managed PostgreSQL with PostGIS and `pg_trgm`. Local is done (`compose.yaml`, CI's ephemeral service); managed (Neon) provisioning is a one-time account-level step outside any agent's reach — see [docs/deployment.md](./docs/deployment.md).
+- [x] Add versioned migrations for sources, snapshots, import runs, and audit records, including retry counts, leases, heartbeats, and failure history on the import-run table.
+- [x] Define shared API/data contracts and generate types where practical.
+- [ ] Configure development, staging, and production environments with isolated secrets and databases. Development exists; the staging promotion mechanism is built (`.github/workflows/promote-staging.yml`) but not yet exercised against real infrastructure — see [docs/deployment.md](./docs/deployment.md).
+- [x] Add CI checks for lint, type-check, unit tests, migrations, and production builds.
+- [x] Add structured logging, error reporting, health endpoints, and run IDs.
+- [x] Configure object storage paths for immutable raw snapshots.
 
-Exit gate: a migration can be promoted through staging, web and worker deployments are repeatable, and a sample importer persists a snapshot and auditable run record.
+Exit gate: a migration can be promoted through staging, web and worker deployments are repeatable, and a sample importer persists a snapshot and auditable run record. The sample-importer criterion is met and independently reviewed (`9ed23b4`). The staging/deployment mechanism is built and documented but not yet run against real infrastructure — don't mark this exit gate closed until a staging promotion and a Vercel deployment have actually succeeded, not just until the tooling exists.
 
 ### Phase 2 — Geographic foundation
 
