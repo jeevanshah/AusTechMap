@@ -102,7 +102,14 @@ def match_or_create_company(database_url: str, candidate: CandidateCompany) -> M
             matches = _find_active_by_abn(connection, abn)
             if len(matches) == 1:
                 return _accept(
-                    connection, matches[0], _ABN_MATCH_CONFIDENCE, "abn", candidate, acn, domain
+                    connection,
+                    matches[0],
+                    _ABN_MATCH_CONFIDENCE,
+                    "abn",
+                    candidate,
+                    abn,
+                    acn,
+                    domain,
                 )
             if len(matches) > 1:
                 # Defensive: migration 0007's partial unique index already
@@ -126,6 +133,7 @@ def match_or_create_company(database_url: str, candidate: CandidateCompany) -> M
                     _DOMAIN_MATCH_CONFIDENCE,
                     "domain",
                     candidate,
+                    abn,
                     acn,
                     domain,
                 )
@@ -209,6 +217,7 @@ def _accept(
     confidence: float,
     method: str,
     candidate: CandidateCompany,
+    abn: str | None,
     acn: str | None,
     domain: str | None,
 ) -> MatchOutcome:
@@ -218,12 +227,13 @@ def _accept(
     connection.execute(
         """
         UPDATE companies
-        SET acn = COALESCE(acn, %s),
+        SET abn = COALESCE(abn, %s),
+            acn = COALESCE(acn, %s),
             domain = COALESCE(domain, %s),
             careers_url = COALESCE(careers_url, %s)
         WHERE id = %s
         """,
-        (acn, domain, candidate.careers_url, existing.id),
+        (abn, acn, domain, candidate.careers_url, existing.id),
     )
     connection.execute(
         """

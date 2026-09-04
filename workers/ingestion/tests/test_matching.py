@@ -6,6 +6,7 @@ from pathlib import Path
 
 import psycopg
 import pytest
+from _helpers import unique_valid_abn
 
 from austechmap_ingestion.db.migrations import apply_migrations
 from austechmap_ingestion.employers.matching import (
@@ -17,10 +18,6 @@ from austechmap_ingestion.jobs import JobRepository
 
 REPOSITORY_ROOT = Path(__file__).parents[3]
 MIGRATIONS_DIRECTORY = REPOSITORY_ROOT / "db" / "migrations"
-
-# A real, checksum-valid ABN (see test_normalisation.py for how this was
-# verified against the official worked example).
-VALID_ABN = "51824753556"
 
 
 def _database_url() -> str:
@@ -63,11 +60,12 @@ def test_match_or_create_company_matches_by_abn_and_enriches() -> None:
     database_url = _database_url()
     suffix = uuid.uuid4().hex
     source_id = _source_id(database_url, suffix)
+    abn = unique_valid_abn(suffix)
 
     with psycopg.connect(database_url, autocommit=True) as connection:
         existing_id = connection.execute(
             "INSERT INTO companies (slug, display_name, abn) VALUES (%s, %s, %s) RETURNING id",
-            (f"acme-{suffix}", "Acme Technologies", VALID_ABN),
+            (f"acme-{suffix}", "Acme Technologies", abn),
         ).fetchone()
         assert existing_id is not None
 
@@ -76,7 +74,7 @@ def test_match_or_create_company_matches_by_abn_and_enriches() -> None:
         CandidateCompany(
             display_name="Acme Technologies Pty Ltd",
             source_id=source_id,
-            abn=VALID_ABN,
+            abn=abn,
             acn="004085616",
             domain="acme.example.com",
             careers_url="https://acme.example.com/careers",
@@ -106,6 +104,7 @@ def test_match_or_create_company_does_not_overwrite_existing_fields() -> None:
     database_url = _database_url()
     suffix = uuid.uuid4().hex
     source_id = _source_id(database_url, suffix)
+    abn = unique_valid_abn(suffix)
 
     with psycopg.connect(database_url, autocommit=True) as connection:
         existing_id = connection.execute(
@@ -114,7 +113,7 @@ def test_match_or_create_company_does_not_overwrite_existing_fields() -> None:
             VALUES (%s, %s, %s, 'already-set.example.com')
             RETURNING id
             """,
-            (f"acme-{suffix}", "Acme Technologies", VALID_ABN),
+            (f"acme-{suffix}", "Acme Technologies", abn),
         ).fetchone()
         assert existing_id is not None
 
@@ -123,7 +122,7 @@ def test_match_or_create_company_does_not_overwrite_existing_fields() -> None:
         CandidateCompany(
             display_name="Acme Technologies",
             source_id=source_id,
-            abn=VALID_ABN,
+            abn=abn,
             domain="different.example.com",
         ),
     )

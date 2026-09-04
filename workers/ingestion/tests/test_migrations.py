@@ -6,6 +6,7 @@ from pathlib import Path
 
 import psycopg
 import pytest
+from _helpers import unique_valid_abn
 
 from austechmap_ingestion.db.migrations import (
     MigrationError,
@@ -328,14 +329,15 @@ def test_employer_identity_constraints() -> None:
             (f"abr-{unique_suffix}", "ABR"),
         ).fetchone()
         assert source_id is not None
+        abn = unique_valid_abn(unique_suffix)
 
         first_company_id = connection.execute(
             """
             INSERT INTO companies (slug, display_name, abn)
-            VALUES (%s, 'Example Pty Ltd', '51824753556')
+            VALUES (%s, 'Example Pty Ltd', %s)
             RETURNING id
             """,
-            (f"example-{unique_suffix}",),
+            (f"example-{unique_suffix}", abn),
         ).fetchone()
         assert first_company_id is not None
 
@@ -343,9 +345,9 @@ def test_employer_identity_constraints() -> None:
             connection.execute(
                 """
                 INSERT INTO companies (slug, display_name, abn)
-                VALUES (%s, 'Duplicate ABN Pty Ltd', '51824753556')
+                VALUES (%s, 'Duplicate ABN Pty Ltd', %s)
                 """,
-                (f"duplicate-{unique_suffix}",),
+                (f"duplicate-{unique_suffix}", abn),
             )
 
         second_company_id = connection.execute(
@@ -371,9 +373,9 @@ def test_employer_identity_constraints() -> None:
         connection.execute(
             """
             INSERT INTO companies (slug, display_name, abn)
-            VALUES (%s, 'Reissued ABN Pty Ltd', '51824753556')
+            VALUES (%s, 'Reissued ABN Pty Ltd', %s)
             """,
-            (f"reissued-{unique_suffix}",),
+            (f"reissued-{unique_suffix}", abn),
         )
 
         alias_id = connection.execute(

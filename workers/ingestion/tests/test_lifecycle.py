@@ -6,6 +6,7 @@ from pathlib import Path
 
 import psycopg
 import pytest
+from _helpers import unique_valid_abn
 from psycopg.types.json import Jsonb
 
 from austechmap_ingestion.db.migrations import apply_migrations
@@ -20,10 +21,6 @@ from austechmap_ingestion.jobs import JobRepository
 
 REPOSITORY_ROOT = Path(__file__).parents[3]
 MIGRATIONS_DIRECTORY = REPOSITORY_ROOT / "db" / "migrations"
-
-# See test_normalisation.py for how these were verified as real,
-# checksum-valid ABNs.
-VALID_ABN = "51824753556"
 
 
 def _database_url() -> str:
@@ -187,6 +184,7 @@ def test_resolve_review_item_approved_with_match_enriches_existing_company() -> 
     actor = _make_user(database_url, suffix)
     source_id = _source_id(database_url, suffix)
     existing = _make_company(database_url, suffix)
+    abn = unique_valid_abn(suffix)
 
     with psycopg.connect(database_url, autocommit=True) as connection:
         review_row = connection.execute(
@@ -200,7 +198,7 @@ def test_resolve_review_item_approved_with_match_enriches_existing_company() -> 
                 Jsonb(
                     {
                         "candidate_display_name": "Candidate Name Pty Ltd",
-                        "candidate_abn": VALID_ABN,
+                        "candidate_abn": abn,
                         "candidate_acn": None,
                         "candidate_domain": "candidate.example.com",
                         "match_method": "name",
@@ -231,7 +229,7 @@ def test_resolve_review_item_approved_with_match_enriches_existing_company() -> 
         status = connection.execute(
             "SELECT status FROM review_queue_items WHERE id = %s", (review_id,)
         ).fetchone()
-    assert company == (VALID_ABN, "candidate.example.com")
+    assert company == (abn, "candidate.example.com")
     assert status == ("approved",)
 
 

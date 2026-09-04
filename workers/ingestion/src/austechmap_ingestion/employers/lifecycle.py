@@ -238,9 +238,12 @@ def resolve_review_item(
                 if existing_row is None:
                     raise EmployerIdentityError(f"company not found: {matched_company_id}")
                 existing = _existing_company_from_row(existing_row)
+                abn = normalise_abn(candidate.abn) if candidate.abn else None
                 acn = normalise_acn(candidate.acn) if candidate.acn else None
                 domain_value = candidate.domain
-                outcome = _accept(connection, existing, 1.0, "review", candidate, acn, domain_value)
+                outcome = _accept(
+                    connection, existing, 1.0, "review", candidate, abn, acn, domain_value
+                )
             else:
                 abn = normalise_abn(candidate.abn) if candidate.abn else None
                 acn = normalise_acn(candidate.acn) if candidate.acn else None
