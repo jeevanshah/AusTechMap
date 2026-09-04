@@ -20,7 +20,7 @@ MIGRATIONS_DIRECTORY = REPOSITORY_ROOT / "db" / "migrations"
 def test_repository_migrations_are_contiguous_and_cover_foundation_contracts() -> None:
     migrations = discover_migrations(MIGRATIONS_DIRECTORY)
 
-    assert [migration.version for migration in migrations] == [1, 2, 3, 4, 5, 6]
+    assert [migration.version for migration in migrations] == [1, 2, 3, 4, 5, 6, 7]
     combined_sql = "\n".join(migration.sql for migration in migrations)
     assert "CREATE EXTENSION IF NOT EXISTS postgis" in combined_sql
     assert "CREATE TABLE users" in combined_sql
@@ -31,6 +31,10 @@ def test_repository_migrations_are_contiguous_and_cover_foundation_contracts() -
     assert "CREATE TABLE regions" in combined_sql
     assert "CREATE TABLE postcode_rules" in combined_sql
     assert "CREATE TABLE resolved_locations" in combined_sql
+    assert "CREATE TABLE companies" in combined_sql
+    assert "CREATE TABLE company_aliases" in combined_sql
+    assert "CREATE TABLE evidence" in combined_sql
+    assert "CREATE TABLE review_queue_items" in combined_sql
 
 
 def test_discovery_rejects_a_gap_in_versions(tmp_path: Path) -> None:
@@ -57,7 +61,10 @@ def test_migrations_apply_idempotently_to_postgis() -> None:
     first_application = apply_migrations(database_url, MIGRATIONS_DIRECTORY)
     second_application = apply_migrations(database_url, MIGRATIONS_DIRECTORY)
 
-    assert [migration.version for migration in first_application] in ([1, 2, 3, 4, 5, 6], [])
+    assert [migration.version for migration in first_application] in (
+        [1, 2, 3, 4, 5, 6, 7],
+        [],
+    )
     assert second_application == ()
 
     with psycopg.connect(database_url) as connection:
@@ -301,3 +308,96 @@ def test_geographic_foundation_constraints() -> None:
             ("f" * 64, region_id[0]),
         ).fetchone()
         assert accepted_id is not None
+
+
+@pytest.mark.integration
+def test_employer_identity_constraints() -> None:
+    database_url = os.environ.get("TEST_DATABASE_URL")
+    if not database_url:
+        pytest.skip("TEST_DATABASE_URL is not configured")
+
+    apply_migrations(database_url, MIGRATIONS_DIRECTORY)
+    unique_suffix = uuid.uuid4().hex
+    with psycopg.connect(database_url, autocommit=True) as connection:
+        source_id = connection.execute(
+            """
+            INSERT INTO data_sources (source_key, name, kind)
+            VALUES (%s, %s, 'government_open_data')
+            RETURNING id
+            """,
+            (f"abr-{unique_suffix}", "ABR"),
+        ).fetchone()
+        assert source_id is not None
+
+        first_company_id = connection.execute(
+            """
+            INSERT INTO companies (slug, display_name, abn)
+            VALUES (%s, 'Example Pty Ltd', '51824753556')
+            RETURNING id
+            """,
+            (f"example-{unique_suffix}",),
+        ).fetchone()
+        assert first_company_id is not None
+
+        with pytest.raises(psycopg.errors.UniqueViolation):
+            connection.execute(
+                """
+                INSERT INTO companies (slug, display_name, abn)
+                VALUES (%s, 'Duplicate ABN Pty Ltd', '51824753556')
+                """,
+                (f"duplicate-{unique_suffix}",),
+            )
+
+        second_company_id = connection.execute(
+            "INSERT INTO companies (slug, display_name) VALUES (%s, 'Merge Target') RETURNING id",
+            (f"target-{unique_suffix}",),
+        ).fetchone()
+        assert second_company_id is not None
+
+        with pytest.raises(psycopg.errors.CheckViolation):
+            connection.execute(
+                "UPDATE companies SET status = 'merged' WHERE id = %s", (first_company_id[0],)
+            )
+
+        connection.execute(
+            """
+            UPDATE companies SET status = 'merged', merged_into_company_id = %s
+            WHERE id = %s
+            """,
+            (second_company_id[0], first_company_id[0]),
+        )
+
+        # A merged company's ABN no longer blocks a fresh registration of it.
+        connection.execute(
+            """
+            INSERT INTO companies (slug, display_name, abn)
+            VALUES (%s, 'Reissued ABN Pty Ltd', '51824753556')
+            """,
+            (f"reissued-{unique_suffix}",),
+        )
+
+        alias_id = connection.execute(
+            """
+            INSERT INTO company_aliases (company_id, alias, alias_type, source_id)
+            VALUES (%s, 'Example P/L', 'trading_name', %s)
+            RETURNING id
+            """,
+            (first_company_id[0], source_id[0]),
+        ).fetchone()
+        assert alias_id is not None
+
+        review_id = connection.execute(
+            """
+            INSERT INTO review_queue_items (kind, company_id, source_id)
+            VALUES ('candidate_match', %s, %s)
+            RETURNING id
+            """,
+            (first_company_id[0], source_id[0]),
+        ).fetchone()
+        assert review_id is not None
+
+        with pytest.raises(psycopg.errors.CheckViolation):
+            connection.execute(
+                "UPDATE review_queue_items SET status = 'approved' WHERE id = %s",
+                (review_id[0],),
+            )
