@@ -20,13 +20,17 @@ MIGRATIONS_DIRECTORY = REPOSITORY_ROOT / "db" / "migrations"
 def test_repository_migrations_are_contiguous_and_cover_foundation_contracts() -> None:
     migrations = discover_migrations(MIGRATIONS_DIRECTORY)
 
-    assert [migration.version for migration in migrations] == [1, 2, 3, 4, 5]
+    assert [migration.version for migration in migrations] == [1, 2, 3, 4, 5, 6]
     combined_sql = "\n".join(migration.sql for migration in migrations)
     assert "CREATE EXTENSION IF NOT EXISTS postgis" in combined_sql
     assert "CREATE TABLE users" in combined_sql
     assert "CREATE TABLE import_runs" in combined_sql
     assert "CREATE TABLE raw_snapshots" in combined_sql
     assert "CREATE TABLE audit_records" in combined_sql
+    assert "CREATE TABLE geography_releases" in combined_sql
+    assert "CREATE TABLE regions" in combined_sql
+    assert "CREATE TABLE postcode_rules" in combined_sql
+    assert "CREATE TABLE resolved_locations" in combined_sql
 
 
 def test_discovery_rejects_a_gap_in_versions(tmp_path: Path) -> None:
@@ -53,7 +57,7 @@ def test_migrations_apply_idempotently_to_postgis() -> None:
     first_application = apply_migrations(database_url, MIGRATIONS_DIRECTORY)
     second_application = apply_migrations(database_url, MIGRATIONS_DIRECTORY)
 
-    assert [migration.version for migration in first_application] in ([1, 2, 3, 4, 5], [])
+    assert [migration.version for migration in first_application] in ([1, 2, 3, 4, 5, 6], [])
     assert second_application == ()
 
     with psycopg.connect(database_url) as connection:
@@ -171,3 +175,116 @@ def test_ingestion_constraints_and_append_only_audit_log() -> None:
             )
         with pytest.raises(psycopg.errors.RaiseException, match="append-only"):
             connection.execute("TRUNCATE audit_records")
+
+
+@pytest.mark.integration
+def test_geographic_foundation_constraints() -> None:
+    database_url = os.environ.get("TEST_DATABASE_URL")
+    if not database_url:
+        pytest.skip("TEST_DATABASE_URL is not configured")
+
+    apply_migrations(database_url, MIGRATIONS_DIRECTORY)
+    unique_suffix = uuid.uuid4().hex
+    with psycopg.connect(database_url, autocommit=True) as connection:
+        source_id = connection.execute(
+            """
+            INSERT INTO data_sources (source_key, name, kind)
+            VALUES (%s, %s, 'government_open_data')
+            RETURNING id
+            """,
+            (f"asgs-{unique_suffix}", "ASGS"),
+        ).fetchone()
+        assert source_id is not None
+
+        release_id = connection.execute(
+            """
+            INSERT INTO geography_releases (
+              dataset, release_version, source_id, effective_from,
+              content_hash, is_active, activated_at
+            )
+            VALUES ('asgs_sa2', %s, %s, '2026-07-01', %s, true, now())
+            RETURNING id
+            """,
+            (unique_suffix, source_id[0], "b" * 64),
+        ).fetchone()
+        assert release_id is not None
+
+        with pytest.raises(psycopg.errors.UniqueViolation):
+            connection.execute(
+                """
+                INSERT INTO geography_releases (
+                  dataset, release_version, source_id, effective_from,
+                  content_hash, is_active, activated_at
+                )
+                VALUES ('asgs_sa2', %s, %s, '2026-07-01', %s, true, now())
+                """,
+                (f"{unique_suffix}-second", source_id[0], "c" * 64),
+            )
+
+        region_id = connection.execute(
+            """
+            INSERT INTO regions (release_id, region_type, code, name, geom)
+            VALUES (
+              %s, 'sa2', %s, 'Test Region',
+              ST_Multi(ST_GeomFromText(
+                'POLYGON((151.0 -33.9, 151.1 -33.9, 151.1 -33.8, 151.0 -33.8, 151.0 -33.9))', 4326
+              ))
+            )
+            RETURNING id
+            """,
+            (release_id[0], f"sa2-{unique_suffix}"),
+        ).fetchone()
+        assert region_id is not None
+
+        with pytest.raises(psycopg.errors.CheckViolation):
+            connection.execute(
+                """
+                INSERT INTO postcode_rules (release_id, postcode, category, dama_name, valid_from)
+                VALUES (%s, '2000', 'category_2', 'Should not be set', '2026-01-01')
+                """,
+                (release_id[0],),
+            )
+
+        connection.execute(
+            """
+            INSERT INTO postcode_rules (release_id, postcode, category, valid_from)
+            VALUES (%s, '2000', 'category_2', '2026-01-01')
+            """,
+            (release_id[0],),
+        )
+
+        with pytest.raises(psycopg.errors.CheckViolation):
+            connection.execute(
+                """
+                INSERT INTO resolved_locations (input_hash, input_text, status)
+                VALUES (%s, 'accepted with no point', 'accepted')
+                """,
+                ("d" * 64,),
+            )
+
+        with pytest.raises(psycopg.errors.CheckViolation):
+            connection.execute(
+                """
+                INSERT INTO resolved_locations (input_hash, input_text, status, method, point)
+                VALUES (
+                  %s, 'out of Australia', 'accepted', 'postcode_centroid',
+                  ST_SetSRID(ST_MakePoint(0, 0), 4326)
+                )
+                """,
+                ("e" * 64,),
+            )
+
+        accepted_id = connection.execute(
+            """
+            INSERT INTO resolved_locations (
+              input_hash, input_text, status, method, point, sa2_region_id
+            )
+            VALUES (
+              %s, '2000 NSW', 'accepted', 'postcode_centroid',
+              ST_SetSRID(ST_MakePoint(151.05, -33.85), 4326), %s
+            )
+            RETURNING id
+            """,
+            ("f" * 64, region_id[0]),
+        ).fetchone()
+        assert accepted_id is not None
