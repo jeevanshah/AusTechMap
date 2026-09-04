@@ -31,6 +31,7 @@ graphify-out/
 
 # Local logs and temporary output
 *.log
+.local/
 tmp/
 temp/
 

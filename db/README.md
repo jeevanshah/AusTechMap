@@ -9,7 +9,8 @@ down migration.
 The target is Neon PostgreSQL. Local development and CI use PostgreSQL 17 with PostGIS 3.5 through
 the official `postgis/postgis:17-3.5` image. Migration `0001` enables `postgis`, `pg_trgm`, and
 `pgcrypto`; `0002` establishes the Auth.js-compatible identity schema and ingestion control plane;
-`0003` hardens deletion-state and append-only audit constraints.
+`0003` hardens deletion-state and append-only audit constraints; `0004` permits repeated database
+observations of one content-addressed object; and `0005` enforces the six-attempt ceiling.
 
 From the repository root:
 

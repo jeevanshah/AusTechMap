@@ -47,6 +47,20 @@ and records its SHA-256 checksum. Never edit an applied migration; add the next 
 To stop the database, run `docker compose down`. The named volume preserves local data; use
 `docker compose down --volumes` only when you intentionally want to erase that local database.
 
+To exercise the Phase 1 importer end to end against the local database and filesystem snapshot
+store:
+
+```powershell
+$env:RAW_SNAPSHOT_ROOT = ".local/raw-snapshots"
+workers/ingestion/.venv/Scripts/python.exe -m austechmap_ingestion sample-import `
+  --source-key phase-1-fixture `
+  workers/ingestion/tests/fixtures/sample_source.json
+```
+
+The command is idempotent for the same source and content hash. Raw objects use
+`raw/{source_key}/{sha256_prefix}/{sha256}` keys, matching the content-addressed layout intended for
+R2. The local `.local/` directory is ignored by Git.
+
 ## Quality checks
 
 ```powershell
