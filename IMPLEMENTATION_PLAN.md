@@ -1,7 +1,7 @@
 # Australia Tech Map — Implementation Plan
 
 > Execution plan derived from [PRODUCT_SPEC.md](./PRODUCT_SPEC.md). [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) is authoritative for technology choices where it conflicts with either document.  
-> Version 2.5 · 5 September 2026
+> Version 2.6 · 5 September 2026
 
 ## 1. Objective
 
@@ -168,17 +168,17 @@ Exit gate: representative addresses resolve to coordinates, SA2/SA3/SA4/LGA/post
 
 Goal: create trustworthy canonical employer records and the first reviewed dataset.
 
-- [ ] Add company, alias, domain, category, location, source, evidence, and review-queue migrations.
-- [ ] Implement ABN, ACN, domain, URL, and company-name normalisation.
-- [ ] Build the ABR importer as an identity/enrichment source, not as the only discovery source.
-- [ ] Implement deterministic matching and confidence thresholds.
-- [ ] Route ambiguous or conflicting matches to review instead of auto-merging.
-- [ ] Build admin screens to create, edit, merge, redirect, verify, and disable employers.
-- [ ] Preserve aliases, evidence, and audit history through merges.
-- [ ] Build a repeatable seed pipeline for a deliberately selected 100–200 employer alpha cohort (Sydney, Melbourne, Brisbane, and selected regional centres), expanding toward 1,000 in later phases (see Phase 8).
+- [x] Add company, alias, domain, category, location, source, evidence, and review-queue migrations (migration `0007`).
+- [x] Implement ABN, ACN, domain, URL, and company-name normalisation (`employers/normalisation.py`, checksum algorithms verified against official/hand-recomputed worked examples).
+- [x] Build the ABR importer as an identity/enrichment source, not as the only discovery source (`employers/abr.py`, schema verified against the real, official bulk-extract XSD; DuckDB lookup index, not a wholesale import).
+- [x] Implement deterministic matching and confidence thresholds (`employers/matching.py`: ABN/domain matches auto-accept when unique; name-only matches never auto-accept).
+- [x] Route ambiguous or conflicting matches to review instead of auto-merging (`review_queue_items`, `employers/lifecycle.py::resolve_review_item`).
+- [x] Build admin screens to create, edit, merge, redirect, verify, and disable employers (`/admin/companies`, `/admin/review` — unauthenticated for now, see `ARCHITECTURE_DECISIONS.md` §4.1's interim-state note).
+- [x] Preserve aliases, evidence, and audit history through merges (companies are never deleted, only marked `merged`; every mutation writes an `audit_records` row).
+- [ ] Build a repeatable seed pipeline for a deliberately selected 100–200 employer alpha cohort (Sydney, Melbourne, Brisbane, and selected regional centres), expanding toward 1,000 in later phases (see Phase 8). The matching mechanism (`match_or_create_company`) is built and tested; the actual 100–200 employers are a curation task, not something to auto-generate — a candidate list is being researched separately (outside this repo) for the user to review before any seeding runs against a real database.
 - [ ] Produce duplicate, provenance, location, and enrichment coverage reports.
 
-Exit gate: 100–200 reviewed employers exist for the alpha cohort; fewer than 1% remain unresolved duplicates; more than 95% have usable locations; more than 98% have provenance.
+Exit gate: 100–200 reviewed employers exist for the alpha cohort; fewer than 1% remain unresolved duplicates; more than 95% have usable locations; more than 98% have provenance. **Not yet closed** — same shape as Phase 2's gate: the matching/review/admin machinery is built and tested, but no real employers have actually been seeded into a real database yet.
 
 ### Phase 4 — Map, search, and employer profiles
 
