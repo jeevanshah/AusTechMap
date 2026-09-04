@@ -1,0 +1,56 @@
+{
+  "source_url": "https://immi.homeaffairs.gov.au/visas/working-in-australia/skill-occupation-list/regional-postcodes",
+  "retrieved_at": "2026-09-04",
+  "notes": "Transcribed by hand from the live page on the retrieved_at date. Postcodes marked with an asterisk on that page (Queensland only) carry a 'not applicable to visas granted before 5 March 2022' caveat that this fixture does not model - they are included in category_2 unconditionally here. Norfolk Island and 'Other Territories' rows are omitted as an edge case not worth the ambiguity right now. Re-transcribe (a new dated file, not an edit of this one) if the source page changes.",
+  "states": [
+    {
+      "state": "NSW",
+      "category_2_ranges": [[2259, 2259], [2264, 2308], [2500, 2526], [2528, 2535], [2574, 2574]],
+      "category_3_ranges": [[2250, 2258], [2260, 2263], [2311, 2490], [2527, 2527], [2536, 2551], [2575, 2739], [2753, 2754], [2756, 2758], [2773, 2898]],
+      "category_3_all_remaining": false
+    },
+    {
+      "state": "VIC",
+      "category_2_ranges": [[3211, 3232], [3235, 3235], [3240, 3240], [3328, 3328], [3330, 3333], [3340, 3340], [3342, 3342]],
+      "category_3_ranges": [[3097, 3099], [3139, 3139], [3233, 3234], [3236, 3239], [3241, 3325], [3329, 3329], [3334, 3334], [3341, 3341], [3345, 3424], [3430, 3799], [3809, 3909], [3912, 3971], [3978, 3996]],
+      "category_3_all_remaining": false
+    },
+    {
+      "state": "QLD",
+      "category_2_ranges": [[4019, 4022], [4025, 4025], [4037, 4037], [4074, 4074], [4076, 4078], [4207, 4275], [4300, 4301], [4303, 4305], [4500, 4506], [4508, 4512], [4514, 4516], [4517, 4519], [4521, 4521], [4550, 4551], [4553, 4562], [4564, 4569], [4571, 4575]],
+      "category_3_ranges": [[4124, 4125], [4133, 4133], [4183, 4184], [4280, 4287], [4306, 4498], [4507, 4507], [4552, 4552], [4563, 4563], [4570, 4570], [4580, 4895]],
+      "category_3_all_remaining": false
+    },
+    {
+      "state": "WA",
+      "category_2_ranges": [[6000, 6038], [6050, 6083], [6090, 6182], [6208, 6211], [6214, 6214], [6556, 6558]],
+      "category_3_ranges": [],
+      "category_3_all_remaining": true
+    },
+    {
+      "state": "SA",
+      "category_2_ranges": [[5000, 5171], [5173, 5174], [5231, 5235], [5240, 5252], [5351, 5351], [5950, 5960]],
+      "category_3_ranges": [],
+      "category_3_all_remaining": true
+    },
+    {
+      "state": "TAS",
+      "category_2_ranges": [[7000, 7000], [7004, 7026], [7030, 7109], [7140, 7151], [7170, 7177]],
+      "category_3_ranges": [],
+      "category_3_all_remaining": true
+    },
+    {
+      "state": "ACT",
+      "category_2_all_state": true,
+      "category_2_ranges": [],
+      "category_3_ranges": [],
+      "category_3_all_remaining": false
+    },
+    {
+      "state": "NT",
+      "category_2_ranges": [],
+      "category_3_ranges": [],
+      "category_3_all_remaining": true
+    }
+  ]
+}
