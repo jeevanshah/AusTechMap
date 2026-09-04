@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import os
 import uuid
 from dataclasses import replace
@@ -22,7 +23,7 @@ from austechmap_ingestion.jobs import (
     validate_transition,
 )
 from austechmap_ingestion.sample_importer import run_sample_import
-from austechmap_ingestion.storage import FilesystemSnapshotStore
+from austechmap_ingestion.storage import FilesystemSnapshotStore, SnapshotStorageError
 
 REPOSITORY_ROOT = Path(__file__).parents[3]
 MIGRATIONS_DIRECTORY = REPOSITORY_ROOT / "db" / "migrations"
@@ -75,6 +76,25 @@ def test_filesystem_store_is_content_addressed_and_idempotent(tmp_path: Path) ->
     assert first == second
     assert first.object_key.startswith("raw/sample-source/")
     assert (tmp_path / Path(first.object_key)).read_bytes() == b'{"ok":true}'
+
+
+def test_filesystem_store_rejects_unsafe_source_key(tmp_path: Path) -> None:
+    store = FilesystemSnapshotStore(tmp_path)
+
+    with pytest.raises(ValueError, match="source_key"):
+        store.put(source_key="../outside", content=b"unsafe")
+
+
+def test_filesystem_store_detects_content_address_collision(tmp_path: Path) -> None:
+    store = FilesystemSnapshotStore(tmp_path)
+    content = b"expected"
+    digest = hashlib.sha256(content).hexdigest()
+    destination = tmp_path / "raw" / "sample-source" / digest[:2] / digest
+    destination.parent.mkdir(parents=True)
+    destination.write_bytes(b"different")
+
+    with pytest.raises(SnapshotStorageError, match="collision"):
+        store.put(source_key="sample-source", content=content)
 
 
 def _database_url() -> str:
@@ -225,6 +245,16 @@ def test_retry_dead_letter_and_expired_lease_reconciliation() -> None:
     with pytest.raises(LostLeaseError):
         repository.heartbeat(expired, now=FIXED_NOW + timedelta(minutes=11))
 
+    final_expired = _enqueue_and_claim(
+        repository, source_id, f"{suffix}-final-expired", max_attempts=1
+    )
+    final_reconciliation = repository.reconcile_one_expired(
+        now=FIXED_NOW + timedelta(minutes=11), jitter_fraction=0
+    )
+    assert final_reconciliation is not None
+    assert final_reconciliation.run_id == final_expired.run_id
+    assert final_reconciliation.status is RunStatus.DEAD_LETTER
+
     with psycopg.connect(database_url) as connection:
         outcomes = connection.execute(
             """
@@ -235,7 +265,16 @@ def test_retry_dead_letter_and_expired_lease_reconciliation() -> None:
             """,
             (first_claim.run_id,),
         ).fetchall()
+        final_run = connection.execute(
+            """
+            SELECT status, terminal_error_code, finished_at IS NOT NULL
+            FROM import_runs
+            WHERE id = %s
+            """,
+            (final_expired.run_id,),
+        ).fetchone()
     assert outcomes == [(1, "retryable_failure"), (2, "retryable_failure")]
+    assert final_run == ("dead_letter", "lease_expired", True)
 
 
 @pytest.mark.integration

@@ -10,7 +10,7 @@ from austechmap_ingestion.db.migrations import MigrationError, apply_migrations
 from austechmap_ingestion.health import build_health
 from austechmap_ingestion.jobs import JobError, JobRepository
 from austechmap_ingestion.sample_importer import run_sample_import
-from austechmap_ingestion.storage import FilesystemSnapshotStore
+from austechmap_ingestion.storage import FilesystemSnapshotStore, SnapshotStorageError
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -77,7 +77,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 content_type=args.content_type,
                 worker_id=args.worker_id,
             )
-        except (JobError, OSError, ValueError, psycopg.Error) as error:
+        except (JobError, OSError, SnapshotStorageError, ValueError, psycopg.Error) as error:
             print(f"Sample import failed: {error}")
             return 1
         print(
