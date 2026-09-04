@@ -1,5 +1,7 @@
 # Deployment and staging
 
+> Version 1.0 · 4 September 2026
+>
 > Closes the remaining gap in IMPLEMENTATION_PLAN.md's Phase 1 exit gate: "a migration can be promoted through staging, web and worker deployments are repeatable." The mechanism here is built and ready; the account-level setup below can only be done by whoever owns the Neon/Vercel accounts (it needs real credentials no agent has access to).
 
 ## Staging database (Neon)
