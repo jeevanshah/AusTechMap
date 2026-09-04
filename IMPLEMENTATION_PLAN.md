@@ -1,7 +1,7 @@
 # Australia Tech Map — Implementation Plan
 
 > Execution plan derived from [PRODUCT_SPEC.md](./PRODUCT_SPEC.md). [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) is authoritative for technology choices where it conflicts with either document.  
-> Version 2.4 · 4 September 2026
+> Version 2.5 · 5 September 2026
 
 ## 1. Objective
 
@@ -152,17 +152,17 @@ Status: closed on 4 September 2026. All three of these fixes were found and fixe
 
 Goal: make Australian addresses and regions consistently queryable.
 
-- [ ] Create region, boundary-version, postcode-rule, and location schemas.
-- [ ] Build idempotent ABS geography importers for required ASGS levels.
-- [ ] Implement the G-NAF bulk geocoding path and address normalisation (operated as an offline worker reference dataset or batch geocoding pipeline to avoid loading all 15.8M addresses into the primary transactional database).
-- [ ] Import Home Affairs regional categories, DAMA boundaries, and effective dates — the canonical import; Phase 6 builds product presentation and scoring on it without re-importing.
-- [ ] Implement postcode/address-to-coordinate and point-in-polygon services.
-- [ ] Add spatial and lookup indexes.
-- [ ] Store source version, effective date, retrieved date, and content hash for every import.
-- [ ] Add fixtures for metro, regional, border, ambiguous, and invalid addresses.
-- [ ] Build an admin import-status and geography-version view.
+- [x] Create region, boundary-version, postcode-rule, and location schemas (migration `0006`: `geography_releases`, `regions`, `postcode_rules`, `resolved_locations`).
+- [x] Build idempotent ABS geography importers for required ASGS levels (`geography/asgs.py`; not yet run against a real downloaded ABS boundary file — see below).
+- [x] Implement the G-NAF bulk geocoding path and address normalisation (`geography/gnaf.py`, DuckDB-based, exact-match-only per `ARCHITECTURE_DECISIONS.md` §4.3; schema verified against the real August 2026 release archive, but not yet run against that full archive — see below).
+- [x] Import Home Affairs regional categories and effective dates (`geography/home_affairs.py`, a dated, versioned fixture transcribed from the real live page). DAMA boundaries are explicitly deferred — each of the 13 DAMAs is its own separately-negotiated area, and guessing at that structure without verifying each one individually was rejected as unsafe; a documented follow-up, not an oversight.
+- [x] Implement postcode/address-to-coordinate and point-in-polygon services (`geography/locations.py`).
+- [x] Add spatial and lookup indexes (GiST on every geometry column, btree on codes/postcodes, all in migration `0006`).
+- [x] Store source version, effective date, retrieved date, and content hash for every import (`geography_releases`, mirroring the Phase 1 `raw_snapshots`/`import_runs` pattern).
+- [ ] Add fixtures for metro, regional, border, ambiguous, and invalid addresses. Synthetic fixtures proving the matching/resolution *mechanism* is correct exist in the test suite; representative *real* Australian addresses require real ASGS boundary files and the real G-NAF archive to actually be downloaded and imported first — not done, see below.
+- [x] Build an admin import-status and geography-version view (`apps/web/src/app/admin/geography/page.tsx`). Deliberately unauthenticated for now — no auth system exists anywhere in this app yet (Phase 1 decided the model in `ARCHITECTURE_DECISIONS.md` §4.1 but did not build it); safe only because no real employer or user data exists yet. Must not go to production without an auth gate.
 
-Exit gate: representative addresses resolve to coordinates, SA2/SA3/SA4/LGA/postcode, and the correct versioned regional classification with documented accuracy.
+Exit gate: representative addresses resolve to coordinates, SA2/SA3/SA4/LGA/postcode, and the correct versioned regional classification with documented accuracy. **Not yet closed.** Every importer above is built and verified (CI for ASGS/locations against live PostGIS; fully local for G-NAF and Home Affairs, including G-NAF's schema against the real archive) but only against synthetic or hand-transcribed fixture data. Actually closing this gate needs, in order: downloading real ABS ASGS boundary files and running the importer against a real Neon database; downloading the real G-NAF archive (~1.85GB) and building its DuckDB index; running the Home Affairs importer for real; then resolving genuinely representative addresses and recording the accuracy. This is real-world data acquisition and compute, not something to run unattended inside an interactive coding session — treat it the same way Phase 1's Neon/Vercel provisioning was treated: a real operational step, not a formality.
 
 ### Phase 3 — Employer identity and seed graph
 

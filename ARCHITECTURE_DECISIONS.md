@@ -2,7 +2,7 @@
 
 > Satisfies [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) Phase 0: "Record architecture decisions for the database, map provider, storage, hosting, authentication, email, and analytics."
 > This document is authoritative for technology choices — where it conflicts with [PRODUCT_SPEC.md](./PRODUCT_SPEC.md)'s recommendations, this document wins.
-> Version 3.1 · 4 September 2026
+> Version 3.2 · 5 September 2026
 
 ## 1. Decision summary
 
@@ -140,6 +140,14 @@ operational change.
 - Enforce authorisation in server actions/route handlers and again in the domain/service operation.
   Protect both `/admin` pages and their APIs; hiding navigation is not access control. Return `401` for
   no valid session and `403` for insufficient role.
+
+  **Interim state (5 September 2026):** `/admin/geography` (Phase 2's import-status/geography-version
+  view) ships with no access control at all, a direct, deliberate, user-approved exception to the rule
+  above — none of this section's authentication/MFA/role system is built yet (only decided), and
+  building it just to gate one read-only operational page was judged out of proportion to Phase 2's
+  scope. Safe only because no real employer or user data exists yet. This must be gated — by the real
+  system above, not a stopgap — before any real user, employer data, or commercial activity, the same
+  trigger already used for the Vercel Hobby-tier deviation in §3.4.
 - Destructive merges, source disablement, role changes, and importer replay require `admin` plus an
   MFA assertion no older than 15 minutes; all staff mutations write an immutable audit record.
 
