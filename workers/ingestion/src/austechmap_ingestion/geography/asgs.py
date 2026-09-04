@@ -103,7 +103,7 @@ def load_asgs_release(
     region_type: RegionType,
     release_version: str,
     source_id: uuid.UUID,
-    import_run_id: uuid.UUID,
+    import_run_id: uuid.UUID | None,
     effective_from: date,
     content_hash: str,
     features: list[AsgsFeature],

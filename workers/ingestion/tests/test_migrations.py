@@ -192,7 +192,7 @@ def test_geographic_foundation_constraints() -> None:
             VALUES (%s, %s, 'government_open_data')
             RETURNING id
             """,
-            (f"asgs-{unique_suffix}", "ASGS"),
+            (f"geography-{unique_suffix}", "Geography source"),
         ).fetchone()
         assert source_id is not None
 
@@ -202,7 +202,7 @@ def test_geographic_foundation_constraints() -> None:
               dataset, release_version, source_id, effective_from,
               content_hash, is_active, activated_at
             )
-            VALUES ('asgs_sa2', %s, %s, '2026-07-01', %s, true, now())
+            VALUES ('home_affairs_regional', %s, %s, '2026-07-01', %s, true, now())
             RETURNING id
             """,
             (unique_suffix, source_id[0], "b" * 64),
@@ -216,7 +216,7 @@ def test_geographic_foundation_constraints() -> None:
                   dataset, release_version, source_id, effective_from,
                   content_hash, is_active, activated_at
                 )
-                VALUES ('asgs_sa2', %s, %s, '2026-07-01', %s, true, now())
+                VALUES ('home_affairs_regional', %s, %s, '2026-07-01', %s, true, now())
                 """,
                 (f"{unique_suffix}-second", source_id[0], "c" * 64),
             )
