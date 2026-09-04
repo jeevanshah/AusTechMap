@@ -2,8 +2,10 @@ boto3==1.43.88
 boto3-stubs==1.43.88
 mypy-boto3-s3==1.43.66
 mypy==2.3.1
+numpy==2.5.2
 psycopg==3.3.5
 psycopg-binary==3.3.5
+pyogrio==0.13.0
 pytest==9.1.1
 ruff==0.16.5
 sentry-sdk==2.68.1

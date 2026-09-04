@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 dependencies = [
     "boto3==1.43.88",
     "psycopg[binary]==3.3.5",
+    "pyogrio==0.13.0",
     "sentry-sdk==2.68.1",
 ]
 
@@ -26,3 +27,7 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 python_version = "3.12"
 strict = true
 mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = "pyogrio.*"
+ignore_missing_imports = true
