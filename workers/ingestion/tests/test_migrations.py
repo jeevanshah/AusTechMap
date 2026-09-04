@@ -196,6 +196,19 @@ def test_geographic_foundation_constraints() -> None:
         ).fetchone()
         assert source_id is not None
 
+        # Deactivate any release another test already left active for this
+        # dataset first (the "one active per dataset" constraint is global
+        # across the whole shared test database, not scoped to this test) so
+        # the insert below is guaranteed to succeed regardless of ordering,
+        # and the *second* insert a few lines down is what actually proves
+        # the constraint fires.
+        connection.execute(
+            """
+            UPDATE geography_releases SET is_active = false
+            WHERE dataset = 'home_affairs_regional' AND is_active
+            """
+        )
+
         release_id = connection.execute(
             """
             INSERT INTO geography_releases (
