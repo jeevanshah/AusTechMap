@@ -38,6 +38,10 @@ graphify-out/
 .local/
 tmp/
 temp/
+scratch/
+
+# Claude Code local settings/state
+.claude/
 
 # Superseded source/conversion artifacts retained locally
 Australia_Tech_Map_Production_Implementation_Plan_UPDATED.docx
