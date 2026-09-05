@@ -9,8 +9,11 @@ import pytest
 
 from austechmap_ingestion.db.migrations import apply_migrations
 from austechmap_ingestion.hiring.ats_source_seed import (
+    ATS_SOURCE_SEED,
+    DEFAULT_FIXTURE_PATH,
     AtsSourceSeed,
     AtsSourceSeedError,
+    load_ats_source_seed_fixture,
     seed_ats_sources,
 )
 
@@ -24,6 +27,31 @@ def _database_url() -> str:
         pytest.skip("TEST_DATABASE_URL is not configured")
     apply_migrations(database_url, MIGRATIONS_DIRECTORY)
     return database_url
+
+
+def test_default_fixture_exists_and_parses() -> None:
+    assert DEFAULT_FIXTURE_PATH.exists()
+    seeds = load_ats_source_seed_fixture()
+    assert seeds == ATS_SOURCE_SEED
+    assert len(seeds) == 10
+    by_domain = {seed.company_domain: seed for seed in seeds}
+    assert by_domain["kasada.io"].ats_provider == "lever"
+    assert by_domain["kasada.io"].ats_identifier == "kasada"
+    assert by_domain["vowfood.com"].ats_provider == "ashby"
+    assert by_domain["vowfood.com"].ats_identifier == "vow"
+    assert all(seed.discovered_method == "manual_verified" for seed in seeds)
+
+
+def test_load_ats_source_seed_fixture_rejects_an_unrecognised_provider(
+    tmp_path: Path,
+) -> None:
+    bad_fixture = tmp_path / "bad.csv"
+    bad_fixture.write_text(
+        'company_domain,ats_provider,ats_identifier\nexample.com,workday,example\n',
+        encoding="utf-8",
+    )
+    with pytest.raises(AtsSourceSeedError, match="unrecognised ats_provider"):
+        load_ats_source_seed_fixture(bad_fixture)
 
 
 @pytest.mark.integration

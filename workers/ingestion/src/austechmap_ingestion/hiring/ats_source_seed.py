@@ -1,19 +1,25 @@
-"""One-time manual registration of the ATS sources verified against real
-data (Phase 5): Immutable's Lever site and Dovetail's Ashby board, found
-by actually fetching their careers pages and grepping for a known ATS
-domain reference -- a plain constant tuple, not a CSV, since 2 rows
-doesn't warrant fixture-file ceremony; promote to a CSV (mirroring
-employers/seed.py's precedent) once this list reaches double digits.
+"""Registration of the ATS sources verified against real data (Phase 5):
+each row is a company whose careers page was actually fetched and found
+to reference a known ATS domain, then independently confirmed by calling
+that ATS's real public API before being added here -- never registered
+on a URL-pattern guess alone.
 
-Automated ATS discovery (turning that fetch+grep technique into a
-repeatable tool) is explicitly deferred -- this stays a manual research
-step for now.
+Now a CSV fixture (mirroring employers/seed.py's precedent), promoted
+from a 2-row plain constant tuple once real ATS-discovery research (see
+IMPLEMENTATION_PLAN.md Phase 5) pushed the list past the "double digits"
+threshold this module originally deferred that promotion to.
+
+Automated ATS discovery (turning the fetch+grep technique into a
+repeatable tool, rather than a manual research pass each time) remains
+explicitly deferred.
 """
 
 from __future__ import annotations
 
+import csv
 from dataclasses import dataclass
-from typing import Literal
+from pathlib import Path
+from typing import Literal, cast
 
 import psycopg
 
@@ -22,10 +28,13 @@ from austechmap_ingestion.hiring.company_sources import AtsProvider
 from austechmap_ingestion.jobs import JobRepository
 
 SOURCE_KEY = "ats-discovery"
+DEFAULT_FIXTURE_PATH = Path(__file__).parent / "fixtures" / "ats_source_seed_20260905.csv"
+_VALID_PROVIDERS = frozenset({"lever", "ashby"})
 
 
 class AtsSourceSeedError(Exception):
-    """Raised for a domain that resolves to zero or more than one company."""
+    """Raised for a domain that resolves to zero or more than one company,
+    or for a malformed seed fixture."""
 
 
 @dataclass(frozen=True)
@@ -36,10 +45,27 @@ class AtsSourceSeed:
     discovered_method: Literal["manual_verified"] = "manual_verified"
 
 
-ATS_SOURCE_SEED: tuple[AtsSourceSeed, ...] = (
-    AtsSourceSeed(company_domain="immutable.com", ats_provider="lever", ats_identifier="immutable"),
-    AtsSourceSeed(company_domain="dovetail.com", ats_provider="ashby", ats_identifier="dovetail"),
-)
+def load_ats_source_seed_fixture(path: Path = DEFAULT_FIXTURE_PATH) -> tuple[AtsSourceSeed, ...]:
+    with path.open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        seeds = []
+        for row in reader:
+            provider = row["ats_provider"].strip()
+            if provider not in _VALID_PROVIDERS:
+                raise AtsSourceSeedError(f"unrecognised ats_provider: {provider!r}")
+            seeds.append(
+                AtsSourceSeed(
+                    company_domain=row["company_domain"].strip(),
+                    ats_provider=cast(AtsProvider, provider),
+                    ats_identifier=row["ats_identifier"].strip(),
+                )
+            )
+    if not seeds:
+        raise AtsSourceSeedError(f"no ATS sources found in {path}")
+    return tuple(seeds)
+
+
+ATS_SOURCE_SEED: tuple[AtsSourceSeed, ...] = load_ats_source_seed_fixture()
 
 
 @dataclass(frozen=True)
