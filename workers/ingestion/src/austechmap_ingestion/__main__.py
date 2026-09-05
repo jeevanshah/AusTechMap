@@ -7,6 +7,8 @@ from pathlib import Path
 import psycopg
 
 from austechmap_ingestion.db.migrations import MigrationError, apply_migrations
+from austechmap_ingestion.employers.category_apply import apply_company_categories
+from austechmap_ingestion.employers.category_seed import seed_categories
 from austechmap_ingestion.employers.geocoding import (
     GeocodingError,
     geocode_address,
@@ -97,6 +99,17 @@ def build_parser() -> argparse.ArgumentParser:
         "seed-taxonomy", help="seed the v1 role-family and skills taxonomies"
     )
     taxonomy_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    category_seed_parser = subparsers.add_parser(
+        "seed-categories", help="seed the v1 company/technology niche taxonomy (Appendix A.1)"
+    )
+    category_seed_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    category_classify_parser = subparsers.add_parser(
+        "classify-employer-categories",
+        help="keyword-classify seeded companies' niches from their seed-research reason text",
+    )
+    category_classify_parser.add_argument(
+        "--database-url", default=os.environ.get("DATABASE_URL")
+    )
     ats_seed_parser = subparsers.add_parser(
         "seed-ats-sources", help="register the manually verified ATS sources"
     )
@@ -254,6 +267,50 @@ def main(argv: Sequence[str] | None = None) -> int:
                 {
                     "roleFamiliesCreated": taxonomy_stats.role_families_created,
                     "skillsCreated": taxonomy_stats.skills_created,
+                },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "seed-categories":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        try:
+            category_stats = seed_categories(args.database_url)
+        except psycopg.Error as error:
+            print(f"Category seed failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "groupsCreated": category_stats.groups_created,
+                    "nichesCreated": category_stats.niches_created,
+                },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "classify-employer-categories":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        try:
+            apply_stats = apply_company_categories(args.database_url)
+        except psycopg.Error as error:
+            print(f"Category classification failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "companiesConsidered": apply_stats.companies_considered,
+                    "companiesMatched": apply_stats.companies_matched,
+                    "linksCreated": apply_stats.links_created,
+                    "companiesWithoutReason": list(apply_stats.companies_without_reason),
                 },
                 separators=(",", ":"),
                 sort_keys=True,
