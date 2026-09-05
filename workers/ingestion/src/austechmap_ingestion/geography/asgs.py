@@ -77,8 +77,10 @@ def parse_asgs_boundary_file(path: Path, mapping: AsgsFieldMapping) -> list[Asgs
 
     features: list[AsgsFeature] = []
     for index, geometry_wkb in enumerate(geometries):
-        if geometry_wkb is None:
-            raise GeographyImportError(f"{path} feature {index} has no geometry")
+        if geometry_wkb is None or len(geometry_wkb) == 0:
+            # Skip non-spatial entities, e.g. "Migratory - Offshore -
+            # Shipping", "No usual address", "Outside Australia".
+            continue
         features.append(
             AsgsFeature(
                 code=str(codes[index]),

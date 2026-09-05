@@ -88,6 +88,39 @@ def test_parse_asgs_boundary_file_without_parent_field(tmp_path: Path) -> None:
     assert all(feature.parent_code is None for feature in features)
 
 
+def _write_sa2_geopackage_with_non_spatial_entity(path: Path) -> None:
+    # Real ABS ASGS releases include census accounting entities with no
+    # geometry (e.g. "Migratory - Offshore - Shipping", "No usual address",
+    # "Outside Australia") alongside genuine spatial polygons.
+    geometries = np.array([_wkb_polygon(_SQUARE_A), None, _wkb_polygon(_SQUARE_B)], dtype=object)
+    codes = np.array(["101021007", "199999499", "101021008"])
+    names = np.array(["Braidwood", "Migratory - Offshore - Shipping (NSW)", "Karabar"])
+    parents = np.array(["101", "199", "101"])
+    ogr_write(
+        str(path),
+        geometry=geometries,
+        field_data=[codes, names, parents],
+        fields=["SA2_CODE21", "SA2_NAME21", "SA3_CODE21"],
+        geometry_type="Polygon",
+        crs="EPSG:4326",
+        driver="GPKG",
+    )
+
+
+def test_parse_asgs_boundary_file_skips_non_spatial_entities(tmp_path: Path) -> None:
+    gpkg_path = tmp_path / "sa2_non_spatial.gpkg"
+    _write_sa2_geopackage_with_non_spatial_entity(gpkg_path)
+
+    features = parse_asgs_boundary_file(
+        gpkg_path,
+        AsgsFieldMapping(
+            code_field="SA2_CODE21", name_field="SA2_NAME21", parent_code_field="SA3_CODE21"
+        ),
+    )
+
+    assert [f.code for f in features] == ["101021007", "101021008"]
+
+
 def test_parse_asgs_boundary_file_raises_for_missing_field(tmp_path: Path) -> None:
     gpkg_path = tmp_path / "sa2.gpkg"
     _write_sa2_geopackage(gpkg_path)
