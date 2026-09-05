@@ -7,7 +7,11 @@ from pathlib import Path
 import psycopg
 
 from austechmap_ingestion.db.migrations import MigrationError, apply_migrations
-from austechmap_ingestion.employers.geocoding import GeocodingError
+from austechmap_ingestion.employers.geocoding import (
+    GeocodingError,
+    geocode_address,
+    geocode_address_nominatim,
+)
 from austechmap_ingestion.employers.locations_seed import (
     DEFAULT_FIXTURE_PATH as DEFAULT_ADDRESS_FIXTURE_PATH,
 )
@@ -70,6 +74,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="geocode the alpha-cohort address research and link it to seeded companies",
     )
     location_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    location_parser.add_argument(
+        "--provider",
+        choices=["nominatim", "mapbox"],
+        default="nominatim",
+        help="geocoding provider: nominatim needs no signup (default); "
+        "mapbox needs --mapbox-token / MAPBOX_TOKEN",
+    )
     location_parser.add_argument("--mapbox-token", default=os.environ.get("MAPBOX_TOKEN"))
     location_parser.add_argument(
         "--fixture",
@@ -175,12 +186,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         if not args.database_url:
             print("DATABASE_URL or --database-url is required")
             return 2
-        if not args.mapbox_token:
-            print("MAPBOX_TOKEN or --mapbox-token is required")
+        if args.provider == "mapbox" and not args.mapbox_token:
+            print("MAPBOX_TOKEN or --mapbox-token is required for --provider mapbox")
             return 2
+        geocode_fn = geocode_address if args.provider == "mapbox" else geocode_address_nominatim
+        credential = args.mapbox_token if args.provider == "mapbox" else ""
         try:
             location_stats = run_location_seed_import(
-                args.database_url, args.mapbox_token, args.fixture
+                args.database_url, credential, args.fixture, geocode_fn=geocode_fn
             )
         except (LocationSeedError, GeocodingError, psycopg.Error) as error:
             print(f"Location seed import failed: {error}")

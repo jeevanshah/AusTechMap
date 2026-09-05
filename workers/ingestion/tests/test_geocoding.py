@@ -1,16 +1,19 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Mapping
 from unittest.mock import MagicMock, patch
 from urllib.error import HTTPError
 
 import pytest
 
-from austechmap_ingestion.employers.geocoding import GeocodingError, geocode_address
+from austechmap_ingestion.employers.geocoding import (
+    GeocodingError,
+    geocode_address,
+    geocode_address_nominatim,
+)
 
 
-def _fake_response(payload: Mapping[str, object]) -> MagicMock:
+def _fake_response(payload: object) -> MagicMock:
     response = MagicMock()
     response.read.return_value = json.dumps(payload).encode("utf-8")
     response.__enter__.return_value = response
@@ -58,3 +61,45 @@ def test_geocode_address_raises_for_http_error() -> None:
         pytest.raises(GeocodingError, match="401"),
     ):
         geocode_address("bad-token", "341 George Street, Sydney NSW 2000, Australia")
+
+
+def test_geocode_address_nominatim_parses_a_successful_match() -> None:
+    payload = [
+        {"lat": "-33.8688197", "lon": "151.2092955", "display_name": "341 George St, Sydney"}
+    ]
+    with (
+        patch(
+            "austechmap_ingestion.employers.geocoding.urlopen",
+            return_value=_fake_response(payload),
+        ),
+        patch("austechmap_ingestion.employers.geocoding.time.sleep"),
+    ):
+        result = geocode_address_nominatim(
+            "unused", "341 George Street, Sydney NSW 2000, Australia"
+        )
+
+    assert result.longitude == pytest.approx(151.2092955)
+    assert result.latitude == pytest.approx(-33.8688197)
+    assert result.full_address == "341 George St, Sydney"
+
+
+def test_geocode_address_nominatim_raises_for_zero_matches() -> None:
+    with (
+        patch(
+            "austechmap_ingestion.employers.geocoding.urlopen",
+            return_value=_fake_response([]),
+        ),
+        patch("austechmap_ingestion.employers.geocoding.time.sleep"),
+        pytest.raises(GeocodingError, match="no geocoding match"),
+    ):
+        geocode_address_nominatim("unused", "nonexistent place, nowhere")
+
+
+def test_geocode_address_nominatim_raises_for_http_error() -> None:
+    error = HTTPError(url="", code=429, msg="Too Many Requests", hdrs=None, fp=None)  # type: ignore[arg-type]
+    with (
+        patch("austechmap_ingestion.employers.geocoding.urlopen", side_effect=error),
+        patch("austechmap_ingestion.employers.geocoding.time.sleep"),
+        pytest.raises(GeocodingError, match="429"),
+    ):
+        geocode_address_nominatim("unused", "341 George Street, Sydney NSW 2000, Australia")

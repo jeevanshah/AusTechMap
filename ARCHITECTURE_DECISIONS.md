@@ -2,7 +2,7 @@
 
 > Satisfies [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) Phase 0: "Record architecture decisions for the database, map provider, storage, hosting, authentication, email, and analytics."
 > This document is authoritative for technology choices — where it conflicts with [PRODUCT_SPEC.md](./PRODUCT_SPEC.md)'s recommendations, this document wins.
-> Version 3.4 · 5 September 2026
+> Version 3.5 · 5 September 2026
 
 ## 1. Decision summary
 
@@ -77,11 +77,15 @@ Use Pro (~US$20/month) from Phase 0, not just from public launch. Vercel's Hobby
 
 **Interim state (4 September 2026):** the Phase 1 exit-gate deployment was verified on Vercel's free Hobby tier, not Pro, on explicit cost grounds — the founder isn't paying for Pro yet. This is a deliberate, known deviation from the decision above, not an oversight: Hobby's terms restrict it to personal, non-commercial use, so this must be upgraded to Pro **before** any real alpha user, real employer data reaching the public product, or any commercial activity — whichever comes first. Don't treat Hobby as validated for anything beyond proving the deployment mechanism itself.
 
-### 3.5 Map — Mapbox GL JS
+### 3.5 Map — MapLibre GL JS
 
-Confirmed per founder decision. Free tier (~50,000 map loads/month) should cover V1 traffic; monitor usage from first public launch since this is the one usage-metered layer most exposed to organic traffic spikes.
+**Changed from Mapbox GL JS (5 September 2026).** The original decision anticipated reconsidering Mapbox only if map loads approached its free-tier ceiling; the actual trigger arrived earlier and differently — Mapbox's signup now requires a payment method on file before any development use at all, not just once traffic is real, which is a hard blocker for a cost-conscious alpha with no committed budget yet, not a future risk worth merely monitoring. Verified before switching, not assumed: MapLibre GL JS is the BSD-3-Clause-licensed community fork of Mapbox GL JS's last open-source release (v1.31.1, forked when Mapbox went proprietary in December 2020); it is actively maintained, carries no usage telemetry or metered billing, and shares Mapbox GL JS's style-spec/layer/clustering API closely enough to be a near drop-in fit for Phase 4's actual needs (vector basemap, client-side clustering of 133–1,000 employer pins, PostGIS bounding-box queries, click-through profile drawers).
 
-**Reconsider if:** map loads approach the free tier ceiling — MapLibre GL (API-compatible fork) plus a free/self-hosted tile source (Protomaps, MapTiler free tier) is the documented fallback, and because MapLibre shares Mapbox's GL JS API surface, the migration cost is real but bounded (mostly style/tile-source config, not application logic).
+**Tile source:** start with OpenFreeMap's free hosted vector tiles (openfreemap.org — no signup, no cost, no infrastructure to run; verified as a real, actively-maintained project publishing full-planet OpenStreetMap vector tiles under an open licence) rather than building a custom tile pipeline before Phase 4 even starts.
+
+**Reconsider if:** OpenFreeMap's reliability, rate limits, or terms become a problem, or once traffic genuinely justifies owning the tile infrastructure directly — self-host an Australia-only PMTiles extract (built with Protomaps' tooling from OSM data, on the order of 1–2 GB, far smaller than OpenFreeMap's own ~90 GB full-planet file) in the project's already-provisioned Cloudflare R2 bucket (§3.3), served via HTTP range requests through the pmtiles protocol — R2's zero egress fees make ongoing hosting cost effectively zero. Not adopted now because Phase 4 hasn't started and a custom tile pipeline isn't needed yet.
+
+Geocoding (turning a company address into coordinates, distinct from rendering the map itself) is unaffected by this decision either way — see §4.3's interim-state note on how the Phase 3 seed cohort's addresses were actually resolved.
 
 ### 3.6 Authentication — NextAuth / Auth.js
 
@@ -296,13 +300,17 @@ failed gate leaves the prior release active and creates a failed auditable impor
 
 **Interim state (5 September 2026):** no G-NAF release has been acquired yet, so the exact-match
 contract above has no reference data to run against. The Phase 3 alpha seed cohort's 133 real,
-researched street addresses were instead resolved via the Mapbox Geocoding API — the project's own
-already-chosen map provider (§3.5), not a second vendor introduced for this — recorded in
-`resolved_locations` with `location_match_method = 'external_geocoder'` (migration `0008`), distinct
-from `gnaf_exact_match` so provenance stays honest about how each point was actually obtained.
-Upgrade trigger: once a real G-NAF release is acquired and activated, re-resolve these addresses
-through the exact-match pipeline above and retire the `external_geocoder` rows, rather than treating
-Mapbox geocoding as a permanent substitute for the G-NAF contract this section actually specifies.
+researched street addresses are instead resolved via a third-party geocoding API — OpenStreetMap's
+Nominatim by default (no signup or payment method required, self-throttled to its 1 request/second
+usage-policy limit), with the Mapbox Geocoding API available as an alternate provider behind the same
+interface if ever preferred — recorded in `resolved_locations` with
+`location_match_method = 'external_geocoder'` (migration `0008`), distinct from `gnaf_exact_match` so
+provenance stays honest about how each point was actually obtained. This is unrelated to §3.5's map
+renderer/tile-source decision — geocoding an address and rendering a map are different concerns, and
+this interim choice holds regardless of which one that section names. Upgrade trigger: once a real
+G-NAF release is acquired and activated, re-resolve these addresses through the exact-match pipeline
+above and retire the `external_geocoder` rows, rather than treating either geocoding API as a
+permanent substitute for the G-NAF contract this section actually specifies.
 
 ### 4.4 Database backup, restore, and retention
 
