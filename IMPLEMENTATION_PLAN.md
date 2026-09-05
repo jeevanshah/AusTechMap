@@ -1,7 +1,7 @@
 # Australia Tech Map — Implementation Plan
 
 > Execution plan derived from [PRODUCT_SPEC.md](./PRODUCT_SPEC.md). [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) is authoritative for technology choices where it conflicts with either document.  
-> Version 3.9 · 5 September 2026
+> Version 4.0 · 5 September 2026
 
 ## 1. Objective
 
@@ -227,13 +227,13 @@ Exit gate: monitored sources meet the refresh target; snapshots can be replayed;
 Goal: publish migration and regional information without unsupported claims.
 
 #### Track 6A: Sponsorship Evidence
-- [ ] Import Home Affairs labour-agreement sources (5,900+ agreements) with source versions and effective dates.
-- [ ] Separate current employer evidence, historical evidence, role-specific wording, and regional context.
-- [ ] Require evidence links, observation dates, confidence, and status on every displayed claim.
-- [ ] Add stale, superseded, rejected, and review-required evidence states.
-- [ ] Build evidence review and source-comparison screens.
-- [ ] Add visible caveats that evidence does not guarantee sponsorship for an applicant or role.
-- [ ] Activate sponsorship evidence filters on the public map and search interface.
+- [ ] Import Home Affairs labour-agreement sources (5,900+ agreements) with source versions and effective dates. `employers/labour_agreements.py` is built and tested (exact-name auto-accept, `pg_trgm`-fuzzy-to-review, no-match-leaves-untouched) but has deliberately no default fixture — a direct fetch from this environment returns HTTP 403 (same bot-blocking Phase 2's Home Affairs regional import hit); acquiring the real file needs a real browser, not done yet.
+- [~] Separate current employer evidence, historical evidence, role-specific wording, and regional context. Current/historical explicit evidence is derived from Phase 5's real job postings (`employers/sponsorship_evidence.py`) — a conservative keyword classifier with a negation guard, checked against the real fixture text before writing anything (zero real hits currently, an honest finding given only 9 companies/92 jobs exist). Labour-agreement evidence is its own claim type. Regional/DAMA-specific sponsorship context is not addressed — deferred with Track 6B.
+- [~] Require evidence links, observation dates, confidence, and status on every displayed claim. Source links and observation dates are shown on the employer profile's sponsorship panel; numeric confidence is stored (`evidence.confidence`) but not yet surfaced in that UI; per-claim lifecycle status (stale/superseded) isn't tracked at all — see the next item.
+- [ ] Add stale, superseded, rejected, and review-required evidence states. Not built — `evidence` rows have no status field; only `review_queue_items` (a different, unconfirmed-match mechanism) has pending/approved/rejected.
+- [~] Build evidence review and source-comparison screens. `/admin/review` now handles a `sponsorship_match` kind (approve writes the evidence row, reject just declines) alongside the existing `candidate_match` one — a general-purpose, multi-source "compare and pick" screen for arbitrary evidence types is not built, a deliberate scope decision matching how this screen has only ever handled one `kind` at a time.
+- [x] Add visible caveats that evidence does not guarantee sponsorship for an applicant or role. PRODUCT_SPEC.md §8.5's exact disclaimer wording is always shown on the employer profile's sponsorship panel, regardless of whether any evidence exists.
+- [x] Activate sponsorship evidence filters on the public map and search interface. A `?sponsorship=true` boolean filter (mirrors the category filter's shape exactly) is wired into both `/api/map/companies` and `/api/search/companies`, plus a checkbox in the map/search UI — built and tested against CI's real Postgres service; real coverage is still 0% until `derive-sponsorship-evidence`/`match-labour-agreements` actually run against production.
 
 #### Track 6B: Regional Intelligence & Scoring
 - [ ] Build region pages and DAMA context on Phase 2's canonical Home Affairs import (no re-import here).
@@ -243,7 +243,7 @@ Goal: publish migration and regional information without unsupported claims.
 - [ ] Store score components, methodology version, input period, and sufficiency result.
 - [ ] Suppress scores when coverage or history is insufficient.
 
-Exit gate: every sponsorship claim is inspectable and sourced; region scores are reproducible; insufficient data produces an honest empty state rather than false precision.
+Exit gate: every sponsorship claim is inspectable and sourced; region scores are reproducible; insufficient data produces an honest empty state rather than false precision. **Not closed** — Track 6A's sponsorship-evidence infrastructure is real and tested (job-description keyword classifier, labour-agreement matcher, evidence review, map/search filters, employer-profile display) but not yet run against production, and Track 6B (region scores) hasn't been started at all, per the alpha/beta checkpoint's own "ship 0-6A, not 0-6B" scoping below.
 
 #### Alpha/beta checkpoint (before Phase 7)
 
