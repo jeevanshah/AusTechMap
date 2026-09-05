@@ -132,7 +132,7 @@ def test_run_location_seed_import_resolves_and_links(tmp_path: Path) -> None:
     fixture_path = tmp_path / "addresses.csv"
     _write_fixture(
         fixture_path,
-        [(domain, "341 George Street", "Sydney", "NSW", "2000", "High", "test office")],
+        [(domain, "341 George Street", f"Sydney {suffix}", "NSW", "2000", "High", "test office")],
     )
 
     with psycopg.connect(database_url, autocommit=True) as connection:
@@ -175,7 +175,7 @@ def test_run_location_seed_import_is_idempotent_on_retry(tmp_path: Path) -> None
     fixture_path = tmp_path / "addresses.csv"
     _write_fixture(
         fixture_path,
-        [(domain, "1 Test Street", "Melbourne", "VIC", "3000", "High", "test office")],
+        [(domain, "1 Test Street", f"Melbourne {suffix}", "VIC", "3000", "High", "test office")],
     )
 
     with psycopg.connect(database_url, autocommit=True) as connection:
@@ -206,13 +206,14 @@ def test_run_location_seed_import_falls_back_past_unit_prefix(tmp_path: Path) ->
     suffix = uuid.uuid4().hex
     domain = f"fallback-{suffix}.example.com"
     fixture_path = tmp_path / "addresses.csv"
+    suburb = f"Sydney {suffix}"
     _write_fixture(
         fixture_path,
         [
             (
                 domain,
                 "Level 6, 341 George Street",
-                "Sydney",
+                suburb,
                 "NSW",
                 "2000",
                 "High",
@@ -244,8 +245,8 @@ def test_run_location_seed_import_falls_back_past_unit_prefix(tmp_path: Path) ->
     assert stats.resolved == 1
     assert stats.errors == ()
     assert calls == [
-        "Level 6, 341 George Street, Sydney NSW 2000, Australia",
-        "341 George Street, Sydney NSW 2000, Australia",
+        f"Level 6, 341 George Street, {suburb} NSW 2000, Australia",
+        f"341 George Street, {suburb} NSW 2000, Australia",
     ]
 
     with psycopg.connect(database_url) as connection:
@@ -258,7 +259,7 @@ def test_run_location_seed_import_falls_back_past_unit_prefix(tmp_path: Path) ->
             """,
             (company_id,),
         ).fetchone()
-    assert input_text == ("341 George Street, Sydney NSW 2000, Australia",)
+    assert input_text == (f"341 George Street, {suburb} NSW 2000, Australia",)
 
 
 @pytest.mark.integration
