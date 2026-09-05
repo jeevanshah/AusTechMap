@@ -2,7 +2,7 @@
 
 > Satisfies [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) Phase 0: "Record architecture decisions for the database, map provider, storage, hosting, authentication, email, and analytics."
 > This document is authoritative for technology choices — where it conflicts with [PRODUCT_SPEC.md](./PRODUCT_SPEC.md)'s recommendations, this document wins.
-> Version 3.3 · 5 September 2026
+> Version 3.4 · 5 September 2026
 
 ## 1. Decision summary
 
@@ -293,6 +293,16 @@ batch geocoding the comparatively small set of employer addresses.
 Activation requires schema/count checks, duplicate-PID checks, coordinate bounds, state-level count
 deltas, exact-match regression fixtures, and a sample comparison against the previous release. A
 failed gate leaves the prior release active and creates a failed auditable import run.
+
+**Interim state (5 September 2026):** no G-NAF release has been acquired yet, so the exact-match
+contract above has no reference data to run against. The Phase 3 alpha seed cohort's 133 real,
+researched street addresses were instead resolved via the Mapbox Geocoding API — the project's own
+already-chosen map provider (§3.5), not a second vendor introduced for this — recorded in
+`resolved_locations` with `location_match_method = 'external_geocoder'` (migration `0008`), distinct
+from `gnaf_exact_match` so provenance stays honest about how each point was actually obtained.
+Upgrade trigger: once a real G-NAF release is acquired and activated, re-resolve these addresses
+through the exact-match pipeline above and retire the `external_geocoder` rows, rather than treating
+Mapbox geocoding as a permanent substitute for the G-NAF contract this section actually specifies.
 
 ### 4.4 Database backup, restore, and retention
 

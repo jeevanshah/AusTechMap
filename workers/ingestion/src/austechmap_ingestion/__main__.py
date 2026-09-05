@@ -7,6 +7,14 @@ from pathlib import Path
 import psycopg
 
 from austechmap_ingestion.db.migrations import MigrationError, apply_migrations
+from austechmap_ingestion.employers.geocoding import GeocodingError
+from austechmap_ingestion.employers.locations_seed import (
+    DEFAULT_FIXTURE_PATH as DEFAULT_ADDRESS_FIXTURE_PATH,
+)
+from austechmap_ingestion.employers.locations_seed import (
+    LocationSeedError,
+    run_location_seed_import,
+)
 from austechmap_ingestion.employers.seed import (
     DEFAULT_FIXTURE_PATH,
     SeedImportError,
@@ -56,6 +64,18 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=DEFAULT_FIXTURE_PATH,
         help="candidate CSV to seed from (defaults to the alpha cohort fixture)",
+    )
+    location_parser = subparsers.add_parser(
+        "seed-locations",
+        help="geocode the alpha-cohort address research and link it to seeded companies",
+    )
+    location_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    location_parser.add_argument("--mapbox-token", default=os.environ.get("MAPBOX_TOKEN"))
+    location_parser.add_argument(
+        "--fixture",
+        type=Path,
+        default=DEFAULT_ADDRESS_FIXTURE_PATH,
+        help="address CSV to geocode from (defaults to the alpha cohort address fixture)",
     )
     return parser
 
@@ -143,6 +163,37 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "skippedLowConfidence": list(stats.skipped_low_confidence),
                     "errors": [
                         {"name": name, "error": message} for name, message in stats.errors
+                    ],
+                },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "seed-locations":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        if not args.mapbox_token:
+            print("MAPBOX_TOKEN or --mapbox-token is required")
+            return 2
+        try:
+            location_stats = run_location_seed_import(
+                args.database_url, args.mapbox_token, args.fixture
+            )
+        except (LocationSeedError, GeocodingError, psycopg.Error) as error:
+            print(f"Location seed import failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "resolved": location_stats.resolved,
+                    "reused": location_stats.reused,
+                    "unmatchedDomains": list(location_stats.unmatched_domains),
+                    "errors": [
+                        {"domain": domain, "error": message}
+                        for domain, message in location_stats.errors
                     ],
                 },
                 separators=(",", ":"),
