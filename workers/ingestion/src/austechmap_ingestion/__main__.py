@@ -25,6 +25,11 @@ from austechmap_ingestion.employers.seed import (
     run_seed_import,
 )
 from austechmap_ingestion.health import build_health
+from austechmap_ingestion.hiring.ats_source_seed import AtsSourceSeedError, seed_ats_sources
+from austechmap_ingestion.hiring.company_sources import list_active_ats_sources
+from austechmap_ingestion.hiring.normalisation import SkillDef
+from austechmap_ingestion.hiring.pipeline import run_ats_crawl
+from austechmap_ingestion.hiring.taxonomy_seed import SKILLS, seed_taxonomy
 from austechmap_ingestion.jobs import JobError, JobRepository
 from austechmap_ingestion.observability import (
     build_error_reporter_from_env,
@@ -87,6 +92,26 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=DEFAULT_ADDRESS_FIXTURE_PATH,
         help="address CSV to geocode from (defaults to the alpha cohort address fixture)",
+    )
+    taxonomy_parser = subparsers.add_parser(
+        "seed-taxonomy", help="seed the v1 role-family and skills taxonomies"
+    )
+    taxonomy_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    ats_seed_parser = subparsers.add_parser(
+        "seed-ats-sources", help="register the manually verified ATS sources"
+    )
+    ats_seed_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    crawl_parser = subparsers.add_parser(
+        "crawl-jobs", help="fetch job postings from a registered ATS source and persist them"
+    )
+    crawl_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    crawl_parser.add_argument("--ats-identifier")
+    crawl_parser.add_argument("--all", action="store_true")
+    crawl_parser.add_argument("--worker-id", default="ats-crawler")
+    crawl_parser.add_argument(
+        "--snapshot-root",
+        type=Path,
+        help="force filesystem storage at this path instead of RAW_SNAPSHOT_BACKEND",
     )
     return parser
 
@@ -209,6 +234,97 @@ def main(argv: Sequence[str] | None = None) -> int:
                         for domain, message in location_stats.errors
                     ],
                 },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "seed-taxonomy":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        try:
+            taxonomy_stats = seed_taxonomy(args.database_url)
+        except psycopg.Error as error:
+            print(f"Taxonomy seed failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "roleFamiliesCreated": taxonomy_stats.role_families_created,
+                    "skillsCreated": taxonomy_stats.skills_created,
+                },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "seed-ats-sources":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        try:
+            ats_stats = seed_ats_sources(args.database_url)
+        except (AtsSourceSeedError, psycopg.Error) as error:
+            print(f"ATS source seed failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {"created": ats_stats.created, "reused": ats_stats.reused},
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "crawl-jobs":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        if not args.ats_identifier and not args.all:
+            print("either --ats-identifier NAME or --all is required")
+            return 2
+        try:
+            sources = list_active_ats_sources(
+                args.database_url, ats_identifier=args.ats_identifier
+            )
+            store = (
+                FilesystemSnapshotStore(args.snapshot_root)
+                if args.snapshot_root is not None
+                else build_snapshot_store_from_env()
+            )
+            skills = tuple(SkillDef(key=s.key, label=s.label, aliases=s.aliases) for s in SKILLS)
+            repository = JobRepository(args.database_url)
+            results = [
+                run_ats_crawl(
+                    repository,
+                    store,
+                    database_url=args.database_url,
+                    company_ats_source=source,
+                    skills=skills,
+                    worker_id=args.worker_id,
+                )
+                for source in sources
+            ]
+        except (JobError, OSError, SnapshotStorageError, ValueError, psycopg.Error) as error:
+            print(f"Job crawl failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                [
+                    {
+                        "runId": str(result.run_id),
+                        "created": result.created,
+                        "fetched": result.fetched,
+                        "jobsCreated": result.jobs_created,
+                        "jobsUpdated": result.jobs_updated,
+                        "jobsUnchanged": result.jobs_unchanged,
+                        "jobsExpired": result.jobs_expired,
+                    }
+                    for result in results
+                ],
                 separators=(",", ":"),
                 sort_keys=True,
             )

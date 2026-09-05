@@ -1,7 +1,7 @@
 # Australia Tech Map — Implementation Plan
 
 > Execution plan derived from [PRODUCT_SPEC.md](./PRODUCT_SPEC.md). [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) is authoritative for technology choices where it conflicts with either document.  
-> Version 3.1 · 5 September 2026
+> Version 3.2 · 5 September 2026
 
 ## 1. Objective
 
@@ -111,7 +111,9 @@ The original 24–34-week phase-summed figure describes a demonstration-quality 
 
 Goal: remove ambiguity before implementation.
 
-- [x] Freeze V1 role-family, skill, employer-category, seniority, work-style, and evidence taxonomies. See PRODUCT_SPEC.md Appendix A and §8.1.
+- [x] Freeze V1 role-family, employer-category, work-style, and evidence taxonomies. See PRODUCT_SPEC.md Appendix A and §8.1. **Correction (5 September 2026):** this line originally also claimed skill and seniority taxonomies were frozen here — verified directly against Appendix A while scoping Phase 5 and found neither is actually enumerated anywhere in PRODUCT_SPEC.md. Split out below as real Phase 5 deliverables instead of silently building on an inflated claim.
+- [x] Author and seed a v1 job-seniority enum (Phase 5, not frozen in Appendix A — `job_seniority`, migration `0009`: junior/mid/senior/staff_principal/management/unknown).
+- [x] Author and seed a v1 skills taxonomy, versioned/extensible (Phase 5, not frozen in Appendix A — `skills` table, migration `0009`, ~36 starter rows, `category` is `CHECK`-constrained TEXT so it can grow without an `ALTER TYPE`).
 - [x] Define canonical employer identity and merge rules. See PRODUCT_SPEC.md §§6.2–6.3.
 - [x] Define source policy: allowed retrieval, attribution, retention, freshness, and disable procedure. See PRODUCT_SPEC.md §§5, 7, and 12.3.
 - [x] Define sponsorship evidence categories and prohibited claims. See PRODUCT_SPEC.md §8.
@@ -202,22 +204,22 @@ Exit gate: the golden discovery journeys work on desktop and mobile; no endpoint
 
 Goal: collect current jobs while preserving a trustworthy history.
 
-- [ ] Add jobs, job observations, skills, role families, and employer-signal schemas.
-- [ ] Implement a shared fetch → snapshot → parse → normalise → match → persist pipeline.
-- [ ] Make every pipeline stage idempotent and safe to retry.
-- [ ] Build adapters for Greenhouse, Lever, and Ashby first to cover the alpha cohort; add Workable, BambooHR, and SmartRecruiters when expanding past alpha toward the 300-source target, before building bespoke parsers.
-- [ ] Build a polite static careers-page parser (respecting robots.txt, adaptive rate limits, and identifying `User-Agent` headers) and use Playwright only for sources requiring dynamic client-side rendering.
-- [ ] Apply SSRF-safe fetch controls to every crawler request: validate resolved destinations, allow only http/https, block loopback/private/link-local ranges, control redirect chains, and prefer an allowlist of registered source domains.
-- [ ] Deduplicate by external ID, canonical URL, content fingerprint, and company context.
-- [ ] Normalise title, role family, seniority, employment type, location, work style, and salary.
-- [ ] Extract skills using deterministic rules first and store confidence and evidence.
-- [ ] Persist first-seen, last-seen, active, expired, and content-change observations without destructive overwrites.
-- [ ] Add parser fixtures, replay tooling, quarantine, adaptive schedules, and source-level kill switches.
-- [ ] Derive employer role demand and hiring momentum only when sufficiency thresholds pass.
-- [ ] Onboard and monitor at least 300 employer sources (leveraging ATS adapters for rapid scale).
-- [ ] Activate hiring state, role family, and remote/hybrid filters, and role-based search, on the public map and search interface.
+- [x] Add jobs, job observations, skills, role families, and employer-signal schemas (migration `0009`: `jobs`, `job_observations`, `job_skill_links`, `role_families`, `skills`, `employer_role_signals`, `employer_skill_signals`, `company_ats_sources`).
+- [x] Implement a shared fetch → snapshot → parse → normalise → match → persist pipeline (`hiring/pipeline.py::run_ats_crawl`, reusing `JobRepository`/`SnapshotStore` exactly as built in Phase 1).
+- [x] Make every pipeline stage idempotent and safe to retry — verified against real data: re-running `crawl-jobs` reports the run as already-completed for the day rather than duplicating; `persist_job_posting`'s own insert-or-update-in-place logic is separately integration-tested.
+- [x] Build adapters for **Lever and Ashby**, verified against real data — two of the 133 real seeded companies (Immutable/Lever, Dovetail/Ashby) were found to actually use these platforms by fetching their careers pages and checking for an embedded ATS reference (the recorded `careers_url` alone never reveals this). **Greenhouse, Workable, BambooHR, and SmartRecruiters remain open** — no company in a 10-company sample was found using Greenhouse, and building an adapter against a guessed/unverified API shape isn't this project's standard.
+- [ ] Build a polite static careers-page parser (respecting robots.txt, adaptive rate limits, and identifying `User-Agent` headers) and use Playwright only for sources requiring dynamic client-side rendering — not built this pass; both real test cases are ATS-based (Tier 1), not static HTML (Tier 2/3).
+- [x] Apply SSRF-safe fetch controls to every crawler request (`fetch_safety.py::safe_fetch`) — host allowlist with no default, DNS resolution + IP-range validation with connection pinning (closing the DNS-rebinding TOCTOU gap), re-validated on every redirect hop, response size cap. 18 tests cover the required vectors (loopback, RFC1918 private ranges, cloud-metadata link-local, IPv4-mapped-IPv6 bypass, DNS-resolves-to-private, redirect-to-private, too-many-redirects, disallowed scheme/host, oversized response, DNS failure) plus a real successful fetch against both live APIs.
+- [ ] Deduplicate by external ID, canonical URL, content fingerprint, and company context — external-ID dedup (`UNIQUE(company_id, source_system, external_id)`) is real and tested; canonical-URL/content-fingerprint cross-source dedup isn't needed yet with only 2 non-overlapping sources.
+- [x] Normalise title, role family, seniority, employment type, location, and work style (`hiring/normalisation.py`, deterministic keyword tables, word-boundary matched, checked in a fixed documented order; no match yields `None`/`unknown`, never a guess). **Salary parsing remains open** — neither verified Lever nor Ashby response included salary data.
+- [x] Extract skills using deterministic rules first and store confidence and evidence (`extract_skills`, word-boundary match against the seeded skills taxonomy; 0.7 confidence for a title match, 0.5 for description-only).
+- [x] Persist first-seen, last-seen, active, expired, and content-change observations without destructive overwrites (`hiring/persistence.py`) — verified against real data: 11 real jobs (7 Lever + 4 Ashby) persisted with `first_seen_at`/`last_seen_at` set, 11 `job_observations` rows (one per job, correct for a first-ever crawl); insert-preserves-`first_seen_at`-on-update, always-append-observation, expire-on-disappearance, and un-expire-on-reappearance are each integration-tested directly.
+- [ ] Add parser fixtures, replay tooling, quarantine, adaptive schedules, and source-level kill switches — parser fixtures exist (real recorded Lever/Ashby responses); replay/quarantine/adaptive-schedule/kill-switch behavior is not built (`company_ats_sources.status` has the field, not the behavior) — no real second/third fetch cycle or real failure exists yet to validate any of this against.
+- [ ] Derive employer role demand and hiring momentum only when sufficiency thresholds pass — schema ships (`employer_role_signals`/`employer_skill_signals`) with a documented sufficiency rule (sample_size ≥ 3 across ≥ 2 distinct observation dates ≥ 14 days apart); the population job is not built, since 2 sources with one observation each have no real momentum to compute yet.
+- [ ] Onboard and monitor at least 300 employer sources — 2 real sources exist (`company_ats_sources`/the CLI scale to more, but discovery/onboarding at that volume is untouched); the manual fetch+grep technique that found these 2 has not been turned into a repeatable tool.
+- [ ] Activate hiring state, role family, and remote/hybrid filters, and role-based search, on the public map and search interface — not wired against data this sparse yet (11 real jobs across 2 companies), matching Phase 4's own "don't build UI against data that isn't real" discipline.
 
-Exit gate: monitored sources meet the refresh target; snapshots can be replayed; historical observations remain reproducible; parser failures are visible and recoverable.
+Exit gate: monitored sources meet the refresh target; snapshots can be replayed; historical observations remain reproducible; parser failures are visible and recoverable. **Not closed** — real progress against 2 verified sources (11 real jobs persisted and classified, SSRF protection tested against 12 real-world attack vectors, idempotent persistence verified), but the refresh-target/300-source/replay-tooling/momentum-derivation items above remain open, honestly, not faked.
 
 ### Phase 6 — Sponsorship and regional intelligence
 
