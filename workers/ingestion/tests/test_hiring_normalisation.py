@@ -81,6 +81,9 @@ def test_classify_graduate_flags(title: str, graduate: bool, internship: bool) -
         ("ashby", "OnSite", "onsite"),
         ("lever", None, "unknown"),
         ("ashby", "some-future-value", "unknown"),
+        # Greenhouse's public API has no equivalent field at all -- raw is
+        # always None for it, always resolving to "unknown".
+        ("greenhouse", None, "unknown"),
     ],
 )
 def test_map_work_style(provider: str, raw: str | None, expected: str) -> None:

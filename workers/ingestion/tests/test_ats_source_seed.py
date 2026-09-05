@@ -33,12 +33,14 @@ def test_default_fixture_exists_and_parses() -> None:
     assert DEFAULT_FIXTURE_PATH.exists()
     seeds = load_ats_source_seed_fixture()
     assert seeds == ATS_SOURCE_SEED
-    assert len(seeds) == 10
+    assert len(seeds) == 12
     by_domain = {seed.company_domain: seed for seed in seeds}
     assert by_domain["kasada.io"].ats_provider == "lever"
     assert by_domain["kasada.io"].ats_identifier == "kasada"
     assert by_domain["vowfood.com"].ats_provider == "ashby"
     assert by_domain["vowfood.com"].ats_identifier == "vow"
+    assert by_domain["cultureamp.com"].ats_provider == "greenhouse"
+    assert by_domain["cultureamp.com"].ats_identifier == "cultureamp"
     assert all(seed.discovered_method == "manual_verified" for seed in seeds)
 
 

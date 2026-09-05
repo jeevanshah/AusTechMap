@@ -17,8 +17,8 @@ import hashlib
 import re
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Literal
 
+from austechmap_ingestion.hiring.company_sources import AtsProvider
 from austechmap_ingestion.hiring.types import RawJobPosting
 
 # Keys match role_families.key seeded from PRODUCT_SPEC.md Appendix A.2,
@@ -127,6 +127,14 @@ _INTERNSHIP_KEYWORDS = ("intern", "internship")
 
 _LEVER_WORK_STYLE_MAP = {"remote": "remote", "hybrid": "hybrid", "on-site": "onsite"}
 _ASHBY_WORK_STYLE_MAP = {"remote": "remote", "hybrid": "hybrid", "onsite": "onsite"}
+# Greenhouse's public job-board API has no equivalent field at all -- raw
+# is always None for it, so map_work_style's early return handles it
+# before this mapping is ever consulted.
+_WORK_STYLE_MAPS: dict[AtsProvider, dict[str, str]] = {
+    "lever": _LEVER_WORK_STYLE_MAP,
+    "ashby": _ASHBY_WORK_STYLE_MAP,
+    "greenhouse": {},
+}
 
 _TITLE_MATCH_CONFIDENCE = 0.7
 _DESCRIPTION_MATCH_CONFIDENCE = 0.5
@@ -158,12 +166,11 @@ def classify_graduate_flags(title: str) -> tuple[bool, bool]:
     return graduate_role, internship_role
 
 
-def map_work_style(provider: Literal["lever", "ashby"], raw: str | None) -> str:
+def map_work_style(provider: AtsProvider, raw: str | None) -> str:
     if raw is None:
         return "unknown"
     normalised = raw.strip().lower()
-    mapping = _LEVER_WORK_STYLE_MAP if provider == "lever" else _ASHBY_WORK_STYLE_MAP
-    return mapping.get(normalised, "unknown")
+    return _WORK_STYLE_MAPS[provider].get(normalised, "unknown")
 
 
 def normalise_title(title: str) -> str:
@@ -241,7 +248,7 @@ def compute_job_content_hash(
 
 
 def normalise_job(
-    posting: RawJobPosting, *, provider: Literal["lever", "ashby"], skills: Sequence[SkillDef]
+    posting: RawJobPosting, *, provider: AtsProvider, skills: Sequence[SkillDef]
 ) -> tuple[NormalisedJob, list[tuple[str, float]]]:
     """Ties the individual classification steps together into the one
     shape persistence.py needs. Salary parsing is out of scope this pass

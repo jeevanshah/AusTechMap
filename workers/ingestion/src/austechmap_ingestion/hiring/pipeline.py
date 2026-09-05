@@ -18,6 +18,7 @@ import psycopg
 from austechmap_ingestion.fetch_safety import SafeFetchResult, safe_fetch
 from austechmap_ingestion.hiring.ashby import fetch_ashby_postings
 from austechmap_ingestion.hiring.company_sources import CompanyAtsSource
+from austechmap_ingestion.hiring.greenhouse import fetch_greenhouse_postings
 from austechmap_ingestion.hiring.lever import fetch_lever_postings
 from austechmap_ingestion.hiring.normalisation import SkillDef, normalise_job
 from austechmap_ingestion.hiring.persistence import mark_expired_jobs, persist_job_posting
@@ -90,8 +91,12 @@ def run_ats_crawl(
     try:
         if provider == "lever":
             raw_bytes, postings = fetch_lever_postings(identifier, fetch_fn=fetch_fn)
-        else:
+        elif provider == "ashby":
             raw_bytes, postings = fetch_ashby_postings(identifier, fetch_fn=fetch_fn)
+        elif provider == "greenhouse":
+            raw_bytes, postings = fetch_greenhouse_postings(identifier, fetch_fn=fetch_fn)
+        else:
+            raise ValueError(f"unsupported ats_provider: {provider!r}")
 
         # Snapshot before parsing, per PRODUCT_SPEC.md §7.3's pipeline
         # stage order.

@@ -155,6 +155,34 @@ def test_run_ats_crawl_persists_real_ashby_postings() -> None:
 
 
 @pytest.mark.integration
+def test_run_ats_crawl_persists_real_greenhouse_postings() -> None:
+    database_url = _database_url()
+    suffix = uuid.uuid4().hex
+    company_ats_source = _setup_company_ats_source(database_url, suffix, "greenhouse", "cultureamp")
+    repository = JobRepository(database_url)
+    store = FilesystemSnapshotStore(Path(tempfile.gettempdir()) / f"pipeline-test-{suffix}")
+
+    result = run_ats_crawl(
+        repository,
+        store,
+        database_url=database_url,
+        company_ats_source=company_ats_source,
+        skills=(),
+        fetch_fn=lambda *a, **kw: _fake_fetch("greenhouse_cultureamp_postings.json"),
+    )
+
+    assert result.created is True
+    assert result.fetched == 5
+    assert result.jobs_created == 5
+
+    with psycopg.connect(database_url) as connection:
+        job_count = connection.execute(
+            "SELECT count(*) FROM jobs WHERE company_id = %s", (company_ats_source.company_id,)
+        ).fetchone()
+    assert job_count == (5,)
+
+
+@pytest.mark.integration
 def test_run_ats_crawl_is_idempotent_at_the_run_level_on_the_same_day() -> None:
     database_url = _database_url()
     suffix = uuid.uuid4().hex

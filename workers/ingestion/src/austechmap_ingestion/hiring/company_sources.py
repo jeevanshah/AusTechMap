@@ -11,7 +11,7 @@ from typing import Literal, cast
 
 import psycopg
 
-AtsProvider = Literal["lever", "ashby"]
+AtsProvider = Literal["lever", "ashby", "greenhouse"]
 
 
 @dataclass(frozen=True)
