@@ -41,6 +41,15 @@ interface SponsorshipEvidenceEntry {
   observedAt: string;
 }
 
+interface OpenJobEntry {
+  title: string;
+  roleFamily: string | null;
+  seniority: string;
+  remoteType: string;
+  sourceUrl: string | null;
+  postedAt: string | null;
+}
+
 interface CompanyProfileRow {
   id: string;
   slug: string;
@@ -59,7 +68,23 @@ interface CompanyProfileRow {
   research_observed_at: string | null;
   research_source_name: string | null;
   sponsorship_evidence: SponsorshipEvidenceEntry[];
+  open_jobs: OpenJobEntry[];
 }
+
+const SENIORITY_LABELS: Record<string, string> = {
+  junior: "Junior",
+  mid: "Mid-level",
+  senior: "Senior",
+  staff_principal: "Staff / Principal",
+  management: "Management",
+};
+
+const REMOTE_TYPE_LABELS: Record<string, string> = {
+  onsite: "On-site",
+  hybrid: "Hybrid",
+  remote: "Remote",
+  flexible_mixed: "Flexible",
+};
 
 const SPONSORSHIP_CLAIM_LABELS: Record<SponsorshipClaimType, string> = {
   sponsorship_current_explicit: "Current explicit evidence",
@@ -79,7 +104,8 @@ async function loadCompany(slug: string): Promise<CompanyProfileRow | null> {
        research.confidence AS research_confidence,
        research.observed_at AS research_observed_at,
        research.source_name AS research_source_name,
-       COALESCE(sponsorship.items, '[]'::json) AS sponsorship_evidence
+       COALESCE(sponsorship.items, '[]'::json) AS sponsorship_evidence,
+       COALESCE(jobs_data.items, '[]'::json) AS open_jobs
      FROM companies c
      LEFT JOIN companies m ON m.id = c.merged_into_company_id
      LEFT JOIN LATERAL (
@@ -120,6 +146,26 @@ async function loadCompany(slug: string): Promise<CompanyProfileRow | null> {
                'sponsorship_labour_agreement'
              )
      ) sponsorship ON true
+     -- No LIMIT here: the largest current employer has 44 real open roles,
+     -- trivial to render on one page at today's data scale. Revisit with a
+     -- cap once ATS coverage grows enough for a company's list to actually
+     -- get unwieldy -- don't add one preemptively against data that doesn't
+     -- exist yet.
+     LEFT JOIN LATERAL (
+       SELECT json_agg(
+                json_build_object(
+                  'title', j.title,
+                  'roleFamily', rf.label,
+                  'seniority', j.seniority,
+                  'remoteType', j.remote_type,
+                  'sourceUrl', j.source_url,
+                  'postedAt', j.posted_at
+                ) ORDER BY j.posted_at DESC NULLS LAST, j.first_seen_at DESC
+              ) AS items
+       FROM jobs j
+       LEFT JOIN role_families rf ON rf.id = j.role_family_id
+       WHERE j.company_id = c.id AND j.expired_at IS NULL
+     ) jobs_data ON true
      WHERE c.slug = $1`,
     [slug],
   );
@@ -373,10 +419,102 @@ export default async function CompanyProfilePage({
         </p>
       </section>
 
-      <p className="text-xs text-stone-600">
-        Hiring activity and technology-stack data will appear here once those
-        pipelines are built (Phase 5).
-      </p>
+      <section>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-emerald-950">
+            Open roles
+            {company.open_jobs.length > 0
+              ? ` (${company.open_jobs.length})`
+              : ""}
+          </h2>
+          {company.careers_url && (
+            <a
+              href={company.careers_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-medium text-emerald-800 hover:underline"
+            >
+              Careers page ↗
+            </a>
+          )}
+        </div>
+
+        {company.open_jobs.length === 0 ? (
+          <p className="rounded-xl border border-emerald-950/15 p-4 text-sm text-stone-600">
+            No open roles currently indexed for this employer.
+            {company.careers_url && (
+              <>
+                {" "}
+                Check their{" "}
+                <a
+                  href={company.careers_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-emerald-800 underline hover:text-emerald-900"
+                >
+                  careers page
+                </a>{" "}
+                directly for current openings.
+              </>
+            )}
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {company.open_jobs.map((job, index) => (
+              <li
+                key={`${job.title}-${job.postedAt ?? index}-${index}`}
+                className="flex flex-col gap-2 rounded-xl border border-emerald-950/10 bg-white p-4 shadow-2xs transition hover:border-emerald-900/30"
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  {job.sourceUrl ? (
+                    <a
+                      href={job.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-950 hover:text-emerald-800"
+                    >
+                      <span className="group-hover:underline">{job.title}</span>
+                      <span
+                        aria-hidden="true"
+                        className="text-xs text-stone-400 group-hover:text-emerald-800"
+                      >
+                        ↗
+                      </span>
+                    </a>
+                  ) : (
+                    <span className="text-sm font-semibold text-emerald-950">
+                      {job.title}
+                    </span>
+                  )}
+                  {job.postedAt && (
+                    <span className="text-xs text-stone-500">
+                      {new Date(job.postedAt).toLocaleDateString("en-AU")}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {job.roleFamily && (
+                    <span className="rounded-full bg-emerald-950/5 px-2.5 py-0.5 text-xs text-emerald-950/80">
+                      {job.roleFamily}
+                    </span>
+                  )}
+                  {SENIORITY_LABELS[job.seniority] && (
+                    <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs text-stone-700">
+                      {SENIORITY_LABELS[job.seniority]}
+                    </span>
+                  )}
+                  {REMOTE_TYPE_LABELS[job.remoteType] && (
+                    <span className="rounded-full bg-emerald-100/70 px-2.5 py-0.5 text-xs font-medium text-emerald-900">
+                      {REMOTE_TYPE_LABELS[job.remoteType]}
+                    </span>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </main>
   );
 }
