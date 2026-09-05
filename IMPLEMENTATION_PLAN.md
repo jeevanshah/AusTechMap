@@ -1,7 +1,7 @@
 # Australia Tech Map — Implementation Plan
 
 > Execution plan derived from [PRODUCT_SPEC.md](./PRODUCT_SPEC.md). [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) is authoritative for technology choices where it conflicts with either document.  
-> Version 3.0 · 5 September 2026
+> Version 3.1 · 5 September 2026
 
 ## 1. Objective
 
@@ -184,19 +184,19 @@ Exit gate: 100–200 reviewed employers exist for the alpha cohort; fewer than 1
 
 Goal: deliver the first useful public discovery experience.
 
-- [ ] Implement the bounding-box map API with PostGIS.
-- [ ] Return clusters at low zoom and minimal employer points at high zoom.
-- [ ] Add caching for common aggregate and region requests.
-- [ ] Build the responsive map shell, result list, company drawer, and mobile interaction pattern.
-- [ ] Add core filters for company category, location, and regional status (hiring state, remote type, and sponsorship evidence filters activate progressively as backend data pipelines land in Phases 5 and 6).
-- [ ] Implement company, alias, niche, suburb, postcode, and region search (role search activates in Phase 5 once role-family and job data exist).
-- [ ] Create employer profile pages with locations, careers link, sources, and freshness.
-- [ ] Add stable slugs, canonical metadata, sitemap support, empty states, and accessibility basics.
-- [ ] Index only pages backed by substantial unique data; avoid thin combinatorial SEO pages.
-- [ ] Instrument search-to-profile-to-source-click analytics.
-- [ ] Load-test large and dense map viewports.
+- [x] Implement the bounding-box map API with PostGIS (`GET /api/map/companies`, `ST_Intersects`/`ST_MakeEnvelope` against `resolved_locations.point`; `apps/web/src/lib/queries/mapCompanies.ts`). Verified against the real database: returns real points for all 133 companies within an Australia-wide bbox, `400` for a malformed bbox, `503` (not a crash) when `DATABASE_URL` is unset.
+- [x] Return clusters at low zoom and minimal employer points at high zoom — client-side, not server-side: the API returns a bbox-filtered minimal-point payload and MapLibre's built-in `cluster: true` GeoJSON source (supercluster) does the aggregation (`apps/web/src/components/map/MapCanvas.tsx`). ARCHITECTURE_DECISIONS.md §3.5 already frames MapLibre around client-side clustering at this dataset's scale (133–1,000 points); reconsider server-side clustering only if the bbox-filtered payload approaches the 250KB SLO budget.
+- [x] Add caching for common aggregate and region requests — `Cache-Control: public, s-maxage=60, stale-while-revalidate=300` on the map route (shorter window on search), made effective by snapping the bbox to a fixed grid (`apps/web/src/app/api/map/companies/bbox.ts`) so repeated pans over the same area produce the same cache key. No region-specific caching yet since Phase 2's `regions` table is still empty — nothing to cache there.
+- [x] Build the responsive map shell, result list, company drawer, and mobile interaction pattern (`apps/web/src/app/_components/HomeMapShell.tsx`): an always-in-DOM result list (map is progressive enhancement, not the only path to a company), a "Show map"/"Show list" toggle below the `lg:` breakpoint, and a drawer with careers CTA + profile link on marker/list click.
+- [~] Core filters — category filter has real SQL/API plumbing (`?category=`, joined against `company_category_links`/`categories`) but no UI control yet, since 0 categories are populated; location search works via company/alias/free-text (below); **regional status is not implemented at all**, not just deferred — `resolved_locations.migration_category` is NULL for all 133 real rows since Phase 2's Home Affairs import hasn't run against real data (blocked on Phase 2, not Phase 5/6 as the original wording implied). Hiring/remote/sponsorship filters remain correctly deferred to Phase 5/6 (no backing data).
+- [~] Search: company name and alias (Postgres `pg_trgm` similarity, `GET /api/search/companies`) is real and verified — `Atlassian` scores 1.0, the typo `atlassain` still resolves to Atlassian at score 0.43, a nonsense query returns an honest empty result. A free-text fallback against `resolved_locations.input_text` covers suburb/city text search as a stopgap. Structured postcode/region search is not implemented (Phase 2's `regions`/`postcode_rules` are empty); role search remains correctly deferred to Phase 5.
+- [x] Create employer profile pages with locations, careers link, sources, and freshness (`apps/web/src/app/companies/[slug]/page.tsx`) — real content for identity, domain, careers CTA, and a non-clustered locations map; the `employer_seed_research` evidence row is surfaced as a labelled, source-attributed research summary (not presented as verified fact), with `evidence.observed_at` as "Last checked". Role count, work-style, sponsorship, tech-stack, and hiring-chart sections are honestly omitted (not blank placeholders) with one explanatory line, since no Phase 5/6 data exists yet. `merged` companies 308-redirect to their target; `disabled` companies render with a banner and `noindex`.
+- [x] Add stable slugs, canonical metadata, sitemap support, empty states, and accessibility basics — `sitemap.ts`/`robots.ts` (133 real `/companies/{slug}` entries, verified against the real database), `generateMetadata` per profile page, branded `not-found.tsx`, empty states for both zero-result search and an empty map viewport.
+- [x] Index only pages backed by substantial unique data; avoid thin combinatorial SEO pages — only `/companies/{slug}` is generated; no `/locations`, `/roles`, `/industries`, `/regional` pages yet, since none of that data is real.
+- [~] Instrument search-to-profile-to-source-click analytics — a real, provider-agnostic call-site seam exists and is wired into the four actual UI actions (`apps/web/src/lib/analytics.ts`: `search_submitted`, `map_company_clicked`, `company_profile_viewed`, `careers_link_clicked`), but it only logs to the console today — no PostHog account exists yet (ARCHITECTURE_DECISIONS.md §3.9 names PostHog but nothing is wired up), and getting one is deliberately not forced through in this pass, the same way an unwanted Mapbox signup was avoided for geocoding (Phase 3). Swapping the stub's internals for `posthog-js` is a small change once an account exists.
+- [ ] Load-test large and dense map viewports — genuinely not done, and not fakeable: §4.5's load-test gate needs "a frozen launch-like fixture of at least 1,000 employers," and only 133 real employers exist. Revisit once real employer count grows, or once Phase 2/5/6 data makes a realistic launch-like fixture possible — not by seeding synthetic filler companies.
 
-Exit gate: the golden discovery journeys work on desktop and mobile; no endpoint sends the full dataset to the browser; search relevance and map latency meet agreed staging targets.
+Exit gate: the golden discovery journeys work on desktop and mobile; no endpoint sends the full dataset to the browser; search relevance and map latency meet agreed staging targets. **Partially met, verified against real data**: of the 25 golden queries, only GQ-01 (exact name), GQ-02 (typo), GQ-03 (alias — untestable today, 0 real aliases exist), and the map-only half of GQ-25 are checkable without Phase 5/6 role/skill/job data — GQ-01 and GQ-02 both verified correct against the real database. The other 21 golden queries, formal p95/p99 latency measurement, and the 1,000-employer load test all remain open, blocked on data or scale this phase doesn't have yet. No endpoint returns the full dataset (map and search are both bbox/hard-cap-bounded in SQL) — verified structurally, not yet load-tested.
 
 ### Phase 5 — Hiring intelligence
 
