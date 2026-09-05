@@ -50,13 +50,18 @@ def run_ats_crawl(
     crawl_time = datetime.now(UTC) if now is None else now
     identifier = company_ats_source.ats_identifier
     provider = company_ats_source.ats_provider
+    # Lowercased for internal storage/source keys only -- SnapshotStore.put()
+    # requires a lowercase slug, but the real ATS site/board identifier
+    # (used for the actual fetch URL below) is legitimately case-sensitive
+    # for some providers (e.g. Lever's "Zeller", "Lumary" 404 in lowercase).
+    source_key = f"ats-{provider}-{identifier}".lower()
 
     # A distinct data_sources row from company_ats_source.source_id: that
     # one records provenance for the discovery ("how we know this company
     # uses this ATS"); this one is the ongoing job-feed source jobs/
     # observations/skill-links actually cite.
     crawl_source_id = repository.ensure_source(
-        source_key=f"ats-{provider}-{identifier}",
+        source_key=source_key,
         name=f"{provider.capitalize()} jobs: {identifier}",
         kind="employer_first_party",
     )
@@ -84,7 +89,7 @@ def run_ats_crawl(
         # Snapshot before parsing, per PRODUCT_SPEC.md §7.3's pipeline
         # stage order.
         stored = store.put(
-            source_key=f"ats-{provider}-{identifier}",
+            source_key=source_key,
             content=raw_bytes,
             content_type="application/json",
         )

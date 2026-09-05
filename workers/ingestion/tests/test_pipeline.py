@@ -100,6 +100,32 @@ def test_run_ats_crawl_persists_real_lever_postings() -> None:
 
 
 @pytest.mark.integration
+def test_run_ats_crawl_succeeds_with_a_mixed_case_ats_identifier() -> None:
+    # Real bug found running against production: Lever's actual site slugs
+    # for some companies are case-sensitive (e.g. "Zeller", "Lumary"), but
+    # SnapshotStore.put() requires a lowercase source_key -- naively
+    # building the source_key from the identifier's original case raised
+    # ValueError on every mixed-case identifier.
+    database_url = _database_url()
+    suffix = uuid.uuid4().hex
+    company_ats_source = _setup_company_ats_source(database_url, suffix, "lever", "MixedCase")
+    repository = JobRepository(database_url)
+    store = FilesystemSnapshotStore(Path(tempfile.gettempdir()) / f"pipeline-test-{suffix}")
+
+    result = run_ats_crawl(
+        repository,
+        store,
+        database_url=database_url,
+        company_ats_source=company_ats_source,
+        skills=(),
+        fetch_fn=lambda *a, **kw: _fake_fetch("lever_immutable_postings.json"),
+    )
+
+    assert result.created is True
+    assert result.fetched == 7
+
+
+@pytest.mark.integration
 def test_run_ats_crawl_persists_real_ashby_postings() -> None:
     database_url = _database_url()
     suffix = uuid.uuid4().hex
