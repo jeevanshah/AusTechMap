@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import hashlib
+import itertools
 import os
 import struct
 import uuid
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import psycopg
@@ -46,6 +47,25 @@ def _wkb_polygon(coords: list[tuple[float, float]]) -> bytes:
     return struct.pack("<B", 1) + struct.pack("<I", 3) + struct.pack("<I", 1) + ring
 
 
+# dataset='gnaf' is shared, real state across every test in this file
+# (unlike release_version, which is uuid-suffixed) -- activating a
+# release deactivates whatever the *previous* activation anywhere in this
+# file left active, and geography_releases' `effective_to >= effective_from`
+# CHECK means each call's effective_from must never be earlier than
+# whatever's currently active. A hardcoded date here previously caused a
+# real CI failure, the same shared-test-state class of bug fixed twice
+# earlier this session in test_taxonomy_seed.py/test_category_seed.py.
+# This counter guarantees every call in this file gets a strictly later
+# date than the last, regardless of how many tests exist or their order
+# (pytest runs a single file's tests sequentially, in definition order,
+# with no xdist/randomization configured here).
+_gnaf_effective_from_counter = itertools.count()
+
+
+def _next_gnaf_effective_from() -> date:
+    return date(2026, 8, 1) + timedelta(days=next(_gnaf_effective_from_counter))
+
+
 def _insert_interim_resolved_location(
     connection: psycopg.Connection[tuple[object, ...]], *, input_text: str
 ) -> uuid.UUID:
@@ -79,7 +99,7 @@ def test_activate_gnaf_release_creates_and_activates_a_release() -> None:
         database_url,
         release_version=suffix,
         source_id=source_id,
-        effective_from=date(2026, 8, 1),
+        effective_from=_next_gnaf_effective_from(),
         content_hash="a" * 64,
         row_count=16_970_406,
     )
@@ -103,7 +123,7 @@ def test_activate_gnaf_release_is_idempotent_on_retry() -> None:
     kwargs = dict(
         release_version=suffix,
         source_id=source_id,
-        effective_from=date(2026, 8, 1),
+        effective_from=_next_gnaf_effective_from(),
         content_hash="b" * 64,
         row_count=100,
     )
@@ -122,11 +142,12 @@ def test_activate_gnaf_release_rejects_mismatched_row_count_on_retry() -> None:
     source_id = repository.ensure_source(
         source_key=f"gnaf-{suffix}", name="G-NAF", kind="government_open_data"
     )
+    retry_effective_from = _next_gnaf_effective_from()
     activate_gnaf_release(
         database_url,
         release_version=suffix,
         source_id=source_id,
-        effective_from=date(2026, 8, 1),
+        effective_from=retry_effective_from,
         content_hash="c" * 64,
         row_count=100,
     )
@@ -136,7 +157,7 @@ def test_activate_gnaf_release_rejects_mismatched_row_count_on_retry() -> None:
             database_url,
             release_version=suffix,
             source_id=source_id,
-            effective_from=date(2026, 8, 1),
+            effective_from=retry_effective_from,
             content_hash="c" * 64,
             row_count=200,
         )
@@ -151,11 +172,13 @@ def test_activate_gnaf_release_deactivates_the_previous_release() -> None:
         source_key=f"gnaf-{suffix}", name="G-NAF", kind="government_open_data"
     )
 
+    first_effective_from = _next_gnaf_effective_from()
+    second_effective_from = _next_gnaf_effective_from()
     first = activate_gnaf_release(
         database_url,
         release_version=f"v1-{suffix}",
         source_id=source_id,
-        effective_from=date(2026, 1, 1),
+        effective_from=first_effective_from,
         content_hash="d" * 64,
         row_count=100,
     )
@@ -163,7 +186,7 @@ def test_activate_gnaf_release_deactivates_the_previous_release() -> None:
         database_url,
         release_version=f"v2-{suffix}",
         source_id=source_id,
-        effective_from=date(2026, 8, 1),
+        effective_from=second_effective_from,
         content_hash="e" * 64,
         row_count=200,
     )
@@ -175,7 +198,7 @@ def test_activate_gnaf_release_deactivates_the_previous_release() -> None:
         second_state = connection.execute(
             "SELECT is_active FROM geography_releases WHERE id = %s", (second,)
         ).fetchone()
-    assert first_state == (False, date(2026, 8, 1))
+    assert first_state == (False, second_effective_from)
     assert second_state == (True,)
 
 
@@ -201,7 +224,7 @@ def test_apply_gnaf_match_to_location_upgrades_the_row_and_records_prior_state()
         database_url,
         release_version=f"gnaf-{suffix}",
         source_id=source_id,
-        effective_from=date(2026, 8, 1),
+        effective_from=_next_gnaf_effective_from(),
         content_hash="2" * 64,
         row_count=1,
     )
@@ -272,7 +295,7 @@ def test_apply_gnaf_match_to_location_rejects_a_non_accepted_match() -> None:
         database_url,
         release_version=f"gnaf-{suffix}",
         source_id=source_id,
-        effective_from=date(2026, 8, 1),
+        effective_from=_next_gnaf_effective_from(),
         content_hash="3" * 64,
         row_count=1,
     )
@@ -318,7 +341,7 @@ def test_apply_gnaf_matches_skips_non_accepted_and_applies_accepted() -> None:
         database_url,
         release_version=f"gnaf-{suffix}",
         source_id=source_id,
-        effective_from=date(2026, 8, 1),
+        effective_from=_next_gnaf_effective_from(),
         content_hash="4" * 64,
         row_count=1,
     )
