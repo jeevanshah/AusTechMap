@@ -2,6 +2,7 @@
 
 import {
   Map as MapLibreMap,
+  config,
   type GeoJSONSource,
   type MapLayerMouseEvent,
 } from "maplibre-gl";
@@ -15,6 +16,20 @@ import type { FeatureCollection } from "geojson";
 // vector tiles. Positron's muted basemap is used deliberately so it doesn't
 // visually compete with this app's emerald-palette pins.
 const STYLE_URL = "https://tiles.openfreemap.org/styles/positron";
+
+// MapLibre's default worker-URL resolution derives from `import.meta.url`,
+// which Next.js/Turbopack compiles to a file:// path rather than an
+// http(s):// one. That makes MapLibre construct `new Worker("")`, which
+// crashes immediately -- the worker thread never starts, so `map.on("load")`
+// never fires, no tiles are ever requested, and the canvas stays blank
+// (diagnosed via live browser DevTools). Point it at self-hosted copies of
+// maplibre-gl's worker chunk instead. These two files are a verbatim copy of
+// node_modules/maplibre-gl/dist/{maplibre-gl-worker,maplibre-gl-shared}.mjs
+// (the worker imports the shared chunk by relative path, so both must be
+// re-copied together on every maplibre-gl version bump).
+if (typeof window !== "undefined") {
+  config.WORKER_URL = "/maplibre-gl-worker.mjs";
+}
 
 export interface Bbox {
   west: number;

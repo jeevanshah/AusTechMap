@@ -2,6 +2,7 @@
 coverage/
 dist/
 node_modules/
+apps/web/public/maplibre-gl-*.mjs
 **/next-env.d.ts
 AGENTS.md
 ARCHITECTURE_DECISIONS.md
