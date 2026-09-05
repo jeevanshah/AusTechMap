@@ -2,7 +2,7 @@
 
 > Satisfies [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) Phase 0: "Record architecture decisions for the database, map provider, storage, hosting, authentication, email, and analytics."
 > This document is authoritative for technology choices — where it conflicts with [PRODUCT_SPEC.md](./PRODUCT_SPEC.md)'s recommendations, this document wins.
-> Version 3.5 · 5 September 2026
+> Version 3.6 · 5 September 2026
 
 ## 1. Decision summary
 
@@ -298,16 +298,26 @@ Activation requires schema/count checks, duplicate-PID checks, coordinate bounds
 deltas, exact-match regression fixtures, and a sample comparison against the previous release. A
 failed gate leaves the prior release active and creates a failed auditable import run.
 
-**Interim state (5 September 2026):** no G-NAF release has been acquired yet, so the exact-match
-contract above has no reference data to run against. The Phase 3 alpha seed cohort's 133 real,
-researched street addresses are instead resolved via a third-party geocoding API — OpenStreetMap's
+**Update (5 September 2026): the real August 2026 G-NAF release has now been acquired and indexed** —
+16,970,406 addresses/geocodes, 767,239 street localities, 17,581 localities, 9 states, built into the
+DuckDB index this section specifies. Run against a real 4-case representative sample (metro, regional,
+a deliberately ambiguous address, a deliberately invalid one) and against the full 133-company Phase 3
+cohort: 93/133 (69.9%) resolve to a unique exact match, 20/133 (15.0%) are ambiguous, 20/133 (15.0%)
+have no match, 0 are out of bounds — see IMPLEMENTATION_PLAN.md's Phase 2 exit gate for the complete
+breakdown. The upgrade trigger below is therefore now genuinely actionable for those 93 companies, but
+applying it (re-resolving and retiring their `external_geocoder` rows) is a deliberate follow-up
+decision, not yet done — this verification pass was read-only against `resolved_locations`/
+`company_locations`.
+
+**Interim state (until that follow-up runs):** the Phase 3 alpha seed cohort's 133 real, researched
+street addresses remain resolved via a third-party geocoding API — OpenStreetMap's
 Nominatim by default (no signup or payment method required, self-throttled to its 1 request/second
 usage-policy limit), with the Mapbox Geocoding API available as an alternate provider behind the same
 interface if ever preferred — recorded in `resolved_locations` with
 `location_match_method = 'external_geocoder'` (migration `0008`), distinct from `gnaf_exact_match` so
 provenance stays honest about how each point was actually obtained. This is unrelated to §3.5's map
 renderer/tile-source decision — geocoding an address and rendering a map are different concerns, and
-this interim choice holds regardless of which one that section names. Upgrade trigger: once a real
+this interim choice holds regardless of which one that section names. Upgrade trigger: now that a real
 G-NAF release is acquired and activated, re-resolve these addresses through the exact-match pipeline
 above and retire the `external_geocoder` rows, rather than treating either geocoding API as a
 permanent substitute for the G-NAF contract this section actually specifies.
