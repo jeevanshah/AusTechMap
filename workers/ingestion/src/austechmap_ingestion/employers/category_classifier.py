@@ -21,7 +21,7 @@ _KEYWORD_MATCH_CONFIDENCE = 0.6
 
 # Keys match categories.key seeded by category_seed.py from Appendix A.1.
 CATEGORY_NICHE_KEYWORDS: dict[str, tuple[str, ...]] = {
-    "saas": ("saas", "software as a service"),
+    "saas": ("saas", "software as a service", "collaboration software"),
     "enterprise-software": ("enterprise software",),
     "developer-tools": ("developer tools", "developer platform", "developer experience"),
     "cloud": ("cloud platform", "cloud computing", "cloud infrastructure", "cloud provider"),
@@ -37,7 +37,7 @@ CATEGORY_NICHE_KEYWORDS: dict[str, tuple[str, ...]] = {
     "banking-technology": ("banking technology", "core banking", "neobank"),
     "insurtech": ("insurtech", "insurance technology"),
     "mining-tech": ("mining technology", "mining tech"),
-    "agritech": ("agritech", "agricultural technology", "agtech"),
+    "agritech": ("agritech", "agricultural technology", "agtech", "cellular agriculture"),
     "construction-tech": ("construction technology", "construction tech", "contech"),
     "proptech": ("proptech", "property technology", "real estate technology"),
     "logistics-tech": (
