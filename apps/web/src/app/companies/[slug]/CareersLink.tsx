@@ -15,9 +15,9 @@ export function CareersLink({
       target="_blank"
       rel="noopener noreferrer"
       onClick={() => trackEvent("careers_link_clicked", { slug })}
-      className="rounded-full bg-emerald-900 px-4 py-2 text-xs font-medium text-white"
+      className="rounded-md bg-navy-900 px-4 py-2 text-xs font-medium text-white transition hover:bg-navy-800"
     >
-      Careers page
+      Careers page ↗
     </a>
   );
 }

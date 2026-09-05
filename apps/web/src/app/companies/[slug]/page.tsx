@@ -92,6 +92,30 @@ const SPONSORSHIP_CLAIM_LABELS: Record<SponsorshipClaimType, string> = {
   sponsorship_historical_explicit: "Historical explicit evidence",
 };
 
+const STATUS_LABELS: Record<string, string> = {
+  pending_review: "Pending review",
+  active: "Active",
+  disabled: "Disabled",
+  merged: "Merged",
+};
+
+function ShieldCheckIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      viewBox="0 0 20 20"
+      fill="currentColor"
+    >
+      <path
+        fillRule="evenodd"
+        d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zm3.707 6.763a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
 async function loadCompany(slug: string): Promise<CompanyProfileRow | null> {
   const { rows } = await getPool().query<CompanyProfileRow>(
     `SELECT
@@ -268,40 +292,63 @@ export default async function CompanyProfilePage({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-10 px-6 py-8 sm:px-10 sm:py-12">
-      <header className="flex flex-col gap-4 border-b border-emerald-950/15 pb-6">
+      <header className="flex flex-col gap-4 border-b border-surface-border pb-6">
         <div className="flex items-center justify-between gap-4">
           <Link
             href="/"
-            className="text-sm font-medium text-emerald-900 hover:underline"
+            className="text-sm font-medium text-ochre-700 hover:underline"
           >
             ← Back to directory
           </Link>
-          <span className="text-xs text-stone-600">
-            {lastCheckedLabel}:{" "}
+          <span className="font-mono text-xs text-slate-500">
+            {lastCheckedLabel.toUpperCase()}:{" "}
             {new Date(lastCheckedDate).toLocaleDateString("en-AU")}
           </span>
         </div>
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 className="font-heading text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
           {company.display_name}
         </h1>
+        <dl className="flex flex-wrap gap-x-6 gap-y-1 font-mono text-xs text-slate-600">
+          <div className="flex items-center gap-1.5">
+            <dt className="text-slate-400">STATUS</dt>
+            <dd className="font-medium text-navy-900">
+              {STATUS_LABELS[company.status] ?? company.status}
+            </dd>
+          </div>
+          {company.domain && (
+            <div className="flex items-center gap-1.5">
+              <dt className="text-slate-400">DOMAIN</dt>
+              <dd className="font-medium text-navy-900">{company.domain}</dd>
+            </div>
+          )}
+          <div className="flex items-center gap-1.5">
+            <dt className="text-slate-400">REGISTERED</dt>
+            <dd className="font-medium text-navy-900">
+              {new Date(company.created_at).toLocaleDateString("en-AU")}
+            </dd>
+          </div>
+          {company.verified_at && (
+            <div className="flex items-center gap-1.5">
+              <dt className="text-slate-400">VERIFIED</dt>
+              <dd className="font-medium text-navy-900">
+                {new Date(company.verified_at).toLocaleDateString("en-AU")}
+              </dd>
+            </div>
+          )}
+        </dl>
       </header>
 
       {company.status === "disabled" && (
-        <p className="rounded-xl border border-red-600/40 bg-red-50 p-4 text-sm text-red-900">
+        <p className="rounded-lg border border-red-600/40 bg-red-50 p-4 text-sm text-red-900">
           This employer record has been disabled: {company.disabled_reason}
         </p>
       )}
 
       <section className="flex flex-wrap items-center gap-3">
-        {company.domain && (
-          <span className="rounded-full bg-emerald-950/5 px-3 py-1 text-xs">
-            {company.domain}
-          </span>
-        )}
         {company.categories.map((category) => (
           <span
             key={category.key}
-            className="rounded-full bg-emerald-950/5 px-3 py-1 text-xs"
+            className="rounded bg-slate-100 px-2.5 py-1 font-mono text-xs text-slate-700"
           >
             {category.label}
           </span>
@@ -312,7 +359,7 @@ export default async function CompanyProfilePage({
       </section>
 
       {company.research_claim?.reason && (
-        <section className="rounded-xl border border-emerald-950/15 bg-emerald-950/5 p-4 text-sm">
+        <section className="rounded-lg border border-surface-border bg-slate-50 p-4 text-sm text-navy-900">
           <p>
             According to our research
             {confidenceScore !== null &&
@@ -320,12 +367,12 @@ export default async function CompanyProfilePage({
             , {company.research_claim.reason}
           </p>
           {company.research_claim.confidence_note && (
-            <p className="mt-2 text-xs text-stone-600">
+            <p className="mt-2 text-xs text-slate-600">
               {company.research_claim.confidence_note}
             </p>
           )}
           {company.research_source_name && (
-            <p className="mt-2 text-xs text-stone-600">
+            <p className="mt-2 text-xs text-slate-600">
               Source: {company.research_source_name}
             </p>
           )}
@@ -334,10 +381,10 @@ export default async function CompanyProfilePage({
 
       {company.locations.length > 0 && (
         <section>
-          <h2 className="mb-4 text-lg font-semibold text-emerald-950">
+          <h2 className="mb-4 font-heading text-lg font-semibold text-navy-900">
             Locations
           </h2>
-          <div className="h-72 overflow-hidden rounded-2xl border border-emerald-950/15">
+          <div className="h-72 overflow-hidden rounded-xl border border-surface-border">
             <MapCanvas
               points={locationsToPoints(company)}
               initialBbox={locationsToBbox(company.locations)}
@@ -348,11 +395,11 @@ export default async function CompanyProfilePage({
       )}
 
       <section>
-        <h2 className="mb-4 text-lg font-semibold text-emerald-950">
+        <h2 className="mb-4 font-heading text-lg font-semibold text-navy-900">
           Sponsorship evidence
         </h2>
         {company.sponsorship_evidence.length === 0 ? (
-          <p className="rounded-xl border border-emerald-950/15 bg-stone-50 p-4 text-sm text-stone-600">
+          <p className="rounded-lg border border-surface-border bg-slate-50 p-4 text-sm text-slate-600">
             No evidence found. This is not proof the employer does not sponsor.
           </p>
         ) : (
@@ -360,22 +407,20 @@ export default async function CompanyProfilePage({
             {company.sponsorship_evidence.map((entry, index) => (
               <li
                 key={`${entry.claimType}-${entry.observedAt}-${index}`}
-                className="rounded-xl border border-emerald-600/30 bg-emerald-50/60 p-4 text-sm"
+                className="rounded-lg border border-forest-600/25 bg-forest-50 p-4 text-sm"
               >
                 <div className="flex items-center justify-between gap-4">
-                  <span className="flex items-center gap-2 font-semibold text-emerald-900">
-                    <span aria-hidden="true" className="text-emerald-700">
-                      ✓
-                    </span>
+                  <span className="flex items-center gap-2 font-semibold text-forest-900">
+                    <ShieldCheckIcon className="h-4 w-4 shrink-0 text-forest-700" />
                     {SPONSORSHIP_CLAIM_LABELS[entry.claimType] ??
                       entry.claimType}
                   </span>
-                  <span className="text-xs text-stone-600">
+                  <span className="font-mono text-xs text-slate-600">
                     {new Date(entry.observedAt).toLocaleDateString("en-AU")}
                   </span>
                 </div>
                 {entry.claimType === "sponsorship_labour_agreement" ? (
-                  <p className="mt-2 text-xs text-stone-700">
+                  <p className="mt-2 text-xs text-forest-900/80">
                     {[
                       entry.claimValue.agreement_type,
                       entry.claimValue.start_date
@@ -391,7 +436,7 @@ export default async function CompanyProfilePage({
                     , current labour agreements list
                   </p>
                 ) : (
-                  <p className="mt-2 text-xs text-stone-700">
+                  <p className="mt-2 text-xs text-forest-900/80">
                     {String(entry.claimValue.job_title ?? "")}
                     {typeof entry.claimValue.source_url === "string" && (
                       <>
@@ -412,7 +457,7 @@ export default async function CompanyProfilePage({
             ))}
           </ul>
         )}
-        <p className="mt-3 text-xs text-stone-600">
+        <p className="mt-3 text-xs text-slate-600">
           Important: evidence does not guarantee sponsorship for a specific role
           or applicant. Always confirm with the employer and official Home
           Affairs guidance.
@@ -421,7 +466,7 @@ export default async function CompanyProfilePage({
 
       <section>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-emerald-950">
+          <h2 className="font-heading text-lg font-semibold text-navy-900">
             Open roles
             {company.open_jobs.length > 0
               ? ` (${company.open_jobs.length})`
@@ -432,7 +477,7 @@ export default async function CompanyProfilePage({
               href={company.careers_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs font-medium text-emerald-800 hover:underline"
+              className="text-xs font-medium text-ochre-700 hover:underline"
             >
               Careers page ↗
             </a>
@@ -440,7 +485,7 @@ export default async function CompanyProfilePage({
         </div>
 
         {company.open_jobs.length === 0 ? (
-          <p className="rounded-xl border border-emerald-950/15 p-4 text-sm text-stone-600">
+          <p className="rounded-lg border border-surface-border p-4 text-sm text-slate-600">
             No open roles currently indexed for this employer.
             {company.careers_url && (
               <>
@@ -450,7 +495,7 @@ export default async function CompanyProfilePage({
                   href={company.careers_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-medium text-emerald-800 underline hover:text-emerald-900"
+                  className="font-medium text-ochre-700 underline hover:text-ochre-800"
                 >
                   careers page
                 </a>{" "}
@@ -463,7 +508,7 @@ export default async function CompanyProfilePage({
             {company.open_jobs.map((job, index) => (
               <li
                 key={`${job.title}-${job.postedAt ?? index}-${index}`}
-                className="flex flex-col gap-2 rounded-xl border border-emerald-950/10 bg-white p-4 shadow-2xs transition hover:border-emerald-900/30"
+                className="flex flex-col gap-2 rounded-lg border border-surface-border bg-white p-4 shadow-2xs transition hover:border-ochre-600/40"
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   {job.sourceUrl ? (
@@ -471,23 +516,23 @@ export default async function CompanyProfilePage({
                       href={job.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-950 hover:text-emerald-800"
+                      className="group inline-flex items-center gap-1.5 text-sm font-semibold text-navy-900 hover:text-ochre-700"
                     >
                       <span className="group-hover:underline">{job.title}</span>
                       <span
                         aria-hidden="true"
-                        className="text-xs text-stone-400 group-hover:text-emerald-800"
+                        className="text-xs text-slate-400 group-hover:text-ochre-700"
                       >
                         ↗
                       </span>
                     </a>
                   ) : (
-                    <span className="text-sm font-semibold text-emerald-950">
+                    <span className="text-sm font-semibold text-navy-900">
                       {job.title}
                     </span>
                   )}
                   {job.postedAt && (
-                    <span className="text-xs text-stone-500">
+                    <span className="font-mono text-xs text-slate-500">
                       {new Date(job.postedAt).toLocaleDateString("en-AU")}
                     </span>
                   )}
@@ -495,17 +540,17 @@ export default async function CompanyProfilePage({
 
                 <div className="flex flex-wrap items-center gap-2">
                   {job.roleFamily && (
-                    <span className="rounded-full bg-emerald-950/5 px-2.5 py-0.5 text-xs text-emerald-950/80">
+                    <span className="rounded bg-slate-100 px-2.5 py-0.5 font-mono text-[11px] text-slate-700">
                       {job.roleFamily}
                     </span>
                   )}
                   {SENIORITY_LABELS[job.seniority] && (
-                    <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs text-stone-700">
+                    <span className="rounded bg-slate-100 px-2.5 py-0.5 font-mono text-[11px] text-slate-700">
                       {SENIORITY_LABELS[job.seniority]}
                     </span>
                   )}
                   {REMOTE_TYPE_LABELS[job.remoteType] && (
-                    <span className="rounded-full bg-emerald-100/70 px-2.5 py-0.5 text-xs font-medium text-emerald-900">
+                    <span className="rounded bg-ochre-50 px-2.5 py-0.5 font-mono text-[11px] font-medium text-ochre-800">
                       {REMOTE_TYPE_LABELS[job.remoteType]}
                     </span>
                   )}

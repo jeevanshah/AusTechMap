@@ -15,7 +15,7 @@ import type { FeatureCollection } from "geojson";
 
 // ARCHITECTURE_DECISIONS.md §3.5: MapLibre GL JS + OpenFreeMap's free hosted
 // vector tiles. Positron's muted basemap is used deliberately so it doesn't
-// visually compete with this app's emerald-palette pins.
+// visually compete with this app's navy/ochre pins.
 const STYLE_URL = "https://tiles.openfreemap.org/styles/positron";
 
 // MapLibre's default worker-URL resolution derives from `import.meta.url`,
@@ -113,9 +113,11 @@ export function MapCanvas({
         source: SOURCE_ID,
         filter: ["has", "point_count"],
         paint: {
-          "circle-color": "#065f46",
+          "circle-color": "#d97706",
+          "circle-stroke-color": "#b45309",
+          "circle-stroke-width": 2,
           "circle-radius": ["step", ["get", "point_count"], 16, 10, 22, 50, 28],
-          "circle-opacity": 0.85,
+          "circle-opacity": 0.92,
         },
       });
       map.addLayer({
@@ -132,7 +134,7 @@ export function MapCanvas({
         source: SOURCE_ID,
         filter: ["!", ["has", "point_count"]],
         paint: {
-          "circle-color": "#136f50",
+          "circle-color": "#0f172a",
           "circle-radius": 7,
           "circle-stroke-width": 2,
           "circle-stroke-color": "#ffffff",

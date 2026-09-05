@@ -47,20 +47,31 @@ export default async function Home() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-10 px-6 py-8 sm:px-10 sm:py-12">
-      <header className="flex items-center justify-between border-b border-emerald-950/15 pb-5">
-        <span className="text-sm font-semibold tracking-[0.18em] uppercase">
-          Australia Tech Map
+      <header className="flex items-center justify-between border-b border-surface-border pb-5">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-7 w-7 items-center justify-center rounded bg-navy-900 text-white font-mono text-xs font-bold shadow-2xs">
+            AU
+          </span>
+          <span className="font-heading text-sm font-semibold tracking-wider text-navy-900 uppercase">
+            Australia Tech Map
+          </span>
+        </div>
+        <span className="rounded bg-slate-100 px-2.5 py-1 font-mono text-xs font-medium text-slate-600 border border-surface-border">
+          National Registry
         </span>
       </header>
 
       <section>
-        <p className="mb-5 text-sm font-semibold tracking-[0.2em] text-emerald-800 uppercase">
-          Where can your tech career take you?
+        <p className="mb-3 font-mono text-xs font-semibold tracking-wider text-ochre-700 uppercase">
+          Australian Technology Opportunity Intelligence
         </p>
-        <h1 className="max-w-4xl text-5xl leading-[0.98] font-semibold tracking-[-0.05em] sm:text-7xl">
+        <h1 className="max-w-4xl font-heading text-4xl leading-[1.08] font-bold tracking-tight text-navy-900 sm:text-6xl">
           A clearer map of employers, regions, and real opportunity.
         </h1>
-        <p className="mt-4 text-base text-emerald-950/70">{count} employers</p>
+        <p className="mt-4 font-mono text-sm font-medium text-slate-600">
+          <span className="font-semibold text-navy-900">{count}</span> verified
+          Australian tech employers indexed
+        </p>
       </section>
 
       {error && (

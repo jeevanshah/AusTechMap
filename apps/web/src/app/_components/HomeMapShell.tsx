@@ -181,62 +181,71 @@ export function HomeMapShell({
 
   return (
     <div className="flex flex-col gap-4">
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="sr-only">Search companies, roles or technologies</span>
-        <input
-          type="search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search companies, roles or technologies"
-          className="rounded-full border border-emerald-950/20 px-4 py-3 text-base"
-        />
-      </label>
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="sr-only">Filter by category</span>
-        <select
-          value={selectedCategory}
-          onChange={(event) => setSelectedCategory(event.target.value)}
-          className="rounded-full border border-emerald-950/20 px-4 py-2 text-sm"
-        >
-          <option value="">All categories</option>
-          {categoryGroups.map((group) => (
-            <optgroup key={group.groupLabel} label={group.groupLabel}>
-              {group.items.map((category) => (
-                <option key={category.key} value={category.key}>
-                  {category.label}
-                </option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
-      </label>
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={sponsorshipOnly}
-          onChange={(event) => setSponsorshipOnly(event.target.checked)}
-          className="h-4 w-4 rounded border-emerald-950/30"
-        />
-        Has sponsorship evidence
-      </label>
-      <p className="text-xs text-emerald-950/50">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="flex flex-col gap-1 text-sm">
+          <span className="sr-only">
+            Search companies, roles or technologies
+          </span>
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search companies, roles or technologies"
+            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-navy-900 shadow-2xs placeholder:text-slate-400 focus:border-ochre-600 focus:outline-none focus:ring-1 focus:ring-ochre-600"
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
+          <span className="sr-only">Filter by category</span>
+          <select
+            value={selectedCategory}
+            onChange={(event) => setSelectedCategory(event.target.value)}
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-navy-900 shadow-2xs focus:border-ochre-600 focus:outline-none focus:ring-1 focus:ring-ochre-600"
+          >
+            <option value="">All categories</option>
+            {categoryGroups.map((group) => (
+              <optgroup key={group.groupLabel} label={group.groupLabel}>
+                {group.items.map((category) => (
+                  <option key={category.key} value={category.key}>
+                    {category.label}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <label className="flex items-center gap-2 text-sm text-navy-900 font-medium">
+          <input
+            type="checkbox"
+            checked={sponsorshipOnly}
+            onChange={(event) => setSponsorshipOnly(event.target.checked)}
+            className="h-4 w-4 rounded border-slate-300 text-ochre-600 focus:ring-ochre-600"
+          />
+          Has sponsorship evidence
+        </label>
+      </div>
+      <p className="-mt-2 text-xs text-slate-500">
         Hiring and regional filters land in later phases.
       </p>
 
       {selectedEntry && (
-        <div className="fixed inset-x-0 bottom-0 z-30 max-h-[70vh] overflow-y-auto rounded-t-2xl border border-emerald-950/20 bg-white p-4 text-sm shadow-lg lg:static lg:z-auto lg:mb-1 lg:max-h-none lg:overflow-visible lg:rounded-xl lg:shadow-sm">
+        <div className="fixed inset-x-0 bottom-0 z-30 max-h-[70vh] overflow-y-auto rounded-t-xl border border-surface-border bg-white p-4 text-sm shadow-xl lg:static lg:z-auto lg:mb-1 lg:max-h-none lg:overflow-visible lg:rounded-lg lg:shadow-xs">
           <div className="flex items-center justify-between gap-4">
-            <span className="font-medium">{selectedEntry.name}</span>
+            <span className="font-heading font-semibold text-navy-900 text-base">
+              {selectedEntry.name}
+            </span>
             <button
               type="button"
               onClick={() => setSelectedSlug(null)}
               aria-label="Close"
-              className="text-emerald-950/50"
+              className="text-slate-400 hover:text-navy-900 text-sm font-medium"
             >
               ✕
             </button>
           </div>
-          <div className="mt-3 flex gap-4">
+          <div className="mt-3 flex gap-3">
             {selectedEntry.careersUrl && (
               <a
                 href={selectedEntry.careersUrl}
@@ -247,14 +256,14 @@ export function HomeMapShell({
                     slug: selectedEntry.slug,
                   })
                 }
-                className="rounded-full bg-emerald-900 px-4 py-2 text-xs font-medium text-white"
+                className="rounded-md bg-navy-900 px-4 py-2 text-xs font-medium text-white hover:bg-navy-800 transition"
               >
-                Careers page
+                Careers page ↗
               </a>
             )}
             <Link
               href={`/companies/${selectedEntry.slug}`}
-              className="rounded-full border border-emerald-950/40 px-4 py-2 text-xs font-medium"
+              className="rounded-md border border-slate-300 bg-white px-4 py-2 text-xs font-medium text-navy-900 hover:bg-slate-50 transition"
             >
               View full profile →
             </Link>
@@ -265,12 +274,12 @@ export function HomeMapShell({
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <div className={showMapMobile ? "hidden lg:block" : ""}>
           {searchError && (
-            <p className="mb-3 rounded-xl border border-red-600/40 bg-red-50 p-3 text-sm text-red-900">
+            <p className="mb-3 rounded-lg border border-red-600/40 bg-red-50 p-3 text-sm text-red-900">
               Search is temporarily unavailable. Please try again.
             </p>
           )}
           {listEntries.length === 0 ? (
-            <p className="rounded-xl border border-emerald-950/15 p-4 text-sm text-emerald-950/60">
+            <p className="rounded-lg border border-surface-border bg-white p-4 text-sm text-slate-600">
               {isSearching
                 ? `No companies matched "${query.trim()}".`
                 : "No employers found in this area — try zooming out."}
@@ -285,25 +294,40 @@ export function HomeMapShell({
                       type="button"
                       onClick={() => handlePointClick(entry.slug)}
                       aria-pressed={isSelected}
-                      className={`w-full rounded-xl border px-4 py-3 text-left text-sm transition ${
+                      className={`w-full rounded-lg border px-3.5 py-3 text-left text-sm transition ${
                         isSelected
-                          ? "border-emerald-900 bg-emerald-50"
-                          : "border-emerald-950/15 hover:border-emerald-900/40"
+                          ? "border-ochre-600 bg-ochre-50/60 shadow-xs ring-1 ring-ochre-600"
+                          : "border-surface-border bg-white hover:border-slate-300 hover:bg-slate-50/50"
                       }`}
                     >
-                      <span className="font-medium">{entry.name}</span>
+                      <span className="font-heading font-semibold text-navy-900 block">
+                        {entry.name}
+                      </span>
                       {(entry.city ??
                         entry.primaryCategory ??
                         entry.hasSponsorshipEvidence) && (
-                        <span className="mt-1 flex flex-wrap items-center gap-2 text-xs text-stone-600">
-                          {entry.city && <span>{entry.city}</span>}
+                        <span className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-600">
+                          {entry.city && (
+                            <span className="font-medium">{entry.city}</span>
+                          )}
                           {entry.primaryCategory && (
-                            <span className="rounded-full bg-emerald-950/5 px-2 py-0.5">
+                            <span className="rounded bg-slate-100 px-2 py-0.5 text-slate-700 font-mono text-[11px]">
                               {entry.primaryCategory}
                             </span>
                           )}
                           {entry.hasSponsorshipEvidence && (
-                            <span className="rounded-full bg-emerald-100 px-2 py-0.5 font-medium text-emerald-800">
+                            <span className="inline-flex items-center gap-1 rounded bg-forest-50 px-2 py-0.5 text-[11px] font-medium text-forest-800 border border-forest-600/20">
+                              <svg
+                                className="h-3 w-3 text-forest-800 shrink-0"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zm3.707 6.763a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
                               Sponsors
                             </span>
                           )}
@@ -318,7 +342,7 @@ export function HomeMapShell({
         </div>
 
         <div className={showMapMobile ? "" : "hidden lg:block"}>
-          <div className="h-[32rem] overflow-hidden rounded-2xl border border-emerald-950/15">
+          <div className="h-[32rem] overflow-hidden rounded-xl border border-surface-border bg-slate-100 shadow-2xs">
             <MapCanvas
               points={points}
               initialBbox={initialBbox}
@@ -331,15 +355,15 @@ export function HomeMapShell({
 
       {!selectedEntry && (
         <div className="fixed inset-x-0 bottom-4 z-20 flex justify-center lg:hidden">
-          <div className="inline-flex rounded-full border border-emerald-950/20 bg-white p-1 shadow-lg">
+          <div className="inline-flex rounded-full border border-surface-border bg-navy-950/90 p-1 shadow-xl backdrop-blur-md">
             <button
               type="button"
               onClick={() => setShowMapMobile(false)}
               aria-pressed={!showMapMobile}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+              className={`rounded-full px-4 py-2 text-xs font-semibold transition ${
                 showMapMobile
-                  ? "text-emerald-950/70"
-                  : "bg-emerald-900 text-white"
+                  ? "text-slate-300 hover:text-white"
+                  : "bg-ochre-600 text-white shadow-xs"
               }`}
             >
               List ({listEntries.length})
@@ -348,10 +372,10 @@ export function HomeMapShell({
               type="button"
               onClick={() => setShowMapMobile(true)}
               aria-pressed={showMapMobile}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+              className={`rounded-full px-4 py-2 text-xs font-semibold transition ${
                 showMapMobile
-                  ? "bg-emerald-900 text-white"
-                  : "text-emerald-950/70"
+                  ? "bg-ochre-600 text-white shadow-xs"
+                  : "text-slate-300 hover:text-white"
               }`}
             >
               Map view
