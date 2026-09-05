@@ -3,19 +3,32 @@ map points and company_locations rows (Phase 3 gap-fill), since Phase 2's
 own G-NAF/ASGS pipeline has no real reference data loaded yet to resolve
 them against. Each candidate is matched to its already-seeded company by
 domain (the same join key the address research was given), geocoded via
-employers.geocoding.geocode_address, and recorded as a resolved_locations
-row (method='external_geocoder', migration 0008) plus a company_locations
-row pointing at it -- idempotent on retry, same insert-or-reuse idiom
-every other importer in this codebase uses.
+one of employers.geocoding's providers, and recorded as a
+resolved_locations row (method='external_geocoder', migration 0008) plus
+a company_locations row pointing at it -- idempotent on retry, same
+insert-or-reuse idiom every other importer in this codebase uses.
+
+No geocoder resolves to floor/suite level -- a "Level 6, Suite 7.01, ..."
+prefix in front of a real street address only makes free-text geocoding
+*worse*, not more precise, since it gives the geocoder tokens that don't
+match anything. _query_variants tries the full researched text first,
+then progressively strips leading unit/level/building descriptors
+(a leading "<number>/" slash-prefix, then leading comma-separated
+segments one at a time), and falls back to a suburb-level match only if
+every street-level attempt fails -- a real, geocoder-verified point at
+coarser precision beats no point at all, and this only engages for the
+minority of addresses a plain building-and-street query can't resolve.
 """
 
 from __future__ import annotations
 
 import csv
 import hashlib
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+from typing import cast
 from uuid import UUID
 
 import psycopg
@@ -33,6 +46,8 @@ DEFAULT_FIXTURE_PATH = (
 SOURCE_KEY = "alpha-seed-cohort-addresses"
 
 GeocodeFn = Callable[[str, str], GeocodeResult]
+
+_UNIT_SLASH_PREFIX_RE = re.compile(r"^\d+[A-Za-z]?/")
 
 
 class LocationSeedError(Exception):
@@ -77,12 +92,93 @@ def _query_text(candidate: AddressCandidate) -> str:
     )
 
 
+def _query_variants(candidate: AddressCandidate) -> list[str]:
+    """Full researched address first, then progressively simplified
+    fallbacks, most-precise first, ending in a suburb-level last resort."""
+    suffix = f"{candidate.suburb} {candidate.state} {candidate.postcode}, Australia"
+    variants = [f"{candidate.street_address}, {suffix}"]
+
+    unit_stripped = _UNIT_SLASH_PREFIX_RE.sub("", candidate.street_address)
+    if unit_stripped != candidate.street_address:
+        variants.append(f"{unit_stripped}, {suffix}")
+
+    segments = [segment.strip() for segment in candidate.street_address.split(",")]
+    for drop_count in range(1, len(segments)):
+        variants.append(f"{', '.join(segments[drop_count:])}, {suffix}")
+
+    variants.append(suffix)
+
+    seen: set[str] = set()
+    unique_variants = []
+    for variant in variants:
+        if variant not in seen:
+            seen.add(variant)
+            unique_variants.append(variant)
+    return unique_variants
+
+
 @dataclass(frozen=True)
 class LocationSeedStats:
     resolved: int
     reused: int
     errors: tuple[tuple[str, str], ...]
     unmatched_domains: tuple[str, ...]
+
+
+def _resolve_location(
+    connection: psycopg.Connection[tuple[object, ...]],
+    credential: str,
+    geocode_fn: GeocodeFn,
+    variants: list[str],
+) -> tuple[UUID, str, bool]:
+    """Try each variant in order; returns (resolved_location_id,
+    matched_query_text, was_reused) for the first that resolves (either
+    already stored, or freshly geocoded). Raises the last GeocodingError
+    if every variant fails."""
+    last_error: GeocodingError | None = None
+    for variant in variants:
+        input_hash = hashlib.sha256(variant.encode("utf-8")).hexdigest()
+
+        existing = connection.execute(
+            "SELECT id FROM resolved_locations WHERE input_hash = %s", (input_hash,)
+        ).fetchone()
+        if existing is not None:
+            return cast(UUID, existing[0]), variant, True
+
+        try:
+            geocoded = geocode_fn(credential, variant)
+        except GeocodingError as error:
+            last_error = error
+            continue
+
+        try:
+            inserted = connection.execute(
+                """
+                INSERT INTO resolved_locations (
+                  input_hash, input_text, status, method, point
+                )
+                VALUES (%s, %s, 'accepted', 'external_geocoder',
+                        ST_SetSRID(ST_MakePoint(%s, %s), 4326))
+                ON CONFLICT (input_hash) DO NOTHING
+                RETURNING id
+                """,
+                (input_hash, variant, geocoded.longitude, geocoded.latitude),
+            ).fetchone()
+        except psycopg.errors.CheckViolation as error:
+            last_error = GeocodingError(f"geocoded point failed validation: {error}")
+            continue
+
+        if inserted is not None:
+            return cast(UUID, inserted[0]), variant, False
+
+        refetched = connection.execute(
+            "SELECT id FROM resolved_locations WHERE input_hash = %s", (input_hash,)
+        ).fetchone()
+        if refetched is None:
+            raise LocationSeedError(f"resolved_locations row disappeared for hash {input_hash}")
+        return cast(UUID, refetched[0]), variant, True
+
+    raise last_error if last_error is not None else GeocodingError("no variants to try")
 
 
 def run_location_seed_import(
@@ -113,51 +209,19 @@ def run_location_seed_import(
                 continue
             company_id: UUID = company_row[0]
 
-            query_text = _query_text(candidate)
-            input_hash = hashlib.sha256(query_text.encode("utf-8")).hexdigest()
+            try:
+                outcome = _resolve_location(
+                    connection, mapbox_token, geocode_fn, _query_variants(candidate)
+                )
+            except GeocodingError as error:
+                errors.append((candidate.domain, str(error)))
+                continue
 
-            existing = connection.execute(
-                "SELECT id FROM resolved_locations WHERE input_hash = %s", (input_hash,)
-            ).fetchone()
-            if existing is not None:
-                resolved_location_id: UUID = existing[0]
+            resolved_location_id, query_text, was_reused = outcome
+            if was_reused:
                 reused += 1
             else:
-                try:
-                    geocoded = geocode_fn(mapbox_token, query_text)
-                except GeocodingError as error:
-                    errors.append((candidate.domain, str(error)))
-                    continue
-                try:
-                    inserted = connection.execute(
-                        """
-                        INSERT INTO resolved_locations (
-                          input_hash, input_text, status, method, point
-                        )
-                        VALUES (%s, %s, 'accepted', 'external_geocoder',
-                                ST_SetSRID(ST_MakePoint(%s, %s), 4326))
-                        ON CONFLICT (input_hash) DO NOTHING
-                        RETURNING id
-                        """,
-                        (input_hash, query_text, geocoded.longitude, geocoded.latitude),
-                    ).fetchone()
-                except psycopg.errors.CheckViolation as error:
-                    errors.append((candidate.domain, f"geocoded point failed validation: {error}"))
-                    continue
-                if inserted is not None:
-                    resolved_location_id = inserted[0]
-                    resolved += 1
-                else:
-                    refetched = connection.execute(
-                        "SELECT id FROM resolved_locations WHERE input_hash = %s",
-                        (input_hash,),
-                    ).fetchone()
-                    if refetched is None:
-                        raise LocationSeedError(
-                            f"resolved_locations row disappeared for hash {input_hash}"
-                        )
-                    resolved_location_id = refetched[0]
-                    reused += 1
+                resolved += 1
 
             already_linked = connection.execute(
                 """

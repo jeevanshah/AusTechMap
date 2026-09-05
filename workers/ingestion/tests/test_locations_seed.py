@@ -8,12 +8,13 @@ import psycopg
 import pytest
 
 from austechmap_ingestion.db.migrations import apply_migrations
-from austechmap_ingestion.employers.geocoding import GeocodeResult
+from austechmap_ingestion.employers.geocoding import GeocodeResult, GeocodingError
 from austechmap_ingestion.employers.locations_seed import (
     DEFAULT_FIXTURE_PATH,
     AddressCandidate,
     GeocodeFn,
     _query_text,
+    _query_variants,
     load_address_fixture,
     run_location_seed_import,
 )
@@ -60,6 +61,54 @@ def test_query_text_formats_the_full_address() -> None:
         source_note="test",
     )
     assert _query_text(candidate) == "341 George Street, Sydney NSW 2000, Australia"
+
+
+def test_query_variants_strips_leading_level_and_suite_segments() -> None:
+    candidate = AddressCandidate(
+        domain="example.com",
+        street_address="Level 7, Suite 7.01, 155 Clarence Street",
+        suburb="Sydney",
+        state="NSW",
+        postcode="2000",
+        source_confidence="High",
+        source_note="test",
+    )
+    variants = _query_variants(candidate)
+    assert variants[0] == "Level 7, Suite 7.01, 155 Clarence Street, Sydney NSW 2000, Australia"
+    assert "Suite 7.01, 155 Clarence Street, Sydney NSW 2000, Australia" in variants
+    assert "155 Clarence Street, Sydney NSW 2000, Australia" in variants
+    assert variants[-1] == "Sydney NSW 2000, Australia"
+
+
+def test_query_variants_strips_unit_slash_prefix() -> None:
+    candidate = AddressCandidate(
+        domain="example.com",
+        street_address="1/61-63 Primary School Court",
+        suburb="Maroochydore",
+        state="QLD",
+        postcode="4558",
+        source_confidence="High",
+        source_note="test",
+    )
+    variants = _query_variants(candidate)
+    assert "61-63 Primary School Court, Maroochydore QLD 4558, Australia" in variants
+
+
+def test_query_variants_has_no_duplicates_for_a_simple_address() -> None:
+    candidate = AddressCandidate(
+        domain="example.com",
+        street_address="341 George Street",
+        suburb="Sydney",
+        state="NSW",
+        postcode="2000",
+        source_confidence="High",
+        source_note="test",
+    )
+    variants = _query_variants(candidate)
+    assert variants == [
+        "341 George Street, Sydney NSW 2000, Australia",
+        "Sydney NSW 2000, Australia",
+    ]
 
 
 def test_default_fixture_exists_and_matches_employer_fixture_domains() -> None:
@@ -149,6 +198,67 @@ def test_run_location_seed_import_is_idempotent_on_retry(tmp_path: Path) -> None
             "SELECT count(*) FROM company_locations WHERE company_id = %s", (company_id,)
         ).fetchone()
     assert count == (1,)
+
+
+@pytest.mark.integration
+def test_run_location_seed_import_falls_back_past_unit_prefix(tmp_path: Path) -> None:
+    database_url = _database_url()
+    suffix = uuid.uuid4().hex
+    domain = f"fallback-{suffix}.example.com"
+    fixture_path = tmp_path / "addresses.csv"
+    _write_fixture(
+        fixture_path,
+        [
+            (
+                domain,
+                "Level 6, 341 George Street",
+                "Sydney",
+                "NSW",
+                "2000",
+                "High",
+                "test office",
+            )
+        ],
+    )
+
+    with psycopg.connect(database_url, autocommit=True) as connection:
+        inserted = connection.execute(
+            "INSERT INTO companies (slug, display_name, domain) VALUES (%s, %s, %s) RETURNING id",
+            (f"fallback-co-{suffix}", f"Fallback Co {suffix}", domain),
+        ).fetchone()
+        assert inserted is not None
+        company_id = inserted[0]
+
+    calls: list[str] = []
+
+    def flaky_geocode(_token: str, query_text: str) -> GeocodeResult:
+        calls.append(query_text)
+        if "Level 6" in query_text:
+            raise GeocodingError(f"no geocoding match for: {query_text!r}")
+        return GeocodeResult(longitude=151.2093, latitude=-33.8688, full_address=query_text)
+
+    stats = run_location_seed_import(
+        database_url, "fake-token", fixture_path, geocode_fn=flaky_geocode
+    )
+
+    assert stats.resolved == 1
+    assert stats.errors == ()
+    assert calls == [
+        "Level 6, 341 George Street, Sydney NSW 2000, Australia",
+        "341 George Street, Sydney NSW 2000, Australia",
+    ]
+
+    with psycopg.connect(database_url) as connection:
+        input_text = connection.execute(
+            """
+            SELECT rl.input_text
+            FROM company_locations cl
+            JOIN resolved_locations rl ON rl.id = cl.resolved_location_id
+            WHERE cl.company_id = %s
+            """,
+            (company_id,),
+        ).fetchone()
+    assert input_text == ("341 George Street, Sydney NSW 2000, Australia",)
 
 
 @pytest.mark.integration
