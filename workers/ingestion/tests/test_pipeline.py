@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -30,6 +31,7 @@ def _database_url() -> str:
 def _setup_company_ats_source(
     database_url: str, suffix: str, ats_provider: str, ats_identifier: str
 ) -> CompanyAtsSource:
+    unique_identifier = f"{ats_identifier}-{suffix}"
     repository = JobRepository(database_url)
     source_id = repository.ensure_source(
         source_key=f"pipeline-test-discovery-{suffix}",
@@ -49,12 +51,12 @@ def _setup_company_ats_source(
             )
             VALUES (%s, %s, %s, 'manual_verified', %s)
             """,
-            (company_row[0], ats_provider, ats_identifier, source_id),
+            (company_row[0], ats_provider, unique_identifier, source_id),
         )
     return CompanyAtsSource(
         company_id=company_row[0],
         ats_provider=ats_provider,  # type: ignore[arg-type]
-        ats_identifier=ats_identifier,
+        ats_identifier=unique_identifier,
         source_id=source_id,
     )
 
@@ -73,7 +75,7 @@ def test_run_ats_crawl_persists_real_lever_postings() -> None:
     suffix = uuid.uuid4().hex
     company_ats_source = _setup_company_ats_source(database_url, suffix, "lever", "immutable")
     repository = JobRepository(database_url)
-    store = FilesystemSnapshotStore(Path(os.environ["TEMP"]) / f"pipeline-test-{suffix}")
+    store = FilesystemSnapshotStore(Path(tempfile.gettempdir()) / f"pipeline-test-{suffix}")
 
     result = run_ats_crawl(
         repository,
@@ -103,7 +105,7 @@ def test_run_ats_crawl_persists_real_ashby_postings() -> None:
     suffix = uuid.uuid4().hex
     company_ats_source = _setup_company_ats_source(database_url, suffix, "ashby", "dovetail")
     repository = JobRepository(database_url)
-    store = FilesystemSnapshotStore(Path(os.environ["TEMP"]) / f"pipeline-test-{suffix}")
+    store = FilesystemSnapshotStore(Path(tempfile.gettempdir()) / f"pipeline-test-{suffix}")
 
     result = run_ats_crawl(
         repository,
@@ -131,7 +133,7 @@ def test_run_ats_crawl_is_idempotent_at_the_run_level_on_the_same_day() -> None:
     suffix = uuid.uuid4().hex
     company_ats_source = _setup_company_ats_source(database_url, suffix, "lever", "immutable")
     repository = JobRepository(database_url)
-    store = FilesystemSnapshotStore(Path(os.environ["TEMP"]) / f"pipeline-test-{suffix}")
+    store = FilesystemSnapshotStore(Path(tempfile.gettempdir()) / f"pipeline-test-{suffix}")
     fetch_fn = lambda *a, **kw: _fake_fetch("lever_immutable_postings.json")  # noqa: E731
 
     first = run_ats_crawl(
