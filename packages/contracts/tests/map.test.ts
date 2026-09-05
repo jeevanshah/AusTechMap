@@ -9,6 +9,9 @@ const validPoint = {
   lng: 151.2093,
   locationType: "head_office" as const,
   careersUrl: "https://acme.example.com/careers",
+  city: "Sydney",
+  primaryCategory: "Fintech",
+  hasSponsorshipEvidence: false,
 };
 
 describe("MapCompaniesResponseSchema", () => {

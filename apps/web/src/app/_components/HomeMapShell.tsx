@@ -24,6 +24,9 @@ interface ListEntry {
   slug: string;
   name: string;
   careersUrl: string | null;
+  city: string | null;
+  primaryCategory: string | null;
+  hasSponsorshipEvidence: boolean;
 }
 
 function pointsToListEntries(points: MapCompanyPoint[]): ListEntry[] {
@@ -31,6 +34,9 @@ function pointsToListEntries(points: MapCompanyPoint[]): ListEntry[] {
     slug: point.slug,
     name: point.name,
     careersUrl: point.careersUrl,
+    city: point.city,
+    primaryCategory: point.primaryCategory,
+    hasSponsorshipEvidence: point.hasSponsorshipEvidence,
   }));
 }
 
@@ -41,6 +47,9 @@ function searchResultsToListEntries(
     slug: result.slug,
     name: result.name,
     careersUrl: null,
+    city: result.city,
+    primaryCategory: result.primaryCategory,
+    hasSponsorshipEvidence: result.hasSponsorshipEvidence,
   }));
 }
 
@@ -214,60 +223,8 @@ export function HomeMapShell({
         Hiring and regional filters land in later phases.
       </p>
 
-      <div className="flex justify-end lg:hidden">
-        <button
-          type="button"
-          onClick={() => setShowMapMobile((value) => !value)}
-          className="rounded-full border border-emerald-950/40 px-4 py-2 text-sm font-medium"
-        >
-          {showMapMobile ? "Show list" : "Show map"}
-        </button>
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
-        <div className={showMapMobile ? "hidden lg:block" : ""}>
-          {searchError && (
-            <p className="mb-3 rounded-xl border border-red-600/40 bg-red-50 p-3 text-sm text-red-900">
-              Search is temporarily unavailable. Please try again.
-            </p>
-          )}
-          {listEntries.length === 0 ? (
-            <p className="rounded-xl border border-emerald-950/15 p-4 text-sm text-emerald-950/60">
-              {isSearching
-                ? `No companies matched "${query.trim()}".`
-                : "No employers found in this area — try zooming out."}
-            </p>
-          ) : (
-            <ul className="flex max-h-[32rem] flex-col gap-2 overflow-y-auto">
-              {listEntries.map((entry) => (
-                <li key={entry.slug}>
-                  <button
-                    type="button"
-                    onClick={() => handlePointClick(entry.slug)}
-                    className="w-full rounded-xl border border-emerald-950/15 px-4 py-3 text-left text-sm hover:border-emerald-900/40"
-                  >
-                    {entry.name}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className={showMapMobile ? "" : "hidden lg:block"}>
-          <div className="h-[32rem] overflow-hidden rounded-2xl border border-emerald-950/15">
-            <MapCanvas
-              points={points}
-              initialBbox={initialBbox}
-              onMoveEnd={handleMoveEnd}
-              onPointClick={handlePointClick}
-            />
-          </div>
-        </div>
-      </div>
-
       {selectedEntry && (
-        <div className="rounded-xl border border-emerald-950/20 bg-white p-4 text-sm shadow-sm">
+        <div className="fixed inset-x-0 bottom-0 z-30 max-h-[70vh] overflow-y-auto rounded-t-2xl border border-emerald-950/20 bg-white p-4 text-sm shadow-lg lg:static lg:z-auto lg:mb-1 lg:max-h-none lg:overflow-visible lg:rounded-xl lg:shadow-sm">
           <div className="flex items-center justify-between gap-4">
             <span className="font-medium">{selectedEntry.name}</span>
             <button
@@ -301,6 +258,104 @@ export function HomeMapShell({
             >
               View full profile →
             </Link>
+          </div>
+        </div>
+      )}
+
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+        <div className={showMapMobile ? "hidden lg:block" : ""}>
+          {searchError && (
+            <p className="mb-3 rounded-xl border border-red-600/40 bg-red-50 p-3 text-sm text-red-900">
+              Search is temporarily unavailable. Please try again.
+            </p>
+          )}
+          {listEntries.length === 0 ? (
+            <p className="rounded-xl border border-emerald-950/15 p-4 text-sm text-emerald-950/60">
+              {isSearching
+                ? `No companies matched "${query.trim()}".`
+                : "No employers found in this area — try zooming out."}
+            </p>
+          ) : (
+            <ul className="flex max-h-[32rem] flex-col gap-2 overflow-y-auto pb-16 lg:pb-0">
+              {listEntries.map((entry) => {
+                const isSelected = entry.slug === selectedSlug;
+                return (
+                  <li key={entry.slug}>
+                    <button
+                      type="button"
+                      onClick={() => handlePointClick(entry.slug)}
+                      aria-pressed={isSelected}
+                      className={`w-full rounded-xl border px-4 py-3 text-left text-sm transition ${
+                        isSelected
+                          ? "border-emerald-900 bg-emerald-50"
+                          : "border-emerald-950/15 hover:border-emerald-900/40"
+                      }`}
+                    >
+                      <span className="font-medium">{entry.name}</span>
+                      {(entry.city ??
+                        entry.primaryCategory ??
+                        entry.hasSponsorshipEvidence) && (
+                        <span className="mt-1 flex flex-wrap items-center gap-2 text-xs text-stone-600">
+                          {entry.city && <span>{entry.city}</span>}
+                          {entry.primaryCategory && (
+                            <span className="rounded-full bg-emerald-950/5 px-2 py-0.5">
+                              {entry.primaryCategory}
+                            </span>
+                          )}
+                          {entry.hasSponsorshipEvidence && (
+                            <span className="rounded-full bg-emerald-100 px-2 py-0.5 font-medium text-emerald-800">
+                              Sponsors
+                            </span>
+                          )}
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+
+        <div className={showMapMobile ? "" : "hidden lg:block"}>
+          <div className="h-[32rem] overflow-hidden rounded-2xl border border-emerald-950/15">
+            <MapCanvas
+              points={points}
+              initialBbox={initialBbox}
+              onMoveEnd={handleMoveEnd}
+              onPointClick={handlePointClick}
+            />
+          </div>
+        </div>
+      </div>
+
+      {!selectedEntry && (
+        <div className="fixed inset-x-0 bottom-4 z-20 flex justify-center lg:hidden">
+          <div className="inline-flex rounded-full border border-emerald-950/20 bg-white p-1 shadow-lg">
+            <button
+              type="button"
+              onClick={() => setShowMapMobile(false)}
+              aria-pressed={!showMapMobile}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                showMapMobile
+                  ? "text-emerald-950/70"
+                  : "bg-emerald-900 text-white"
+              }`}
+            >
+              List ({listEntries.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowMapMobile(true)}
+              aria-pressed={showMapMobile}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                showMapMobile
+                  ? "bg-emerald-900 text-white"
+                  : "text-emerald-950/70"
+              }`}
+            >
+              Map view
+            </button>
           </div>
         </div>
       )}

@@ -16,6 +16,9 @@ export const MapCompanyPointSchema = z.object({
   lng: z.number().min(96).max(168),
   locationType: z.enum(["head_office", "branch", "remote_only"]),
   careersUrl: z.string().nullable(),
+  city: z.string().nullable(),
+  primaryCategory: z.string().nullable(),
+  hasSponsorshipEvidence: z.boolean(),
 });
 
 export type MapCompanyPoint = z.infer<typeof MapCompanyPointSchema>;
@@ -41,6 +44,9 @@ export const CompanySearchResultSchema = z.object({
   matchType: z.enum(["name", "alias", "location", "research_summary"]),
   matchedText: z.string().nullable(),
   score: z.number().min(0).max(1),
+  city: z.string().nullable(),
+  primaryCategory: z.string().nullable(),
+  hasSponsorshipEvidence: z.boolean(),
 });
 
 export type CompanySearchResult = z.infer<typeof CompanySearchResultSchema>;

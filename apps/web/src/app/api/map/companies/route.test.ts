@@ -32,6 +32,9 @@ describe("GET /api/map/companies", () => {
           lng: 151.2093,
           lat: -33.8688,
           location_type: "head_office",
+          city: "Sydney",
+          primary_category: "Fintech",
+          has_sponsorship_evidence: true,
         },
       ]),
     );
@@ -52,6 +55,9 @@ describe("GET /api/map/companies", () => {
         lng: 151.2093,
         locationType: "head_office",
         careersUrl: "https://acme.example.com/careers",
+        city: "Sydney",
+        primaryCategory: "Fintech",
+        hasSponsorshipEvidence: true,
       },
     ]);
   });
@@ -64,6 +70,9 @@ describe("GET /api/map/companies", () => {
       lng: 151.2093,
       lat: -33.8688,
       location_type: "head_office",
+      city: null,
+      primary_category: null,
+      has_sponsorship_evidence: false,
     }));
     vi.mocked(getPool).mockReturnValue(fakePool(rows));
 

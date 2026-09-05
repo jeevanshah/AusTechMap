@@ -36,6 +36,9 @@ describe("GET /api/search/companies", () => {
           name_score: 0.9,
           alias_score: null,
           matched_alias: null,
+          city: "Sydney",
+          primary_category: "Fintech",
+          has_sponsorship_evidence: true,
         },
       ]),
     );
@@ -52,6 +55,9 @@ describe("GET /api/search/companies", () => {
         matchType: "name",
         matchedText: null,
         score: 0.9,
+        city: "Sydney",
+        primaryCategory: "Fintech",
+        hasSponsorshipEvidence: true,
       },
     ]);
   });
@@ -66,6 +72,9 @@ describe("GET /api/search/companies", () => {
           name_score: 0.2,
           alias_score: 0.95,
           matched_alias: "Acme Tech",
+          city: null,
+          primary_category: null,
+          has_sponsorship_evidence: false,
         },
       ]),
     );
@@ -81,6 +90,9 @@ describe("GET /api/search/companies", () => {
         matchType: "alias",
         matchedText: "Acme Tech",
         score: 0.95,
+        city: null,
+        primaryCategory: null,
+        hasSponsorshipEvidence: false,
       },
     ]);
   });
@@ -95,6 +107,9 @@ describe("GET /api/search/companies", () => {
             name: "Acme",
             domain: "acme.example.com",
             input_text: "1 George Street, Sydney NSW 2000, Australia",
+            city: null,
+            primary_category: null,
+            has_sponsorship_evidence: false,
           },
         ],
       ),
@@ -111,6 +126,9 @@ describe("GET /api/search/companies", () => {
         matchType: "location",
         matchedText: "1 George Street, Sydney NSW 2000, Australia",
         score: 0.5,
+        city: null,
+        primaryCategory: null,
+        hasSponsorshipEvidence: false,
       },
     ]);
   });

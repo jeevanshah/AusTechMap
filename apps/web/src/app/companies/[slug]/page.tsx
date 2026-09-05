@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 
 import type { MapCompanyPoint } from "@austechmap/contracts";
@@ -148,6 +149,9 @@ function locationsToPoints(company: CompanyProfileRow): MapCompanyPoint[] {
     lng: location.lng,
     locationType: location.locationType,
     careersUrl: company.careers_url,
+    city: null,
+    primaryCategory: null,
+    hasSponsorshipEvidence: false,
   }));
 }
 
@@ -218,14 +222,22 @@ export default async function CompanyProfilePage({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-10 px-6 py-8 sm:px-10 sm:py-12">
-      <header className="flex items-center justify-between border-b border-emerald-950/15 pb-5">
-        <span className="text-sm font-semibold tracking-[0.18em] uppercase">
+      <header className="flex flex-col gap-4 border-b border-emerald-950/15 pb-6">
+        <div className="flex items-center justify-between gap-4">
+          <Link
+            href="/"
+            className="text-sm font-medium text-emerald-900 hover:underline"
+          >
+            ← Back to directory
+          </Link>
+          <span className="text-xs text-stone-600">
+            {lastCheckedLabel}:{" "}
+            {new Date(lastCheckedDate).toLocaleDateString("en-AU")}
+          </span>
+        </div>
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
           {company.display_name}
-        </span>
-        <span className="text-xs text-emerald-950/50">
-          {lastCheckedLabel}:{" "}
-          {new Date(lastCheckedDate).toLocaleDateString("en-AU")}
-        </span>
+        </h1>
       </header>
 
       {company.status === "disabled" && (
@@ -262,12 +274,12 @@ export default async function CompanyProfilePage({
             , {company.research_claim.reason}
           </p>
           {company.research_claim.confidence_note && (
-            <p className="mt-2 text-xs text-emerald-950/60">
+            <p className="mt-2 text-xs text-stone-600">
               {company.research_claim.confidence_note}
             </p>
           )}
           {company.research_source_name && (
-            <p className="mt-2 text-xs text-emerald-950/50">
+            <p className="mt-2 text-xs text-stone-600">
               Source: {company.research_source_name}
             </p>
           )}
@@ -276,7 +288,7 @@ export default async function CompanyProfilePage({
 
       {company.locations.length > 0 && (
         <section>
-          <h2 className="mb-4 font-mono text-xs tracking-[0.18em] text-emerald-700 uppercase">
+          <h2 className="mb-4 text-lg font-semibold text-emerald-950">
             Locations
           </h2>
           <div className="h-72 overflow-hidden rounded-2xl border border-emerald-950/15">
@@ -290,11 +302,11 @@ export default async function CompanyProfilePage({
       )}
 
       <section>
-        <h2 className="mb-4 font-mono text-xs tracking-[0.18em] text-emerald-700 uppercase">
+        <h2 className="mb-4 text-lg font-semibold text-emerald-950">
           Sponsorship evidence
         </h2>
         {company.sponsorship_evidence.length === 0 ? (
-          <p className="rounded-xl border border-emerald-950/15 p-4 text-sm text-emerald-950/60">
+          <p className="rounded-xl border border-emerald-950/15 bg-stone-50 p-4 text-sm text-stone-600">
             No evidence found. This is not proof the employer does not sponsor.
           </p>
         ) : (
@@ -302,19 +314,22 @@ export default async function CompanyProfilePage({
             {company.sponsorship_evidence.map((entry, index) => (
               <li
                 key={`${entry.claimType}-${entry.observedAt}-${index}`}
-                className="rounded-xl border border-emerald-950/15 p-4 text-sm"
+                className="rounded-xl border border-emerald-600/30 bg-emerald-50/60 p-4 text-sm"
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">
+                <div className="flex items-center justify-between gap-4">
+                  <span className="flex items-center gap-2 font-semibold text-emerald-900">
+                    <span aria-hidden="true" className="text-emerald-700">
+                      ✓
+                    </span>
                     {SPONSORSHIP_CLAIM_LABELS[entry.claimType] ??
                       entry.claimType}
                   </span>
-                  <span className="text-xs text-emerald-950/50">
+                  <span className="text-xs text-stone-600">
                     {new Date(entry.observedAt).toLocaleDateString("en-AU")}
                   </span>
                 </div>
                 {entry.claimType === "sponsorship_labour_agreement" ? (
-                  <p className="mt-1 text-xs text-emerald-950/60">
+                  <p className="mt-2 text-xs text-stone-700">
                     {[
                       entry.claimValue.agreement_type,
                       entry.claimValue.start_date
@@ -323,10 +338,14 @@ export default async function CompanyProfilePage({
                     ]
                       .filter(Boolean)
                       .join(" · ")}{" "}
-                    · Source: Home Affairs current labour agreements list
+                    · Source:{" "}
+                    <span className="font-medium">
+                      Department of Home Affairs
+                    </span>
+                    , current labour agreements list
                   </p>
                 ) : (
-                  <p className="mt-1 text-xs text-emerald-950/60">
+                  <p className="mt-2 text-xs text-stone-700">
                     {String(entry.claimValue.job_title ?? "")}
                     {typeof entry.claimValue.source_url === "string" && (
                       <>
@@ -347,14 +366,14 @@ export default async function CompanyProfilePage({
             ))}
           </ul>
         )}
-        <p className="mt-3 text-xs text-emerald-950/50">
+        <p className="mt-3 text-xs text-stone-600">
           Important: evidence does not guarantee sponsorship for a specific role
           or applicant. Always confirm with the employer and official Home
           Affairs guidance.
         </p>
       </section>
 
-      <p className="text-xs text-emerald-950/50">
+      <p className="text-xs text-stone-600">
         Hiring activity and technology-stack data will appear here once those
         pipelines are built (Phase 5).
       </p>

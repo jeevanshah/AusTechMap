@@ -9,6 +9,9 @@ interface TrigramRow {
   name_score: number;
   alias_score: number | null;
   matched_alias: string | null;
+  city: string | null;
+  primary_category: string | null;
+  has_sponsorship_evidence: boolean;
 }
 
 interface LocationRow {
@@ -16,7 +19,34 @@ interface LocationRow {
   name: string;
   domain: string | null;
   input_text: string;
+  city: string | null;
+  primary_category: string | null;
+  has_sponsorship_evidence: boolean;
 }
+
+const SIGNAL_COLUMNS_SQL = `research.claim_value ->> 'city' AS city,
+            cat.label AS primary_category,
+            EXISTS (
+              SELECT 1 FROM evidence e2
+              WHERE e2.entity_type = 'company' AND e2.entity_id = c.id::text
+                AND e2.claim_type = ANY($4::text[])
+            ) AS has_sponsorship_evidence`;
+
+const SIGNAL_JOINS_SQL = `LEFT JOIN LATERAL (
+       SELECT e.claim_value
+       FROM evidence e
+       WHERE e.entity_type = 'company' AND e.entity_id = c.id::text
+         AND e.claim_type = 'employer_seed_research'
+       ORDER BY e.observed_at DESC LIMIT 1
+     ) research ON true
+     LEFT JOIN LATERAL (
+       SELECT cg.label
+       FROM company_category_links ccl2
+       JOIN categories cg ON cg.id = ccl2.category_id
+       WHERE ccl2.company_id = c.id
+       ORDER BY cg.label
+       LIMIT 1
+     ) cat ON true`;
 
 const LOCATION_FALLBACK_SCORE = 0.5;
 
@@ -56,7 +86,8 @@ export async function searchCompanies(
     `SELECT c.slug, c.display_name AS name, c.domain,
             similarity(c.display_name, $1) AS name_score,
             alias_sim.best AS alias_score,
-            alias_sim.best_alias AS matched_alias
+            alias_sim.best_alias AS matched_alias,
+            ${SIGNAL_COLUMNS_SQL}
      FROM companies c
      LEFT JOIN LATERAL (
        SELECT ca.alias AS best_alias, similarity(ca.alias, $1) AS best
@@ -65,6 +96,7 @@ export async function searchCompanies(
        ORDER BY similarity(ca.alias, $1) DESC
        LIMIT 1
      ) alias_sim ON true
+     ${SIGNAL_JOINS_SQL}
      WHERE c.status NOT IN ('merged', 'disabled')
        AND (c.display_name % $1 OR EXISTS (
              SELECT 1 FROM company_aliases ca
@@ -88,6 +120,9 @@ export async function searchCompanies(
           matchType: "alias" as const,
           matchedText: row.matched_alias,
           score: aliasScore,
+          city: row.city,
+          primaryCategory: row.primary_category,
+          hasSponsorshipEvidence: row.has_sponsorship_evidence,
         };
       }
       return {
@@ -97,15 +132,20 @@ export async function searchCompanies(
         matchType: "name" as const,
         matchedText: null,
         score: row.name_score,
+        city: row.city,
+        primaryCategory: row.primary_category,
+        hasSponsorshipEvidence: row.has_sponsorship_evidence,
       };
     });
   }
 
   const { rows: locationRows } = await pool.query<LocationRow>(
-    `SELECT DISTINCT ON (c.id) c.slug, c.display_name AS name, c.domain, rl.input_text
+    `SELECT DISTINCT ON (c.id) c.slug, c.display_name AS name, c.domain, rl.input_text,
+            ${SIGNAL_COLUMNS_SQL}
      FROM company_locations cl
      JOIN companies c ON c.id = cl.company_id
      JOIN resolved_locations rl ON rl.id = cl.resolved_location_id
+     ${SIGNAL_JOINS_SQL}
      WHERE c.status NOT IN ('merged', 'disabled')
        AND rl.input_text ILIKE '%' || $1 || '%'
        AND ${CATEGORY_FILTER_SQL}
@@ -122,5 +162,8 @@ export async function searchCompanies(
     matchType: "location" as const,
     matchedText: row.input_text,
     score: LOCATION_FALLBACK_SCORE,
+    city: row.city,
+    primaryCategory: row.primary_category,
+    hasSponsorshipEvidence: row.has_sponsorship_evidence,
   }));
 }

@@ -9,6 +9,9 @@ const validResult = {
   matchType: "name" as const,
   matchedText: null,
   score: 0.9,
+  city: "Sydney",
+  primaryCategory: "Fintech",
+  hasSponsorshipEvidence: false,
 };
 
 describe("CompanySearchResponseSchema", () => {
