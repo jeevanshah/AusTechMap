@@ -313,18 +313,36 @@ export default async function CompanyProfilePage({
                     {new Date(entry.observedAt).toLocaleDateString("en-AU")}
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-emerald-950/60">
-                  {entry.claimType === "sponsorship_labour_agreement"
-                    ? [
-                        entry.claimValue.agreement_type,
-                        entry.claimValue.start_date
-                          ? `from ${String(entry.claimValue.start_date)}`
-                          : null,
-                      ]
-                        .filter(Boolean)
-                        .join(" · ")
-                    : String(entry.claimValue.job_title ?? "")}
-                </p>
+                {entry.claimType === "sponsorship_labour_agreement" ? (
+                  <p className="mt-1 text-xs text-emerald-950/60">
+                    {[
+                      entry.claimValue.agreement_type,
+                      entry.claimValue.start_date
+                        ? `from ${String(entry.claimValue.start_date)}`
+                        : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}{" "}
+                    · Source: Home Affairs current labour agreements list
+                  </p>
+                ) : (
+                  <p className="mt-1 text-xs text-emerald-950/60">
+                    {String(entry.claimValue.job_title ?? "")}
+                    {typeof entry.claimValue.source_url === "string" && (
+                      <>
+                        {" · "}
+                        <a
+                          href={entry.claimValue.source_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline"
+                        >
+                          View source
+                        </a>
+                      </>
+                    )}
+                  </p>
+                )}
               </li>
             ))}
           </ul>
