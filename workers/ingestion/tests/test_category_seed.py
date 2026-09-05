@@ -29,10 +29,13 @@ def _database_url() -> str:
 def test_seed_categories_creates_every_group_and_niche_with_correct_parents() -> None:
     database_url = _database_url()
 
-    stats = seed_categories(database_url)
-
-    assert stats.groups_created == len(CATEGORY_GROUPS)
-    assert stats.niches_created == len(CATEGORY_NICHES)
+    # Not asserting stats.groups_created/niches_created == the full count:
+    # test_category_apply.py's own setup may have already called
+    # seed_categories in this same shared database before this test runs
+    # (alphabetical file ordering puts it first), so this may not be the
+    # first-ever call. Presence and correct parent linkage are what this
+    # test actually verifies.
+    seed_categories(database_url)
 
     with psycopg.connect(database_url) as connection:
         group_keys = {
