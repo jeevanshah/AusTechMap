@@ -2,6 +2,7 @@
 
 import {
   Map as MapLibreMap,
+  NavigationControl,
   config,
   type GeoJSONSource,
   type MapLayerMouseEvent,
@@ -138,17 +139,83 @@ export function MapCanvas({
         },
       });
 
-      map.on("click", "unclustered-point", (event: MapLayerMouseEvent) => {
-        const slug = event.features?.[0]?.properties?.slug as
-          string | undefined;
-        if (slug) onPointClickRef.current?.(slug);
-      });
-      map.on("mouseenter", "unclustered-point", () => {
+      const handleClusterClick = async (event: MapLayerMouseEvent) => {
+        const features = map.queryRenderedFeatures(event.point, {
+          layers: ["clusters"],
+        });
+        const cluster = features[0];
+        if (!cluster || !cluster.properties) return;
+        const clusterId = cluster.properties.cluster_id as number | undefined;
+        if (clusterId === undefined) return;
+
+        const source = map.getSource(SOURCE_ID) as GeoJSONSource | undefined;
+        if (!source) return;
+
+        const geometry = cluster.geometry as GeoJSON.Point;
+        const currentZoom = map.getZoom();
+        try {
+          const expansionZoom = await source.getClusterExpansionZoom(clusterId);
+          // Smart zoom: zoom to the expansion level, or if points have identical
+          // coordinates, step in by +2 up to max zoom 16 so the click always advances.
+          const targetZoom =
+            expansionZoom !== undefined &&
+            expansionZoom !== null &&
+            expansionZoom > currentZoom
+              ? expansionZoom
+              : Math.min(currentZoom + 2, 16);
+
+          map.easeTo({
+            center: geometry.coordinates as [number, number],
+            zoom: targetZoom,
+            duration: 400,
+          });
+        } catch {
+          map.easeTo({
+            center: geometry.coordinates as [number, number],
+            zoom: Math.min(currentZoom + 2, 16),
+            duration: 400,
+          });
+        }
+      };
+
+      map.on("click", "clusters", handleClusterClick);
+      map.on("click", "cluster-count", handleClusterClick);
+
+      const setPointerCursor = () => {
         map.getCanvas().style.cursor = "pointer";
-      });
-      map.on("mouseleave", "unclustered-point", () => {
+      };
+      const resetCursor = () => {
         map.getCanvas().style.cursor = "";
+      };
+
+      map.on("mouseenter", "clusters", setPointerCursor);
+      map.on("mouseleave", "clusters", resetCursor);
+      map.on("mouseenter", "cluster-count", setPointerCursor);
+      map.on("mouseleave", "cluster-count", resetCursor);
+
+      map.on("click", "unclustered-point", (event: MapLayerMouseEvent) => {
+        const feature = event.features?.[0];
+        const slug = feature?.properties?.slug as string | undefined;
+        if (slug) onPointClickRef.current?.(slug);
+        if (feature?.geometry.type === "Point") {
+          map.easeTo({
+            center: (feature.geometry as GeoJSON.Point).coordinates as [
+              number,
+              number,
+            ],
+            duration: 300,
+          });
+        }
       });
+      map.on("mouseenter", "unclustered-point", setPointerCursor);
+      map.on("mouseleave", "unclustered-point", resetCursor);
+
+      if (interactive) {
+        map.addControl(
+          new NavigationControl({ showCompass: false }),
+          "top-right",
+        );
+      }
     });
 
     if (onMoveEndRef.current) {
