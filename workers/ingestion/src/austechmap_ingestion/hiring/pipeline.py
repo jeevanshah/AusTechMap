@@ -73,12 +73,19 @@ def run_ats_crawl(
         payload={"ats_provider": provider, "ats_identifier": identifier},
         scheduled_for=crawl_time,
     )
-    if not enqueued.created:
-        return AtsCrawlResult(enqueued.run_id, False, 0, 0, 0, 0, 0)
-
+    # Always attempt to claim the run this idempotency key resolved to,
+    # whether freshly enqueued or a pre-existing same-day row -- claim_run
+    # only succeeds for a 'queued' or 'retry_wait' row whose backoff has
+    # elapsed, so a run that already succeeded (or is running elsewhere)
+    # correctly stays untouched. Returning early on `not enqueued.created`
+    # alone (the previous behaviour) meant a retryable failure from earlier
+    # today could never actually be retried within the same day, since its
+    # idempotency key already existed.
     claim = repository.claim_run(enqueued.run_id, worker_id=worker_id, now=crawl_time)
     if claim is None:
-        raise RuntimeError(f"New ATS crawl run could not be claimed: {enqueued.run_id}")
+        if enqueued.created:
+            raise RuntimeError(f"New ATS crawl run could not be claimed: {enqueued.run_id}")
+        return AtsCrawlResult(enqueued.run_id, False, 0, 0, 0, 0, 0)
 
     try:
         if provider == "lever":

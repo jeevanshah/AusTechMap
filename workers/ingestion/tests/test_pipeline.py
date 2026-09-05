@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import tempfile
 import uuid
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import psycopg
@@ -174,3 +175,39 @@ def test_run_ats_crawl_is_idempotent_at_the_run_level_on_the_same_day() -> None:
     assert first.created is True
     assert second.created is False
     assert second.run_id == first.run_id
+
+
+@pytest.mark.integration
+def test_run_ats_crawl_retries_a_same_day_retryable_failure() -> None:
+    # Real bug found running against production: a run that failed earlier
+    # today (retry_wait, backoff elapsed) was never actually reclaimed on a
+    # later same-day call -- `enqueue()` correctly finds the existing
+    # idempotency-key row (`created=False`), but the old code treated that
+    # alone as "already handled today" without ever attempting to claim it,
+    # so a retryable failure could never be retried until the next day.
+    database_url = _database_url()
+    suffix = uuid.uuid4().hex
+    company_ats_source = _setup_company_ats_source(database_url, suffix, "lever", "immutable")
+    repository = JobRepository(database_url)
+    store = FilesystemSnapshotStore(Path(tempfile.gettempdir()) / f"pipeline-test-{suffix}")
+    crawl_day = datetime(2026, 1, 1, tzinfo=UTC)
+
+    def _failing_fetch(*args: object, **kwargs: object) -> SafeFetchResult:
+        raise RuntimeError("simulated transient failure")
+
+    with pytest.raises(RuntimeError, match="simulated transient failure"):
+        run_ats_crawl(
+            repository, store, database_url=database_url, company_ats_source=company_ats_source,
+            skills=(), fetch_fn=_failing_fetch, now=crawl_day,
+        )
+
+    # Retry a couple of minutes later the same day -- past the first
+    # retry's 1-minute backoff window.
+    result = run_ats_crawl(
+        repository, store, database_url=database_url, company_ats_source=company_ats_source,
+        skills=(), fetch_fn=lambda *a, **kw: _fake_fetch("lever_immutable_postings.json"),
+        now=crawl_day + timedelta(minutes=2),
+    )
+
+    assert result.created is True
+    assert result.fetched == 7
