@@ -14,6 +14,11 @@ from austechmap_ingestion.employers.geocoding import (
     geocode_address,
     geocode_address_nominatim,
 )
+from austechmap_ingestion.employers.labour_agreements import (
+    LabourAgreementError,
+    load_labour_agreements_fixture,
+    match_labour_agreements,
+)
 from austechmap_ingestion.employers.locations_seed import (
     DEFAULT_FIXTURE_PATH as DEFAULT_ADDRESS_FIXTURE_PATH,
 )
@@ -25,6 +30,9 @@ from austechmap_ingestion.employers.seed import (
     DEFAULT_FIXTURE_PATH,
     SeedImportError,
     run_seed_import,
+)
+from austechmap_ingestion.employers.sponsorship_evidence import (
+    derive_sponsorship_evidence_from_jobs,
 )
 from austechmap_ingestion.health import build_health
 from austechmap_ingestion.hiring.ats_source_seed import AtsSourceSeedError, seed_ats_sources
@@ -125,6 +133,25 @@ def build_parser() -> argparse.ArgumentParser:
         "--snapshot-root",
         type=Path,
         help="force filesystem storage at this path instead of RAW_SNAPSHOT_BACKEND",
+    )
+    sponsorship_derive_parser = subparsers.add_parser(
+        "derive-sponsorship-evidence",
+        help="classify real job postings for explicit sponsorship mentions",
+    )
+    sponsorship_derive_parser.add_argument(
+        "--database-url", default=os.environ.get("DATABASE_URL")
+    )
+    labour_agreement_parser = subparsers.add_parser(
+        "match-labour-agreements",
+        help="match the Home Affairs current-labour-agreements list against real companies",
+    )
+    labour_agreement_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    labour_agreement_parser.add_argument(
+        "--fixture",
+        type=Path,
+        required=True,
+        help="labour-agreements CSV to match from (no default -- see employers/"
+        "labour_agreements.py)",
     )
     return parser
 
@@ -382,6 +409,52 @@ def main(argv: Sequence[str] | None = None) -> int:
                     }
                     for result in results
                 ],
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "derive-sponsorship-evidence":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        try:
+            sponsorship_stats = derive_sponsorship_evidence_from_jobs(args.database_url)
+        except psycopg.Error as error:
+            print(f"Sponsorship evidence derivation failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "companiesConsidered": sponsorship_stats.companies_considered,
+                    "currentEvidenceCreated": sponsorship_stats.current_evidence_created,
+                    "historicalEvidenceCreated": sponsorship_stats.historical_evidence_created,
+                },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "match-labour-agreements":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        try:
+            records = load_labour_agreements_fixture(args.fixture)
+            labour_agreement_stats = match_labour_agreements(args.database_url, records)
+        except (LabourAgreementError, psycopg.Error) as error:
+            print(f"Labour agreement match failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "companiesConsidered": labour_agreement_stats.companies_considered,
+                    "exactMatches": labour_agreement_stats.exact_matches,
+                    "reviewQueueItemsCreated": labour_agreement_stats.review_queue_items_created,
+                    "noMatch": labour_agreement_stats.no_match,
+                },
                 separators=(",", ":"),
                 sort_keys=True,
             )
