@@ -33,11 +33,25 @@ const CATEGORY_FILTER_SQL = `($2::text IS NULL OR EXISTS (
              WHERE ccl.company_id = c.id AND cat.key = $2
            ))`;
 
+const SPONSORSHIP_FILTER_SQL = `(NOT $3::boolean OR EXISTS (
+             SELECT 1 FROM evidence e
+             WHERE e.entity_type = 'company' AND e.entity_id = c.id::text
+               AND e.claim_type = ANY($4::text[])
+           ))`;
+
+const SPONSORSHIP_CLAIM_TYPES = [
+  "sponsorship_current_explicit",
+  "sponsorship_historical_explicit",
+  "sponsorship_labour_agreement",
+];
+
 export async function searchCompanies(
   pool: Pool,
   query: string,
   category: string | null = null,
+  sponsorship = false,
 ): Promise<CompanySearchResult[]> {
+  const filterParams = [category, sponsorship, SPONSORSHIP_CLAIM_TYPES];
   const { rows } = await pool.query<TrigramRow>(
     `SELECT c.slug, c.display_name AS name, c.domain,
             similarity(c.display_name, $1) AS name_score,
@@ -57,9 +71,10 @@ export async function searchCompanies(
              WHERE ca.company_id = c.id AND ca.alias % $1
            ))
        AND ${CATEGORY_FILTER_SQL}
+       AND ${SPONSORSHIP_FILTER_SQL}
      ORDER BY GREATEST(similarity(c.display_name, $1), COALESCE(alias_sim.best, 0)) DESC
      LIMIT 20`,
-    [query, category],
+    [query, ...filterParams],
   );
 
   if (rows.length > 0) {
@@ -94,9 +109,10 @@ export async function searchCompanies(
      WHERE c.status NOT IN ('merged', 'disabled')
        AND rl.input_text ILIKE '%' || $1 || '%'
        AND ${CATEGORY_FILTER_SQL}
+       AND ${SPONSORSHIP_FILTER_SQL}
      ORDER BY c.id
      LIMIT 20`,
-    [query, category],
+    [query, ...filterParams],
   );
 
   return locationRows.map((row) => ({

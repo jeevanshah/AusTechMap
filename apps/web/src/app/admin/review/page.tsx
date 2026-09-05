@@ -1,5 +1,9 @@
 import { DatabaseNotConfiguredError, getPool } from "../../../lib/db";
-import { approveReviewItem, rejectReviewItem } from "./actions";
+import {
+  approveReviewItem,
+  approveSponsorshipMatch,
+  rejectReviewItem,
+} from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +17,8 @@ interface ReviewItemRow {
     candidate_domain?: string | null;
     match_method?: string;
     candidate_company_ids?: string[];
+    holder_name?: string;
+    similarity?: number;
   };
   created_at: string;
 }
@@ -63,8 +69,55 @@ export default async function ReviewQueuePage() {
 
       <div className="flex flex-col gap-6">
         {items.map((item) => {
-          const boundApprove = approveReviewItem.bind(null, item.id);
           const boundReject = rejectReviewItem.bind(null, item.id);
+
+          if (item.kind === "sponsorship_match") {
+            const boundApproveSponsorship = approveSponsorshipMatch.bind(
+              null,
+              item.id,
+            );
+            return (
+              <div
+                key={item.id}
+                className="rounded-2xl border border-emerald-950/15 p-5"
+              >
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="font-medium">
+                    {item.payload.holder_name}
+                  </span>
+                  <span className="font-mono text-xs text-emerald-950/50">
+                    {item.kind}
+                  </span>
+                </div>
+                <dl className="mb-4 grid grid-cols-2 gap-2 text-sm text-emerald-950/70">
+                  <dt>Similarity score</dt>
+                  <dd>{item.payload.similarity?.toFixed(2) ?? "—"}</dd>
+                  <dt>Reason</dt>
+                  <dd>{item.reason ?? "—"}</dd>
+                </dl>
+                <div className="flex flex-wrap gap-3">
+                  <form action={boundApproveSponsorship}>
+                    <button
+                      type="submit"
+                      className="rounded-full bg-emerald-900 px-4 py-2 text-xs font-medium text-white"
+                    >
+                      Approve
+                    </button>
+                  </form>
+                  <form action={boundReject}>
+                    <button
+                      type="submit"
+                      className="rounded-full border border-red-700 px-4 py-2 text-xs font-medium text-red-700"
+                    >
+                      Reject
+                    </button>
+                  </form>
+                </div>
+              </div>
+            );
+          }
+
+          const boundApprove = approveReviewItem.bind(null, item.id);
           const candidates = item.payload.candidate_company_ids ?? [];
           return (
             <div

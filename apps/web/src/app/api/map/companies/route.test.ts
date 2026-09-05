@@ -74,6 +74,18 @@ describe("GET /api/map/companies", () => {
     expect(body.points).toHaveLength(500);
   });
 
+  it("forwards a sponsorship filter to the query", async () => {
+    const pool = fakePool([]);
+    vi.mocked(getPool).mockReturnValue(pool);
+
+    await GET(request("bbox=150,-34,152,-33&sponsorship=true"));
+
+    expect(pool.query).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.arrayContaining([true]),
+    );
+  });
+
   it("returns 400 for a malformed bbox without touching the database", async () => {
     const response = await GET(request("bbox=not-a-bbox"));
 

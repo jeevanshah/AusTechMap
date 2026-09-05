@@ -21,7 +21,11 @@ async function loadHomeData(): Promise<HomeData> {
     pool.query<{ count: string }>(
       "SELECT count(*) FROM companies WHERE status NOT IN ('merged', 'disabled')",
     ),
-    fetchMapCompanies(pool, { bbox: AUSTRALIA_BBOX, category: null }),
+    fetchMapCompanies(pool, {
+      bbox: AUSTRALIA_BBOX,
+      category: null,
+      sponsorship: false,
+    }),
   ]);
   return { count: Number(rows[0]?.count ?? 0), points: mapResult.points };
 }

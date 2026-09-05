@@ -12,7 +12,14 @@ export interface Bbox {
 export interface MapCompaniesQuery {
   bbox: Bbox;
   category: string | null;
+  sponsorship: boolean;
 }
+
+const SPONSORSHIP_CLAIM_TYPES = [
+  "sponsorship_current_explicit",
+  "sponsorship_historical_explicit",
+  "sponsorship_labour_agreement",
+];
 
 interface MapCompanyRow {
   slug: string;
@@ -51,14 +58,21 @@ export async function fetchMapCompanies(
              JOIN categories cat ON cat.id = ccl.category_id
              WHERE ccl.company_id = c.id AND cat.key = $5
            ))
+       AND (NOT $6::boolean OR EXISTS (
+             SELECT 1 FROM evidence e
+             WHERE e.entity_type = 'company' AND e.entity_id = c.id::text
+               AND e.claim_type = ANY($7::text[])
+           ))
      ORDER BY c.display_name
-     LIMIT $6`,
+     LIMIT $8`,
     [
       query.bbox.west,
       query.bbox.south,
       query.bbox.east,
       query.bbox.north,
       query.category,
+      query.sponsorship,
+      SPONSORSHIP_CLAIM_TYPES,
       MAX_ROWS + 1,
     ],
   );

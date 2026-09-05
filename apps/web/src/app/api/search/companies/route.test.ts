@@ -130,10 +130,10 @@ describe("GET /api/search/companies", () => {
 
     await GET(request("q=acme&category=fintech"));
 
-    expect(pool.query).toHaveBeenCalledWith(expect.any(String), [
-      "acme",
-      "fintech",
-    ]);
+    expect(pool.query).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.arrayContaining(["acme", "fintech", false]),
+    );
   });
 
   it("treats a blank category as no filter", async () => {
@@ -142,7 +142,22 @@ describe("GET /api/search/companies", () => {
 
     await GET(request("q=acme&category="));
 
-    expect(pool.query).toHaveBeenCalledWith(expect.any(String), ["acme", null]);
+    expect(pool.query).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.arrayContaining(["acme", null, false]),
+    );
+  });
+
+  it("forwards a sponsorship filter to the query", async () => {
+    const pool = fakePool([]);
+    vi.mocked(getPool).mockReturnValue(pool);
+
+    await GET(request("q=acme&sponsorship=true"));
+
+    expect(pool.query).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.arrayContaining(["acme", true]),
+    );
   });
 
   it("returns 400 for a missing query", async () => {

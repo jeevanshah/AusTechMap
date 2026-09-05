@@ -16,6 +16,7 @@ export async function GET(request: Request): Promise<Response> {
     const { points, truncated } = await fetchMapCompanies(getPool(), {
       bbox: parsed.params.bbox,
       category: parsed.params.category,
+      sponsorship: parsed.params.sponsorship,
     });
     const body = MapCompaniesResponseSchema.parse({
       version: 1,

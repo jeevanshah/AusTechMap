@@ -4,6 +4,7 @@ export interface ParsedBboxParams {
   bbox: Bbox;
   zoom: number;
   category: string | null;
+  sponsorship: boolean;
 }
 
 export type BboxParseResult =
@@ -78,6 +79,7 @@ export function parseBboxParams(
 
   const categoryRaw = searchParams.get("category")?.trim();
   const category = categoryRaw && categoryRaw !== "" ? categoryRaw : null;
+  const sponsorship = searchParams.get("sponsorship") === "true";
 
   return {
     ok: true,
@@ -85,6 +87,7 @@ export function parseBboxParams(
       bbox: snapBbox({ west, south, east, north }, zoom),
       zoom,
       category,
+      sponsorship,
     },
   };
 }

@@ -58,6 +58,7 @@ export function HomeMapShell({
   const [showMapMobile, setShowMapMobile] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [sponsorshipOnly, setSponsorshipOnly] = useState(false);
   const [currentBbox, setCurrentBbox] = useState<Bbox>(initialBbox);
   const [currentZoom, setCurrentZoom] = useState<number | null>(null);
   const moveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -103,8 +104,9 @@ export function HomeMapShell({
       const categoryParam = selectedCategory
         ? `&category=${encodeURIComponent(selectedCategory)}`
         : "";
+      const sponsorshipParam = sponsorshipOnly ? "&sponsorship=true" : "";
       fetch(
-        `/api/search/companies?q=${encodeURIComponent(trimmed)}${categoryParam}`,
+        `/api/search/companies?q=${encodeURIComponent(trimmed)}${categoryParam}${sponsorshipParam}`,
       )
         .then((response) => response.json())
         .then((body: { results?: CompanySearchResult[] }) => {
@@ -119,7 +121,7 @@ export function HomeMapShell({
     return () => {
       if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     };
-  }, [query, selectedCategory]);
+  }, [query, selectedCategory, sponsorshipOnly]);
 
   const handleMoveEnd = useCallback((bbox: Bbox, zoom: number) => {
     if (moveTimeoutRef.current) clearTimeout(moveTimeoutRef.current);
@@ -143,7 +145,10 @@ export function HomeMapShell({
     const categoryParam = selectedCategory
       ? `&category=${encodeURIComponent(selectedCategory)}`
       : "";
-    fetch(`/api/map/companies?bbox=${bboxParam}${zoomParam}${categoryParam}`)
+    const sponsorshipParam = sponsorshipOnly ? "&sponsorship=true" : "";
+    fetch(
+      `/api/map/companies?bbox=${bboxParam}${zoomParam}${categoryParam}${sponsorshipParam}`,
+    )
       .then((response) => response.json())
       .then((body: { points?: MapCompanyPoint[] }) =>
         setPoints(body.points ?? []),
@@ -151,7 +156,7 @@ export function HomeMapShell({
       .catch(() => {
         /* keep showing the last-known points rather than clearing the map */
       });
-  }, [currentBbox, currentZoom, selectedCategory]);
+  }, [currentBbox, currentZoom, selectedCategory, sponsorshipOnly]);
 
   const handlePointClick = useCallback((slug: string) => {
     setSelectedSlug(slug);
@@ -196,8 +201,17 @@ export function HomeMapShell({
           ))}
         </select>
       </label>
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={sponsorshipOnly}
+          onChange={(event) => setSponsorshipOnly(event.target.checked)}
+          className="h-4 w-4 rounded border-emerald-950/30"
+        />
+        Has sponsorship evidence
+      </label>
       <p className="text-xs text-emerald-950/50">
-        Hiring, sponsorship, and regional filters land in later phases.
+        Hiring and regional filters land in later phases.
       </p>
 
       <div className="flex justify-end lg:hidden">

@@ -13,6 +13,27 @@ describe("parseBboxParams", () => {
     if (result.ok) {
       expect(result.params.zoom).toBe(4);
       expect(result.params.category).toBeNull();
+      expect(result.params.sponsorship).toBe(false);
+    }
+  });
+
+  it("parses a sponsorship=true param", () => {
+    const result = parseBboxParams(
+      params("bbox=150,-34,152,-33&sponsorship=true"),
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.params.sponsorship).toBe(true);
+    }
+  });
+
+  it("treats any non-'true' sponsorship value as false", () => {
+    const result = parseBboxParams(
+      params("bbox=150,-34,152,-33&sponsorship=1"),
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.params.sponsorship).toBe(false);
     }
   });
 

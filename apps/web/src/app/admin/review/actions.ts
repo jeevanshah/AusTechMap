@@ -71,6 +71,64 @@ export async function rejectReviewItem(reviewItemId: string): Promise<void> {
   revalidatePath("/admin/review");
 }
 
+interface SponsorshipMatchPayload {
+  holder_name?: string;
+  similarity?: number;
+}
+
+export async function approveSponsorshipMatch(
+  reviewItemId: string,
+): Promise<void> {
+  const pool = getPool();
+  const actorUserId = await ensureSystemActor(pool);
+  const row = await pool.query<{
+    status: string;
+    company_id: string | null;
+    payload: SponsorshipMatchPayload;
+    source_id: string;
+  }>(
+    "SELECT status, company_id, payload, source_id FROM review_queue_items WHERE id = $1",
+    [reviewItemId],
+  );
+  const reviewRow = row.rows[0];
+  if (!reviewRow) throw new Error(`review item not found: ${reviewItemId}`);
+  if (reviewRow.status !== "pending")
+    throw new Error("review item already resolved");
+  if (!reviewRow.company_id)
+    throw new Error("sponsorship match review item has no company_id");
+
+  await pool.query(
+    `INSERT INTO evidence (
+       entity_type, entity_id, claim_type, claim_value, source_id, confidence, observed_at
+     )
+     VALUES ('company', $1, 'sponsorship_labour_agreement', $2, $3, 1.0, now())`,
+    [
+      reviewRow.company_id,
+      JSON.stringify({
+        holder_name: reviewRow.payload.holder_name,
+        similarity: reviewRow.payload.similarity,
+        approved_via: "review",
+      }),
+      reviewRow.source_id,
+    ],
+  );
+  await pool.query(
+    `UPDATE review_queue_items
+     SET status = 'approved', reviewed_by_user_id = $1, reviewed_at = now()
+     WHERE id = $2`,
+    [actorUserId, reviewItemId],
+  );
+  await pool.query(
+    `INSERT INTO audit_records (
+       actor_type, actor_id, action, target_type, target_id, request_id
+     )
+     VALUES ('user', $1, 'review_item_approved', 'company', $2, $3)`,
+    [String(actorUserId), reviewRow.company_id, randomUUID()],
+  );
+
+  revalidatePath("/admin/review");
+}
+
 export async function approveReviewItem(
   reviewItemId: string,
   formData: FormData,

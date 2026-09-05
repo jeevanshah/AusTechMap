@@ -29,6 +29,17 @@ interface ResearchClaim {
   confidence_note?: string | null;
 }
 
+type SponsorshipClaimType =
+  | "sponsorship_current_explicit"
+  | "sponsorship_historical_explicit"
+  | "sponsorship_labour_agreement";
+
+interface SponsorshipEvidenceEntry {
+  claimType: SponsorshipClaimType;
+  claimValue: Record<string, unknown>;
+  observedAt: string;
+}
+
 interface CompanyProfileRow {
   id: string;
   slug: string;
@@ -46,7 +57,14 @@ interface CompanyProfileRow {
   research_confidence: string | null;
   research_observed_at: string | null;
   research_source_name: string | null;
+  sponsorship_evidence: SponsorshipEvidenceEntry[];
 }
+
+const SPONSORSHIP_CLAIM_LABELS: Record<SponsorshipClaimType, string> = {
+  sponsorship_current_explicit: "Current explicit evidence",
+  sponsorship_labour_agreement: "Current labour agreement",
+  sponsorship_historical_explicit: "Historical explicit evidence",
+};
 
 async function loadCompany(slug: string): Promise<CompanyProfileRow | null> {
   const { rows } = await getPool().query<CompanyProfileRow>(
@@ -59,7 +77,8 @@ async function loadCompany(slug: string): Promise<CompanyProfileRow | null> {
        research.claim_value AS research_claim,
        research.confidence AS research_confidence,
        research.observed_at AS research_observed_at,
-       research.source_name AS research_source_name
+       research.source_name AS research_source_name,
+       COALESCE(sponsorship.items, '[]'::json) AS sponsorship_evidence
      FROM companies c
      LEFT JOIN companies m ON m.id = c.merged_into_company_id
      LEFT JOIN LATERAL (
@@ -84,6 +103,22 @@ async function loadCompany(slug: string): Promise<CompanyProfileRow | null> {
          AND e.claim_type = 'employer_seed_research'
        ORDER BY e.observed_at DESC LIMIT 1
      ) research ON true
+     LEFT JOIN LATERAL (
+       SELECT json_agg(
+                json_build_object(
+                  'claimType', e.claim_type,
+                  'claimValue', e.claim_value,
+                  'observedAt', e.observed_at
+                ) ORDER BY e.observed_at DESC
+              ) AS items
+       FROM evidence e
+       WHERE e.entity_type = 'company' AND e.entity_id = c.id::text
+         AND e.claim_type IN (
+               'sponsorship_current_explicit',
+               'sponsorship_historical_explicit',
+               'sponsorship_labour_agreement'
+             )
+     ) sponsorship ON true
      WHERE c.slug = $1`,
     [slug],
   );
@@ -254,9 +289,56 @@ export default async function CompanyProfilePage({
         </section>
       )}
 
+      <section>
+        <h2 className="mb-4 font-mono text-xs tracking-[0.18em] text-emerald-700 uppercase">
+          Sponsorship evidence
+        </h2>
+        {company.sponsorship_evidence.length === 0 ? (
+          <p className="rounded-xl border border-emerald-950/15 p-4 text-sm text-emerald-950/60">
+            No evidence found. This is not proof the employer does not sponsor.
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {company.sponsorship_evidence.map((entry, index) => (
+              <li
+                key={`${entry.claimType}-${entry.observedAt}-${index}`}
+                className="rounded-xl border border-emerald-950/15 p-4 text-sm"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">
+                    {SPONSORSHIP_CLAIM_LABELS[entry.claimType] ??
+                      entry.claimType}
+                  </span>
+                  <span className="text-xs text-emerald-950/50">
+                    {new Date(entry.observedAt).toLocaleDateString("en-AU")}
+                  </span>
+                </div>
+                <p className="mt-1 text-xs text-emerald-950/60">
+                  {entry.claimType === "sponsorship_labour_agreement"
+                    ? [
+                        entry.claimValue.agreement_type,
+                        entry.claimValue.start_date
+                          ? `from ${String(entry.claimValue.start_date)}`
+                          : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")
+                    : String(entry.claimValue.job_title ?? "")}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="mt-3 text-xs text-emerald-950/50">
+          Important: evidence does not guarantee sponsorship for a specific role
+          or applicant. Always confirm with the employer and official Home
+          Affairs guidance.
+        </p>
+      </section>
+
       <p className="text-xs text-emerald-950/50">
-        Hiring activity, sponsorship evidence, and technology-stack data will
-        appear here once those pipelines are built (Phase 5–6).
+        Hiring activity and technology-stack data will appear here once those
+        pipelines are built (Phase 5).
       </p>
     </main>
   );
