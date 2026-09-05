@@ -2,7 +2,7 @@
 
 > Satisfies [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) Phase 0: "Record architecture decisions for the database, map provider, storage, hosting, authentication, email, and analytics."
 > This document is authoritative for technology choices — where it conflicts with [PRODUCT_SPEC.md](./PRODUCT_SPEC.md)'s recommendations, this document wins.
-> Version 3.6 · 5 September 2026
+> Version 3.7 · 5 September 2026
 
 ## 1. Decision summary
 
@@ -304,10 +304,17 @@ DuckDB index this section specifies. Run against a real 4-case representative sa
 a deliberately ambiguous address, a deliberately invalid one) and against the full 133-company Phase 3
 cohort: 93/133 (69.9%) resolve to a unique exact match, 20/133 (15.0%) are ambiguous, 20/133 (15.0%)
 have no match, 0 are out of bounds — see IMPLEMENTATION_PLAN.md's Phase 2 exit gate for the complete
-breakdown. The upgrade trigger below is therefore now genuinely actionable for those 93 companies, but
-applying it (re-resolving and retiring their `external_geocoder` rows) is a deliberate follow-up
-decision, not yet done — this verification pass was read-only against `resolved_locations`/
-`company_locations`.
+breakdown. The upgrade trigger below is therefore now genuinely actionable for those 93 companies.
+**Its safe half is built and tested** (`geography/gnaf_upgrade.py`): activating a real `gnaf`
+`geography_releases` row, and upgrading one `resolved_locations` row in place from
+`external_geocoder` to `gnaf_exact_match` given an already-computed match, recording the prior
+state as an `evidence` row first since the table itself has no room for history. What's still
+missing is turning a free-text address line ("Level 6, 341 George Street") into the structured
+fields the G-NAF matcher needs — the real fixture has messy formats (number ranges, institutional
+addresses with no street number, building-name prefixes) that a hastily-written parser could easily
+get wrong, and Gemini's own ad hoc script already produced the verified 93/20/20 breakdown above
+using its own such parser; reviewing and adopting that logic (rather than reimplementing it blind)
+is the remaining step before this upgrade can actually run.
 
 **Interim state (until that follow-up runs):** the Phase 3 alpha seed cohort's 133 real, researched
 street addresses remain resolved via a third-party geocoding API — OpenStreetMap's
