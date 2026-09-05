@@ -2,7 +2,7 @@
 
 > Satisfies [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) Phase 0: "Record architecture decisions for the database, map provider, storage, hosting, authentication, email, and analytics."
 > This document is authoritative for technology choices — where it conflicts with [PRODUCT_SPEC.md](./PRODUCT_SPEC.md)'s recommendations, this document wins.
-> Version 3.7 · 5 September 2026
+> Version 3.8 · 5 September 2026
 
 ## 1. Decision summary
 
@@ -298,36 +298,33 @@ Activation requires schema/count checks, duplicate-PID checks, coordinate bounds
 deltas, exact-match regression fixtures, and a sample comparison against the previous release. A
 failed gate leaves the prior release active and creates a failed auditable import run.
 
-**Update (5 September 2026): the real August 2026 G-NAF release has now been acquired and indexed** —
-16,970,406 addresses/geocodes, 767,239 street localities, 17,581 localities, 9 states, built into the
-DuckDB index this section specifies. Run against a real 4-case representative sample (metro, regional,
-a deliberately ambiguous address, a deliberately invalid one) and against the full 133-company Phase 3
-cohort: 93/133 (69.9%) resolve to a unique exact match, 20/133 (15.0%) are ambiguous, 20/133 (15.0%)
-have no match, 0 are out of bounds — see IMPLEMENTATION_PLAN.md's Phase 2 exit gate for the complete
-breakdown. The upgrade trigger below is therefore now genuinely actionable for those 93 companies.
-**Its safe half is built and tested** (`geography/gnaf_upgrade.py`): activating a real `gnaf`
-`geography_releases` row, and upgrading one `resolved_locations` row in place from
-`external_geocoder` to `gnaf_exact_match` given an already-computed match, recording the prior
-state as an `evidence` row first since the table itself has no room for history. What's still
-missing is turning a free-text address line ("Level 6, 341 George Street") into the structured
-fields the G-NAF matcher needs — the real fixture has messy formats (number ranges, institutional
-addresses with no street number, building-name prefixes) that a hastily-written parser could easily
-get wrong, and Gemini's own ad hoc script already produced the verified 93/20/20 breakdown above
-using its own such parser; reviewing and adopting that logic (rather than reimplementing it blind)
-is the remaining step before this upgrade can actually run.
+**Resolved (5 September 2026): the real August 2026 G-NAF release was acquired, indexed, and its
+upgrade applied to production.** 16,970,406 addresses/geocodes, 767,239 street localities, 17,581
+localities, 9 states, built into the DuckDB index this section specifies. Run against a real 4-case
+representative sample (metro, regional, a deliberately ambiguous address, a deliberately invalid
+one) and against the full 133-company Phase 3 cohort: 93/133 (69.9%) resolve to a unique exact
+match, 24/133 (18.0%) are ambiguous, 16/133 (12.0%) have no match, 0 are out of bounds. A real bug
+in the free-text-to-structured-address parsing (an unnumbered-street fallback that left a
+comma-polluted street name, e.g. "Lot Fourteen, North Terrace" parsing to street name "LOT
+FOURTEEN, NORTH" instead of "NORTH") was found by tracing the code against real fixture addresses
+and fixed before this run — its effect was always fail-safe (it could only ever push a result
+toward `no_match`, never fabricate a false `accepted`), and fixing it correctly moved 4 addresses
+from `no_match` to the honest `ambiguous` bucket rather than silently guessing a coordinate for an
+unnumbered CBD/campus street with multiple candidate parcels.
 
-**Interim state (until that follow-up runs):** the Phase 3 alpha seed cohort's 133 real, researched
-street addresses remain resolved via a third-party geocoding API — OpenStreetMap's
-Nominatim by default (no signup or payment method required, self-throttled to its 1 request/second
-usage-policy limit), with the Mapbox Geocoding API available as an alternate provider behind the same
-interface if ever preferred — recorded in `resolved_locations` with
-`location_match_method = 'external_geocoder'` (migration `0008`), distinct from `gnaf_exact_match` so
-provenance stays honest about how each point was actually obtained. This is unrelated to §3.5's map
-renderer/tile-source decision — geocoding an address and rendering a map are different concerns, and
-this interim choice holds regardless of which one that section names. Upgrade trigger: now that a real
-G-NAF release is acquired and activated, re-resolve these addresses through the exact-match pipeline
-above and retire the `external_geocoder` rows, rather than treating either geocoding API as a
-permanent substitute for the G-NAF contract this section actually specifies.
+The upgrade itself (`geography/gnaf_upgrade.py`: `activate_gnaf_release` + `apply_gnaf_matches`,
+built and tested first, then run using only those reviewed functions — no ad hoc SQL) applied to
+all 93 confidently-matched companies: a `gnaf` `geography_releases` row is now active
+(`release_version='aug26'`, 16,970,406 rows), 93 `resolved_locations` upgrades were applied (90
+distinct rows, since a few companies share an address), each preceded by an `evidence` row recording
+the prior `external_geocoder` method/coordinate so that provenance is never silently lost. Verified
+by direct query: `company_locations` now shows 93 rows on `gnaf_exact_match` and 40 still on
+`external_geocoder` (93 + 40 = 133); `resolved_locations` shows 90 `gnaf_exact_match` and 35
+`external_geocoder` (90 + 35 = 125, the distinct-address count). The remaining 40 companies (24
+ambiguous, 16 no-match) correctly keep their interim Nominatim/Mapbox `external_geocoder` rows —
+`location_match_method` stays an honest record of how each point was actually obtained, per this
+section's own design, rather than every row eventually claiming the same (higher-precision but not
+universally available) method.
 
 ### 4.4 Database backup, restore, and retention
 
