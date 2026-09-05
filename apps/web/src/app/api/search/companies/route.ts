@@ -6,16 +6,19 @@ import { searchCompanies } from "../../../../lib/queries/searchCompanies";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request): Promise<Response> {
-  const query = new URL(request.url).searchParams.get("q")?.trim();
+  const searchParams = new URL(request.url).searchParams;
+  const query = searchParams.get("q")?.trim();
   if (!query) {
     return Response.json(
       { version: 1, error: "q is required" },
       { status: 400 },
     );
   }
+  const categoryRaw = searchParams.get("category")?.trim();
+  const category = categoryRaw && categoryRaw !== "" ? categoryRaw : null;
 
   try {
-    const results = await searchCompanies(getPool(), query);
+    const results = await searchCompanies(getPool(), query, category);
     const body = CompanySearchResponseSchema.parse({
       version: 1,
       query,

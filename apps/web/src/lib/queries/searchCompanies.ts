@@ -27,9 +27,16 @@ const LOCATION_FALLBACK_SCORE = 0.5;
  * structured region/postcode data is imported, not a real geography
  * resolver.
  */
+const CATEGORY_FILTER_SQL = `($2::text IS NULL OR EXISTS (
+             SELECT 1 FROM company_category_links ccl
+             JOIN categories cat ON cat.id = ccl.category_id
+             WHERE ccl.company_id = c.id AND cat.key = $2
+           ))`;
+
 export async function searchCompanies(
   pool: Pool,
   query: string,
+  category: string | null = null,
 ): Promise<CompanySearchResult[]> {
   const { rows } = await pool.query<TrigramRow>(
     `SELECT c.slug, c.display_name AS name, c.domain,
@@ -49,9 +56,10 @@ export async function searchCompanies(
              SELECT 1 FROM company_aliases ca
              WHERE ca.company_id = c.id AND ca.alias % $1
            ))
+       AND ${CATEGORY_FILTER_SQL}
      ORDER BY GREATEST(similarity(c.display_name, $1), COALESCE(alias_sim.best, 0)) DESC
      LIMIT 20`,
-    [query],
+    [query, category],
   );
 
   if (rows.length > 0) {
@@ -85,9 +93,10 @@ export async function searchCompanies(
      JOIN resolved_locations rl ON rl.id = cl.resolved_location_id
      WHERE c.status NOT IN ('merged', 'disabled')
        AND rl.input_text ILIKE '%' || $1 || '%'
+       AND ${CATEGORY_FILTER_SQL}
      ORDER BY c.id
      LIMIT 20`,
-    [query],
+    [query, category],
   );
 
   return locationRows.map((row) => ({

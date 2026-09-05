@@ -52,3 +52,19 @@ export const CompanySearchResponseSchema = z.object({
 });
 
 export type CompanySearchResponse = z.infer<typeof CompanySearchResponseSchema>;
+
+export const CategorySchema = z.object({
+  key: z.string().min(1),
+  label: z.string().min(1),
+  groupKey: z.string().min(1),
+  groupLabel: z.string().min(1),
+});
+
+export type Category = z.infer<typeof CategorySchema>;
+
+export const CategoriesResponseSchema = z.object({
+  version: z.literal(1),
+  categories: z.array(CategorySchema),
+});
+
+export type CategoriesResponse = z.infer<typeof CategoriesResponseSchema>;

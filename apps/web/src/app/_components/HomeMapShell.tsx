@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type {
+  Category,
   CompanySearchResult,
   MapCompanyPoint,
 } from "@austechmap/contracts";
@@ -55,8 +56,40 @@ export function HomeMapShell({
   const [searchError, setSearchError] = useState(false);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [showMapMobile, setShowMapMobile] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [currentBbox, setCurrentBbox] = useState<Bbox>(initialBbox);
+  const [currentZoom, setCurrentZoom] = useState<number | null>(null);
   const moveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const didMountMapFetchRef = useRef(false);
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((response) => response.json())
+      .then((body: { categories?: Category[] }) =>
+        setCategories(body.categories ?? []),
+      )
+      .catch(() => {
+        /* leave the filter showing only "All categories" */
+      });
+  }, []);
+
+  const categoryGroups = useMemo(() => {
+    const groups = new Map<string, { groupLabel: string; items: Category[] }>();
+    for (const category of categories) {
+      const group = groups.get(category.groupKey);
+      if (group) {
+        group.items.push(category);
+      } else {
+        groups.set(category.groupKey, {
+          groupLabel: category.groupLabel,
+          items: [category],
+        });
+      }
+    }
+    return Array.from(groups.values());
+  }, [categories]);
 
   useEffect(() => {
     if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
@@ -67,7 +100,12 @@ export function HomeMapShell({
     if (trimmed === "") return;
     searchTimeoutRef.current = setTimeout(() => {
       trackEvent("search_submitted", { query: trimmed });
-      fetch(`/api/search/companies?q=${encodeURIComponent(trimmed)}`)
+      const categoryParam = selectedCategory
+        ? `&category=${encodeURIComponent(selectedCategory)}`
+        : "";
+      fetch(
+        `/api/search/companies?q=${encodeURIComponent(trimmed)}${categoryParam}`,
+      )
         .then((response) => response.json())
         .then((body: { results?: CompanySearchResult[] }) => {
           setSearchResults(body.results ?? []);
@@ -81,22 +119,39 @@ export function HomeMapShell({
     return () => {
       if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     };
-  }, [query]);
+  }, [query, selectedCategory]);
 
   const handleMoveEnd = useCallback((bbox: Bbox, zoom: number) => {
     if (moveTimeoutRef.current) clearTimeout(moveTimeoutRef.current);
     moveTimeoutRef.current = setTimeout(() => {
-      const bboxParam = `${bbox.west},${bbox.south},${bbox.east},${bbox.north}`;
-      fetch(`/api/map/companies?bbox=${bboxParam}&zoom=${zoom}`)
-        .then((response) => response.json())
-        .then((body: { points?: MapCompanyPoint[] }) =>
-          setPoints(body.points ?? []),
-        )
-        .catch(() => {
-          /* keep showing the last-known points rather than clearing the map */
-        });
+      setCurrentBbox(bbox);
+      setCurrentZoom(zoom);
     }, MOVE_DEBOUNCE_MS);
   }, []);
+
+  useEffect(() => {
+    // Skipped on mount: `initialPoints` already reflects currentBbox with
+    // no category filter, so re-fetching the same thing on first render
+    // would be redundant. Fires on every later bbox move or category
+    // change instead.
+    if (!didMountMapFetchRef.current) {
+      didMountMapFetchRef.current = true;
+      return;
+    }
+    const bboxParam = `${currentBbox.west},${currentBbox.south},${currentBbox.east},${currentBbox.north}`;
+    const zoomParam = currentZoom !== null ? `&zoom=${currentZoom}` : "";
+    const categoryParam = selectedCategory
+      ? `&category=${encodeURIComponent(selectedCategory)}`
+      : "";
+    fetch(`/api/map/companies?bbox=${bboxParam}${zoomParam}${categoryParam}`)
+      .then((response) => response.json())
+      .then((body: { points?: MapCompanyPoint[] }) =>
+        setPoints(body.points ?? []),
+      )
+      .catch(() => {
+        /* keep showing the last-known points rather than clearing the map */
+      });
+  }, [currentBbox, currentZoom, selectedCategory]);
 
   const handlePointClick = useCallback((slug: string) => {
     setSelectedSlug(slug);
@@ -122,9 +177,27 @@ export function HomeMapShell({
           className="rounded-full border border-emerald-950/20 px-4 py-3 text-base"
         />
       </label>
+      <label className="flex flex-col gap-1 text-sm">
+        <span className="sr-only">Filter by category</span>
+        <select
+          value={selectedCategory}
+          onChange={(event) => setSelectedCategory(event.target.value)}
+          className="rounded-full border border-emerald-950/20 px-4 py-2 text-sm"
+        >
+          <option value="">All categories</option>
+          {categoryGroups.map((group) => (
+            <optgroup key={group.groupLabel} label={group.groupLabel}>
+              {group.items.map((category) => (
+                <option key={category.key} value={category.key}>
+                  {category.label}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+      </label>
       <p className="text-xs text-emerald-950/50">
-        Category, hiring, sponsorship, and regional filters land in later
-        phases.
+        Hiring, sponsorship, and regional filters land in later phases.
       </p>
 
       <div className="flex justify-end lg:hidden">
