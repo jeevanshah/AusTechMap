@@ -65,13 +65,12 @@ export function parseBboxParams(
     const parsedZoom = Number(zoomRaw);
     if (
       !Number.isFinite(parsedZoom) ||
-      !Number.isInteger(parsedZoom) ||
       parsedZoom < MIN_ZOOM ||
       parsedZoom > MAX_ZOOM
     ) {
       return {
         ok: false,
-        error: `zoom must be an integer between ${MIN_ZOOM} and ${MAX_ZOOM}`,
+        error: `zoom must be a number between ${MIN_ZOOM} and ${MAX_ZOOM}`,
       };
     }
     zoom = parsedZoom;

@@ -102,9 +102,12 @@ describe("parseBboxParams", () => {
     expect(result.ok).toBe(false);
   });
 
-  it("rejects a non-integer zoom", () => {
+  it("accepts a fractional zoom (MapLibre's getZoom() is continuous, not integer)", () => {
     const result = parseBboxParams(params("bbox=150,-34,152,-33&zoom=4.5"));
-    expect(result.ok).toBe(false);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.params.zoom).toBe(4.5);
+    }
   });
 
   it("rejects a zoom outside 0-22", () => {
