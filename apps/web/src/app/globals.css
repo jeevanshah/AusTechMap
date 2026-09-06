@@ -8,9 +8,9 @@
   --font-mono:
     var(--font-jetbrains-mono), "SF Mono", Menlo, Monaco, Consolas, monospace;
 
-  --color-canvas: #f8fafc;
+  --color-canvas: #faf8f5;
   --color-surface: #ffffff;
-  --color-surface-border: #e2e8f0;
+  --color-surface-border: #e8e3da;
 
   --color-navy-50: #f0f4f8;
   --color-navy-100: #d9e2ec;
@@ -23,6 +23,16 @@
   --color-navy-800: #1e3a5f;
   --color-navy-900: #0f172a;
   --color-navy-950: #070d19;
+
+  /* Australian Terracotta / Red Earth (Primary CTAs, Sydney hub cluster) */
+  --color-terracotta-50: #fff7ed;
+  --color-terracotta-100: #ffedd5;
+  --color-terracotta-200: #fed7aa;
+  --color-terracotta-500: #f97316;
+  --color-terracotta-600: #ea580c;
+  --color-terracotta-700: #c2410c;
+  --color-terracotta-800: #9a3412;
+  --color-terracotta-900: #7c2d12;
 
   --color-ochre-50: #fffbeb;
   --color-ochre-100: #fef3c7;

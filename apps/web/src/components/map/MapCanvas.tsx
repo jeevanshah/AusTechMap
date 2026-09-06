@@ -124,15 +124,15 @@ export function MapCanvas({
           "circle-color": [
             "step",
             ["get", "point_count"],
-            "#60a5fa", // 1-4: Sky Cobalt (Regional clusters: Darwin, Hobart)
+            "#60a5fa", // 1-4: Regional hubs (Darwin, Hobart) - Sky Azure
             5,
-            "#3b82f6", // 5-9: Medium Azure (Emerging hubs: Adelaide, Canberra, Wollongong, Newcastle)
+            "#f59e0b", // 5-9: Emerging hubs (Adelaide, Canberra) - Warm Amber
             10,
-            "#2563eb", // 10-19: Pacific Cobalt (Established hubs: Brisbane, Perth)
+            "#3b82f6", // 10-19: Established hubs (Brisbane, Perth) - Pacific Azure
             20,
-            "#1d4ed8", // 20-39: Royal Cobalt (Major tech hubs: Melbourne)
+            "#2563eb", // 20-39: Major tech hub (Melbourne) - Royal Cobalt
             40,
-            "#0f2963", // 40+: Midnight Navy Cobalt (Metro tech center: Sydney)
+            "#c2410c", // 40+: Flagship Innovation Center (Sydney) - Terracotta Red Earth
           ],
           "circle-stroke-color": "#ffffff",
           "circle-stroke-width": 2,

@@ -101,7 +101,7 @@ export default async function Home() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-8 px-6 py-8 sm:px-10 sm:py-12">
+    <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-6 px-4 py-6 sm:px-8 sm:py-8">
       <a
         href="#directory-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-navy-900 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:outline-none focus:ring-2 focus:ring-ochre-600 focus:ring-offset-2"
@@ -109,139 +109,169 @@ export default async function Home() {
         Skip to directory content
       </a>
 
-      <header className="flex items-center justify-between border-b border-surface-border pb-5">
+      {/* Global Brand Header with Terracotta CTA */}
+      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-surface-border pb-4">
         <div className="flex items-center gap-3">
-          <div className="relative h-9 w-9 overflow-hidden rounded-lg border border-slate-200/90 shadow-2xs bg-white">
+          <div className="relative h-10 w-10 overflow-hidden rounded-xl border border-surface-border shadow-2xs bg-white">
             <Image
               src="/brand/logo.jpg"
               alt="Australia Tech Map Logo"
-              width={36}
-              height={36}
+              width={40}
+              height={40}
               className="h-full w-full object-cover"
               priority
             />
           </div>
           <div className="flex flex-col">
-            <span className="font-heading text-sm font-bold tracking-wider text-navy-900 uppercase leading-none">
+            <span className="font-heading text-base font-bold tracking-tight text-navy-900 leading-none">
               Australia Tech Map
             </span>
-            <span className="font-mono text-[10px] text-slate-500 uppercase tracking-wider mt-1">
-              National Tech Opportunity Registry
+            <span className="text-xs text-slate-500 font-medium mt-1">
+              People. Companies. Opportunities.
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-3 py-1 font-mono text-[11px] font-medium text-slate-700 shadow-2xs">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            Verified Registry Data
+
+        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
+          <span className="text-navy-900 font-semibold cursor-default border-b-2 border-terracotta-700 pb-0.5">
+            Map
           </span>
+          <a
+            href="#directory-content"
+            className="hover:text-navy-900 transition-colors"
+          >
+            Companies
+          </a>
+          <a
+            href="#directory-content"
+            className="hover:text-navy-900 transition-colors"
+          >
+            Regions
+          </a>
+          <span className="text-slate-400 cursor-not-allowed">Insights</span>
+          <span className="text-slate-400 cursor-not-allowed">About</span>
+        </nav>
+
+        <div className="flex items-center gap-3">
+          <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-surface-border bg-white px-3 py-1 font-mono text-[11px] font-medium text-slate-700 shadow-2xs">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            Verified Registry
+          </span>
+          <a
+            href="https://github.com/jeevanshah/AusTechMap"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-terracotta-700 hover:bg-terracotta-800 active:scale-95 text-white px-3.5 py-1.5 text-xs font-semibold shadow-xs transition-all"
+          >
+            + Add your company
+          </a>
         </div>
       </header>
 
-      <section className="relative flex flex-col gap-6 overflow-hidden rounded-2xl border border-surface-border bg-white p-6 sm:p-8 shadow-2xs">
-        {/* Authentic Australian Topography & Geodetic Surveyor Blueprint (Slate & Desert Ochre on Pure White) */}
+      {/* Compact Studio Masthead: Headline Left, 4 Stat Cards Right */}
+      <section className="relative overflow-hidden rounded-2xl border border-surface-border bg-white p-6 sm:p-7 shadow-2xs">
+        {/* Subtle Topographical Surveyor Texture */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-0 opacity-[0.12] mix-blend-multiply bg-center bg-cover [mask-image:radial-gradient(ellipse_at_center,black_65%,transparent_92%)]"
+          className="pointer-events-none absolute inset-0 z-0 opacity-[0.07] mix-blend-multiply bg-center bg-cover [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_95%)]"
           style={{
             backgroundImage: "url('/brand/hero_cartography.jpg')",
           }}
         />
 
-        <div className="relative z-10 flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-ochre-600" />
-            <p className="font-mono text-xs font-semibold tracking-wider text-ochre-700 uppercase">
-              Australian Technology Opportunity Intelligence
+        <div className="relative z-10 grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-center">
+          {/* Left: Headline & Narrative */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-terracotta-700" />
+              <p className="font-mono text-xs font-bold tracking-wider text-terracotta-700 uppercase">
+                Explore Australia’s Tech Ecosystem
+              </p>
+            </div>
+            <h1 className="font-heading text-3xl font-extrabold tracking-tight text-navy-900 sm:text-4xl text-balance">
+              See where opportunity lives.
+            </h1>
+            <p className="max-w-xl text-sm leading-relaxed text-slate-600">
+              Discover verified tech companies, roles, sponsorship info, and
+              regional innovation hubs across Australia — all in one synchronized
+              map.
             </p>
           </div>
-          <h1 className="max-w-4xl font-heading text-4xl leading-[1.08] font-bold tracking-tight text-navy-900 sm:text-5xl text-balance">
-            Explore Australia’s tech landscape.
-          </h1>
-          <p className="max-w-3xl text-sm leading-relaxed text-slate-600 sm:text-base">
-            Find tech employers by location, industry, hiring activity, and
-            sponsorship evidence — from Sydney and Melbourne to Australia&apos;s
-            regional tech hubs.
-          </p>
-          <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-slate-500">
-            <span className="inline-flex items-center gap-1 rounded bg-slate-50 px-2 py-0.5 font-mono text-[11px] text-slate-600 border border-slate-200 shadow-2xs">
-              <kbd className="font-semibold text-navy-900">⌘K</kbd> or{" "}
-              <kbd className="font-semibold text-navy-900">Ctrl+K</kbd> to
-              search
-            </span>
-            <span>•</span>
-            <span>Click any regional hub to fly &amp; filter</span>
-          </div>
-        </div>
 
-        {/* Hero Stat Strip with Intentional 4-Pillar Color Theory */}
-        <div className="relative z-10 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-          <div className="group rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-xs p-4 shadow-2xs hover:border-slate-300 transition-all duration-150">
-            <div className="flex items-center justify-between mb-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-navy-900 border border-slate-200/80 shadow-2xs group-hover:bg-navy-900 group-hover:text-white transition-colors duration-200">
-                <Building2 className="h-4.5 w-4.5" />
+          {/* Right: Elevated 4-Stat Strip */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-4">
+            <div className="rounded-xl border border-surface-border bg-[#faf8f5]/80 p-3.5 shadow-2xs hover:border-slate-300 transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-navy-900 border border-slate-200/80 shadow-2xs">
+                  <Building2 className="h-3.5 w-3.5" />
+                </span>
+                <span className="font-mono text-[10px] font-semibold text-slate-400 uppercase">
+                  Index
+                </span>
+              </div>
+              <span className="font-mono text-xl font-bold tracking-tight text-navy-900 tabular-nums">
+                <AnimatedCounter target={stats.totalEmployers} />
               </span>
-              <span className="font-mono text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
-                Index
+              <span className="mt-0.5 block font-mono text-[11px] text-slate-500">
+                verified companies
               </span>
             </div>
-            <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
-              <AnimatedCounter target={stats.totalEmployers} />
-            </span>
-            <span className="mt-1 block font-mono text-xs text-slate-500 font-medium">
-              verified employers
-            </span>
-          </div>
 
-          <div className="group rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-xs p-4 shadow-2xs hover:border-pacific-300 transition-all duration-150">
-            <div className="flex items-center justify-between mb-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-pacific-50 text-pacific-700 border border-pacific-200/80 shadow-2xs group-hover:bg-pacific-600 group-hover:text-white transition-colors duration-200">
-                <MapPin className="h-4.5 w-4.5" />
+            <div className="rounded-xl border border-surface-border bg-[#faf8f5]/80 p-3.5 shadow-2xs hover:border-pacific-300 transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-pacific-700 border border-pacific-200/80 shadow-2xs">
+                  <MapPin className="h-3.5 w-3.5" />
+                </span>
+                <span className="font-mono text-[10px] font-semibold text-pacific-600 uppercase">
+                  Hubs
+                </span>
+              </div>
+              <span className="font-mono text-xl font-bold tracking-tight text-navy-900 tabular-nums">
+                <AnimatedCounter target={stats.totalCities} />
               </span>
-              <span className="font-mono text-[10px] font-semibold text-pacific-700 uppercase tracking-wider">
-                Coverage
+              <span className="mt-0.5 block font-mono text-[11px] text-slate-500">
+                cities &amp; regions
               </span>
             </div>
-            <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
-              <AnimatedCounter target={stats.totalCities} />
-            </span>
-            <span className="mt-1 block font-mono text-xs text-slate-500 font-medium">
-              cities &amp; regions
-            </span>
-          </div>
 
-          <div className="group rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-xs p-4 shadow-2xs hover:border-amber-300 transition-all duration-150">
-            <div className="flex items-center justify-between mb-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-ochre-50 text-ochre-800 border border-amber-200/80 shadow-2xs group-hover:bg-ochre-600 group-hover:text-white transition-colors duration-200">
-                <Compass className="h-4.5 w-4.5" />
+            <div className="rounded-xl border border-surface-border bg-[#faf8f5]/80 p-3.5 shadow-2xs hover:border-amber-300 transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-ochre-700 border border-amber-200/80 shadow-2xs">
+                  <Compass className="h-3.5 w-3.5" />
+                </span>
+                <span className="font-mono text-[10px] font-semibold text-ochre-700 uppercase">
+                  Regional
+                </span>
+              </div>
+              <span className="font-mono text-xl font-bold tracking-tight text-navy-900 tabular-nums">
+                <AnimatedCounter target={stats.regionalEmployers} />
               </span>
-              <span className="font-mono text-[10px] font-semibold text-ochre-700 uppercase tracking-wider">
-                Regional
+              <span className="mt-0.5 block font-mono text-[11px] text-slate-500">
+                regional areas
               </span>
             </div>
-            <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
-              <AnimatedCounter target={stats.regionalEmployers} />
-            </span>
-            <span className="mt-1 block font-mono text-xs text-slate-500 font-medium">
-              regional employers
-            </span>
-          </div>
 
-          <div className="group rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-xs p-4 shadow-2xs hover:border-emerald-300 transition-all duration-150">
-            <div className="flex items-center justify-between mb-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-forest-50 text-forest-800 border border-emerald-200/80 shadow-2xs group-hover:bg-forest-700 group-hover:text-white transition-colors duration-200">
-                <ShieldCheck className="h-4.5 w-4.5" />
+            <div className="rounded-xl border border-surface-border bg-[#faf8f5]/80 p-3.5 shadow-2xs hover:border-emerald-300 transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-forest-700 border border-emerald-200/80 shadow-2xs">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                </span>
+                <span className="font-mono text-[10px] font-semibold text-forest-700 uppercase">
+                  Visas
+                </span>
+              </div>
+              <span className="font-mono text-xl font-bold tracking-tight text-navy-900 tabular-nums">
+                {Math.round(
+                  (stats.sponsorshipEmployers /
+                    (stats.totalEmployers || 1)) *
+                    100,
+                )}
+                %
               </span>
-              <span className="font-mono text-[10px] font-semibold text-forest-700 uppercase tracking-wider">
-                Sponsors
+              <span className="mt-0.5 block font-mono text-[11px] text-slate-500">
+                offer sponsorship
               </span>
             </div>
-            <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
-              <AnimatedCounter target={stats.sponsorshipEmployers} />
-            </span>
-            <span className="mt-1 block font-mono text-xs text-slate-500 font-medium">
-              with sponsorship evidence
-            </span>
           </div>
         </div>
       </section>

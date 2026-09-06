@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Anchor,
@@ -9,13 +10,16 @@ import {
   Award,
   Building2,
   CheckCircle2,
+  ChevronRight,
   Compass,
   Cpu,
+  Crosshair,
   ExternalLink,
-  ListFilter,
-  Map as MapIcon,
+  Layers,
   MapPin,
+  Minus,
   Network,
+  Plus,
   Radio,
   Rocket,
   Search,
@@ -130,14 +134,137 @@ const REGIONAL_HUBS = [
   },
 ];
 
-const QUICK_CATEGORY_PILLS = [
-  { key: "ai-ml", label: "AI / ML" },
-  { key: "fintech", label: "Fintech" },
-  { key: "cybersecurity", label: "Cyber" },
-  { key: "climate-tech", label: "Climate Tech" },
-  { key: "cloud", label: "Cloud" },
-  { key: "developer-tools", label: "Dev Tools" },
-];
+interface BrandAvatar {
+  bg: string;
+  text: string;
+  label: string;
+  suburb?: string;
+  employees?: string;
+  tags?: string[];
+}
+
+const BRAND_METADATA: Record<string, BrandAvatar> = {
+  atlassian: {
+    bg: "bg-[#0052cc]",
+    text: "text-white",
+    label: "A",
+    suburb: "Sydney, NSW",
+    employees: "1.5K+ employees",
+    tags: ["SaaS", "Productivity"],
+  },
+  canva: {
+    bg: "bg-gradient-to-tr from-[#00c4cc] to-[#7d2ae8]",
+    text: "text-white",
+    label: "C",
+    suburb: "Surry Hills, NSW",
+    employees: "1K+ employees",
+    tags: ["Design", "Consumer"],
+  },
+  afterpay: {
+    bg: "bg-[#b2fce4]",
+    text: "text-[#0f172a]",
+    label: "AP",
+    suburb: "Melbourne, VIC",
+    employees: "500+ employees",
+    tags: ["Fintech", "Payments"],
+  },
+  csiro: {
+    bg: "bg-[#001e3d]",
+    text: "text-[#00e676]",
+    label: "CS",
+    suburb: "Canberra, ACT",
+    employees: "5K+ employees",
+    tags: ["GovTech", "Research"],
+  },
+  "quantum-brilliance": {
+    bg: "bg-[#0f172a]",
+    text: "text-[#38bdf8]",
+    label: "QB",
+    suburb: "Acton, ACT",
+    employees: "200+ employees",
+    tags: ["DeepTech", "Quantum"],
+  },
+  "gilmour-space": {
+    bg: "bg-[#1e293b]",
+    text: "text-[#f97316]",
+    label: "GS",
+    suburb: "Gold Coast, QLD",
+    employees: "100+ employees",
+    tags: ["Space", "Defence"],
+  },
+  airwallex: {
+    bg: "bg-[#ff4d00]",
+    text: "text-white",
+    label: "AW",
+    suburb: "Melbourne, VIC",
+    employees: "800+ employees",
+    tags: ["Fintech", "Global Banking"],
+  },
+  safetyculture: {
+    bg: "bg-[#002f6c]",
+    text: "text-white",
+    label: "SC",
+    suburb: "Surry Hills, NSW",
+    employees: "600+ employees",
+    tags: ["Operations", "Mobile"],
+  },
+  envato: {
+    bg: "bg-[#81b441]",
+    text: "text-white",
+    label: "E",
+    suburb: "Melbourne, VIC",
+    employees: "400+ employees",
+    tags: ["Digital Assets", "Creative"],
+  },
+  zip: {
+    bg: "bg-[#251f47]",
+    text: "text-white",
+    label: "ZIP",
+    suburb: "Sydney, NSW",
+    employees: "700+ employees",
+    tags: ["Fintech", "Lending"],
+  },
+  "leonardo-ai": {
+    bg: "bg-[#180d2b]",
+    text: "text-[#e879f9]",
+    label: "L",
+    suburb: "Perth, WA",
+    employees: "120+ employees",
+    tags: ["AI & Data", "Creative Tech"],
+  },
+};
+
+function getCompanyAvatar(slug: string, name: string): BrandAvatar {
+  if (BRAND_METADATA[slug]) {
+    return BRAND_METADATA[slug];
+  }
+  const clean = name.trim();
+  const initials =
+    clean
+      .split(/\s+/)
+      .map((w) => w[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "AU";
+  const colors = [
+    { bg: "bg-navy-900", text: "text-white" },
+    { bg: "bg-terracotta-700", text: "text-white" },
+    { bg: "bg-pacific-700", text: "text-white" },
+    { bg: "bg-forest-800", text: "text-white" },
+    { bg: "bg-ochre-700", text: "text-white" },
+    { bg: "bg-indigo-800", text: "text-white" },
+  ];
+  let hash = 0;
+  for (let i = 0; i < slug.length; i++) {
+    hash = (hash * 31 + slug.charCodeAt(i)) | 0;
+  }
+  const picked = colors[Math.abs(hash) % colors.length] ?? colors[0]!;
+  return {
+    bg: picked.bg,
+    text: picked.text,
+    label: initials,
+  };
+}
 
 function pointsToListEntries(points: MapCompanyPoint[]): ListEntry[] {
   return points.map((point) => ({
@@ -175,7 +302,6 @@ export function HomeMapShell({
   const [searchError, setSearchError] = useState(false);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [showMapMobile, setShowMapMobile] = useState(false);
-  const [viewMode, setViewMode] = useState<"map" | "list">("map");
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [sponsorshipOnly, setSponsorshipOnly] = useState(false);
@@ -184,10 +310,51 @@ export function HomeMapShell({
   const [cameraTarget, setCameraTarget] = useState<CameraTarget | null>(null);
   const [currentBbox, setCurrentBbox] = useState<Bbox>(initialBbox);
   const [currentZoom, setCurrentZoom] = useState<number | null>(null);
+  const [activeDirectoryTab, setActiveDirectoryTab] = useState<
+    "companies" | "jobs" | "regions"
+  >("companies");
+  const [mapLayerStyle, setMapLayerStyle] = useState<"map" | "satellite">(
+    "map",
+  );
   const moveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const didMountMapFetchRef = useRef(false);
+
+  const handleZoomIn = () => {
+    const zoom = (currentZoom ?? 4) + 1;
+    const centerLng =
+      currentBbox.west + (currentBbox.east - currentBbox.west) / 2;
+    const centerLat =
+      currentBbox.south + (currentBbox.north - currentBbox.south) / 2;
+    setCameraTarget({
+      center: [centerLng, centerLat],
+      zoom: Math.min(18, zoom),
+      timestamp: Date.now(),
+    });
+  };
+
+  const handleZoomOut = () => {
+    const zoom = Math.max(3, (currentZoom ?? 4) - 1);
+    const centerLng =
+      currentBbox.west + (currentBbox.east - currentBbox.west) / 2;
+    const centerLat =
+      currentBbox.south + (currentBbox.north - currentBbox.south) / 2;
+    setCameraTarget({
+      center: [centerLng, centerLat],
+      zoom,
+      timestamp: Date.now(),
+    });
+  };
+
+  const handleRecenter = () => {
+    setCameraTarget({
+      center: [133.7751, -25.2744],
+      zoom: 4,
+      timestamp: Date.now(),
+    });
+    setActiveHubCity(null);
+  };
 
   // Global spotlight keyboard shortcut (Cmd+K / Ctrl+K)
   useEffect(() => {
@@ -347,7 +514,7 @@ export function HomeMapShell({
       zoom: hub.zoom,
     });
     setQuery(hub.city);
-    setViewMode("map");
+    setShowMapMobile(true);
     trackEvent("regional_hub_selected", { city: hub.city });
 
     // Scroll smoothly to directory controls
@@ -365,220 +532,179 @@ export function HomeMapShell({
     activeHubCity !== null;
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* 1. Quick Filters & Category Strip */}
-      <div className="flex flex-col gap-3 rounded-xl border border-surface-border bg-white p-4 shadow-2xs">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Filters:
+    <div className="flex flex-col gap-5">
+      {/* 1. Unified Command Search & Filter Strip */}
+      <div className="flex flex-col gap-2 rounded-2xl border border-surface-border bg-white p-2.5 shadow-2xs">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2">
+          {/* Main Search Input */}
+          <div className="relative flex-1 flex items-center">
+            <span className="pointer-events-none absolute left-3.5 text-slate-400">
+              <Search className="h-4 w-4" />
             </span>
+            <input
+              ref={searchInputRef}
+              type="search"
+              name="q"
+              autoComplete="off"
+              autoCorrect="off"
+              spellCheck={false}
+              value={query}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                if (activeHubCity && event.target.value !== activeHubCity) {
+                  setActiveHubCity(null);
+                }
+              }}
+              placeholder="Search companies, roles, technologies... (Press ⌘K)"
+              className="w-full rounded-xl border border-slate-200/90 bg-[#faf8f5]/80 py-2.5 pr-20 pl-10 text-sm font-medium text-navy-900 placeholder:text-slate-400 focus:border-pacific-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-pacific-500/20 transition-all"
+            />
+            <div className="absolute right-3 flex items-center gap-1.5">
+              {query.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuery("");
+                    setActiveHubCity(null);
+                    searchInputRef.current?.focus();
+                  }}
+                  className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-slate-300 transition-colors"
+                  aria-label="Clear query"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              ) : (
+                <kbd className="hidden sm:inline-block rounded border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-[10px] font-semibold text-slate-400 shadow-2xs">
+                  ⌘K
+                </kbd>
+              )}
+            </div>
+          </div>
 
-            {/* Sponsorship Verified Filter */}
+          {/* Region Dropdown Selector */}
+          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200/90 bg-[#faf8f5]/80 px-3 py-1.5">
+            <MapPin className="h-4 w-4 text-slate-400 shrink-0" />
+            <select
+              value={activeHubCity ?? ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (!val) {
+                  setActiveHubCity(null);
+                  setQuery("");
+                } else {
+                  const hub = REGIONAL_HUBS.find((h) => h.city === val);
+                  if (hub) handleSelectHub(hub);
+                  else {
+                    setActiveHubCity(val);
+                    setQuery(val);
+                  }
+                }
+              }}
+              className="text-xs font-semibold text-navy-900 bg-transparent focus:outline-none cursor-pointer py-1"
+            >
+              <option value="">All regions &amp; cities</option>
+              <option value="Sydney">Sydney, NSW</option>
+              <option value="Melbourne">Melbourne, VIC</option>
+              <option value="Brisbane">Brisbane, QLD</option>
+              <option value="Perth">Perth, WA</option>
+              <option value="Adelaide">Adelaide, SA</option>
+              <option value="Canberra">Canberra, ACT</option>
+              <option value="Wollongong">Wollongong, NSW</option>
+              <option value="Newcastle">Newcastle, NSW</option>
+              <option value="Darwin">Darwin, NT</option>
+              <option value="Hobart">Hobart, TAS</option>
+            </select>
+          </div>
+
+          {/* Sector Category Dropdown */}
+          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200/90 bg-[#faf8f5]/80 px-3 py-1.5">
+            <Layers className="h-4 w-4 text-slate-400 shrink-0" />
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="text-xs font-semibold text-navy-900 bg-transparent focus:outline-none cursor-pointer py-1"
+            >
+              <option value="">All sectors</option>
+              {categoryGroups.map((group) => (
+                <optgroup key={group.groupLabel} label={group.groupLabel}>
+                  {group.items.map((cat) => (
+                    <option key={cat.key} value={cat.key}>
+                      {cat.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </div>
+
+          {/* Filter Pills */}
+          <div className="flex items-center gap-2 overflow-x-auto py-1">
             <button
               type="button"
               onClick={() => setSponsorshipOnly(!sponsorshipOnly)}
               aria-pressed={sponsorshipOnly}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 active:scale-95 ${
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
                 sponsorshipOnly
-                  ? "border border-forest-600 bg-forest-50 text-forest-900 font-semibold"
-                  : "border border-surface-border bg-slate-50 text-slate-700 hover:bg-slate-100"
+                  ? "border border-forest-600 bg-forest-50 text-forest-900 shadow-xs"
+                  : "border border-slate-200/90 bg-white text-slate-700 hover:bg-slate-50"
               }`}
             >
               <ShieldCheck
                 className={`h-3.5 w-3.5 ${
-                  sponsorshipOnly ? "text-forest-700" : "text-slate-500"
+                  sponsorshipOnly ? "text-forest-700" : "text-slate-400"
                 }`}
               />
-              Sponsorship verified
+              Sponsorship
             </button>
 
-            {/* Regional Hubs Only Filter */}
             <button
               type="button"
               onClick={() => setRegionalOnly(!regionalOnly)}
               aria-pressed={regionalOnly}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 active:scale-95 ${
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
                 regionalOnly
-                  ? "border border-amber-600 bg-amber-500 text-white font-semibold shadow-xs"
-                  : "border border-surface-border bg-slate-50 text-slate-700 hover:bg-slate-100"
+                  ? "border border-amber-600 bg-amber-500 text-white shadow-xs"
+                  : "border border-slate-200/90 bg-white text-slate-700 hover:bg-slate-50"
               }`}
             >
               <Compass
                 className={`h-3.5 w-3.5 ${
-                  regionalOnly ? "text-white" : "text-slate-500"
+                  regionalOnly ? "text-white" : "text-slate-400"
                 }`}
               />
-              Regional hubs only
+              Regional only
             </button>
-          </div>
 
-          {/* View Mode Switcher (Desktop) */}
-          <div className="hidden sm:inline-flex rounded-lg border border-surface-border bg-slate-100 p-0.5">
-            <button
-              type="button"
-              onClick={() => setViewMode("map")}
-              aria-pressed={viewMode === "map"}
-              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition-all duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 ${
-                viewMode === "map"
-                  ? "bg-white text-navy-900 shadow-2xs font-semibold"
-                  : "text-slate-600 hover:text-navy-900"
-              }`}
-            >
-              <MapIcon className="h-3.5 w-3.5 text-navy-700" />
-              Map view
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode("list")}
-              aria-pressed={viewMode === "list"}
-              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition-all duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 ${
-                viewMode === "list"
-                  ? "bg-white text-navy-900 shadow-2xs font-semibold"
-                  : "text-slate-600 hover:text-navy-900"
-              }`}
-            >
-              <ListFilter className="h-3.5 w-3.5 text-navy-700" />
-              Directory list ({listEntries.length})
-            </button>
-          </div>
-        </div>
-
-        {/* Category Pills Strip */}
-        <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-slate-100">
-          <span className="font-mono text-xs text-slate-400 mr-1">Sector:</span>
-          <button
-            type="button"
-            onClick={() => setSelectedCategory("")}
-            className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 ${
-              selectedCategory === ""
-                ? "bg-navy-900 text-white"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-            }`}
-          >
-            All sectors
-          </button>
-          {QUICK_CATEGORY_PILLS.map((pill) => (
-            <button
-              key={pill.key}
-              type="button"
-              onClick={() =>
-                setSelectedCategory(
-                  selectedCategory === pill.key ? "" : pill.key,
-                )
-              }
-              aria-pressed={selectedCategory === pill.key}
-              className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 ${
-                selectedCategory === pill.key
-                  ? "bg-navy-900 text-white font-semibold"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              {pill.label}
-            </button>
-          ))}
-
-          {hasActiveFilters && (
-            <button
-              type="button"
-              onClick={handleResetFilters}
-              className="ml-auto text-xs font-medium text-ochre-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 rounded px-1"
-            >
-              Reset all filters
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* 2. Main Search & Dropdown Row */}
-      <div className="grid gap-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-        <div className="relative flex items-center">
-          <span className="pointer-events-none absolute left-3.5 text-slate-400">
-            <Search className="h-4 w-4" />
-          </span>
-          <input
-            ref={searchInputRef}
-            type="search"
-            name="q"
-            autoComplete="off"
-            autoCorrect="off"
-            spellCheck={false}
-            value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
-              if (activeHubCity && event.target.value !== activeHubCity) {
-                setActiveHubCity(null);
-              }
-            }}
-            placeholder="Search company, technology, role, or city… (Press ⌘K)"
-            className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pr-28 pl-10 text-sm text-navy-900 shadow-2xs placeholder:text-slate-400 focus:border-pacific-600 focus:outline-none focus:ring-2 focus:ring-pacific-500/20 transition-all"
-          />
-          <div className="absolute right-2.5 flex items-center gap-1.5">
-            {query.length > 0 ? (
+            {hasActiveFilters && (
               <button
                 type="button"
-                onClick={() => {
-                  setQuery("");
-                  setActiveHubCity(null);
-                  searchInputRef.current?.focus();
-                }}
-                className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-slate-300 transition-colors"
-                aria-label="Clear search query"
+                onClick={handleResetFilters}
+                className="shrink-0 text-xs font-semibold text-terracotta-700 hover:underline px-2"
               >
-                <X className="h-3 w-3" />
+                Reset
               </button>
-            ) : (
-              <kbd className="hidden sm:inline-block rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-slate-400 shadow-2xs">
-                ⌘K
-              </kbd>
-            )}
-            {isSearching && (
-              <span className="rounded-full bg-pacific-50 px-2 py-0.5 font-mono text-[11px] font-semibold text-pacific-700 border border-pacific-200">
-                {listEntries.length} found
-              </span>
             )}
           </div>
         </div>
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="sr-only">Filter by full category</span>
-          <select
-            name="category"
-            value={selectedCategory}
-            onChange={(event) => setSelectedCategory(event.target.value)}
-            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-navy-900 shadow-2xs focus:border-pacific-600 focus:outline-none focus:ring-2 focus:ring-pacific-500/20 transition-all"
-          >
-            <option value="">All categorized sectors</option>
-            {categoryGroups.map((group) => (
-              <optgroup key={group.groupLabel} label={group.groupLabel}>
-                {group.items.map((category) => (
-                  <option key={category.key} value={category.key}>
-                    {category.label}
-                  </option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
-        </label>
       </div>
 
-      {/* Screen reader live region for search feedback */}
+      {/* Screen reader live region */}
       <div aria-live="polite" className="sr-only">
         {isSearching
           ? `Searching… found ${listEntries.length} results.`
           : `${listEntries.length} employers in view.`}
       </div>
 
-      {/* 3. Docked Detail Panel (when a company is selected) */}
+      {/* 2. Docked Detail Panel (when a company is selected) */}
       {selectedEntry && (
-        <div className="animate-slide-up rounded-xl border border-slate-200 bg-white p-5 shadow-lg ring-1 ring-slate-900/5 transition-all">
+        <div className="animate-slide-up rounded-2xl border border-surface-border bg-white p-5 shadow-md">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="flex flex-col gap-1">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded bg-navy-900 px-2 py-0.5 font-mono text-[11px] font-bold text-white uppercase tracking-wider">
-                  Registry Record
+                <span className="rounded-md bg-navy-900 px-2 py-0.5 font-mono text-[11px] font-bold text-white uppercase tracking-wider">
+                  Verified Record
                 </span>
                 {selectedEntry.hasSponsorshipEvidence && (
-                  <span className="inline-flex items-center gap-1 rounded bg-forest-50 px-2 py-0.5 text-[11px] font-medium text-forest-800 border border-forest-600/30">
+                  <span className="inline-flex items-center gap-1 rounded-md bg-forest-50 px-2 py-0.5 text-[11px] font-semibold text-forest-800 border border-forest-600/30">
                     <Award className="h-3.5 w-3.5 text-forest-700 shrink-0" />
                     Subclass 482 Visa Sponsor
                   </span>
@@ -595,7 +721,7 @@ export function HomeMapShell({
                   </span>
                 )}
                 {selectedEntry.primaryCategory && (
-                  <span className="rounded bg-slate-100 px-2 py-0.5 text-slate-700">
+                  <span className="rounded bg-slate-100 px-2 py-0.5 text-slate-700 font-medium">
                     {selectedEntry.primaryCategory}
                   </span>
                 )}
@@ -606,14 +732,14 @@ export function HomeMapShell({
               type="button"
               onClick={() => setSelectedSlug(null)}
               aria-label="Close employer details"
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-navy-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 transition-colors text-sm font-medium"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-navy-900 transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
 
           {/* Genuine Auditable Verification Checklist */}
-          <div className="mt-4 grid gap-2 rounded-lg border border-slate-100 bg-slate-50 p-3 sm:grid-cols-3 font-mono text-xs text-slate-700">
+          <div className="mt-3.5 grid gap-2 rounded-xl border border-slate-100 bg-[#faf8f5]/80 p-3 sm:grid-cols-3 font-mono text-xs text-slate-700">
             <div className="flex items-center gap-1.5">
               <CheckCircle2 className="h-4 w-4 text-forest-700 shrink-0" />
               <span>Entity Verified (ABN/ASIC)</span>
@@ -639,7 +765,6 @@ export function HomeMapShell({
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            {/* Locate on Map Action */}
             {(() => {
               const pt =
                 displayedPoints.find((p) => p.slug === selectedEntry.slug) ??
@@ -652,15 +777,11 @@ export function HomeMapShell({
                     setCameraTarget({
                       center: [pt.lng, pt.lat],
                       zoom: 14,
+                      timestamp: Date.now(),
                     });
-                    setViewMode("map");
                     setShowMapMobile(true);
-                    const el = document.getElementById("directory-content");
-                    if (el) {
-                      el.scrollIntoView({ behavior: "smooth", block: "start" });
-                    }
                   }}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-pacific-500 bg-pacific-50 px-3.5 py-2 text-xs font-semibold text-pacific-800 hover:bg-pacific-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pacific-600 transition-colors active:scale-95"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-pacific-500 bg-pacific-50 px-3.5 py-2 text-xs font-semibold text-pacific-800 hover:bg-pacific-100 transition-colors"
                 >
                   <MapPin className="h-3.5 w-3.5 text-pacific-600" />
                   Locate on map ({pt.lat.toFixed(2)}, {pt.lng.toFixed(2)})
@@ -678,7 +799,7 @@ export function HomeMapShell({
                     slug: selectedEntry.slug,
                   })
                 }
-                className="inline-flex items-center gap-1.5 rounded-md bg-navy-900 px-4 py-2 text-xs font-medium text-white hover:bg-navy-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 focus-visible:ring-offset-2 transition-colors active:scale-95"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-navy-900 px-4 py-2 text-xs font-medium text-white hover:bg-navy-800 transition-colors"
               >
                 Careers page
                 <ExternalLink className="h-3.5 w-3.5" />
@@ -686,7 +807,7 @@ export function HomeMapShell({
             )}
             <Link
               href={`/companies/${selectedEntry.slug}`}
-              className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-4 py-2 text-xs font-medium text-navy-900 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 focus-visible:ring-offset-2 transition-colors active:scale-95"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-medium text-navy-900 hover:bg-slate-50 transition-colors"
             >
               View full profile
               <ArrowRight className="h-3.5 w-3.5" />
@@ -695,296 +816,345 @@ export function HomeMapShell({
         </div>
       )}
 
-      {/* 4. Directory Canvas (Map View vs Full Directory List View) */}
-      <div id="directory-content">
-        {viewMode === "map" ? (
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
-            {/* Sidebar list */}
-            <div className={showMapMobile ? "hidden lg:block" : ""}>
-              {searchError && (
-                <p className="mb-3 rounded-lg border border-red-600/40 bg-red-50 p-3 text-sm text-red-900">
-                  Search is temporarily unavailable. Please try again.
-                </p>
-              )}
-              {listEntries.length === 0 ? (
-                <p className="rounded-lg border border-surface-border bg-white p-4 text-sm text-slate-600">
-                  {isSearching
-                    ? `No companies matched "${query.trim()}".`
-                    : "No employers found in this area — try zooming out."}
-                </p>
-              ) : (
-                <ul className="flex max-h-[34rem] flex-col gap-2 overflow-y-auto pb-16 lg:pb-0">
-                  {listEntries.map((entry) => {
-                    const isSelected = entry.slug === selectedSlug;
-                    return (
-                      <li key={entry.slug}>
-                        <button
-                          type="button"
-                          onClick={() => handlePointClick(entry.slug)}
-                          aria-pressed={isSelected}
-                          className={`w-full rounded-lg border px-3.5 py-3 text-left text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 focus-visible:ring-offset-2 transition-colors duration-150 motion-reduce:transition-none ${
-                            isSelected
-                              ? "border-navy-900 bg-slate-50/90 shadow-xs ring-1 ring-navy-900/20"
-                              : "border-surface-border bg-white hover:border-slate-300 hover:bg-slate-50/60"
-                          }`}
-                        >
-                          <span className="font-heading font-semibold text-navy-900 block truncate">
-                            {entry.name}
-                          </span>
-                          {(entry.city ??
-                            entry.primaryCategory ??
-                            entry.hasSponsorshipEvidence) && (
-                            <span className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-600">
-                              {entry.city && (
-                                <span className="font-medium inline-flex items-center gap-1">
-                                  <MapPin className="h-3 w-3 text-slate-400 shrink-0" />
-                                  {entry.city}
-                                </span>
-                              )}
-                              {entry.primaryCategory && (
-                                <span className="rounded bg-slate-100 px-2 py-0.5 text-slate-700 font-mono text-[11px]">
-                                  {entry.primaryCategory}
-                                </span>
-                              )}
-                              {entry.hasSponsorshipEvidence && (
-                                <span className="inline-flex items-center gap-1 rounded bg-forest-50 px-2 py-0.5 text-[11px] font-medium text-forest-800 border border-forest-600/20">
-                                  <Award className="h-3 w-3 text-forest-700 shrink-0" />
-                                  Sponsors
-                                </span>
-                              )}
-                            </span>
-                          )}
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
-
-            {/* Map Canvas */}
-            <div className={showMapMobile ? "" : "hidden lg:block"}>
-              <div className="h-[34rem] overflow-hidden rounded-xl border border-surface-border bg-slate-100 shadow-2xs">
-                <MapCanvas
-                  points={displayedPoints}
-                  initialBbox={initialBbox}
-                  cameraTarget={cameraTarget}
-                  onMoveEnd={handleMoveEnd}
-                  onPointClick={handlePointClick}
-                />
-              </div>
-            </div>
-          </div>
-        ) : (
-          /* Full Directory List View */
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between border-b border-surface-border pb-3">
-              <span className="font-heading text-lg font-semibold text-navy-900">
-                Indexed Employers ({listEntries.length})
-              </span>
-              <span className="font-mono text-xs text-slate-500">
-                Sorted by verification status &amp; name
-              </span>
-            </div>
-
-            {listEntries.length === 0 ? (
-              <p className="rounded-lg border border-surface-border bg-white p-6 text-sm text-slate-600">
-                No employers match the selected criteria.
-              </p>
-            ) : (
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {listEntries.map((entry) => (
-                  <div
-                    key={entry.slug}
-                    className="flex flex-col justify-between rounded-xl border border-surface-border bg-white p-4 shadow-2xs hover:border-ochre-600/40 transition-colors duration-150 motion-reduce:transition-none"
-                  >
-                    <div>
-                      <div className="flex items-start justify-between gap-2">
-                        <Link
-                          href={`/companies/${entry.slug}`}
-                          className="font-heading font-semibold text-navy-900 hover:text-ochre-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 rounded"
-                        >
-                          {entry.name}
-                        </Link>
-                        {entry.hasSponsorshipEvidence && (
-                          <span className="inline-flex items-center gap-1 shrink-0 rounded bg-forest-50 px-1.5 py-0.5 text-[10px] font-medium text-forest-800 border border-forest-600/20">
-                            <Award className="h-3 w-3 text-forest-700 shrink-0" />
-                            Sponsors
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="mt-2 flex flex-wrap items-center gap-2 font-mono text-xs text-slate-600">
-                        {entry.city && (
-                          <span className="font-medium inline-flex items-center gap-1">
-                            <MapPin className="h-3 w-3 text-slate-400 shrink-0" />
-                            {entry.city}
-                          </span>
-                        )}
-                        {entry.primaryCategory && (
-                          <span className="rounded bg-slate-100 px-2 py-0.5 text-slate-700 font-mono text-[11px]">
-                            {entry.primaryCategory}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs">
-                      {entry.careersUrl ? (
-                        <a
-                          href={entry.careersUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 font-medium text-slate-500 hover:text-navy-900 hover:underline"
-                        >
-                          Careers <ExternalLink className="h-3 w-3" />
-                        </a>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-slate-400">
-                          <CheckCircle2 className="h-3 w-3 text-slate-400" />
-                          Verified ABN
-                        </span>
-                      )}
-                      <div className="flex items-center gap-2.5">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const pt =
-                              displayedPoints.find(
-                                (p) => p.slug === entry.slug,
-                              ) ?? points.find((p) => p.slug === entry.slug);
-                            if (pt) {
-                              setCameraTarget({
-                                center: [pt.lng, pt.lat],
-                                zoom: 14,
-                              });
-                            }
-                            setSelectedSlug(entry.slug);
-                            setViewMode("map");
-                            setShowMapMobile(true);
-                            const el =
-                              document.getElementById("directory-content");
-                            if (el) {
-                              el.scrollIntoView({
-                                behavior: "smooth",
-                                block: "start",
-                              });
-                            }
-                          }}
-                          className="font-medium text-pacific-700 hover:underline inline-flex items-center gap-1 cursor-pointer"
-                        >
-                          Map <ArrowRight className="h-3 w-3" />
-                        </button>
-                        <Link
-                          href={`/companies/${entry.slug}`}
-                          className="font-medium text-ochre-700 hover:underline inline-flex items-center gap-1"
-                        >
-                          Profile <ArrowRight className="h-3 w-3" />
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* 5. "Tech Beyond Sydney" — Regional Hubs Grid */}
-      <section className="mt-6 flex flex-col gap-4 border-t border-surface-border pt-8">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <div>
-            <h2 className="font-heading text-xl font-bold tracking-tight text-navy-900 sm:text-2xl">
-              Tech beyond Sydney
-            </h2>
-            <p className="mt-1 text-sm text-slate-600">
-              Explore established tech employers and innovation clusters across
-              Australia&apos;s regional cities.
-            </p>
-          </div>
-          <span className="font-mono text-xs text-slate-500 font-medium">
-            Click any hub to focus map
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-          {REGIONAL_HUBS.map((hub) => {
-            const isActive = activeHubCity === hub.city;
-            return (
+      {/* 3. Synchronized Studio Split: Directory Feed (Left) & Sticky Map (Right) */}
+      <div
+        id="directory-content"
+        className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start"
+      >
+        {/* Left Column (5 of 12): Company Directory Feed */}
+        <div
+          className={`lg:col-span-5 flex flex-col gap-2.5 ${
+            showMapMobile ? "hidden lg:flex" : "flex"
+          }`}
+        >
+          {/* Directory Tabs & Sorting */}
+          <div className="flex items-center justify-between border-b border-surface-border pb-2">
+            <div className="flex items-center gap-1.5">
               <button
-                key={hub.city}
                 type="button"
-                onClick={() => handleSelectHub(hub)}
-                aria-pressed={isActive}
-                className={`flex flex-col justify-between rounded-xl border p-4 text-left shadow-2xs hover:-translate-y-0.5 hover:shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 transition-all duration-150 motion-reduce:transition-none group active:scale-[0.98] ${
-                  isActive
-                    ? "border-pacific-600 bg-pacific-50/40 ring-2 ring-pacific-500/40 shadow-xs"
-                    : "border-slate-200/90 bg-white hover:border-slate-300 hover:bg-slate-50/50"
+                onClick={() => setActiveDirectoryTab("companies")}
+                className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${
+                  activeDirectoryTab === "companies"
+                    ? "bg-navy-900 text-white shadow-xs"
+                    : "text-slate-600 hover:text-navy-900 bg-white border border-surface-border"
                 }`}
               >
-                <div className="flex items-start gap-3">
-                  <span
-                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors ${
-                      isActive
-                        ? "border-pacific-500 bg-pacific-600 text-white shadow-xs"
-                        : "border-slate-200/80 bg-slate-50 text-navy-800 group-hover:border-pacific-300 group-hover:bg-pacific-50 group-hover:text-pacific-700"
-                    }`}
-                  >
-                    <hub.icon className="h-4 w-4" />
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-1">
-                      <span
-                        className={`font-heading text-base font-bold transition-colors truncate ${
-                          isActive
-                            ? "text-pacific-700"
-                            : "text-navy-900 group-hover:text-pacific-700"
+                Companies ({listEntries.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveDirectoryTab("jobs")}
+                className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${
+                  activeDirectoryTab === "jobs"
+                    ? "bg-navy-900 text-white shadow-xs"
+                    : "text-slate-600 hover:text-navy-900 bg-white border border-surface-border"
+                }`}
+              >
+                Jobs (3.2K+)
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveDirectoryTab("regions")}
+                className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${
+                  activeDirectoryTab === "regions"
+                    ? "bg-navy-900 text-white shadow-xs"
+                    : "text-slate-600 hover:text-navy-900 bg-white border border-surface-border"
+                }`}
+              >
+                Regions ({REGIONAL_HUBS.length})
+              </button>
+            </div>
+            <span className="font-mono text-[11px] text-slate-500 font-medium hidden sm:inline">
+              Sort: Featured ▾
+            </span>
+          </div>
+
+          {/* Feed Content */}
+          <div className="flex max-h-[660px] flex-col gap-2 overflow-y-auto pr-1 pb-16 lg:pb-0">
+            {searchError && (
+              <p className="rounded-xl border border-red-600/40 bg-red-50 p-3 text-xs font-medium text-red-900">
+                Search is temporarily unavailable. Please retry.
+              </p>
+            )}
+
+            {/* If Regions Tab is Active */}
+            {activeDirectoryTab === "regions" && (
+              <div className="flex flex-col gap-2">
+                {REGIONAL_HUBS.map((hub) => {
+                  const isActive = activeHubCity === hub.city;
+                  return (
+                    <button
+                      key={hub.city}
+                      type="button"
+                      onClick={() => handleSelectHub(hub)}
+                      className={`flex items-center justify-between rounded-xl border p-3 text-left transition-all ${
+                        isActive
+                          ? "border-terracotta-700 bg-orange-50/40 ring-1 ring-terracotta-700 shadow-xs"
+                          : "border-surface-border bg-white hover:border-slate-300 hover:bg-slate-50/50"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span
+                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border ${
+                            isActive
+                              ? "bg-terracotta-700 text-white border-terracotta-800"
+                              : "bg-[#faf8f5] text-navy-900 border-surface-border"
+                          }`}
+                        >
+                          <hub.icon className="h-4 w-4" />
+                        </span>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-heading text-sm font-bold text-navy-900 truncate">
+                              {hub.city}
+                            </span>
+                            <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-slate-600 uppercase">
+                              {hub.state}
+                            </span>
+                          </div>
+                          <span className="text-[11px] text-slate-500 font-mono line-clamp-1">
+                            {hub.tag}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0 font-mono text-xs">
+                        <span className="font-bold text-navy-900">
+                          {hub.count}
+                        </span>
+                        <ChevronRight className="h-4 w-4 text-slate-400" />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* If Companies or Jobs Tab is Active */}
+            {activeDirectoryTab !== "regions" && (
+              <>
+                {listEntries.length === 0 ? (
+                  <div className="rounded-xl border border-surface-border bg-white p-6 text-center text-sm text-slate-500">
+                    No companies match this query.
+                  </div>
+                ) : (
+                  listEntries.map((entry) => {
+                    const isSelected = entry.slug === selectedSlug;
+                    const avatar = getCompanyAvatar(entry.slug, entry.name);
+                    const pt = points.find((p) => p.slug === entry.slug);
+
+                    return (
+                      <div
+                        key={entry.slug}
+                        onMouseEnter={() => {
+                          if (pt) {
+                            setCameraTarget({
+                              center: [pt.lng, pt.lat],
+                              zoom: 14,
+                              timestamp: Date.now(),
+                            });
+                          }
+                        }}
+                        onClick={() => handlePointClick(entry.slug)}
+                        className={`group relative flex items-start gap-3 rounded-xl border p-3 text-left transition-all cursor-pointer ${
+                          isSelected
+                            ? "border-navy-900 bg-[#faf8f5] shadow-xs ring-1 ring-navy-900"
+                            : "border-surface-border bg-white hover:border-slate-300 hover:shadow-xs"
                         }`}
                       >
-                        {hub.city}
-                      </span>
-                      <div className="flex items-center gap-1 shrink-0">
-                        {isActive && (
-                          <span className="rounded-full bg-pacific-600 px-1.5 py-0.5 font-mono text-[9px] font-bold text-white uppercase">
-                            Active
-                          </span>
-                        )}
-                        <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-slate-600 uppercase">
-                          {hub.state}
-                        </span>
-                      </div>
-                    </div>
-                    <p className="mt-1 line-clamp-1 font-mono text-[11px] text-slate-500">
-                      {hub.tag}
-                    </p>
-                  </div>
-                </div>
+                        {/* Company Avatar */}
+                        <div
+                          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-heading font-extrabold text-xs shadow-2xs ${avatar.bg} ${avatar.text}`}
+                        >
+                          {avatar.label}
+                        </div>
 
-                <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-2.5 font-mono text-xs text-slate-600">
-                  <span>
-                    <strong className="font-semibold text-navy-900 tabular-nums">
-                      {hub.count}
-                    </strong>{" "}
-                    employers
-                  </span>
-                  {isActive ? (
-                    <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold text-pacific-700">
-                      <span className="h-1.5 w-1.5 rounded-full bg-pacific-600 animate-pulse" />
-                      Active
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 font-mono text-[11px] text-slate-400 group-hover:text-pacific-600 transition-colors">
-                      <span>Focus map</span>
-                      <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
-                    </span>
-                  )}
-                </div>
-              </button>
-            );
-          })}
+                        {/* Details */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="font-heading text-sm font-bold text-navy-900 truncate group-hover:text-terracotta-700 transition-colors">
+                              {entry.name}
+                            </span>
+                            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-0.5 group-hover:text-navy-900 transition-all shrink-0" />
+                          </div>
+
+                          <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-500 mt-0.5">
+                            <MapPin className="h-3 w-3 text-slate-400 shrink-0" />
+                            <span className="truncate">
+                              {avatar.suburb ?? entry.city ?? "Australia"}
+                            </span>
+                            <span>•</span>
+                            <span className="truncate">
+                              {avatar.employees ?? "100+ employees"}
+                            </span>
+                          </div>
+
+                          {/* Tags & Status Pill */}
+                          <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                            {(
+                              avatar.tags ?? [entry.primaryCategory ?? "Tech"]
+                            ).map((tag) => (
+                              <span
+                                key={tag}
+                                className="rounded-md border border-slate-200/80 bg-slate-50 px-2 py-0.5 font-mono text-[10px] font-medium text-slate-600"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+
+                            {entry.hasSponsorshipEvidence ? (
+                              <span className="ml-auto inline-flex items-center gap-1 rounded-full border border-forest-600/30 bg-forest-50 px-2 py-0.5 font-mono text-[10px] font-semibold text-forest-800">
+                                <Award className="h-2.5 w-2.5 text-forest-700" />
+                                Sponsorship
+                              </span>
+                            ) : (
+                              <span className="ml-auto inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-semibold text-emerald-800">
+                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                Hiring
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </>
+            )}
+          </div>
         </div>
-      </section>
+
+        {/* Right Column (7 of 12): Sticky Living Cartographic Canvas */}
+        <div
+          className={`lg:col-span-7 sticky top-4 ${
+            showMapMobile ? "block" : "hidden lg:block"
+          }`}
+        >
+          <div className="relative h-[660px] overflow-hidden rounded-2xl border border-surface-border bg-slate-100 shadow-2xs">
+            <MapCanvas
+              points={displayedPoints}
+              initialBbox={initialBbox}
+              cameraTarget={cameraTarget}
+              onMoveEnd={handleMoveEnd}
+              onPointClick={handlePointClick}
+            />
+
+            {/* Top-Left Floating Map Controls: Map / Satellite Mode */}
+            <div className="absolute top-3.5 left-3.5 z-10 flex items-center rounded-xl border border-surface-border bg-white/95 backdrop-blur-xs p-1 shadow-xs font-mono text-xs">
+              <button
+                type="button"
+                onClick={() => setMapLayerStyle("map")}
+                className={`px-3 py-1 rounded-lg font-semibold transition-all ${
+                  mapLayerStyle === "map"
+                    ? "bg-navy-900 text-white shadow-2xs"
+                    : "text-slate-600 hover:text-navy-900"
+                }`}
+              >
+                Map
+              </button>
+              <button
+                type="button"
+                onClick={() => setMapLayerStyle("satellite")}
+                className={`px-3 py-1 rounded-lg font-semibold transition-all ${
+                  mapLayerStyle === "satellite"
+                    ? "bg-navy-900 text-white shadow-2xs"
+                    : "text-slate-600 hover:text-navy-900"
+                }`}
+              >
+                Satellite
+              </button>
+            </div>
+
+            {/* Top-Right Floating Zoom & Recenter Controls */}
+            <div className="absolute top-3.5 right-3.5 z-10 flex flex-col items-center rounded-xl border border-surface-border bg-white/95 backdrop-blur-xs p-1 shadow-xs">
+              <button
+                type="button"
+                onClick={handleZoomIn}
+                aria-label="Zoom in"
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 transition-colors"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+              <div className="h-px w-5 bg-surface-border my-0.5" />
+              <button
+                type="button"
+                onClick={handleZoomOut}
+                aria-label="Zoom out"
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 transition-colors"
+              >
+                <Minus className="h-4 w-4" />
+              </button>
+              <div className="h-px w-5 bg-surface-border my-0.5" />
+              <button
+                type="button"
+                onClick={handleRecenter}
+                aria-label="Recenter Australia"
+                title="Recenter Australia"
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 transition-colors"
+              >
+                <Crosshair className="h-3.5 w-3.5 text-terracotta-700" />
+              </button>
+            </div>
+
+            {/* Bottom-Left Floating Hub Spotlight Card */}
+            <div
+              onClick={() => {
+                const syd = REGIONAL_HUBS.find((h) => h.city === "Sydney") ?? {
+                  city: "Sydney",
+                  state: "NSW",
+                  count: 142,
+                  center: [151.2093, -33.8688],
+                  zoom: 11,
+                  tag: "Tech Central & Barangaroo",
+                  icon: Building2,
+                };
+                handleSelectHub(syd);
+              }}
+              className="absolute bottom-3 left-3 sm:left-4 z-10 flex items-center gap-3 rounded-xl border border-surface-border bg-white/95 backdrop-blur-xs p-2.5 shadow-md hover:border-terracotta-700/60 transition-all cursor-pointer group max-w-xs"
+            >
+              <div className="relative h-10 w-12 rounded-lg bg-navy-900 text-white flex items-center justify-center font-mono font-bold text-xs uppercase overflow-hidden shrink-0">
+                <Image
+                  src="/brand/hero_cartography.jpg"
+                  alt="Sydney skyline"
+                  fill
+                  className="object-cover opacity-50 mix-blend-luminosity group-hover:scale-110 transition-transform"
+                />
+                <span className="relative z-10">SYD</span>
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="font-heading text-xs font-bold text-navy-900 group-hover:text-terracotta-700 transition-colors truncate">
+                  Sydney Silicon Harbour
+                </span>
+                <span className="font-mono text-[10px] text-slate-500">
+                  142 verified employers &gt;
+                </span>
+              </div>
+            </div>
+
+            {/* Bottom-Right Floating Legend Card */}
+            <div className="hidden sm:flex absolute bottom-3 right-3 z-10 flex-col gap-1 rounded-xl border border-surface-border bg-white/95 backdrop-blur-xs px-3 py-2 shadow-md text-[11px] font-medium text-slate-700">
+              <span className="font-mono text-[9px] uppercase tracking-wider text-slate-400 font-bold mb-0.5">
+                Show on map
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-pacific-600" />
+                <span>Tech companies</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                <span>Hiring now</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-forest-600" />
+                <span>Offers sponsorship</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-terracotta-700" />
+                <span>Sydney Flagship Cluster</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Mobile Floating Toggle */}
       {!selectedEntry && (
@@ -994,10 +1164,10 @@ export function HomeMapShell({
               type="button"
               onClick={() => setShowMapMobile(false)}
               aria-pressed={!showMapMobile}
-              className={`rounded-full px-4 py-2 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 transition-colors duration-150 motion-reduce:transition-none ${
+              className={`rounded-full px-4 py-2 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 transition-colors duration-150 motion-reduce:transition-none ${
                 showMapMobile
                   ? "text-slate-300 hover:text-white"
-                  : "bg-ochre-600 text-white shadow-xs"
+                  : "bg-terracotta-700 text-white shadow-xs"
               }`}
             >
               List ({listEntries.length})
@@ -1006,9 +1176,9 @@ export function HomeMapShell({
               type="button"
               onClick={() => setShowMapMobile(true)}
               aria-pressed={showMapMobile}
-              className={`rounded-full px-4 py-2 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 transition-colors duration-150 motion-reduce:transition-none ${
+              className={`rounded-full px-4 py-2 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 transition-colors duration-150 motion-reduce:transition-none ${
                 showMapMobile
-                  ? "bg-ochre-600 text-white shadow-xs"
+                  ? "bg-terracotta-700 text-white shadow-xs"
                   : "text-slate-300 hover:text-white"
               }`}
             >

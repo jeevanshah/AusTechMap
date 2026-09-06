@@ -21,18 +21,23 @@ Locked design system. All coding agents (Claude, Codex, Gemini) and Hallmark run
 
 ```css
 @theme {
-  --color-canvas: #f8fafc; /* Base app background */
-  --color-surface: #ffffff; /* Card and panel fill */
-  --color-surface-border: #e2e8f0; /* Default 1px structural border */
+  --color-canvas: #faf8f5; /* Warm Australian Sandstone ground */
+  --color-surface: #ffffff; /* Elevated card and panel fill */
+  --color-surface-border: #e8e3da; /* Warm tactile structural border */
 
-  /* Deep Navy (Institutional chrome, headers, primary buttons) */
+  /* Deep Navy (Institutional chrome, typography ink, headers) */
   --color-navy-50: #f0f4f8;
   --color-navy-100: #d9e2ec;
   --color-navy-800: #1e3a5f;
-  --color-navy-900: #0f172a; /* Main ink & dark buttons */
+  --color-navy-900: #0f172a; /* Main ink & high-contrast text */
   --color-navy-950: #070d19;
 
-  /* Australian Ochre (Primary interactive accent, active states, map clusters) */
+  /* Australian Terracotta / Red Earth (Primary CTAs, Sydney hub cluster) */
+  --color-terracotta-600: #ea580c;
+  --color-terracotta-700: #c2410c; /* Primary brand action button & Sydney cluster */
+  --color-terracotta-800: #9a3412;
+
+  /* Australian Ochre (Secondary accents, active states, regional clusters) */
   --color-ochre-50: #fffbeb;
   --color-ochre-100: #fef3c7;
   --color-ochre-500: #f59e0b;
@@ -60,9 +65,9 @@ Locked design system. All coding agents (Claude, Codex, Gemini) and Hallmark run
 
 1. **No Invented Numbers or Social Proof**: Never display placeholder counts, fake testimonials, or fictional metrics. Real indexed data only (`{count} verified Australian tech employers indexed`).
 2. **60-30-10 Color Architecture (Colorize)**:
-   - **60% Ground**: Clean `#F8FAFC` canvas and `#FFFFFF` cards. No dull yellow-cream or muddy sepia paper.
+   - **60% Ground**: Warm `#FAF8F5` Australian Sandstone canvas and `#FFFFFF` elevated cards with warm `#E8E3DA` hairlines.
    - **30% Structural Ink**: Deep Navy `#0F172A` and Slate `#475569` for confident readability.
-   - **10% Purposeful Semantics**: Cobalt `#2563eb` for pins, Forest `#065F46` for trust, and multi-tier density on the map.
+   - **10% Purposeful Semantics**: Terracotta `#C2410C` for primary action & Sydney cluster, Cobalt `#2563EB` for secondary hubs, Forest `#065F46` for trust.
 3. **No Decorative Numbered Steps**: Do not use `01 / 02 / 03` markers unless the UI represents a genuine chronological workflow.
 4. **No Single-Word Gradient or Italic Accents**: Do not isolate single words in a headline with different colors or italicization.
 5. **No Pastel Icon Circles**: Icons are functional glyphs (e.g. `ShieldCheckIcon` for visa evidence), not emojis centered inside pastel circles.
