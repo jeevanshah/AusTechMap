@@ -54,6 +54,7 @@ const MOVE_DEBOUNCE_MS = 300;
 interface ListEntry {
   slug: string;
   name: string;
+  domain?: string | null;
   careersUrl: string | null;
   city: string | null;
   primaryCategory: string | null;
@@ -300,10 +301,115 @@ function getCompanyAvatar(slug: string, name: string): BrandAvatar {
   };
 }
 
+const KNOWN_DOMAINS: Record<string, string> = {
+  sitemate: "sitemate.com",
+  accelo: "accelo.com",
+  atlassian: "atlassian.com",
+  canva: "canva.com",
+  afterpay: "afterpay.com",
+  airwallex: "airwallex.com",
+  safetyculture: "safetyculture.com",
+  "culture-amp": "cultureamp.com",
+  "mineral-resources-tech-minres": "mineralresources.com.au",
+  csiro: "csiro.au",
+  "csiro-data61": "data61.csiro.au",
+  "quantum-brilliance": "quantumbrilliance.com",
+  "gilmour-space": "gspacetech.com",
+  zip: "zip.co",
+  envato: "envato.com",
+  "leonardo-ai": "leonardo.ai",
+  iress: "iress.com",
+  wooliesx: "wooliesx.com.au",
+  "up-ferocia": "up.com.au",
+  "wisetech-global": "wisetechglobal.com",
+};
+
+function extractDomainFromUrl(
+  url: string | null | undefined,
+  slug: string,
+): string {
+  if (KNOWN_DOMAINS[slug]) {
+    return KNOWN_DOMAINS[slug]!;
+  }
+  if (url) {
+    try {
+      const u = new URL(url);
+      const host = u.hostname.toLowerCase().replace(/^www\./, "");
+      if (
+        !host.includes("lever.co") &&
+        !host.includes("greenhouse.io") &&
+        !host.includes("workable.com") &&
+        !host.includes("bamboohr.com") &&
+        !host.includes("ashbyhq.com")
+      ) {
+        return host;
+      }
+    } catch {
+      // fallback
+    }
+  }
+  return `${slug}.com`;
+}
+
+function CompanyBrandMark({
+  slug,
+  name,
+  domain,
+  careersUrl,
+  size = "md",
+}: {
+  slug: string;
+  name: string;
+  domain?: string | null;
+  careersUrl?: string | null;
+  size?: "sm" | "md" | "lg";
+}) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const avatar = getCompanyAvatar(slug, name);
+  const resolvedDomain = useMemo(
+    () => domain || extractDomainFromUrl(careersUrl, slug),
+    [domain, careersUrl, slug],
+  );
+
+  const sizeClasses = {
+    sm: "h-9 w-9 rounded-lg text-xs",
+    md: "h-10 w-10 rounded-xl text-xs",
+    lg: "h-11 w-11 sm:h-13 sm:w-13 rounded-xl sm:rounded-2xl text-sm sm:text-base",
+  }[size];
+
+  const logoUrl =
+    resolvedDomain && !imgFailed
+      ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(resolvedDomain)}&sz=128`
+      : null;
+
+  return (
+    <div
+      className={`relative flex shrink-0 items-center justify-center overflow-hidden border border-slate-200/90 bg-white shadow-2xs ${sizeClasses}`}
+    >
+      {logoUrl ? (
+        <img
+          src={logoUrl}
+          alt={`${name} logo`}
+          loading="lazy"
+          className="h-full w-full object-contain p-1.5"
+          onError={() => setImgFailed(true)}
+        />
+      ) : (
+        <div
+          className={`flex h-full w-full items-center justify-center font-heading font-black ${avatar.bg} ${avatar.text}`}
+        >
+          {avatar.label}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function pointsToListEntries(points: MapCompanyPoint[]): ListEntry[] {
   return points.map((point) => ({
     slug: point.slug,
     name: point.name,
+    domain: extractDomainFromUrl(point.careersUrl, point.slug),
     careersUrl: point.careersUrl,
     city: point.city,
     primaryCategory: point.primaryCategory,
@@ -317,6 +423,7 @@ function searchResultsToListEntries(
   return results.map((result) => ({
     slug: result.slug,
     name: result.name,
+    domain: result.domain,
     careersUrl: null,
     city: result.city,
     primaryCategory: result.primaryCategory,
@@ -762,7 +869,6 @@ export function HomeMapShell({
       {selectedEntry && (
         <div className="animate-slide-up rounded-2xl border border-surface-border bg-white p-4 sm:p-5 shadow-md">
           {(() => {
-            const avatar = getCompanyAvatar(selectedEntry.slug, selectedEntry.name);
             const pt =
               displayedPoints.find((p) => p.slug === selectedEntry.slug) ??
               points.find((p) => p.slug === selectedEntry.slug);
@@ -772,12 +878,14 @@ export function HomeMapShell({
                 {/* Header Row: Avatar, Title & Metadata */}
                 <div className="flex items-start justify-between gap-3 sm:gap-4">
                   <div className="flex items-start gap-3 sm:gap-3.5 min-w-0">
-                    {/* Brand Avatar */}
-                    <div
-                      className={`flex h-11 w-11 sm:h-13 sm:w-13 shrink-0 items-center justify-center rounded-xl font-heading font-black text-sm sm:text-base shadow-2xs ${avatar.bg} ${avatar.text}`}
-                    >
-                      {avatar.label}
-                    </div>
+                    {/* Brand Avatar / Real Logo */}
+                    <CompanyBrandMark
+                      slug={selectedEntry.slug}
+                      name={selectedEntry.name}
+                      domain={selectedEntry.domain}
+                      careersUrl={selectedEntry.careersUrl}
+                      size="lg"
+                    />
 
                     {/* Metadata & Name */}
                     <div className="flex flex-col gap-0.5 min-w-0">
@@ -1170,7 +1278,6 @@ export function HomeMapShell({
                 ) : (
                   displayedEntries.map((entry) => {
                     const isSelected = entry.slug === selectedSlug;
-                    const avatar = getCompanyAvatar(entry.slug, entry.name);
                     const pt = points.find((p) => p.slug === entry.slug);
 
                     return (
@@ -1193,12 +1300,14 @@ export function HomeMapShell({
                             : "border-surface-border bg-white hover:border-slate-300 hover:shadow-xs"
                         }`}
                       >
-                        {/* Company Avatar */}
-                        <div
-                          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-heading font-extrabold text-xs shadow-2xs ${avatar.bg} ${avatar.text}`}
-                        >
-                          {avatar.label}
-                        </div>
+                        {/* Company Brand Logo */}
+                        <CompanyBrandMark
+                          slug={entry.slug}
+                          name={entry.name}
+                          domain={entry.domain}
+                          careersUrl={entry.careersUrl}
+                          size="md"
+                        />
 
                         {/* Details */}
                         <div className="flex-1 min-w-0">
