@@ -61,12 +61,30 @@ interface ListEntry {
 
 const REGIONAL_HUBS = [
   {
+    city: "Sydney",
+    state: "NSW",
+    count: 41,
+    center: [151.2093, -33.8688] as [number, number],
+    zoom: 11,
+    tag: "Flagship Tech Central & Barangaroo",
+    icon: Building2,
+  },
+  {
+    city: "Melbourne",
+    state: "VIC",
+    count: 25,
+    center: [144.9631, -37.8136] as [number, number],
+    zoom: 11,
+    tag: "Docklands & Cremorne Digital Cluster",
+    icon: Network,
+  },
+  {
     city: "Brisbane",
     state: "QLD",
     count: 15,
     center: [153.0251, -27.4698] as [number, number],
     zoom: 11,
-    tag: "Subtropical Enterprise Hub",
+    tag: "Fortitude Valley & Enterprise Hub",
     icon: Building2,
   },
   {
@@ -75,7 +93,7 @@ const REGIONAL_HUBS = [
     count: 10,
     center: [115.8605, -31.9505] as [number, number],
     zoom: 11,
-    tag: "Resources & Autonomous Systems",
+    tag: "Resources, Mining Tech & Autonomous Systems",
     icon: Cpu,
   },
   {
@@ -84,7 +102,7 @@ const REGIONAL_HUBS = [
     count: 9,
     center: [138.6007, -34.9285] as [number, number],
     zoom: 11,
-    tag: "Defence, Space & Machine Learning",
+    tag: "Lot Fourteen Space, Defence & Machine Learning",
     icon: Rocket,
   },
   {
@@ -93,7 +111,7 @@ const REGIONAL_HUBS = [
     count: 8,
     center: [149.13, -35.2809] as [number, number],
     zoom: 11,
-    tag: "GovTech, Cyber & National Security",
+    tag: "National Security, Cyber & GovTech",
     icon: Shield,
   },
   {
@@ -102,7 +120,7 @@ const REGIONAL_HUBS = [
     count: 6,
     center: [150.8931, -34.4278] as [number, number],
     zoom: 12,
-    tag: "Illawarra Innovation Corridor",
+    tag: "Illawarra Innovation Campus & CleanTech",
     icon: Network,
   },
   {
@@ -111,7 +129,7 @@ const REGIONAL_HUBS = [
     count: 5,
     center: [151.7817, -32.9283] as [number, number],
     zoom: 12,
-    tag: "CleanTech & Industrial Software",
+    tag: "Hunter Energy Tech & Industrial Software",
     icon: Zap,
   },
   {
@@ -120,7 +138,7 @@ const REGIONAL_HUBS = [
     count: 3,
     center: [130.8456, -12.4634] as [number, number],
     zoom: 12,
-    tag: "Tropical Gateway & Communications",
+    tag: "Northern Territory Defence & Marine Systems",
     icon: Radio,
   },
   {
@@ -129,8 +147,44 @@ const REGIONAL_HUBS = [
     count: 3,
     center: [147.3272, -42.8821] as [number, number],
     zoom: 12,
-    tag: "Antarctic, Marine & AgriTech",
+    tag: "Antarctic, Marine Science & AgriTech",
     icon: Anchor,
+  },
+  {
+    city: "Geelong",
+    state: "VIC",
+    count: 2,
+    center: [144.3607, -38.1499] as [number, number],
+    zoom: 12,
+    tag: "Advanced Manufacturing & Regional Tech",
+    icon: Cpu,
+  },
+  {
+    city: "Gold Coast",
+    state: "QLD",
+    count: 2,
+    center: [153.4, -28.0167] as [number, number],
+    zoom: 12,
+    tag: "Aerospace & Coastal Tech Startups",
+    icon: Rocket,
+  },
+  {
+    city: "Sunshine Coast",
+    state: "QLD",
+    count: 2,
+    center: [153.0667, -26.65] as [number, number],
+    zoom: 12,
+    tag: "Subsea Cable & Digital Innovation Hub",
+    icon: Network,
+  },
+  {
+    city: "Bendigo",
+    state: "VIC",
+    count: 2,
+    center: [144.2802, -36.757] as [number, number],
+    zoom: 12,
+    tag: "Regional Finance & Digital Services",
+    icon: Building2,
   },
 ];
 
@@ -138,9 +192,6 @@ interface BrandAvatar {
   bg: string;
   text: string;
   label: string;
-  suburb?: string;
-  employees?: string;
-  tags?: string[];
 }
 
 const BRAND_METADATA: Record<string, BrandAvatar> = {
@@ -148,89 +199,71 @@ const BRAND_METADATA: Record<string, BrandAvatar> = {
     bg: "bg-[#0052cc]",
     text: "text-white",
     label: "A",
-    suburb: "Sydney, NSW",
-    employees: "1.5K+ employees",
-    tags: ["SaaS", "Productivity"],
   },
   canva: {
     bg: "bg-gradient-to-tr from-[#00c4cc] to-[#7d2ae8]",
     text: "text-white",
     label: "C",
-    suburb: "Surry Hills, NSW",
-    employees: "1K+ employees",
-    tags: ["Design", "Consumer"],
   },
   afterpay: {
     bg: "bg-[#b2fce4]",
     text: "text-[#0f172a]",
     label: "AP",
-    suburb: "Melbourne, VIC",
-    employees: "500+ employees",
-    tags: ["Fintech", "Payments"],
   },
   csiro: {
     bg: "bg-[#001e3d]",
     text: "text-[#00e676]",
     label: "CS",
-    suburb: "Canberra, ACT",
-    employees: "5K+ employees",
-    tags: ["GovTech", "Research"],
   },
   "quantum-brilliance": {
     bg: "bg-[#0f172a]",
     text: "text-[#38bdf8]",
     label: "QB",
-    suburb: "Acton, ACT",
-    employees: "200+ employees",
-    tags: ["DeepTech", "Quantum"],
   },
   "gilmour-space": {
     bg: "bg-[#1e293b]",
     text: "text-[#f97316]",
     label: "GS",
-    suburb: "Gold Coast, QLD",
-    employees: "100+ employees",
-    tags: ["Space", "Defence"],
   },
   airwallex: {
     bg: "bg-[#ff4d00]",
     text: "text-white",
     label: "AW",
-    suburb: "Melbourne, VIC",
-    employees: "800+ employees",
-    tags: ["Fintech", "Global Banking"],
   },
   safetyculture: {
     bg: "bg-[#002f6c]",
     text: "text-white",
     label: "SC",
-    suburb: "Surry Hills, NSW",
-    employees: "600+ employees",
-    tags: ["Operations", "Mobile"],
   },
   envato: {
     bg: "bg-[#81b441]",
     text: "text-white",
     label: "E",
-    suburb: "Melbourne, VIC",
-    employees: "400+ employees",
-    tags: ["Digital Assets", "Creative"],
   },
   zip: {
     bg: "bg-[#251f47]",
     text: "text-white",
     label: "ZIP",
-    suburb: "Sydney, NSW",
-    employees: "700+ employees",
-    tags: ["Fintech", "Lending"],
   },
   "leonardo-ai": {
     bg: "bg-[#180d2b]",
     text: "text-[#e879f9]",
     label: "L",
-    suburb: "Perth, WA",
-    employees: "120+ employees",
-    tags: ["AI & Data", "Creative Tech"],
+  },
+  "culture-amp": {
+    bg: "bg-[#242424]",
+    text: "text-[#ff6079]",
+    label: "CA",
+  },
+  iress: {
+    bg: "bg-[#002f6c]",
+    text: "text-white",
+    label: "IR",
+  },
+  "mineral-resources-tech-minres": {
+    bg: "bg-[#1e3a8a]",
+    text: "text-white",
+    label: "MR",
   },
 };
 
@@ -311,7 +344,7 @@ export function HomeMapShell({
   const [currentBbox, setCurrentBbox] = useState<Bbox>(initialBbox);
   const [currentZoom, setCurrentZoom] = useState<number | null>(null);
   const [activeDirectoryTab, setActiveDirectoryTab] = useState<
-    "companies" | "jobs" | "regions"
+    "companies" | "sponsors" | "regions"
   >("companies");
   const [mapLayerStyle, setMapLayerStyle] = useState<"map" | "satellite">(
     "map",
@@ -474,6 +507,20 @@ export function HomeMapShell({
     );
   }, [rawListEntries, regionalOnly]);
 
+  // Verified sponsorship count across currently loaded records
+  const sponsoredCount = useMemo(
+    () => rawListEntries.filter((e) => e.hasSponsorshipEvidence).length,
+    [rawListEntries],
+  );
+
+  // Tab-filtered entries for display
+  const displayedEntries = useMemo(() => {
+    if (activeDirectoryTab === "sponsors") {
+      return listEntries.filter((entry) => entry.hasSponsorshipEvidence);
+    }
+    return listEntries;
+  }, [listEntries, activeDirectoryTab]);
+
   // Apply regional-only filter to map points as well
   const displayedPoints = useMemo(() => {
     if (!regionalOnly) return points;
@@ -601,17 +648,12 @@ export function HomeMapShell({
               }}
               className="text-xs font-semibold text-navy-900 bg-transparent focus:outline-none cursor-pointer py-1"
             >
-              <option value="">All regions &amp; cities</option>
-              <option value="Sydney">Sydney, NSW</option>
-              <option value="Melbourne">Melbourne, VIC</option>
-              <option value="Brisbane">Brisbane, QLD</option>
-              <option value="Perth">Perth, WA</option>
-              <option value="Adelaide">Adelaide, SA</option>
-              <option value="Canberra">Canberra, ACT</option>
-              <option value="Wollongong">Wollongong, NSW</option>
-              <option value="Newcastle">Newcastle, NSW</option>
-              <option value="Darwin">Darwin, NT</option>
-              <option value="Hobart">Hobart, TAS</option>
+              <option value="">All regions &amp; cities ({REGIONAL_HUBS.length})</option>
+              {REGIONAL_HUBS.map((hub) => (
+                <option key={hub.city} value={hub.city}>
+                  {hub.city}, {hub.state} ({hub.count})
+                </option>
+              ))}
             </select>
           </div>
 
@@ -843,21 +885,21 @@ export function HomeMapShell({
               </button>
               <button
                 type="button"
-                onClick={() => setActiveDirectoryTab("jobs")}
+                onClick={() => setActiveDirectoryTab("sponsors")}
                 className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${
-                  activeDirectoryTab === "jobs"
-                    ? "bg-navy-900 text-white shadow-xs"
+                  activeDirectoryTab === "sponsors"
+                    ? "bg-forest-800 text-white shadow-xs"
                     : "text-slate-600 hover:text-navy-900 bg-white border border-surface-border"
                 }`}
               >
-                Jobs (3.2K+)
+                Visa Sponsors ({sponsoredCount})
               </button>
               <button
                 type="button"
                 onClick={() => setActiveDirectoryTab("regions")}
                 className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all ${
                   activeDirectoryTab === "regions"
-                    ? "bg-navy-900 text-white shadow-xs"
+                    ? "bg-terracotta-700 text-white shadow-xs"
                     : "text-slate-600 hover:text-navy-900 bg-white border border-surface-border"
                 }`}
               >
@@ -865,7 +907,7 @@ export function HomeMapShell({
               </button>
             </div>
             <span className="font-mono text-[11px] text-slate-500 font-medium hidden sm:inline">
-              Sort: Featured ▾
+              Verified G-NAF &amp; ABN Registry
             </span>
           </div>
 
@@ -929,15 +971,17 @@ export function HomeMapShell({
               </div>
             )}
 
-            {/* If Companies or Jobs Tab is Active */}
+            {/* If Companies or Sponsors Tab is Active */}
             {activeDirectoryTab !== "regions" && (
               <>
-                {listEntries.length === 0 ? (
+                {displayedEntries.length === 0 ? (
                   <div className="rounded-xl border border-surface-border bg-white p-6 text-center text-sm text-slate-500">
-                    No companies match this query.
+                    {activeDirectoryTab === "sponsors"
+                      ? "No visa-sponsored employers match this query."
+                      : "No companies match this query."}
                   </div>
                 ) : (
-                  listEntries.map((entry) => {
+                  displayedEntries.map((entry) => {
                     const isSelected = entry.slug === selectedSlug;
                     const avatar = getCompanyAvatar(entry.slug, entry.name);
                     const pt = points.find((p) => p.slug === entry.slug);
@@ -980,38 +1024,38 @@ export function HomeMapShell({
                           <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-500 mt-0.5">
                             <MapPin className="h-3 w-3 text-slate-400 shrink-0" />
                             <span className="truncate">
-                              {avatar.suburb ?? entry.city ?? "Australia"}
+                              {entry.city ? `${entry.city}, Australia` : "Australia"}
                             </span>
-                            <span>•</span>
-                            <span className="truncate">
-                              {avatar.employees ?? "100+ employees"}
-                            </span>
+                            {entry.primaryCategory && (
+                              <>
+                                <span>•</span>
+                                <span className="truncate">
+                                  {entry.primaryCategory}
+                                </span>
+                              </>
+                            )}
                           </div>
 
-                          {/* Tags & Status Pill */}
+                          {/* Verified Badges & Status Pill */}
                           <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                            {(
-                              avatar.tags ?? [entry.primaryCategory ?? "Tech"]
-                            ).map((tag) => (
-                              <span
-                                key={tag}
-                                className="rounded-md border border-slate-200/80 bg-slate-50 px-2 py-0.5 font-mono text-[10px] font-medium text-slate-600"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-
-                            {entry.hasSponsorshipEvidence ? (
-                              <span className="ml-auto inline-flex items-center gap-1 rounded-full border border-forest-600/30 bg-forest-50 px-2 py-0.5 font-mono text-[10px] font-semibold text-forest-800">
+                            {entry.hasSponsorshipEvidence && (
+                              <span className="inline-flex items-center gap-1 rounded-md border border-forest-600/30 bg-forest-50 px-2 py-0.5 font-mono text-[10px] font-semibold text-forest-800">
                                 <Award className="h-2.5 w-2.5 text-forest-700" />
-                                Sponsorship
-                              </span>
-                            ) : (
-                              <span className="ml-auto inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-semibold text-emerald-800">
-                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                                Hiring
+                                Subclass 482 Sponsor
                               </span>
                             )}
+
+                            {entry.careersUrl && (
+                              <span className="inline-flex items-center gap-1 rounded-md border border-pacific-500/30 bg-pacific-50 px-2 py-0.5 font-mono text-[10px] font-medium text-pacific-800">
+                                <ExternalLink className="h-2.5 w-2.5 text-pacific-700" />
+                                Careers Portal
+                              </span>
+                            )}
+
+                            <span className="ml-auto inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[10px] font-medium text-slate-600">
+                              <CheckCircle2 className="h-2.5 w-2.5 text-forest-700" />
+                              Verified Registry
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -1098,15 +1142,9 @@ export function HomeMapShell({
             {/* Bottom-Left Floating Hub Spotlight Card */}
             <div
               onClick={() => {
-                const syd = REGIONAL_HUBS.find((h) => h.city === "Sydney") ?? {
-                  city: "Sydney",
-                  state: "NSW",
-                  count: 142,
-                  center: [151.2093, -33.8688],
-                  zoom: 11,
-                  tag: "Tech Central & Barangaroo",
-                  icon: Building2,
-                };
+                const syd =
+                  REGIONAL_HUBS.find((h) => h.city === "Sydney") ??
+                  REGIONAL_HUBS[0]!;
                 handleSelectHub(syd);
               }}
               className="absolute bottom-3 left-3 sm:left-4 z-10 flex items-center gap-3 rounded-xl border border-surface-border bg-white/95 backdrop-blur-xs p-2.5 shadow-md hover:border-terracotta-700/60 transition-all cursor-pointer group max-w-xs"
@@ -1122,34 +1160,34 @@ export function HomeMapShell({
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="font-heading text-xs font-bold text-navy-900 group-hover:text-terracotta-700 transition-colors truncate">
-                  Sydney Silicon Harbour
+                  Sydney Flagship Cluster
                 </span>
                 <span className="font-mono text-[10px] text-slate-500">
-                  142 verified employers &gt;
+                  41 verified employers &gt;
                 </span>
               </div>
             </div>
 
             {/* Bottom-Right Floating Legend Card */}
-            <div className="hidden sm:flex absolute bottom-3 right-3 z-10 flex-col gap-1 rounded-xl border border-surface-border bg-white/95 backdrop-blur-xs px-3 py-2 shadow-md text-[11px] font-medium text-slate-700">
-              <span className="font-mono text-[9px] uppercase tracking-wider text-slate-400 font-bold mb-0.5">
-                Show on map
+            <div className="hidden sm:flex absolute bottom-3 right-3 z-10 flex-col gap-1.5 rounded-xl border border-surface-border bg-white/95 backdrop-blur-xs px-3 py-2 shadow-md text-[11px] font-medium text-slate-700">
+              <span className="font-mono text-[9px] uppercase tracking-wider text-slate-400 font-bold">
+                Map Legend
               </span>
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-pacific-600" />
-                <span>Tech companies</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                <span>Hiring now</span>
+                <span>Tech employers</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-forest-600" />
-                <span>Offers sponsorship</span>
+                <span>Subclass 482 visa sponsor</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-amber-600" />
+                <span>Designated regional location</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-terracotta-700" />
-                <span>Sydney Flagship Cluster</span>
+                <span>Sydney Flagship Cluster (40+)</span>
               </div>
             </div>
           </div>

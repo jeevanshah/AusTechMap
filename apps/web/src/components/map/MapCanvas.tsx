@@ -59,7 +59,12 @@ function pointsToGeoJson(points: MapCompanyPoint[]): FeatureCollection {
     type: "FeatureCollection",
     features: points.map((point) => ({
       type: "Feature",
-      properties: { slug: point.slug, name: point.name },
+      properties: {
+        slug: point.slug,
+        name: point.name,
+        hasSponsorshipEvidence: point.hasSponsorshipEvidence ? 1 : 0,
+        isRegional: point.isRegional ? 1 : 0,
+      },
       geometry: { type: "Point", coordinates: [point.lng, point.lat] },
     })),
   };
@@ -166,11 +171,25 @@ export function MapCanvas({
         source: SOURCE_ID,
         filter: ["!", ["has", "point_count"]],
         paint: {
-          "circle-color": "#2563eb",
+          "circle-color": [
+            "case",
+            ["==", ["get", "hasSponsorshipEvidence"], 1],
+            "#15803d",
+            ["==", ["get", "isRegional"], 1],
+            "#b45309",
+            "#2563eb",
+          ],
           "circle-radius": 12,
-          "circle-opacity": 0.16,
+          "circle-opacity": 0.18,
           "circle-stroke-width": 1.5,
-          "circle-stroke-color": "#2563eb",
+          "circle-stroke-color": [
+            "case",
+            ["==", ["get", "hasSponsorshipEvidence"], 1],
+            "#15803d",
+            ["==", ["get", "isRegional"], 1],
+            "#b45309",
+            "#2563eb",
+          ],
           "circle-stroke-opacity": 0.45,
         },
       });
@@ -180,7 +199,14 @@ export function MapCanvas({
         source: SOURCE_ID,
         filter: ["!", ["has", "point_count"]],
         paint: {
-          "circle-color": "#2563eb",
+          "circle-color": [
+            "case",
+            ["==", ["get", "hasSponsorshipEvidence"], 1],
+            "#15803d",
+            ["==", ["get", "isRegional"], 1],
+            "#b45309",
+            "#2563eb",
+          ],
           "circle-radius": 6.5,
           "circle-stroke-width": 2,
           "circle-stroke-color": "#ffffff",

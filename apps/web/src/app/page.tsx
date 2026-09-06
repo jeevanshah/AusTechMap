@@ -192,9 +192,9 @@ export default async function Home() {
               See where opportunity lives.
             </h1>
             <p className="max-w-xl text-sm leading-relaxed text-slate-600">
-              Discover verified tech companies, roles, sponsorship info, and
-              regional innovation hubs across Australia — all in one synchronized
-              map.
+              Discover verified tech employers, substantiated subclass 482 visa
+              sponsors, and regional innovation hubs across Australia — all
+              indexed from official registry and G-NAF premises data.
             </p>
           </div>
 
@@ -247,7 +247,7 @@ export default async function Home() {
                 <AnimatedCounter target={stats.regionalEmployers} />
               </span>
               <span className="mt-0.5 block font-mono text-[11px] text-slate-500">
-                regional areas
+                regional tech employers
               </span>
             </div>
 
@@ -261,15 +261,10 @@ export default async function Home() {
                 </span>
               </div>
               <span className="font-mono text-xl font-bold tracking-tight text-navy-900 tabular-nums">
-                {Math.round(
-                  (stats.sponsorshipEmployers /
-                    (stats.totalEmployers || 1)) *
-                    100,
-                )}
-                %
+                <AnimatedCounter target={stats.sponsorshipEmployers} />
               </span>
               <span className="mt-0.5 block font-mono text-[11px] text-slate-500">
-                offer sponsorship
+                subclass 482 sponsors
               </span>
             </div>
           </div>
