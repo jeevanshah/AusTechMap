@@ -3,6 +3,27 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Award,
+  Building2,
+  CheckCircle2,
+  Compass,
+  Cpu,
+  ExternalLink,
+  ListFilter,
+  Map as MapIcon,
+  MapPin,
+  Network,
+  Radio,
+  Rocket,
+  Search,
+  Shield,
+  ShieldCheck,
+  X,
+  Zap,
+} from "lucide-react";
 
 import type {
   Category,
@@ -43,6 +64,7 @@ const REGIONAL_HUBS = [
     zoom: 11,
     tag: "Subtropical Enterprise Hub",
     accentGradient: "from-sky-500 to-blue-600",
+    icon: Building2,
   },
   {
     city: "Perth",
@@ -52,6 +74,7 @@ const REGIONAL_HUBS = [
     zoom: 11,
     tag: "Resources & Autonomous Systems",
     accentGradient: "from-amber-500 to-orange-600",
+    icon: Cpu,
   },
   {
     city: "Adelaide",
@@ -61,6 +84,7 @@ const REGIONAL_HUBS = [
     zoom: 11,
     tag: "Defence, Space & Machine Learning",
     accentGradient: "from-emerald-500 to-teal-700",
+    icon: Rocket,
   },
   {
     city: "Canberra",
@@ -70,6 +94,7 @@ const REGIONAL_HUBS = [
     zoom: 11,
     tag: "GovTech, Cyber & National Security",
     accentGradient: "from-slate-700 to-navy-900",
+    icon: Shield,
   },
   {
     city: "Wollongong",
@@ -79,6 +104,7 @@ const REGIONAL_HUBS = [
     zoom: 12,
     tag: "Illawarra Innovation Corridor",
     accentGradient: "from-cyan-500 to-blue-600",
+    icon: Network,
   },
   {
     city: "Newcastle",
@@ -88,6 +114,7 @@ const REGIONAL_HUBS = [
     zoom: 12,
     tag: "CleanTech & Industrial Software",
     accentGradient: "from-teal-500 to-emerald-600",
+    icon: Zap,
   },
   {
     city: "Darwin",
@@ -97,6 +124,7 @@ const REGIONAL_HUBS = [
     zoom: 12,
     tag: "Tropical Gateway & Communications",
     accentGradient: "from-orange-500 to-rose-600",
+    icon: Radio,
   },
   {
     city: "Hobart",
@@ -106,6 +134,7 @@ const REGIONAL_HUBS = [
     zoom: 12,
     tag: "Antarctic, Marine & AgriTech",
     accentGradient: "from-violet-500 to-indigo-700",
+    icon: Compass,
   },
 ];
 
@@ -358,15 +387,15 @@ export function HomeMapShell({
               type="button"
               onClick={() => setSponsorshipOnly(!sponsorshipOnly)}
               aria-pressed={sponsorshipOnly}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 active:scale-95 ${
                 sponsorshipOnly
                   ? "border border-forest-600 bg-forest-50 text-forest-900 font-semibold"
                   : "border border-surface-border bg-slate-50 text-slate-700 hover:bg-slate-100"
               }`}
             >
-              <span
-                className={`h-2 w-2 rounded-full ${
-                  sponsorshipOnly ? "bg-forest-600" : "bg-purple-500"
+              <ShieldCheck
+                className={`h-3.5 w-3.5 ${
+                  sponsorshipOnly ? "text-forest-700" : "text-purple-500"
                 }`}
               />
               Sponsorship verified
@@ -377,15 +406,15 @@ export function HomeMapShell({
               type="button"
               onClick={() => setRegionalOnly(!regionalOnly)}
               aria-pressed={regionalOnly}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 ${
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 active:scale-95 ${
                 regionalOnly
                   ? "border border-amber-600 bg-amber-500 text-white font-semibold shadow-xs"
                   : "border border-surface-border bg-slate-50 text-slate-700 hover:bg-slate-100"
               }`}
             >
-              <span
-                className={`h-2 w-2 rounded-full ${
-                  regionalOnly ? "bg-white" : "bg-amber-500"
+              <Compass
+                className={`h-3.5 w-3.5 ${
+                  regionalOnly ? "text-white" : "text-amber-600"
                 }`}
               />
               Regional hubs only
@@ -398,25 +427,27 @@ export function HomeMapShell({
               type="button"
               onClick={() => setViewMode("map")}
               aria-pressed={viewMode === "map"}
-              className={`rounded-md px-3 py-1 text-xs font-medium transition-colors duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 ${
+              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition-all duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 ${
                 viewMode === "map"
                   ? "bg-white text-navy-900 shadow-2xs font-semibold"
                   : "text-slate-600 hover:text-navy-900"
               }`}
             >
-              🗺️ Map view
+              <MapIcon className="h-3.5 w-3.5 text-pacific-600" />
+              Map view
             </button>
             <button
               type="button"
               onClick={() => setViewMode("list")}
               aria-pressed={viewMode === "list"}
-              className={`rounded-md px-3 py-1 text-xs font-medium transition-colors duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 ${
+              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition-all duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 ${
                 viewMode === "list"
                   ? "bg-white text-navy-900 shadow-2xs font-semibold"
                   : "text-slate-600 hover:text-navy-900"
               }`}
             >
-              📋 Directory list ({listEntries.length})
+              <ListFilter className="h-3.5 w-3.5 text-navy-800" />
+              Directory list ({listEntries.length})
             </button>
           </div>
         </div>
@@ -471,18 +502,7 @@ export function HomeMapShell({
       <div className="grid gap-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <div className="relative flex items-center">
           <span className="pointer-events-none absolute left-3.5 text-slate-400">
-            <svg
-              className="h-4 w-4"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                fillRule="evenodd"
-                d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
-                clipRule="evenodd"
-              />
-            </svg>
+            <Search className="h-4 w-4" />
           </span>
           <input
             ref={searchInputRef}
@@ -510,10 +530,10 @@ export function HomeMapShell({
                   setActiveHubCity(null);
                   searchInputRef.current?.focus();
                 }}
-                className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-slate-300 text-xs font-bold transition-colors"
+                className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-slate-300 transition-colors"
                 aria-label="Clear search query"
               >
-                ✕
+                <X className="h-3 w-3" />
               </button>
             ) : (
               <kbd className="hidden sm:inline-block rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-slate-400 shadow-2xs">
@@ -567,18 +587,7 @@ export function HomeMapShell({
                 </span>
                 {selectedEntry.hasSponsorshipEvidence && (
                   <span className="inline-flex items-center gap-1 rounded bg-forest-50 px-2 py-0.5 text-[11px] font-medium text-forest-800 border border-forest-600/30">
-                    <svg
-                      aria-hidden="true"
-                      className="h-3 w-3 text-forest-800 shrink-0"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zm3.707 6.763a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                    <Award className="h-3.5 w-3.5 text-forest-700 shrink-0" />
                     Subclass 482 Visa Sponsor
                   </span>
                 )}
@@ -589,7 +598,8 @@ export function HomeMapShell({
               <div className="flex flex-wrap items-center gap-3 font-mono text-xs text-slate-600">
                 {selectedEntry.city && (
                   <span className="flex items-center gap-1 font-medium">
-                    📍 {selectedEntry.city}
+                    <MapPin className="h-3.5 w-3.5 text-pacific-600 shrink-0" />
+                    {selectedEntry.city}
                   </span>
                 )}
                 {selectedEntry.primaryCategory && (
@@ -606,30 +616,28 @@ export function HomeMapShell({
               aria-label="Close employer details"
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-navy-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 transition-colors text-sm font-medium"
             >
-              ✕
+              <X className="h-4 w-4" />
             </button>
           </div>
 
           {/* Genuine Auditable Verification Checklist */}
           <div className="mt-4 grid gap-2 rounded-lg border border-slate-100 bg-slate-50 p-3 sm:grid-cols-3 font-mono text-xs text-slate-700">
             <div className="flex items-center gap-1.5">
-              <span className="text-forest-700 font-bold">✓</span>
+              <CheckCircle2 className="h-4 w-4 text-forest-700 shrink-0" />
               <span>Entity Verified (ABN/ASIC)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-forest-700 font-bold">✓</span>
+              <Building2 className="h-4 w-4 text-forest-700 shrink-0" />
               <span>Physical Premises (G-NAF)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span
-                className={
+              <Award
+                className={`h-4 w-4 shrink-0 ${
                   selectedEntry.hasSponsorshipEvidence
-                    ? "text-forest-700 font-bold"
-                    : "text-slate-400 font-bold"
-                }
-              >
-                {selectedEntry.hasSponsorshipEvidence ? "✓" : "○"}
-              </span>
+                    ? "text-forest-700"
+                    : "text-slate-400"
+                }`}
+              />
               <span>
                 {selectedEntry.hasSponsorshipEvidence
                   ? "Substantiated 482 Sponsor"
@@ -662,17 +670,7 @@ export function HomeMapShell({
                   }}
                   className="inline-flex items-center gap-1.5 rounded-md border border-pacific-500 bg-pacific-50 px-3.5 py-2 text-xs font-semibold text-pacific-800 hover:bg-pacific-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pacific-600 transition-colors active:scale-95"
                 >
-                  <svg
-                    className="h-3.5 w-3.5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.096.446-.24.757-.433 1.244-.77 2.87-2.072 4.298-3.953C17.085 12.518 18 9.94 18 7.5A8 8 0 002 7.5c0 2.44.915 5.018 2.33 6.9 1.428 1.88 3.054 3.183 4.298 3.953.311.193.571.337.757.433a5.753 5.753 0 00.3.148l.006.003.001.001zM10 10.5a3 3 0 100-6 3 3 0 000 6z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  <MapPin className="h-3.5 w-3.5 text-pacific-600" />
                   Locate on map ({pt.lat.toFixed(2)}, {pt.lng.toFixed(2)})
                 </button>
               );
@@ -688,16 +686,18 @@ export function HomeMapShell({
                     slug: selectedEntry.slug,
                   })
                 }
-                className="rounded-md bg-navy-900 px-4 py-2 text-xs font-medium text-white hover:bg-navy-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 focus-visible:ring-offset-2 transition-colors active:scale-95"
+                className="inline-flex items-center gap-1.5 rounded-md bg-navy-900 px-4 py-2 text-xs font-medium text-white hover:bg-navy-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 focus-visible:ring-offset-2 transition-colors active:scale-95"
               >
-                Careers page ↗
+                Careers page
+                <ExternalLink className="h-3.5 w-3.5" />
               </a>
             )}
             <Link
               href={`/companies/${selectedEntry.slug}`}
-              className="rounded-md border border-slate-300 bg-white px-4 py-2 text-xs font-medium text-navy-900 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 focus-visible:ring-offset-2 transition-colors active:scale-95"
+              className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-4 py-2 text-xs font-medium text-navy-900 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 focus-visible:ring-offset-2 transition-colors active:scale-95"
             >
-              View full profile →
+              View full profile
+              <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </div>
@@ -744,7 +744,8 @@ export function HomeMapShell({
                             entry.hasSponsorshipEvidence) && (
                             <span className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-600">
                               {entry.city && (
-                                <span className="font-medium">
+                                <span className="font-medium inline-flex items-center gap-1">
+                                  <MapPin className="h-3 w-3 text-slate-400 shrink-0" />
                                   {entry.city}
                                 </span>
                               )}
@@ -755,18 +756,7 @@ export function HomeMapShell({
                               )}
                               {entry.hasSponsorshipEvidence && (
                                 <span className="inline-flex items-center gap-1 rounded bg-forest-50 px-2 py-0.5 text-[11px] font-medium text-forest-800 border border-forest-600/20">
-                                  <svg
-                                    aria-hidden="true"
-                                    className="h-3 w-3 text-forest-800 shrink-0"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                  >
-                                    <path
-                                      fillRule="evenodd"
-                                      d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zm3.707 6.763a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                      clipRule="evenodd"
-                                    />
-                                  </svg>
+                                  <Award className="h-3 w-3 text-forest-700 shrink-0" />
                                   Sponsors
                                 </span>
                               )}
@@ -825,7 +815,8 @@ export function HomeMapShell({
                           {entry.name}
                         </Link>
                         {entry.hasSponsorshipEvidence && (
-                          <span className="shrink-0 rounded bg-forest-50 px-1.5 py-0.5 text-[10px] font-medium text-forest-800 border border-forest-600/20">
+                          <span className="inline-flex items-center gap-1 shrink-0 rounded bg-forest-50 px-1.5 py-0.5 text-[10px] font-medium text-forest-800 border border-forest-600/20">
+                            <Award className="h-3 w-3 text-forest-700 shrink-0" />
                             Sponsors
                           </span>
                         )}
@@ -833,7 +824,10 @@ export function HomeMapShell({
 
                       <div className="mt-2 flex flex-wrap items-center gap-2 font-mono text-xs text-slate-600">
                         {entry.city && (
-                          <span className="font-medium">📍 {entry.city}</span>
+                          <span className="font-medium inline-flex items-center gap-1">
+                            <MapPin className="h-3 w-3 text-slate-400 shrink-0" />
+                            {entry.city}
+                          </span>
                         )}
                         {entry.primaryCategory && (
                           <span className="rounded bg-slate-100 px-2 py-0.5 text-slate-700 font-mono text-[11px]">
@@ -849,12 +843,15 @@ export function HomeMapShell({
                           href={entry.careersUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-medium text-slate-500 hover:text-navy-900 hover:underline"
+                          className="inline-flex items-center gap-1 font-medium text-slate-500 hover:text-navy-900 hover:underline"
                         >
-                          Careers ↗
+                          Careers <ExternalLink className="h-3 w-3" />
                         </a>
                       ) : (
-                        <span className="text-slate-400">Verified ABN</span>
+                        <span className="inline-flex items-center gap-1 text-slate-400">
+                          <CheckCircle2 className="h-3 w-3 text-slate-400" />
+                          Verified ABN
+                        </span>
                       )}
                       <div className="flex items-center gap-2.5">
                         <button
@@ -882,15 +879,15 @@ export function HomeMapShell({
                               });
                             }
                           }}
-                          className="font-medium text-pacific-700 hover:underline inline-flex items-center gap-0.5 cursor-pointer"
+                          className="font-medium text-pacific-700 hover:underline inline-flex items-center gap-1 cursor-pointer"
                         >
-                          Map ↗
+                          Map <ArrowUpRight className="h-3 w-3" />
                         </button>
                         <Link
                           href={`/companies/${entry.slug}`}
-                          className="font-medium text-ochre-700 hover:underline"
+                          className="font-medium text-ochre-700 hover:underline inline-flex items-center gap-1"
                         >
-                          Profile →
+                          Profile <ArrowRight className="h-3 w-3" />
                         </Link>
                       </div>
                     </div>
@@ -943,31 +940,42 @@ export function HomeMapShell({
                   } transition-all duration-200`}
                 />
 
-                <div className="pt-1">
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`font-heading text-base font-bold transition-colors ${
-                        isActive
-                          ? "text-pacific-700"
-                          : "text-navy-900 group-hover:text-pacific-700"
-                      }`}
-                    >
-                      {hub.city}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      {isActive && (
-                        <span className="rounded-full bg-pacific-600 px-1.5 py-0.5 font-mono text-[9px] font-bold text-white uppercase">
-                          Active
-                        </span>
-                      )}
-                      <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-slate-600 uppercase">
-                        {hub.state}
+                <div className="pt-1 flex items-start gap-3">
+                  <span
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors ${
+                      isActive
+                        ? "border-pacific-500 bg-pacific-600 text-white shadow-xs"
+                        : "border-slate-200/80 bg-slate-50 text-navy-800 group-hover:border-pacific-300 group-hover:bg-pacific-50 group-hover:text-pacific-700"
+                    }`}
+                  >
+                    <hub.icon className="h-4 w-4" />
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <span
+                        className={`font-heading text-base font-bold transition-colors truncate ${
+                          isActive
+                            ? "text-pacific-700"
+                            : "text-navy-900 group-hover:text-pacific-700"
+                        }`}
+                      >
+                        {hub.city}
                       </span>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {isActive && (
+                          <span className="rounded-full bg-pacific-600 px-1.5 py-0.5 font-mono text-[9px] font-bold text-white uppercase">
+                            Active
+                          </span>
+                        )}
+                        <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-slate-600 uppercase">
+                          {hub.state}
+                        </span>
+                      </div>
                     </div>
+                    <p className="mt-1 line-clamp-1 font-mono text-[11px] text-slate-500">
+                      {hub.tag}
+                    </p>
                   </div>
-                  <p className="mt-1 line-clamp-1 font-mono text-[11px] text-slate-500">
-                    {hub.tag}
-                  </p>
                 </div>
 
                 <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-2.5 font-mono text-xs text-slate-600">
@@ -978,7 +986,11 @@ export function HomeMapShell({
                     employers
                   </span>
                   <span className="text-pacific-600 font-bold group-hover:translate-x-1 transition-transform duration-200">
-                    {isActive ? "●" : "↗"}
+                    {isActive ? (
+                      "●"
+                    ) : (
+                      <ArrowUpRight className="h-3.5 w-3.5 inline-block" />
+                    )}
                   </span>
                 </div>
               </button>

@@ -1,7 +1,16 @@
 /* Hallmark · macrostructure: long-document · theme: National Registry · system: DESIGN.md */
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
+import {
+  ArrowLeft,
+  Calendar,
+  CheckCircle2,
+  ExternalLink,
+  Globe,
+  ShieldCheck,
+} from "lucide-react";
 
 import type { MapCompanyPoint } from "@austechmap/contracts";
 
@@ -99,23 +108,6 @@ const STATUS_LABELS: Record<string, string> = {
   disabled: "Disabled",
   merged: "Merged",
 };
-
-function ShieldCheckIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      aria-hidden="true"
-      className={className}
-      viewBox="0 0 20 20"
-      fill="currentColor"
-    >
-      <path
-        fillRule="evenodd"
-        d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zm3.707 6.763a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-}
 
 async function loadCompany(slug: string): Promise<CompanyProfileRow | null> {
   const { rows } = await getPool().query<CompanyProfileRow>(
@@ -297,19 +289,31 @@ export default async function CompanyProfilePage({
         <div className="flex items-center justify-between gap-4">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 rounded text-sm font-medium text-ochre-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 focus-visible:ring-offset-2"
+            className="inline-flex items-center gap-2 rounded text-sm font-medium text-ochre-700 hover:text-ochre-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 focus-visible:ring-offset-2 transition-colors"
           >
-            ← Back to directory
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back to directory</span>
           </Link>
-          <span className="font-mono text-xs text-slate-500 tabular-nums">
-            {lastCheckedLabel.toUpperCase()}:{" "}
-            {new Date(lastCheckedDate).toLocaleDateString("en-AU")}
-          </span>
+          <div className="flex items-center gap-2">
+            <div className="relative h-6 w-6 overflow-hidden rounded border border-slate-200 shadow-2xs">
+              <Image
+                src="/brand/logo.jpg"
+                alt="Australia Tech Map Logo"
+                width={24}
+                height={24}
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <span className="font-mono text-xs text-slate-500 tabular-nums">
+              {lastCheckedLabel.toUpperCase()}:{" "}
+              {new Date(lastCheckedDate).toLocaleDateString("en-AU")}
+            </span>
+          </div>
         </div>
         <h1 className="font-heading text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl text-balance">
           {company.display_name}
         </h1>
-        <dl className="flex flex-wrap gap-x-6 gap-y-1 font-mono text-xs text-slate-600 tabular-nums">
+        <dl className="flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs text-slate-600 tabular-nums">
           <div className="flex items-center gap-1.5">
             <dt className="text-slate-400">STATUS</dt>
             <dd className="font-medium text-navy-900">
@@ -319,19 +323,24 @@ export default async function CompanyProfilePage({
           {company.domain && (
             <div className="flex items-center gap-1.5">
               <dt className="text-slate-400">DOMAIN</dt>
-              <dd className="font-medium text-navy-900">{company.domain}</dd>
+              <dd className="font-medium text-navy-900 inline-flex items-center gap-1">
+                <Globe className="h-3 w-3 text-slate-400" />
+                {company.domain}
+              </dd>
             </div>
           )}
           <div className="flex items-center gap-1.5">
             <dt className="text-slate-400">REGISTERED</dt>
-            <dd className="font-medium text-navy-900">
+            <dd className="font-medium text-navy-900 inline-flex items-center gap-1">
+              <Calendar className="h-3 w-3 text-slate-400" />
               {new Date(company.created_at).toLocaleDateString("en-AU")}
             </dd>
           </div>
           {company.verified_at && (
             <div className="flex items-center gap-1.5">
               <dt className="text-slate-400">VERIFIED</dt>
-              <dd className="font-medium text-navy-900">
+              <dd className="font-medium text-emerald-700 inline-flex items-center gap-1">
+                <CheckCircle2 className="h-3 w-3 text-emerald-600" />
                 {new Date(company.verified_at).toLocaleDateString("en-AU")}
               </dd>
             </div>
@@ -412,7 +421,7 @@ export default async function CompanyProfilePage({
               >
                 <div className="flex items-center justify-between gap-4">
                   <span className="flex items-center gap-2 font-semibold text-forest-900">
-                    <ShieldCheckIcon className="h-4 w-4 shrink-0 text-forest-700" />
+                    <ShieldCheck className="h-4 w-4 shrink-0 text-forest-700" />
                     {SPONSORSHIP_CLAIM_LABELS[entry.claimType] ??
                       entry.claimType}
                   </span>
@@ -446,9 +455,10 @@ export default async function CompanyProfilePage({
                           href={entry.claimValue.source_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="underline"
+                          className="underline inline-flex items-center gap-0.5"
                         >
-                          View source
+                          <span>View source</span>
+                          <ExternalLink className="h-3 w-3" />
                         </a>
                       </>
                     )}
@@ -478,9 +488,10 @@ export default async function CompanyProfilePage({
               href={company.careers_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs font-medium text-ochre-700 hover:underline"
+              className="inline-flex items-center gap-1 text-xs font-medium text-ochre-700 hover:underline"
             >
-              Careers page ↗
+              <span>Careers page</span>
+              <ExternalLink className="h-3 w-3" />
             </a>
           )}
         </div>
@@ -520,12 +531,10 @@ export default async function CompanyProfilePage({
                       className="group inline-flex items-center gap-1.5 rounded text-sm font-semibold text-navy-900 hover:text-ochre-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 focus-visible:ring-offset-2"
                     >
                       <span className="group-hover:underline">{job.title}</span>
-                      <span
+                      <ExternalLink
                         aria-hidden="true"
-                        className="text-xs text-slate-400 group-hover:text-ochre-700"
-                      >
-                        ↗
-                      </span>
+                        className="h-3.5 w-3.5 text-slate-400 group-hover:text-ochre-700 transition-colors"
+                      />
                     </a>
                   ) : (
                     <span className="text-sm font-semibold text-navy-900">

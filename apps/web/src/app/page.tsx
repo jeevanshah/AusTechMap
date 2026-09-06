@@ -1,5 +1,4 @@
-/* Hallmark · macrostructure: map-diagram · theme: National Registry · system: DESIGN.md */
-
+import Image from "next/image";
 import type { MapCompanyPoint } from "@austechmap/contracts";
 
 import { AnimatedCounter } from "../components/ui/AnimatedCounter";
@@ -109,13 +108,25 @@ export default async function Home() {
       </a>
 
       <header className="flex items-center justify-between border-b border-surface-border pb-5">
-        <div className="flex items-center gap-2.5">
-          <span className="flex h-7 w-7 items-center justify-center rounded bg-navy-900 text-white font-mono text-xs font-bold shadow-2xs">
-            AU
-          </span>
-          <span className="font-heading text-sm font-semibold tracking-wider text-navy-900 uppercase">
-            Australia Tech Map
-          </span>
+        <div className="flex items-center gap-3">
+          <div className="relative h-9 w-9 overflow-hidden rounded-lg border border-slate-200/90 shadow-2xs bg-white">
+            <Image
+              src="/brand/logo.jpg"
+              alt="Australia Tech Map Logo"
+              width={36}
+              height={36}
+              className="h-full w-full object-cover"
+              priority
+            />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-heading text-sm font-bold tracking-wider text-navy-900 uppercase leading-none">
+              Australia Tech Map
+            </span>
+            <span className="font-mono text-[10px] text-slate-500 uppercase tracking-wider mt-1">
+              National Tech Opportunity Registry
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-50/80 px-3 py-1 text-xs font-medium text-emerald-800 shadow-2xs">
           <span className="relative flex h-2 w-2">
@@ -128,11 +139,20 @@ export default async function Home() {
         </div>
       </header>
 
-      <section className="relative flex flex-col gap-6 overflow-hidden rounded-2xl border border-surface-border bg-gradient-to-br from-white via-slate-50/80 to-blue-50/30 p-6 sm:p-8 shadow-2xs">
+      <section className="relative flex flex-col gap-6 overflow-hidden rounded-2xl border border-surface-border bg-gradient-to-br from-white via-slate-50/90 to-blue-50/40 p-6 sm:p-8 shadow-2xs">
+        {/* Layered Cartographic Topography Blueprint Art */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-0 opacity-[0.14] mix-blend-multiply bg-center bg-cover"
+          style={{
+            backgroundImage: "url('/brand/hero_topography.jpg')",
+          }}
+        />
+
         {/* Subtle oceanic aura in top right */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-blue-100/30 blur-3xl"
+          className="pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-blue-200/30 blur-3xl z-0"
         />
 
         <div className="relative z-10 flex flex-col gap-2">
