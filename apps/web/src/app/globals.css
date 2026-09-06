@@ -8,7 +8,7 @@
   --font-mono:
     var(--font-jetbrains-mono), "SF Mono", Menlo, Monaco, Consolas, monospace;
 
-  --color-canvas: #ffffff;
+  --color-canvas: #f8fafc;
   --color-surface: #ffffff;
   --color-surface-border: #e2e8f0;
 
@@ -64,7 +64,7 @@
 body {
   min-height: 100vh;
   margin: 0;
-  background-color: #ffffff;
+  background-color: var(--color-canvas);
   color: #0f172a;
   font-family: var(--font-sans);
 }

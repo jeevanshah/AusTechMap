@@ -129,13 +129,10 @@ export default async function Home() {
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-50/80 px-3 py-1 text-xs font-medium text-emerald-800 shadow-2xs">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-600" />
-          </span>
-          <span className="font-mono font-semibold tracking-wider uppercase text-[11px]">
-            Live Registry • Neon DB Synced
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-3 py-1 font-mono text-[11px] font-medium text-slate-700 shadow-2xs">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            Verified Registry Data
           </span>
         </div>
       </header>
@@ -144,7 +141,7 @@ export default async function Home() {
         {/* Authentic Australian Topography & Geodetic Surveyor Blueprint (Slate & Desert Ochre on Pure White) */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-0 opacity-[0.09] mix-blend-multiply bg-center bg-cover [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_92%)]"
+          className="pointer-events-none absolute inset-0 z-0 opacity-[0.12] mix-blend-multiply bg-center bg-cover [mask-image:radial-gradient(ellipse_at_center,black_65%,transparent_92%)]"
           style={{
             backgroundImage: "url('/brand/hero_cartography.jpg')",
           }}
@@ -176,14 +173,14 @@ export default async function Home() {
           </div>
         </div>
 
-        {/* Hero Stat Strip with Kinetic Number Counters */}
+        {/* Hero Stat Strip with Intentional 4-Pillar Color Theory */}
         <div className="relative z-10 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           <div className="group rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-xs p-4 shadow-2xs hover:border-slate-300 transition-all duration-150">
             <div className="flex items-center justify-between mb-3">
               <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-navy-900 border border-slate-200/80 shadow-2xs group-hover:bg-navy-900 group-hover:text-white transition-colors duration-200">
                 <Building2 className="h-4.5 w-4.5" />
               </span>
-              <span className="font-mono text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+              <span className="font-mono text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
                 Index
               </span>
             </div>
@@ -195,12 +192,12 @@ export default async function Home() {
             </span>
           </div>
 
-          <div className="group rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-xs p-4 shadow-2xs hover:border-slate-300 transition-all duration-150">
+          <div className="group rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-xs p-4 shadow-2xs hover:border-pacific-300 transition-all duration-150">
             <div className="flex items-center justify-between mb-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-navy-900 border border-slate-200/80 shadow-2xs group-hover:bg-navy-900 group-hover:text-white transition-colors duration-200">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-pacific-50 text-pacific-700 border border-pacific-200/80 shadow-2xs group-hover:bg-pacific-600 group-hover:text-white transition-colors duration-200">
                 <MapPin className="h-4.5 w-4.5" />
               </span>
-              <span className="font-mono text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+              <span className="font-mono text-[10px] font-semibold text-pacific-700 uppercase tracking-wider">
                 Coverage
               </span>
             </div>
@@ -212,12 +209,12 @@ export default async function Home() {
             </span>
           </div>
 
-          <div className="group rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-xs p-4 shadow-2xs hover:border-slate-300 transition-all duration-150">
+          <div className="group rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-xs p-4 shadow-2xs hover:border-amber-300 transition-all duration-150">
             <div className="flex items-center justify-between mb-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-navy-900 border border-slate-200/80 shadow-2xs group-hover:bg-navy-900 group-hover:text-white transition-colors duration-200">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-ochre-50 text-ochre-800 border border-amber-200/80 shadow-2xs group-hover:bg-ochre-600 group-hover:text-white transition-colors duration-200">
                 <Compass className="h-4.5 w-4.5" />
               </span>
-              <span className="font-mono text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+              <span className="font-mono text-[10px] font-semibold text-ochre-700 uppercase tracking-wider">
                 Regional
               </span>
             </div>
@@ -229,12 +226,12 @@ export default async function Home() {
             </span>
           </div>
 
-          <div className="group rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-xs p-4 shadow-2xs hover:border-slate-300 transition-all duration-150">
+          <div className="group rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-xs p-4 shadow-2xs hover:border-emerald-300 transition-all duration-150">
             <div className="flex items-center justify-between mb-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-navy-900 border border-slate-200/80 shadow-2xs group-hover:bg-navy-900 group-hover:text-white transition-colors duration-200">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-forest-50 text-forest-800 border border-emerald-200/80 shadow-2xs group-hover:bg-forest-700 group-hover:text-white transition-colors duration-200">
                 <ShieldCheck className="h-4.5 w-4.5" />
               </span>
-              <span className="font-mono text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+              <span className="font-mono text-[10px] font-semibold text-forest-700 uppercase tracking-wider">
                 Sponsors
               </span>
             </div>
