@@ -42,6 +42,15 @@
   --color-forest-700: #047857;
   --color-forest-800: #065f46;
   --color-forest-900: #064e3b;
+
+  /* Pacific Cobalt (Oceanic intelligence, map hubs, interactive focus) */
+  --color-pacific-50: #eff6ff;
+  --color-pacific-100: #dbeafe;
+  --color-pacific-500: #3b82f6;
+  --color-pacific-600: #2563eb;
+  --color-pacific-700: #1d4ed8;
+  --color-pacific-800: #1e40af;
+  --color-pacific-900: #1e3a8a;
 }
 
 :root {

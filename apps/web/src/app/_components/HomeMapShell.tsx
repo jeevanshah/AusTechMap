@@ -348,13 +348,13 @@ export function HomeMapShell({
               aria-pressed={regionalOnly}
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 ${
                 regionalOnly
-                  ? "border border-ochre-600 bg-ochre-50 text-ochre-800 font-semibold"
+                  ? "border border-amber-600 bg-amber-500 text-white font-semibold shadow-xs"
                   : "border border-surface-border bg-slate-50 text-slate-700 hover:bg-slate-100"
               }`}
             >
               <span
                 className={`h-2 w-2 rounded-full ${
-                  regionalOnly ? "bg-ochre-600" : "bg-amber-500"
+                  regionalOnly ? "bg-white" : "bg-amber-500"
                 }`}
               />
               Regional hubs only
@@ -485,7 +485,7 @@ export function HomeMapShell({
 
       {/* 3. Docked Detail Panel (when a company is selected) */}
       {selectedEntry && (
-        <div className="rounded-xl border border-ochre-600/40 bg-white p-5 shadow-md">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-md ring-1 ring-slate-900/5">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="flex flex-col gap-1">
               <div className="flex flex-wrap items-center gap-2">
@@ -620,8 +620,8 @@ export function HomeMapShell({
                           aria-pressed={isSelected}
                           className={`w-full rounded-lg border px-3.5 py-3 text-left text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 focus-visible:ring-offset-2 transition-colors duration-150 motion-reduce:transition-none ${
                             isSelected
-                              ? "border-ochre-600 bg-ochre-50/60 shadow-xs ring-1 ring-ochre-600"
-                              : "border-surface-border bg-white hover:border-slate-300 hover:bg-slate-50/50"
+                              ? "border-navy-900 bg-slate-50/90 shadow-xs ring-1 ring-navy-900/20"
+                              : "border-surface-border bg-white hover:border-slate-300 hover:bg-slate-50/60"
                           }`}
                         >
                           <span className="font-heading font-semibold text-navy-900 block truncate">
@@ -782,7 +782,7 @@ export function HomeMapShell({
               key={hub.city}
               type="button"
               onClick={() => handleSelectHub(hub)}
-              className="flex flex-col justify-between rounded-xl border border-surface-border bg-white p-4 text-left shadow-2xs hover:border-ochre-600 hover:bg-ochre-50/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 transition-colors duration-150 motion-reduce:transition-none group"
+              className="flex flex-col justify-between rounded-xl border border-surface-border bg-white p-4 text-left shadow-2xs hover:border-navy-900 hover:bg-slate-50/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 transition-colors duration-150 motion-reduce:transition-none group"
             >
               <div>
                 <div className="flex items-center justify-between">

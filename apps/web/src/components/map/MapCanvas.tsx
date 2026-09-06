@@ -121,11 +121,35 @@ export function MapCanvas({
         source: SOURCE_ID,
         filter: ["has", "point_count"],
         paint: {
-          "circle-color": "#d97706",
-          "circle-stroke-color": "#b45309",
+          "circle-color": [
+            "step",
+            ["get", "point_count"],
+            "#8b5cf6", // 1-4: Purple / Violet (Darwin, Hobart)
+            5,
+            "#10b981", // 5-9: Emerald Green (Adelaide, Canberra, Wollongong, Newcastle)
+            10,
+            "#2563eb", // 10-19: Cobalt Blue (Brisbane, Perth)
+            20,
+            "#f97316", // 20-39: Sunset Orange (Melbourne)
+            40,
+            "#ef4444", // 40+: Crimson Red (Sydney)
+          ],
+          "circle-stroke-color": "#ffffff",
           "circle-stroke-width": 2,
-          "circle-radius": ["step", ["get", "point_count"], 16, 10, 22, 50, 28],
-          "circle-opacity": 0.92,
+          "circle-radius": [
+            "step",
+            ["get", "point_count"],
+            16,
+            5,
+            20,
+            10,
+            24,
+            20,
+            28,
+            40,
+            32,
+          ],
+          "circle-opacity": 0.95,
         },
       });
       map.addLayer({
@@ -142,8 +166,8 @@ export function MapCanvas({
         source: SOURCE_ID,
         filter: ["!", ["has", "point_count"]],
         paint: {
-          "circle-color": "#0f172a",
-          "circle-radius": 7,
+          "circle-color": "#2563eb",
+          "circle-radius": 6.5,
           "circle-stroke-width": 2,
           "circle-stroke-color": "#ffffff",
         },
@@ -272,5 +296,36 @@ export function MapCanvas({
     });
   }, [cameraTarget]);
 
-  return <div ref={containerRef} className="h-full w-full" />;
+  return (
+    <div className="relative h-full w-full">
+      <div ref={containerRef} className="h-full w-full" />
+
+      {/* Hub Density Color Legend */}
+      <div className="pointer-events-none absolute top-3 left-3 z-10 hidden sm:flex flex-col gap-1 rounded-lg border border-surface-border/90 bg-white/95 px-2.5 py-2 font-mono text-[11px] shadow-xs backdrop-blur-xs">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          Hub Density
+        </span>
+        <div className="flex items-center gap-1.5 text-slate-700">
+          <span className="h-2 w-2 rounded-full bg-[#ef4444]" />
+          <span>40+ companies</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-slate-700">
+          <span className="h-2 w-2 rounded-full bg-[#f97316]" />
+          <span>20–39 companies</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-slate-700">
+          <span className="h-2 w-2 rounded-full bg-[#2563eb]" />
+          <span>10–19 companies</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-slate-700">
+          <span className="h-2 w-2 rounded-full bg-[#10b981]" />
+          <span>5–9 companies</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-slate-700">
+          <span className="h-2 w-2 rounded-full bg-[#8b5cf6]" />
+          <span>1–4 companies</span>
+        </div>
+      </div>
+    </div>
+  );
 }

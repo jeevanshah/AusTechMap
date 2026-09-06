@@ -121,11 +121,20 @@ export default async function Home() {
         </span>
       </header>
 
-      <section className="flex flex-col gap-6">
-        <div className="flex flex-col gap-2">
-          <p className="font-mono text-xs font-semibold tracking-wider text-ochre-700 uppercase">
-            Australian Technology Opportunity Intelligence
-          </p>
+      <section className="relative flex flex-col gap-6 overflow-hidden rounded-2xl border border-surface-border bg-gradient-to-br from-white via-slate-50/80 to-blue-50/30 p-6 sm:p-8 shadow-2xs">
+        {/* Subtle oceanic aura in top right */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-blue-100/30 blur-3xl"
+        />
+
+        <div className="relative z-10 flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-ochre-600" />
+            <p className="font-mono text-xs font-semibold tracking-wider text-ochre-700 uppercase">
+              Australian Technology Opportunity Intelligence
+            </p>
+          </div>
           <h1 className="max-w-4xl font-heading text-4xl leading-[1.08] font-bold tracking-tight text-navy-900 sm:text-5xl text-balance">
             Explore Australia’s tech landscape.
           </h1>
@@ -137,8 +146,8 @@ export default async function Home() {
         </div>
 
         {/* Hero Stat Strip */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-          <div className="rounded-xl border border-surface-border bg-white p-4 shadow-2xs">
+        <div className="relative z-10 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+          <div className="rounded-xl border border-surface-border/90 bg-white/95 p-4 shadow-2xs hover:border-slate-300 transition-colors">
             <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
               {stats.totalEmployers}
             </span>
@@ -146,7 +155,7 @@ export default async function Home() {
               verified employers
             </span>
           </div>
-          <div className="rounded-xl border border-surface-border bg-white p-4 shadow-2xs">
+          <div className="rounded-xl border border-surface-border/90 bg-white/95 p-4 shadow-2xs hover:border-slate-300 transition-colors">
             <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
               {stats.totalCities}
             </span>
@@ -154,7 +163,7 @@ export default async function Home() {
               cities &amp; regions
             </span>
           </div>
-          <div className="rounded-xl border border-surface-border bg-white p-4 shadow-2xs">
+          <div className="rounded-xl border border-surface-border/90 bg-white/95 p-4 shadow-2xs hover:border-slate-300 transition-colors">
             <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
               {stats.regionalEmployers}
             </span>
@@ -162,7 +171,7 @@ export default async function Home() {
               regional employers
             </span>
           </div>
-          <div className="rounded-xl border border-surface-border bg-white p-4 shadow-2xs">
+          <div className="rounded-xl border border-surface-border/90 bg-white/95 p-4 shadow-2xs hover:border-slate-300 transition-colors">
             <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
               {stats.sponsorshipEmployers}
             </span>

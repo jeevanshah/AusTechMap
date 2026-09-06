@@ -46,22 +46,37 @@ Locked design system. All coding agents (Claude, Codex, Gemini) and Hallmark run
   --color-forest-700: #047857; /* Shield check icon */
   --color-forest-800: #065f46; /* Trust badge text */
   --color-forest-900: #064e3b; /* Evidence headline */
+
+  /* Pacific Cobalt (Oceanic intelligence, individual map pins, interactive focus) */
+  --color-pacific-50: #eff6ff;
+  --color-pacific-100: #dbeafe;
+  --color-pacific-500: #3b82f6;
+  --color-pacific-600: #2563eb;
+  --color-pacific-700: #1d4ed8;
 }
 ```
 
-## Anti-Slop Quality Gates (Hallmark 57-Gate Adaptation)
+## Anti-Slop Quality Gates (Hallmark & Colorize Adaptation)
 
 1. **No Invented Numbers or Social Proof**: Never display placeholder counts, fake testimonials, or fictional metrics. Real indexed data only (`{count} verified Australian tech employers indexed`).
-2. **No Generic Single-Hue Palettes**: Strict multi-token hierarchy (Navy chrome + Ochre accent + Forest trust). Never tint an entire application with varying opacities of one brand color.
+2. **60-30-10 Color Architecture (Colorize)**:
+   - **60% Ground**: Clean `#F8FAFC` canvas and `#FFFFFF` cards. No dull yellow-cream or muddy sepia paper.
+   - **30% Structural Ink**: Deep Navy `#0F172A` and Slate `#475569` for confident readability.
+   - **10% Purposeful Semantics**: Cobalt `#2563eb` for pins, Forest `#065F46` for trust, and multi-tier density on the map.
 3. **No Decorative Numbered Steps**: Do not use `01 / 02 / 03` markers unless the UI represents a genuine chronological workflow.
 4. **No Single-Word Gradient or Italic Accents**: Do not isolate single words in a headline with different colors or italicization.
 5. **No Pastel Icon Circles**: Icons are functional glyphs (e.g. `ShieldCheckIcon` for visa evidence), not emojis centered inside pastel circles.
-6. **Provenance Over Blankness ("Empty Husk" rule)**: When data is sparse (e.g. a company with no active jobs or sponsorship evidence), render an official registry metadata strip (`STATUS`, `DOMAIN`, `REGISTERED`, `VERIFIED`) and honest disclosure states rather than an empty box or vague coming-soon placeholder.
-7. **Accessibility & Contrast**: All body text and labels must maintain WCAG AA contrast (minimum 4.5:1 for normal text) against `#f8fafc` and `#ffffff`. Never use washed-out 50% opacity gray text.
-8. **Restrained Motion**: Micro-interactions are responsive only (button clicks, filter toggles, map zooms). No unprompted entrance fades or auto-sliding cards.
+6. **Provenance Over Blankness ("Empty Husk" rule)**: When data is sparse, render an official registry metadata strip (`STATUS`, `DOMAIN`, `REGISTERED`, `VERIFIED`) and honest disclosure states.
+7. **Accessibility & Contrast**: All body text and labels must maintain WCAG AA contrast (minimum 4.5:1 for normal text) against `#f8fafc` and `#ffffff`.
+8. **Restrained Motion**: Micro-interactions are responsive only (button clicks, filter toggles, map zooms).
 
 ## Map Conventions (`MapCanvas.tsx`)
 
-- **Map Clusters**: Filled with Australian Ochre `#d97706` with stroke `#b45309` and bold white count text.
-- **Unclustered Pins**: Filled with Deep Navy `#0f172a` with a clean 2px `#ffffff` stroke.
+- **Multi-Tier Density Clusters**:
+  - `40+ companies`: Crimson Red `#ef4444` (Major tech centers: Sydney)
+  - `20–39 companies`: Sunset Orange `#f97316` (Large tech hubs: Melbourne)
+  - `10–19 companies`: Cobalt Blue `#2563eb` (Established hubs: Brisbane, Perth)
+  - `5–9 companies`: Emerald Green `#10b981` (Emerging hubs: Adelaide, Canberra, Wollongong, Newcastle)
+  - `1–4 companies`: Vibrant Violet `#8b5cf6` (Regional clusters: Darwin, Hobart)
+- **Unclustered Pins**: Filled with Pacific Cobalt `#2563eb` with a crisp 2px white `#ffffff` stroke.
 - **Interactions**: Smart click-to-zoom using `getClusterExpansionZoom`, plus navigation zoom controls.
