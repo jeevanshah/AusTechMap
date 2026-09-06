@@ -2,6 +2,7 @@
 
 import type { MapCompanyPoint } from "@austechmap/contracts";
 
+import { AnimatedCounter } from "../components/ui/AnimatedCounter";
 import { HomeMapShell } from "./_components/HomeMapShell";
 import { DatabaseNotConfiguredError, getPool } from "../lib/db";
 import { fetchMapCompanies } from "../lib/queries/mapCompanies";
@@ -116,9 +117,15 @@ export default async function Home() {
             Australia Tech Map
           </span>
         </div>
-        <span className="rounded bg-slate-100 px-2.5 py-1 font-mono text-xs font-medium text-slate-600 border border-surface-border">
-          National Registry
-        </span>
+        <div className="flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-50/80 px-3 py-1 text-xs font-medium text-emerald-800 shadow-2xs">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-600" />
+          </span>
+          <span className="font-mono font-semibold tracking-wider uppercase text-[11px]">
+            Live Registry • Neon DB Synced
+          </span>
+        </div>
       </header>
 
       <section className="relative flex flex-col gap-6 overflow-hidden rounded-2xl border border-surface-border bg-gradient-to-br from-white via-slate-50/80 to-blue-50/30 p-6 sm:p-8 shadow-2xs">
@@ -143,14 +150,23 @@ export default async function Home() {
             sponsorship evidence — from Sydney and Melbourne to Australia&apos;s
             regional tech hubs.
           </p>
+          <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-slate-500">
+            <span className="inline-flex items-center gap-1 rounded bg-white px-2 py-0.5 font-mono text-[11px] text-slate-600 border border-slate-200 shadow-2xs">
+              <kbd className="font-semibold text-navy-900">⌘K</kbd> or{" "}
+              <kbd className="font-semibold text-navy-900">Ctrl+K</kbd> to
+              search
+            </span>
+            <span>•</span>
+            <span>Click any regional hub to fly &amp; filter</span>
+          </div>
         </div>
 
-        {/* Hero Stat Strip */}
+        {/* Hero Stat Strip with Kinetic Number Counters */}
         <div className="relative z-10 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
             <div className="h-1 w-8 rounded-full bg-navy-900 mb-3 group-hover:w-12 transition-all duration-200" />
             <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
-              {stats.totalEmployers}
+              <AnimatedCounter target={stats.totalEmployers} />
             </span>
             <span className="mt-1 block font-mono text-xs text-slate-500 font-medium">
               verified employers
@@ -159,7 +175,7 @@ export default async function Home() {
           <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
             <div className="h-1 w-8 rounded-full bg-pacific-600 mb-3 group-hover:w-12 transition-all duration-200" />
             <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
-              {stats.totalCities}
+              <AnimatedCounter target={stats.totalCities} />
             </span>
             <span className="mt-1 block font-mono text-xs text-slate-500 font-medium">
               cities &amp; regions
@@ -168,7 +184,7 @@ export default async function Home() {
           <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
             <div className="h-1 w-8 rounded-full bg-amber-500 mb-3 group-hover:w-12 transition-all duration-200" />
             <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
-              {stats.regionalEmployers}
+              <AnimatedCounter target={stats.regionalEmployers} />
             </span>
             <span className="mt-1 block font-mono text-xs text-slate-500 font-medium">
               regional employers
@@ -177,7 +193,7 @@ export default async function Home() {
           <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
             <div className="h-1 w-8 rounded-full bg-forest-600 mb-3 group-hover:w-12 transition-all duration-200" />
             <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
-              {stats.sponsorshipEmployers}
+              <AnimatedCounter target={stats.sponsorshipEmployers} />
             </span>
             <span className="mt-1 block font-mono text-xs text-slate-500 font-medium">
               with sponsorship evidence
