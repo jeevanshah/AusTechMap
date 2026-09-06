@@ -147,7 +147,8 @@ export default async function Home() {
 
         {/* Hero Stat Strip */}
         <div className="relative z-10 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-          <div className="rounded-xl border border-surface-border/90 bg-white/95 p-4 shadow-2xs hover:border-slate-300 transition-colors">
+          <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
+            <div className="h-1 w-8 rounded-full bg-navy-900 mb-3 group-hover:w-12 transition-all duration-200" />
             <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
               {stats.totalEmployers}
             </span>
@@ -155,7 +156,8 @@ export default async function Home() {
               verified employers
             </span>
           </div>
-          <div className="rounded-xl border border-surface-border/90 bg-white/95 p-4 shadow-2xs hover:border-slate-300 transition-colors">
+          <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
+            <div className="h-1 w-8 rounded-full bg-pacific-600 mb-3 group-hover:w-12 transition-all duration-200" />
             <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
               {stats.totalCities}
             </span>
@@ -163,7 +165,8 @@ export default async function Home() {
               cities &amp; regions
             </span>
           </div>
-          <div className="rounded-xl border border-surface-border/90 bg-white/95 p-4 shadow-2xs hover:border-slate-300 transition-colors">
+          <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
+            <div className="h-1 w-8 rounded-full bg-amber-500 mb-3 group-hover:w-12 transition-all duration-200" />
             <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
               {stats.regionalEmployers}
             </span>
@@ -171,7 +174,8 @@ export default async function Home() {
               regional employers
             </span>
           </div>
-          <div className="rounded-xl border border-surface-border/90 bg-white/95 p-4 shadow-2xs hover:border-slate-300 transition-colors">
+          <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
+            <div className="h-1 w-8 rounded-full bg-forest-600 mb-3 group-hover:w-12 transition-all duration-200" />
             <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
               {stats.sponsorshipEmployers}
             </span>

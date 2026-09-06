@@ -42,6 +42,7 @@ const REGIONAL_HUBS = [
     center: [153.0251, -27.4698] as [number, number],
     zoom: 11,
     tag: "Subtropical Enterprise Hub",
+    accentGradient: "from-sky-500 to-blue-600",
   },
   {
     city: "Perth",
@@ -50,6 +51,7 @@ const REGIONAL_HUBS = [
     center: [115.8605, -31.9505] as [number, number],
     zoom: 11,
     tag: "Resources & Autonomous Systems",
+    accentGradient: "from-amber-500 to-orange-600",
   },
   {
     city: "Adelaide",
@@ -58,6 +60,7 @@ const REGIONAL_HUBS = [
     center: [138.6007, -34.9285] as [number, number],
     zoom: 11,
     tag: "Defence, Space & Machine Learning",
+    accentGradient: "from-emerald-500 to-teal-700",
   },
   {
     city: "Canberra",
@@ -66,6 +69,7 @@ const REGIONAL_HUBS = [
     center: [149.13, -35.2809] as [number, number],
     zoom: 11,
     tag: "GovTech, Cyber & National Security",
+    accentGradient: "from-slate-700 to-navy-900",
   },
   {
     city: "Wollongong",
@@ -74,6 +78,7 @@ const REGIONAL_HUBS = [
     center: [150.8931, -34.4278] as [number, number],
     zoom: 12,
     tag: "Illawarra Innovation Corridor",
+    accentGradient: "from-cyan-500 to-blue-600",
   },
   {
     city: "Newcastle",
@@ -82,6 +87,7 @@ const REGIONAL_HUBS = [
     center: [151.7817, -32.9283] as [number, number],
     zoom: 12,
     tag: "CleanTech & Industrial Software",
+    accentGradient: "from-teal-500 to-emerald-600",
   },
   {
     city: "Darwin",
@@ -90,6 +96,7 @@ const REGIONAL_HUBS = [
     center: [130.8456, -12.4634] as [number, number],
     zoom: 12,
     tag: "Tropical Gateway & Communications",
+    accentGradient: "from-orange-500 to-rose-600",
   },
   {
     city: "Hobart",
@@ -98,6 +105,7 @@ const REGIONAL_HUBS = [
     center: [147.3272, -42.8821] as [number, number],
     zoom: 12,
     tag: "Antarctic, Marine & AgriTech",
+    accentGradient: "from-violet-500 to-indigo-700",
   },
 ];
 
@@ -782,11 +790,16 @@ export function HomeMapShell({
               key={hub.city}
               type="button"
               onClick={() => handleSelectHub(hub)}
-              className="flex flex-col justify-between rounded-xl border border-surface-border bg-white p-4 text-left shadow-2xs hover:border-navy-900 hover:bg-slate-50/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 transition-colors duration-150 motion-reduce:transition-none group"
+              className="relative flex flex-col justify-between overflow-hidden rounded-xl border border-slate-200/90 bg-white p-4 text-left shadow-2xs hover:border-slate-300 hover:-translate-y-1 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 transition-all duration-200 motion-reduce:transition-none group"
             >
-              <div>
+              {/* Vibrant Top Geographic Accent Bar */}
+              <div
+                className={`absolute top-0 inset-x-0 h-1 bg-gradient-to-r ${hub.accentGradient} opacity-80 group-hover:opacity-100 group-hover:h-1.5 transition-all duration-200`}
+              />
+
+              <div className="pt-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-heading text-base font-bold text-navy-900 group-hover:text-ochre-800">
+                  <span className="font-heading text-base font-bold text-navy-900 group-hover:text-pacific-700 transition-colors">
                     {hub.city}
                   </span>
                   <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-slate-600 uppercase">
@@ -798,14 +811,14 @@ export function HomeMapShell({
                 </p>
               </div>
 
-              <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2 font-mono text-xs text-slate-600">
+              <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-2.5 font-mono text-xs text-slate-600">
                 <span>
                   <strong className="font-semibold text-navy-900 tabular-nums">
                     {hub.count}
                   </strong>{" "}
                   employers
                 </span>
-                <span className="text-ochre-700 font-bold group-hover:translate-x-0.5 transition-transform duration-150">
+                <span className="text-pacific-600 font-bold group-hover:translate-x-1 transition-transform duration-200">
                   ↗
                 </span>
               </div>
