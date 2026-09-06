@@ -507,7 +507,9 @@ function CategoryBadge({
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-slate-50 px-2.5 py-0.5 text-[11px] font-medium text-slate-700 shadow-2xs">
       {iconPath && (
-        <span className={`relative inline-block ${sizeClasses} shrink-0 overflow-hidden rounded-full`}>
+        <span
+          className={`relative inline-block ${sizeClasses} shrink-0 overflow-hidden rounded-full`}
+        >
           <Image
             src={iconPath}
             alt={`${category} icon`}
@@ -526,9 +528,21 @@ const QUICK_SECTORS = [
   { key: "ai-ml", label: "AI & Data", icon: "/assets/categories/ai_data.png" },
   { key: "fintech", label: "FinTech", icon: "/assets/categories/fintech.png" },
   { key: "saas", label: "SaaS", icon: "/assets/categories/saas.png" },
-  { key: "climate-tech", label: "ClimateTech", icon: "/assets/categories/climatetech.png" },
-  { key: "healthtech", label: "HealthTech", icon: "/assets/categories/healthtech.png" },
-  { key: "space", label: "Space & Defence", icon: "/assets/categories/space_defence.png" },
+  {
+    key: "climate-tech",
+    label: "ClimateTech",
+    icon: "/assets/categories/climatetech.png",
+  },
+  {
+    key: "healthtech",
+    label: "HealthTech",
+    icon: "/assets/categories/healthtech.png",
+  },
+  {
+    key: "space",
+    label: "Space & Defence",
+    icon: "/assets/categories/space_defence.png",
+  },
   { key: "agritech", label: "AgTech", icon: "/assets/categories/agtech.png" },
   { key: "govtech", label: "GovTech", icon: "/assets/categories/govtech.png" },
 ];
@@ -603,7 +617,10 @@ export function HomeMapShell({
       });
     }
     return Object.entries(HUB_METADATA)
-      .filter(([city]) => city !== "Sydney" && city !== "Melbourne" && city !== "Brisbane")
+      .filter(
+        ([city]) =>
+          city !== "Sydney" && city !== "Melbourne" && city !== "Brisbane",
+      )
       .map(([city, meta]) => ({
         city,
         state: meta.state,
@@ -759,7 +776,8 @@ export function HomeMapShell({
     const categoryParam = selectedCategory
       ? `&category=${encodeURIComponent(selectedCategory)}`
       : "";
-    const isSponsorshipActive = sponsorshipOnly || activeDirectoryTab === "sponsors";
+    const isSponsorshipActive =
+      sponsorshipOnly || activeDirectoryTab === "sponsors";
     const sponsorshipParam = isSponsorshipActive ? "&sponsorship=true" : "";
     const regionalParam = regionalOnly ? "&regional=true" : "";
     fetch(
@@ -772,11 +790,20 @@ export function HomeMapShell({
       .catch(() => {
         /* keep showing the last-known points rather than clearing the map */
       });
-  }, [currentBbox, currentZoom, selectedCategory, sponsorshipOnly, activeDirectoryTab, regionalOnly]);
+  }, [
+    currentBbox,
+    currentZoom,
+    selectedCategory,
+    sponsorshipOnly,
+    activeDirectoryTab,
+    regionalOnly,
+  ]);
 
   const handlePointClick = useCallback((slug: string) => {
     setSelectedSlug(slug);
-    setActiveDirectoryTab((prevTab) => (prevTab === "regions" ? "companies" : prevTab));
+    setActiveDirectoryTab((prevTab) =>
+      prevTab === "regions" ? "companies" : prevTab,
+    );
     trackEvent("map_company_clicked", { slug });
 
     setTimeout(() => {
@@ -952,7 +979,9 @@ export function HomeMapShell({
               }}
               className="text-xs font-semibold text-navy-900 bg-transparent focus:outline-none cursor-pointer py-1"
             >
-              <option value="">All regional hubs ({displayedHubs.length})</option>
+              <option value="">
+                All regional hubs ({displayedHubs.length})
+              </option>
               {displayedHubs.map((hub) => (
                 <option key={hub.city} value={hub.city}>
                   {hub.city}, {hub.state} ({hub.count})
@@ -1137,7 +1166,8 @@ export function HomeMapShell({
                           <>
                             <span className="text-slate-300">•</span>
                             <span className="font-mono text-[11px] text-slate-400">
-                              {Math.abs(pt.lat).toFixed(2)}° S, {Math.abs(pt.lng).toFixed(2)}° E
+                              {Math.abs(pt.lat).toFixed(2)}° S,{" "}
+                              {Math.abs(pt.lng).toFixed(2)}° E
                             </span>
                           </>
                         )}
@@ -1191,7 +1221,9 @@ export function HomeMapShell({
                   {/* Card 3: Visa Sponsorship Status */}
                   <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-slate-50 p-3 transition-colors hover:border-slate-300 shadow-2xs">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
-                      <Award className={`h-4 w-4 ${selectedEntry.hasSponsorshipEvidence ? "text-terracotta-700" : "text-slate-400"}`} />
+                      <Award
+                        className={`h-4 w-4 ${selectedEntry.hasSponsorshipEvidence ? "text-terracotta-700" : "text-slate-400"}`}
+                      />
                     </div>
                     <div className="min-w-0">
                       <span className="block font-heading text-xs font-bold text-navy-900">
@@ -1199,11 +1231,13 @@ export function HomeMapShell({
                           ? "482 Visa Sponsor"
                           : "Visa Sponsorship"}
                       </span>
-                      <span className={`block text-[11px] font-medium truncate ${
-                        selectedEntry.hasSponsorshipEvidence
-                          ? "text-navy-900 font-semibold"
-                          : "text-slate-500"
-                      }`}>
+                      <span
+                        className={`block text-[11px] font-medium truncate ${
+                          selectedEntry.hasSponsorshipEvidence
+                            ? "text-navy-900 font-semibold"
+                            : "text-slate-500"
+                        }`}
+                      >
                         {selectedEntry.hasSponsorshipEvidence
                           ? "Substantiated on File"
                           : "No 482 Record on File"}
@@ -1301,7 +1335,8 @@ export function HomeMapShell({
                 </span>
               </div>
               <span className="font-mono text-[11px] font-medium text-slate-600 shrink-0">
-                {listEntries.length} {listEntries.length === 1 ? "employer" : "employers"}
+                {listEntries.length}{" "}
+                {listEntries.length === 1 ? "employer" : "employers"}
               </span>
             </div>
           )}
@@ -1408,7 +1443,9 @@ export function HomeMapShell({
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                        {displayedHubs.length} designated regional tech hubs across Australia. Click any hub to explore local employers.
+                        {displayedHubs.length} designated regional tech hubs
+                        across Australia. Click any hub to explore local
+                        employers.
                       </p>
                     </div>
                   </div>
@@ -1545,12 +1582,17 @@ export function HomeMapShell({
                           <div className="flex items-center gap-1.5 text-xs text-slate-600 mt-1">
                             <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                             <span className="truncate">
-                              {entry.city ? `${entry.city}, Australia` : "Australia"}
+                              {entry.city
+                                ? `${entry.city}, Australia`
+                                : "Australia"}
                             </span>
                             {entry.primaryCategory && (
                               <>
                                 <span className="text-slate-300">•</span>
-                                <CategoryBadge category={entry.primaryCategory} size="sm" />
+                                <CategoryBadge
+                                  category={entry.primaryCategory}
+                                  size="sm"
+                                />
                               </>
                             )}
                           </div>
@@ -1588,7 +1630,6 @@ export function HomeMapShell({
               onPointClick={handlePointClick}
             />
 
-
             {/* Top-Right Floating Zoom & Recenter Controls */}
             <div className="absolute top-3.5 right-3.5 z-10 flex flex-col items-center rounded-xl border border-surface-border bg-white/95 backdrop-blur-xs p-1 shadow-xs">
               <button
@@ -1621,35 +1662,36 @@ export function HomeMapShell({
             </div>
 
             {/* Bottom-Left Floating Hub Spotlight Card */}
-            {displayedHubs.length > 0 && (() => {
-              const spotlightHub = displayedHubs[0]!;
-              return (
-                <div
-                  onClick={() => handleSelectHub(spotlightHub)}
-                  className="absolute bottom-3 left-3 sm:left-4 z-10 flex items-center gap-3 rounded-xl border border-surface-border bg-white/95 backdrop-blur-xs p-2.5 shadow-md hover:border-terracotta-700/60 transition-all cursor-pointer group max-w-xs"
-                >
-                  <div className="relative h-10 w-12 rounded-lg bg-navy-900 text-white flex items-center justify-center font-mono font-bold text-xs uppercase overflow-hidden shrink-0">
-                    <Image
-                      src="/brand/hero_cartography.jpg"
-                      alt={`${spotlightHub.city} tech cluster`}
-                      fill
-                      className="object-cover opacity-50 mix-blend-luminosity group-hover:scale-110 transition-transform"
-                    />
-                    <span className="relative z-10">{spotlightHub.city.slice(0, 3).toUpperCase()}</span>
+            {displayedHubs.length > 0 &&
+              (() => {
+                const spotlightHub = displayedHubs[0]!;
+                return (
+                  <div
+                    onClick={() => handleSelectHub(spotlightHub)}
+                    className="absolute bottom-3 left-3 sm:left-4 z-10 flex items-center gap-3 rounded-xl border border-surface-border bg-white/95 backdrop-blur-xs p-2.5 shadow-md hover:border-terracotta-700/60 transition-all cursor-pointer group max-w-xs"
+                  >
+                    <div className="relative h-10 w-12 rounded-lg bg-navy-900 text-white flex items-center justify-center font-mono font-bold text-xs uppercase overflow-hidden shrink-0">
+                      <Image
+                        src="/brand/hero_cartography.jpg"
+                        alt={`${spotlightHub.city} tech cluster`}
+                        fill
+                        className="object-cover opacity-50 mix-blend-luminosity group-hover:scale-110 transition-transform"
+                      />
+                      <span className="relative z-10">
+                        {spotlightHub.city.slice(0, 3).toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="font-heading text-xs font-bold text-navy-900 group-hover:text-terracotta-700 transition-colors truncate">
+                        {spotlightHub.city} Regional Hub
+                      </span>
+                      <span className="font-mono text-[10px] text-slate-500">
+                        {spotlightHub.count} verified employers &gt;
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-heading text-xs font-bold text-navy-900 group-hover:text-terracotta-700 transition-colors truncate">
-                      {spotlightHub.city} Regional Hub
-                    </span>
-                    <span className="font-mono text-[10px] text-slate-500">
-                      {spotlightHub.count} verified employers &gt;
-                    </span>
-                  </div>
-                </div>
-              );
-            })()}
-
-
+                );
+              })()}
           </div>
         </div>
       </div>
