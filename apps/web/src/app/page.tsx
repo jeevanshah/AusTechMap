@@ -153,9 +153,9 @@ export default async function Home() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-surface-border bg-white px-3 py-1 font-mono text-[11px] font-medium text-slate-700 shadow-2xs">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            Verified Registry
+          <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/80 px-3 py-1 font-mono text-[11px] font-semibold text-emerald-900 shadow-2xs">
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
+            Verified National Registry
           </span>
           <a
             href="https://github.com/jeevanshah/AusTechMap"
@@ -173,7 +173,7 @@ export default async function Home() {
         {/* Subtle Topographical Surveyor Texture */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-0 opacity-[0.07] mix-blend-multiply bg-center bg-cover [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_95%)]"
+          className="pointer-events-none absolute inset-0 z-0 opacity-[0.09] mix-blend-multiply bg-center bg-cover [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_95%)]"
           style={{
             backgroundImage: "url('/brand/hero_cartography.jpg')",
           }}
@@ -187,6 +187,15 @@ export default async function Home() {
               <p className="font-mono text-xs font-bold tracking-wider text-terracotta-700 uppercase">
                 Explore Australia’s Tech Ecosystem
               </p>
+              <div className="relative hidden md:inline-block h-5 w-24 overflow-hidden mix-blend-multiply opacity-80">
+                <Image
+                  src="/assets/annotations/cities_to_regions.png"
+                  alt="From cities to regions"
+                  width={96}
+                  height={20}
+                  className="h-full w-full object-contain"
+                />
+              </div>
             </div>
             <h1 className="font-heading text-3xl font-extrabold tracking-tight text-navy-900 sm:text-4xl text-balance">
               See where opportunity lives.

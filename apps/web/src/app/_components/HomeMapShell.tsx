@@ -409,6 +409,141 @@ function CompanyBrandMark({
   );
 }
 
+export function getCategoryIconPath(
+  category: string | null | undefined,
+): string | null {
+  if (!category) return null;
+  const lower = category.toLowerCase().trim();
+  if (
+    lower.includes("fintech") ||
+    lower.includes("payment") ||
+    lower.includes("bank") ||
+    lower.includes("insurtech")
+  ) {
+    return "/assets/categories/fintech.png";
+  }
+  if (
+    lower.includes("health") ||
+    lower.includes("medtech") ||
+    lower.includes("biotech")
+  ) {
+    return "/assets/categories/healthtech.png";
+  }
+  if (
+    lower.includes("climate") ||
+    lower.includes("renew") ||
+    lower.includes("environ")
+  ) {
+    return "/assets/categories/climatetech.png";
+  }
+  if (
+    lower.includes("energy") ||
+    lower.includes("solar") ||
+    lower.includes("wind") ||
+    lower.includes("clean")
+  ) {
+    return "/assets/categories/clean_energy.png";
+  }
+  if (
+    lower.includes("space") ||
+    lower.includes("defence") ||
+    lower.includes("defense") ||
+    lower.includes("aerospace")
+  ) {
+    return "/assets/categories/space_defence.png";
+  }
+  if (
+    lower.includes("govtech") ||
+    lower.includes("government") ||
+    lower.includes("civic")
+  ) {
+    return "/assets/categories/govtech.png";
+  }
+  if (
+    lower.includes("ai") ||
+    lower.includes("data") ||
+    lower.includes("machine learning") ||
+    lower.includes("ml")
+  ) {
+    return "/assets/categories/ai_data.png";
+  }
+  if (
+    lower.includes("agtech") ||
+    lower.includes("agri") ||
+    lower.includes("farm")
+  ) {
+    return "/assets/categories/agtech.png";
+  }
+  if (
+    lower.includes("saas") ||
+    lower.includes("cloud") ||
+    lower.includes("enterprise") ||
+    lower.includes("devops") ||
+    lower.includes("developer")
+  ) {
+    return "/assets/categories/saas.png";
+  }
+  if (
+    lower.includes("deep") ||
+    lower.includes("robot") ||
+    lower.includes("iot") ||
+    lower.includes("hardware")
+  ) {
+    return "/assets/categories/deeptech.png";
+  }
+  if (lower.includes("quantum")) {
+    return "/assets/categories/quantum.png";
+  }
+  if (
+    lower.includes("research") ||
+    lower.includes("science") ||
+    lower.includes("lab")
+  ) {
+    return "/assets/categories/research.png";
+  }
+  return null;
+}
+
+function CategoryBadge({
+  category,
+  size = "sm",
+}: {
+  category: string | null | undefined;
+  size?: "sm" | "md";
+}) {
+  if (!category) return null;
+  const iconPath = getCategoryIconPath(category);
+  const sizeClasses = size === "md" ? "h-4 w-4" : "h-3.5 w-3.5";
+
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-[#faf8f5] px-2.5 py-0.5 text-[11px] font-medium text-slate-700 shadow-2xs">
+      {iconPath && (
+        <span className={`relative inline-block ${sizeClasses} shrink-0 overflow-hidden rounded-full`}>
+          <Image
+            src={iconPath}
+            alt={`${category} icon`}
+            width={16}
+            height={16}
+            className="h-full w-full object-cover"
+          />
+        </span>
+      )}
+      <span className="truncate">{category}</span>
+    </span>
+  );
+}
+
+const QUICK_SECTORS = [
+  { key: "ai-ml", label: "AI & Data", icon: "/assets/categories/ai_data.png" },
+  { key: "fintech", label: "FinTech", icon: "/assets/categories/fintech.png" },
+  { key: "saas", label: "SaaS", icon: "/assets/categories/saas.png" },
+  { key: "climate-tech", label: "ClimateTech", icon: "/assets/categories/climatetech.png" },
+  { key: "healthtech", label: "HealthTech", icon: "/assets/categories/healthtech.png" },
+  { key: "space", label: "Space & Defence", icon: "/assets/categories/space_defence.png" },
+  { key: "agritech", label: "AgTech", icon: "/assets/categories/agtech.png" },
+  { key: "govtech", label: "GovTech", icon: "/assets/categories/govtech.png" },
+];
+
 function pointsToListEntries(points: MapCompanyPoint[]): ListEntry[] {
   return points.map((point) => ({
     slug: point.slug,
@@ -861,6 +996,41 @@ export function HomeMapShell({
             )}
           </div>
         </div>
+
+        {/* Quick Sector Filter Badges with bespoke illustrated icons */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pt-1 pb-0.5 border-t border-slate-100 no-scrollbar">
+          <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider shrink-0 pl-1">
+            Explore:
+          </span>
+          {QUICK_SECTORS.map((sector) => {
+            const isSelected = selectedCategory === sector.key;
+            return (
+              <button
+                key={sector.key}
+                type="button"
+                onClick={() => {
+                  setSelectedCategory(isSelected ? "" : sector.key);
+                }}
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition-all ${
+                  isSelected
+                    ? "border-navy-900 bg-navy-900 text-white shadow-2xs"
+                    : "border-slate-200/90 bg-[#faf8f5]/90 text-slate-700 hover:border-slate-300 hover:bg-white"
+                }`}
+              >
+                <span className="relative inline-block h-3.5 w-3.5 shrink-0 overflow-hidden rounded-full">
+                  <Image
+                    src={sector.icon}
+                    alt={sector.label}
+                    width={14}
+                    height={14}
+                    className="h-full w-full object-cover"
+                  />
+                </span>
+                <span>{sector.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Screen reader live region */}
@@ -895,23 +1065,25 @@ export function HomeMapShell({
                     {/* Metadata & Name */}
                     <div className="flex flex-col gap-0.5 min-w-0">
                       <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                        <span className="rounded-md bg-navy-900 px-2 py-0.5 font-mono text-[10px] font-bold text-white uppercase tracking-wider">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-[10px] font-bold text-sky-800 uppercase tracking-wider shadow-2xs">
+                          <CheckCircle2 className="h-2.5 w-2.5 text-sky-600 shrink-0" />
                           Verified Record
                         </span>
                         {selectedEntry.hasSponsorshipEvidence ? (
-                          <span className="inline-flex items-center gap-1 rounded-md bg-forest-50 px-2 py-0.5 text-[11px] font-semibold text-forest-800 border border-forest-600/30">
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-forest-50 px-2.5 py-0.5 text-[11px] font-semibold text-forest-800 border border-forest-600/30 shadow-2xs">
                             <Award className="h-3 w-3 text-forest-700 shrink-0" />
                             Subclass 482 Visa Sponsor
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-medium text-slate-600">
                             Standard Employer
                           </span>
                         )}
                         {selectedEntry.primaryCategory && (
-                          <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] text-slate-700 font-medium">
-                            {selectedEntry.primaryCategory}
-                          </span>
+                          <CategoryBadge
+                            category={selectedEntry.primaryCategory}
+                            size="md"
+                          />
                         )}
                       </div>
 
@@ -1200,7 +1372,33 @@ export function HomeMapShell({
 
             {/* If Regions Tab is Active */}
             {activeDirectoryTab === "regions" && (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2.5">
+                {/* Featured Regional Hubs Illustrated Map Banner */}
+                <div className="relative overflow-hidden rounded-2xl border border-surface-border bg-gradient-to-b from-[#faf8f5] to-white p-3 shadow-2xs">
+                  <div className="relative h-44 sm:h-52 w-full overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-2xs">
+                    <Image
+                      src="/assets/australia_hubs_map.png"
+                      alt="Australia Regional Innovation Corridors"
+                      fill
+                      className="object-contain p-2 hover:scale-[1.02] transition-transform duration-500 ease-out"
+                      priority
+                    />
+                  </div>
+                  <div className="mt-2.5 flex items-center justify-between px-1">
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-terracotta-700 animate-pulse" />
+                        <span className="font-heading text-xs font-bold text-navy-900 tracking-wide uppercase">
+                          National Innovation Corridors
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                        14 regional tech hubs across Australia. Click any hub to explore local employers.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {REGIONAL_HUBS.map((hub) => {
                   const isActive = activeHubCity === hub.city;
                   return (
@@ -1321,8 +1519,8 @@ export function HomeMapShell({
                               {entry.name}
                             </span>
                             <div className="flex items-center gap-1.5 shrink-0">
-                              <span className="inline-flex items-center gap-1 text-[11px] text-forest-700 font-medium">
-                                <CheckCircle2 className="h-3 w-3 shrink-0" />
+                              <span className="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-sky-800 shadow-2xs">
+                                <CheckCircle2 className="h-2.5 w-2.5 text-sky-600 shrink-0" />
                                 Verified
                               </span>
                               <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-0.5 group-hover:text-navy-900 transition-all" />
@@ -1337,17 +1535,15 @@ export function HomeMapShell({
                             {entry.primaryCategory && (
                               <>
                                 <span className="text-slate-300">•</span>
-                                <span className="truncate font-medium text-slate-700">
-                                  {entry.primaryCategory}
-                                </span>
+                                <CategoryBadge category={entry.primaryCategory} size="sm" />
                               </>
                             )}
                           </div>
 
                           {entry.hasSponsorshipEvidence && (
                             <div className="flex items-center gap-1.5 mt-2">
-                              <span className="inline-flex items-center gap-1 rounded-md border border-forest-600/30 bg-forest-50 px-2 py-0.5 font-mono text-[10px] font-semibold text-forest-800">
-                                <Award className="h-2.5 w-2.5 text-forest-700" />
+                              <span className="inline-flex items-center gap-1.5 rounded-full border border-forest-600/30 bg-forest-50 px-2.5 py-0.5 font-mono text-[10px] font-semibold text-forest-800 shadow-2xs">
+                                <Award className="h-2.5 w-2.5 text-forest-700 shrink-0" />
                                 Subclass 482 Visa Sponsor
                               </span>
                             </div>

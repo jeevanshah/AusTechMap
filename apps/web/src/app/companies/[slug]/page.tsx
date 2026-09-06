@@ -15,6 +15,7 @@ import {
 import type { MapCompanyPoint } from "@austechmap/contracts";
 
 import { CareersLink } from "./CareersLink";
+import { getCategoryIconPath } from "../../_components/HomeMapShell";
 import { MapCanvas, type Bbox } from "../../../components/map/MapCanvas";
 import { trackEvent } from "../../../lib/analytics";
 import { DatabaseNotConfiguredError, getPool } from "../../../lib/db";
@@ -364,15 +365,29 @@ export default async function CompanyProfilePage({
         </p>
       )}
 
-      <section className="flex flex-wrap items-center gap-3">
-        {company.categories.map((category) => (
-          <span
-            key={category.key}
-            className="rounded bg-slate-100 px-2.5 py-1 font-mono text-xs text-slate-700"
-          >
-            {category.label}
-          </span>
-        ))}
+      <section className="flex flex-wrap items-center gap-2.5">
+        {company.categories.map((category) => {
+          const iconPath = getCategoryIconPath(category.label);
+          return (
+            <span
+              key={category.key}
+              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-[#faf8f5] px-3 py-1 font-mono text-xs text-slate-700 shadow-2xs"
+            >
+              {iconPath && (
+                <span className="relative inline-block h-3.5 w-3.5 shrink-0 overflow-hidden rounded-full">
+                  <Image
+                    src={iconPath}
+                    alt={`${category.label} icon`}
+                    width={14}
+                    height={14}
+                    className="h-full w-full object-cover"
+                  />
+                </span>
+              )}
+              {category.label}
+            </span>
+          );
+        })}
         {company.careers_url && (
           <CareersLink slug={company.slug} careersUrl={company.careers_url} />
         )}
