@@ -928,7 +928,7 @@ export function HomeMapShell({
                       onClick={() => handleSelectHub(hub)}
                       className={`flex items-center justify-between rounded-xl border p-3 text-left transition-all ${
                         isActive
-                          ? "border-terracotta-700 bg-orange-50/40 ring-1 ring-terracotta-700 shadow-xs"
+                          ? "border-terracotta-700 bg-orange-50/40 shadow-xs"
                           : "border-surface-border bg-white hover:border-slate-300 hover:bg-slate-50/50"
                       }`}
                     >
@@ -998,7 +998,7 @@ export function HomeMapShell({
                         onClick={() => handlePointClick(entry.slug)}
                         className={`group relative flex items-start gap-3 rounded-xl border p-3 text-left transition-all cursor-pointer ${
                           isSelected
-                            ? "border-navy-900 bg-[#faf8f5] shadow-xs ring-1 ring-navy-900"
+                            ? "border-navy-900 bg-[#faf8f5] shadow-xs"
                             : "border-surface-border bg-white hover:border-slate-300 hover:shadow-xs"
                         }`}
                       >
@@ -1039,13 +1039,6 @@ export function HomeMapShell({
                               <span className="inline-flex items-center gap-1 rounded-md border border-forest-600/30 bg-forest-50 px-2 py-0.5 font-mono text-[10px] font-semibold text-forest-800">
                                 <Award className="h-2.5 w-2.5 text-forest-700" />
                                 Subclass 482 Sponsor
-                              </span>
-                            )}
-
-                            {entry.careersUrl && (
-                              <span className="inline-flex items-center gap-1 rounded-md border border-pacific-500/30 bg-pacific-50 px-2 py-0.5 font-mono text-[10px] font-medium text-pacific-800">
-                                <ExternalLink className="h-2.5 w-2.5 text-pacific-700" />
-                                Careers Portal
                               </span>
                             )}
 
