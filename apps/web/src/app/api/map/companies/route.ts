@@ -17,6 +17,7 @@ export async function GET(request: Request): Promise<Response> {
       bbox: parsed.params.bbox,
       category: parsed.params.category,
       sponsorship: parsed.params.sponsorship,
+      regional: parsed.params.regional,
     });
     const body = MapCompaniesResponseSchema.parse({
       version: 1,

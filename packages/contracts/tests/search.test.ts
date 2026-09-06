@@ -12,6 +12,7 @@ const validResult = {
   city: "Sydney",
   primaryCategory: "Fintech",
   hasSponsorshipEvidence: false,
+  isRegional: false,
 };
 
 describe("CompanySearchResponseSchema", () => {

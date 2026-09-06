@@ -5,6 +5,7 @@ export interface ParsedBboxParams {
   zoom: number;
   category: string | null;
   sponsorship: boolean;
+  regional: boolean;
 }
 
 export type BboxParseResult =
@@ -79,6 +80,7 @@ export function parseBboxParams(
   const categoryRaw = searchParams.get("category")?.trim();
   const category = categoryRaw && categoryRaw !== "" ? categoryRaw : null;
   const sponsorship = searchParams.get("sponsorship") === "true";
+  const regional = searchParams.get("regional") === "true";
 
   return {
     ok: true,
@@ -87,6 +89,7 @@ export function parseBboxParams(
       zoom,
       category,
       sponsorship,
+      regional,
     },
   };
 }

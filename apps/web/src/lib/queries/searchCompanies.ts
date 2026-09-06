@@ -12,6 +12,7 @@ interface TrigramRow {
   city: string | null;
   primary_category: string | null;
   has_sponsorship_evidence: boolean;
+  is_regional: boolean;
 }
 
 interface LocationRow {
@@ -22,6 +23,7 @@ interface LocationRow {
   city: string | null;
   primary_category: string | null;
   has_sponsorship_evidence: boolean;
+  is_regional: boolean;
 }
 
 const SIGNAL_COLUMNS_SQL = `research.claim_value ->> 'city' AS city,
@@ -30,7 +32,12 @@ const SIGNAL_COLUMNS_SQL = `research.claim_value ->> 'city' AS city,
               SELECT 1 FROM evidence e2
               WHERE e2.entity_type = 'company' AND e2.entity_id = c.id::text
                 AND e2.claim_type = ANY($4::text[])
-            ) AS has_sponsorship_evidence`;
+            ) AS has_sponsorship_evidence,
+            EXISTS (
+              SELECT 1 FROM company_locations cl2
+              JOIN resolved_locations rl2 ON rl2.id = cl2.resolved_location_id
+              WHERE cl2.company_id = c.id AND rl2.migration_category IS NOT NULL
+            ) AS is_regional`;
 
 const SIGNAL_JOINS_SQL = `LEFT JOIN LATERAL (
        SELECT e.claim_value
@@ -69,6 +76,12 @@ const SPONSORSHIP_FILTER_SQL = `(NOT $3::boolean OR EXISTS (
                AND e.claim_type = ANY($4::text[])
            ))`;
 
+const REGIONAL_FILTER_SQL = `(NOT $5::boolean OR EXISTS (
+             SELECT 1 FROM company_locations cl2
+             JOIN resolved_locations rl2 ON rl2.id = cl2.resolved_location_id
+             WHERE cl2.company_id = c.id AND rl2.migration_category IS NOT NULL
+           ))`;
+
 const SPONSORSHIP_CLAIM_TYPES = [
   "sponsorship_current_explicit",
   "sponsorship_historical_explicit",
@@ -80,8 +93,14 @@ export async function searchCompanies(
   query: string,
   category: string | null = null,
   sponsorship = false,
+  regional = false,
 ): Promise<CompanySearchResult[]> {
-  const filterParams = [category, sponsorship, SPONSORSHIP_CLAIM_TYPES];
+  const filterParams = [
+    category,
+    sponsorship,
+    SPONSORSHIP_CLAIM_TYPES,
+    regional,
+  ];
   const { rows } = await pool.query<TrigramRow>(
     `SELECT c.slug, c.display_name AS name, c.domain,
             similarity(c.display_name, $1) AS name_score,
@@ -104,6 +123,7 @@ export async function searchCompanies(
            ))
        AND ${CATEGORY_FILTER_SQL}
        AND ${SPONSORSHIP_FILTER_SQL}
+       AND ${REGIONAL_FILTER_SQL}
      ORDER BY GREATEST(similarity(c.display_name, $1), COALESCE(alias_sim.best, 0)) DESC
      LIMIT 20`,
     [query, ...filterParams],
@@ -123,6 +143,7 @@ export async function searchCompanies(
           city: row.city,
           primaryCategory: row.primary_category,
           hasSponsorshipEvidence: row.has_sponsorship_evidence,
+          isRegional: row.is_regional,
         };
       }
       return {
@@ -135,6 +156,7 @@ export async function searchCompanies(
         city: row.city,
         primaryCategory: row.primary_category,
         hasSponsorshipEvidence: row.has_sponsorship_evidence,
+        isRegional: row.is_regional,
       };
     });
   }
@@ -150,6 +172,7 @@ export async function searchCompanies(
        AND rl.input_text ILIKE '%' || $1 || '%'
        AND ${CATEGORY_FILTER_SQL}
        AND ${SPONSORSHIP_FILTER_SQL}
+       AND ${REGIONAL_FILTER_SQL}
      ORDER BY c.id
      LIMIT 20`,
     [query, ...filterParams],
@@ -165,5 +188,6 @@ export async function searchCompanies(
     city: row.city,
     primaryCategory: row.primary_category,
     hasSponsorshipEvidence: row.has_sponsorship_evidence,
+    isRegional: row.is_regional,
   }));
 }

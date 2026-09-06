@@ -17,6 +17,7 @@ export async function GET(request: Request): Promise<Response> {
   const categoryRaw = searchParams.get("category")?.trim();
   const category = categoryRaw && categoryRaw !== "" ? categoryRaw : null;
   const sponsorship = searchParams.get("sponsorship") === "true";
+  const regional = searchParams.get("regional") === "true";
 
   try {
     const results = await searchCompanies(
@@ -24,6 +25,7 @@ export async function GET(request: Request): Promise<Response> {
       query,
       category,
       sponsorship,
+      regional,
     );
     const body = CompanySearchResponseSchema.parse({
       version: 1,

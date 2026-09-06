@@ -64,6 +64,7 @@ async function loadHomeData(): Promise<HomeData> {
       bbox: AUSTRALIA_BBOX,
       category: null,
       sponsorship: false,
+      regional: false,
     }),
   ]);
 

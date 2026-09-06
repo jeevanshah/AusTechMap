@@ -39,6 +39,7 @@ describe("GET /api/search/companies", () => {
           city: "Sydney",
           primary_category: "Fintech",
           has_sponsorship_evidence: true,
+          is_regional: false,
         },
       ]),
     );
@@ -58,6 +59,7 @@ describe("GET /api/search/companies", () => {
         city: "Sydney",
         primaryCategory: "Fintech",
         hasSponsorshipEvidence: true,
+        isRegional: false,
       },
     ]);
   });
@@ -75,6 +77,7 @@ describe("GET /api/search/companies", () => {
           city: null,
           primary_category: null,
           has_sponsorship_evidence: false,
+          is_regional: false,
         },
       ]),
     );
@@ -93,6 +96,7 @@ describe("GET /api/search/companies", () => {
         city: null,
         primaryCategory: null,
         hasSponsorshipEvidence: false,
+        isRegional: false,
       },
     ]);
   });
@@ -110,6 +114,7 @@ describe("GET /api/search/companies", () => {
             city: null,
             primary_category: null,
             has_sponsorship_evidence: false,
+            is_regional: false,
           },
         ],
       ),
@@ -129,6 +134,7 @@ describe("GET /api/search/companies", () => {
         city: null,
         primaryCategory: null,
         hasSponsorshipEvidence: false,
+        isRegional: false,
       },
     ]);
   });
@@ -171,6 +177,18 @@ describe("GET /api/search/companies", () => {
     vi.mocked(getPool).mockReturnValue(pool);
 
     await GET(request("q=acme&sponsorship=true"));
+
+    expect(pool.query).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.arrayContaining(["acme", true]),
+    );
+  });
+
+  it("forwards a regional filter to the query", async () => {
+    const pool = fakePool([]);
+    vi.mocked(getPool).mockReturnValue(pool);
+
+    await GET(request("q=acme&regional=true"));
 
     expect(pool.query).toHaveBeenCalledWith(
       expect.any(String),

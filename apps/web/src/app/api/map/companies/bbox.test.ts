@@ -14,6 +14,7 @@ describe("parseBboxParams", () => {
       expect(result.params.zoom).toBe(4);
       expect(result.params.category).toBeNull();
       expect(result.params.sponsorship).toBe(false);
+      expect(result.params.regional).toBe(false);
     }
   });
 
@@ -34,6 +35,24 @@ describe("parseBboxParams", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.params.sponsorship).toBe(false);
+    }
+  });
+
+  it("parses a regional=true param", () => {
+    const result = parseBboxParams(
+      params("bbox=150,-34,152,-33&regional=true"),
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.params.regional).toBe(true);
+    }
+  });
+
+  it("treats any non-'true' regional value as false", () => {
+    const result = parseBboxParams(params("bbox=150,-34,152,-33&regional=1"));
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.params.regional).toBe(false);
     }
   });
 

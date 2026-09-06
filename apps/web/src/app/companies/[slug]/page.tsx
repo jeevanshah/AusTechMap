@@ -215,6 +215,7 @@ function locationsToPoints(company: CompanyProfileRow): MapCompanyPoint[] {
     city: null,
     primaryCategory: null,
     hasSponsorshipEvidence: false,
+    isRegional: false,
   }));
 }
 

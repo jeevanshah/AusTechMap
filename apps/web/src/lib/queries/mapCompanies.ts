@@ -13,6 +13,7 @@ export interface MapCompaniesQuery {
   bbox: Bbox;
   category: string | null;
   sponsorship: boolean;
+  regional: boolean;
 }
 
 const SPONSORSHIP_CLAIM_TYPES = [
@@ -31,6 +32,7 @@ interface MapCompanyRow {
   city: string | null;
   primary_category: string | null;
   has_sponsorship_evidence: boolean;
+  is_regional: boolean;
 }
 
 const MAX_ROWS = 500;
@@ -55,7 +57,8 @@ export async function fetchMapCompanies(
               SELECT 1 FROM evidence e2
               WHERE e2.entity_type = 'company' AND e2.entity_id = c.id::text
                 AND e2.claim_type = ANY($7::text[])
-            ) AS has_sponsorship_evidence
+            ) AS has_sponsorship_evidence,
+            rl.migration_category IS NOT NULL AS is_regional
      FROM company_locations cl
      JOIN companies c ON c.id = cl.company_id
      JOIN resolved_locations rl ON rl.id = cl.resolved_location_id
@@ -88,8 +91,9 @@ export async function fetchMapCompanies(
              WHERE e.entity_type = 'company' AND e.entity_id = c.id::text
                AND e.claim_type = ANY($7::text[])
            ))
+       AND (NOT $8::boolean OR rl.migration_category IS NOT NULL)
      ORDER BY c.display_name
-     LIMIT $8`,
+     LIMIT $9`,
     [
       query.bbox.west,
       query.bbox.south,
@@ -98,6 +102,7 @@ export async function fetchMapCompanies(
       query.category,
       query.sponsorship,
       SPONSORSHIP_CLAIM_TYPES,
+      query.regional,
       MAX_ROWS + 1,
     ],
   );
@@ -113,6 +118,7 @@ export async function fetchMapCompanies(
     city: row.city,
     primaryCategory: row.primary_category,
     hasSponsorshipEvidence: row.has_sponsorship_evidence,
+    isRegional: row.is_regional,
   }));
 
   return { points, truncated };

@@ -12,6 +12,7 @@ const validPoint = {
   city: "Sydney",
   primaryCategory: "Fintech",
   hasSponsorshipEvidence: false,
+  isRegional: false,
 };
 
 describe("MapCompaniesResponseSchema", () => {

@@ -19,6 +19,7 @@ export const MapCompanyPointSchema = z.object({
   city: z.string().nullable(),
   primaryCategory: z.string().nullable(),
   hasSponsorshipEvidence: z.boolean(),
+  isRegional: z.boolean(),
 });
 
 export type MapCompanyPoint = z.infer<typeof MapCompanyPointSchema>;
@@ -47,6 +48,7 @@ export const CompanySearchResultSchema = z.object({
   city: z.string().nullable(),
   primaryCategory: z.string().nullable(),
   hasSponsorshipEvidence: z.boolean(),
+  isRegional: z.boolean(),
 });
 
 export type CompanySearchResult = z.infer<typeof CompanySearchResultSchema>;
@@ -74,3 +76,17 @@ export const CategoriesResponseSchema = z.object({
 });
 
 export type CategoriesResponse = z.infer<typeof CategoriesResponseSchema>;
+
+export const RegionalHubSchema = z.object({
+  city: z.string().min(1),
+  count: z.number().int().min(1),
+});
+
+export type RegionalHub = z.infer<typeof RegionalHubSchema>;
+
+export const RegionalHubsResponseSchema = z.object({
+  version: z.literal(1),
+  hubs: z.array(RegionalHubSchema),
+});
+
+export type RegionalHubsResponse = z.infer<typeof RegionalHubsResponseSchema>;

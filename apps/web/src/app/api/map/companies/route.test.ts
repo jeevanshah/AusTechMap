@@ -35,6 +35,7 @@ describe("GET /api/map/companies", () => {
           city: "Sydney",
           primary_category: "Fintech",
           has_sponsorship_evidence: true,
+          is_regional: false,
         },
       ]),
     );
@@ -58,6 +59,7 @@ describe("GET /api/map/companies", () => {
         city: "Sydney",
         primaryCategory: "Fintech",
         hasSponsorshipEvidence: true,
+        isRegional: false,
       },
     ]);
   });
@@ -73,6 +75,7 @@ describe("GET /api/map/companies", () => {
       city: null,
       primary_category: null,
       has_sponsorship_evidence: false,
+      is_regional: false,
     }));
     vi.mocked(getPool).mockReturnValue(fakePool(rows));
 
@@ -88,6 +91,18 @@ describe("GET /api/map/companies", () => {
     vi.mocked(getPool).mockReturnValue(pool);
 
     await GET(request("bbox=150,-34,152,-33&sponsorship=true"));
+
+    expect(pool.query).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.arrayContaining([true]),
+    );
+  });
+
+  it("forwards a regional filter to the query", async () => {
+    const pool = fakePool([]);
+    vi.mocked(getPool).mockReturnValue(pool);
+
+    await GET(request("bbox=150,-34,152,-33&regional=true"));
 
     expect(pool.query).toHaveBeenCalledWith(
       expect.any(String),
