@@ -144,7 +144,7 @@ export default async function Home() {
         {/* Authentic Australian Topography & Geodetic Surveyor Blueprint (Slate & Desert Ochre on Pure White) */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-0 opacity-[0.10] mix-blend-multiply bg-center bg-cover"
+          className="pointer-events-none absolute inset-0 z-0 opacity-[0.09] mix-blend-multiply bg-center bg-cover [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_92%)]"
           style={{
             backgroundImage: "url('/brand/hero_cartography.jpg')",
           }}
