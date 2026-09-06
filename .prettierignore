@@ -15,3 +15,5 @@ workers/ingestion/.venv/
 workers/ingestion/.mypy_cache/
 workers/ingestion/.pytest_cache/
 workers/ingestion/.ruff_cache/
+.agents/
+agent/
