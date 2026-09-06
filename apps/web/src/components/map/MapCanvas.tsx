@@ -39,9 +39,16 @@ export interface Bbox {
   north: number;
 }
 
+export interface CameraTarget {
+  center: [number, number]; // [lng, lat]
+  zoom?: number;
+  timestamp?: number;
+}
+
 export interface MapCanvasProps {
   points: MapCompanyPoint[];
   initialBbox: Bbox;
+  cameraTarget?: CameraTarget | null;
   interactive?: boolean;
   onMoveEnd?: (bbox: Bbox, zoom: number) => void;
   onPointClick?: (slug: string) => void;
@@ -63,6 +70,7 @@ const SOURCE_ID = "companies";
 export function MapCanvas({
   points,
   initialBbox,
+  cameraTarget,
   interactive = true,
   onMoveEnd,
   onPointClick,
@@ -251,6 +259,18 @@ export function MapCanvas({
     const source = map.getSource(SOURCE_ID) as GeoJSONSource | undefined;
     source?.setData(pointsToGeoJson(points));
   }, [points]);
+
+  useEffect(() => {
+    if (!cameraTarget) return;
+    const map = mapRef.current;
+    if (!map) return;
+    map.flyTo({
+      center: cameraTarget.center,
+      zoom: cameraTarget.zoom ?? 11,
+      essential: true,
+      duration: 1200,
+    });
+  }, [cameraTarget]);
 
   return <div ref={containerRef} className="h-full w-full" />;
 }

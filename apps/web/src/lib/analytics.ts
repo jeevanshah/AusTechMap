@@ -12,7 +12,8 @@ export type AnalyticsEvent =
   | "search_submitted"
   | "map_company_clicked"
   | "company_profile_viewed"
-  | "careers_link_clicked";
+  | "careers_link_clicked"
+  | "regional_hub_selected";
 
 export function trackEvent(
   event: AnalyticsEvent,
