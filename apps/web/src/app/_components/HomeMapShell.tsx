@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Anchor,
+  ArrowLeft,
   ArrowRight,
   Award,
   Building2,
@@ -472,7 +473,8 @@ export function HomeMapShell({
     const categoryParam = selectedCategory
       ? `&category=${encodeURIComponent(selectedCategory)}`
       : "";
-    const sponsorshipParam = sponsorshipOnly ? "&sponsorship=true" : "";
+    const isSponsorshipActive = sponsorshipOnly || activeDirectoryTab === "sponsors";
+    const sponsorshipParam = isSponsorshipActive ? "&sponsorship=true" : "";
     fetch(
       `/api/map/companies?bbox=${bboxParam}${zoomParam}${categoryParam}${sponsorshipParam}`,
     )
@@ -483,11 +485,19 @@ export function HomeMapShell({
       .catch(() => {
         /* keep showing the last-known points rather than clearing the map */
       });
-  }, [currentBbox, currentZoom, selectedCategory, sponsorshipOnly]);
+  }, [currentBbox, currentZoom, selectedCategory, sponsorshipOnly, activeDirectoryTab]);
 
   const handlePointClick = useCallback((slug: string) => {
     setSelectedSlug(slug);
+    setActiveDirectoryTab((prevTab) => (prevTab === "regions" ? "companies" : prevTab));
     trackEvent("map_company_clicked", { slug });
+
+    setTimeout(() => {
+      const cardEl = document.getElementById(`company-card-${slug}`);
+      if (cardEl) {
+        cardEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }, 150);
   }, []);
 
   const isSearching = query.trim() !== "";
@@ -518,14 +528,20 @@ export function HomeMapShell({
     return listEntries;
   }, [listEntries, activeDirectoryTab]);
 
-  // Apply regional-only filter to map points as well
+  // Apply regional-only and visa-sponsor filter to map points as well
   const displayedPoints = useMemo(() => {
-    if (!regionalOnly) return points;
-    return points.filter(
-      (point) =>
-        point.city && point.city !== "Sydney" && point.city !== "Melbourne",
-    );
-  }, [points, regionalOnly]);
+    let pts = points;
+    if (regionalOnly) {
+      pts = pts.filter(
+        (point) =>
+          point.city && point.city !== "Sydney" && point.city !== "Melbourne",
+      );
+    }
+    if (activeDirectoryTab === "sponsors") {
+      pts = pts.filter((point) => point.hasSponsorshipEvidence);
+    }
+    return pts;
+  }, [points, regionalOnly, activeDirectoryTab]);
 
   const selectedEntry =
     listEntries.find((entry) => entry.slug === selectedSlug) ??
@@ -543,21 +559,30 @@ export function HomeMapShell({
     setCameraTarget({
       center: [133.7751, -25.2744],
       zoom: 4,
+      timestamp: Date.now(),
     });
   };
 
   const handleSelectHub = (hub: (typeof REGIONAL_HUBS)[number]) => {
-    if (activeHubCity === hub.city) {
+    if (activeHubCity === hub.city && activeDirectoryTab === "companies") {
       setActiveHubCity(null);
       setQuery("");
+      setActiveDirectoryTab("regions");
+      setCameraTarget({
+        center: [133.7751, -25.2744],
+        zoom: 4,
+        timestamp: Date.now(),
+      });
       return;
     }
     setActiveHubCity(hub.city);
     setCameraTarget({
       center: hub.center,
       zoom: hub.zoom,
+      timestamp: Date.now(),
     });
     setQuery(hub.city);
+    setActiveDirectoryTab("companies");
     setShowMapMobile(true);
     trackEvent("regional_hub_selected", { city: hub.city });
 
@@ -877,6 +902,38 @@ export function HomeMapShell({
             showMapMobile ? "hidden lg:flex" : "flex"
           }`}
         >
+          {/* Active Region Hub Breadcrumb Banner */}
+          {activeHubCity && (
+            <div className="flex items-center justify-between rounded-xl bg-orange-50/90 border border-orange-200/90 px-3 py-2 text-xs transition-all">
+              <div className="flex items-center gap-2 min-w-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveHubCity(null);
+                    setQuery("");
+                    setActiveDirectoryTab("regions");
+                    setCameraTarget({
+                      center: [133.7751, -25.2744],
+                      zoom: 4,
+                      timestamp: Date.now(),
+                    });
+                  }}
+                  className="inline-flex items-center gap-1 font-semibold text-terracotta-700 hover:text-terracotta-900 hover:underline shrink-0"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                  All regions
+                </button>
+                <span className="text-orange-300">•</span>
+                <span className="truncate font-bold text-navy-900">
+                  📍 {activeHubCity} Hub
+                </span>
+              </div>
+              <span className="font-mono text-[11px] font-medium text-slate-600 shrink-0">
+                {listEntries.length} {listEntries.length === 1 ? "employer" : "employers"}
+              </span>
+            </div>
+          )}
+
           {/* Section Tabs: Companies | Visa Sponsors | Regions */}
           <div className="flex items-center justify-between border-b border-surface-border pb-2.5">
             <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
@@ -1013,9 +1070,30 @@ export function HomeMapShell({
               <>
                 {displayedEntries.length === 0 ? (
                   <div className="rounded-xl border border-surface-border bg-white p-6 text-center text-sm text-slate-500">
-                    {activeDirectoryTab === "sponsors"
-                      ? "No visa-sponsored employers match this query."
-                      : "No companies match this query."}
+                    <p className="font-medium text-slate-700">
+                      {activeDirectoryTab === "sponsors"
+                        ? "No visa-sponsored employers match this current view or query."
+                        : "No companies match this query."}
+                    </p>
+                    {activeDirectoryTab === "sponsors" && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setQuery("");
+                          setActiveHubCity(null);
+                          setRegionalOnly(false);
+                          setCameraTarget({
+                            center: [133.7751, -25.2744],
+                            zoom: 4,
+                            timestamp: Date.now(),
+                          });
+                        }}
+                        className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-forest-800 px-3.5 py-2 text-xs font-semibold text-white hover:bg-forest-900 transition-all shadow-2xs"
+                      >
+                        <Award className="h-3.5 w-3.5 text-forest-300" />
+                        View all 5 nationwide visa sponsors
+                      </button>
+                    )}
                   </div>
                 ) : (
                   displayedEntries.map((entry) => {
@@ -1026,16 +1104,17 @@ export function HomeMapShell({
                     return (
                       <div
                         key={entry.slug}
-                        onMouseEnter={() => {
+                        id={`company-card-${entry.slug}`}
+                        onClick={() => {
+                          handlePointClick(entry.slug);
                           if (pt) {
                             setCameraTarget({
                               center: [pt.lng, pt.lat],
-                              zoom: 14,
+                              zoom: Math.max(currentZoom ?? 13, 13),
                               timestamp: Date.now(),
                             });
                           }
                         }}
-                        onClick={() => handlePointClick(entry.slug)}
                         className={`group relative flex items-start gap-3 rounded-xl border p-3 text-left transition-all cursor-pointer ${
                           isSelected
                             ? "border-navy-900 bg-[#faf8f5] shadow-xs"
