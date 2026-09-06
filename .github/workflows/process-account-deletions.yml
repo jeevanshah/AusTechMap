@@ -1,0 +1,40 @@
+name: Process account deletions
+
+# ARCHITECTURE_DECISIONS.md §3.2's established pattern for this alpha
+# stage: GitHub Actions `schedule:`, moving to a Railway cron-enqueuer once
+# Phase 5's freshness SLAs are live. Completes queued account_deletion_
+# requests within the §4.1 step 2's 24h SLA, and expires old rate-limit
+# buckets. Requires a "production" Environment with DATABASE_URL,
+# R2_ACCOUNT_ID/R2_ACCESS_KEY_ID/R2_SECRET_ACCESS_KEY,
+# RAW_SNAPSHOT_BUCKET, and DELETION_LEDGER_AGE_RECIPIENT secrets -- until
+# those exist this workflow fails with a clear "required" message, which
+# is expected, not a bug (same documented pattern as promote-staging.yml).
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  process-deletions:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Process queued account deletions and expire rate-limit buckets
+        working-directory: apps/web
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          RAW_SNAPSHOT_BUCKET: ${{ secrets.RAW_SNAPSHOT_BUCKET }}
+          DELETION_LEDGER_AGE_RECIPIENT: ${{ secrets.DELETION_LEDGER_AGE_RECIPIENT }}
+        run: node scripts/process-deletions.mjs

@@ -1,10 +1,13 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { ensureSystemActor } from "../../../lib/actors";
+import {
+  requireFreshMfa,
+  requireStaffSession,
+} from "../../../lib/auth/require-role";
+import { recordAudit } from "../../../lib/audit";
 import { getPool } from "../../../lib/db";
 import { normaliseAbn, normaliseAcn } from "../../../lib/normalisation";
 
@@ -33,33 +36,9 @@ async function uniqueSlug(displayName: string): Promise<string> {
   }
 }
 
-async function writeAudit(
-  actorUserId: number,
-  action: string,
-  targetId: string,
-  reason: string | null,
-  beforeState: Record<string, unknown> | null,
-  afterState: Record<string, unknown> | null,
-): Promise<void> {
-  await getPool().query(
-    `INSERT INTO audit_records (
-       actor_type, actor_id, action, target_type, target_id,
-       reason, before_state, after_state, request_id
-     )
-     VALUES ('user', $1, $2, 'company', $3, $4, $5, $6, $7)`,
-    [
-      String(actorUserId),
-      action,
-      targetId,
-      reason,
-      beforeState ? JSON.stringify(beforeState) : null,
-      afterState ? JSON.stringify(afterState) : null,
-      randomUUID(),
-    ],
-  );
-}
-
 export async function createCompany(formData: FormData): Promise<void> {
+  const actor = await requireStaffSession("reviewer");
+
   const displayName = String(formData.get("display_name") ?? "").trim();
   if (!displayName) {
     throw new Error("Display name is required");
@@ -75,7 +54,6 @@ export async function createCompany(formData: FormData): Promise<void> {
   if (acnRaw && !acn) throw new Error(`Invalid ACN: ${acnRaw}`);
 
   const pool = getPool();
-  const actorUserId = await ensureSystemActor(pool);
   const slug = await uniqueSlug(displayName);
   const inserted = await pool.query<{ id: string }>(
     `INSERT INTO companies (slug, display_name, abn, acn, domain, careers_url, status)
@@ -86,13 +64,19 @@ export async function createCompany(formData: FormData): Promise<void> {
   const companyId = inserted.rows[0]?.id;
   if (!companyId) throw new Error("insert did not return an id");
 
-  await writeAudit(actorUserId, "company_created", companyId, null, null, {
-    slug,
-    display_name: displayName,
-    abn,
-    acn,
-    domain,
-    careers_url: careersUrl,
+  await recordAudit(pool, {
+    actorUserId: actor.id,
+    action: "company_created",
+    targetType: "company",
+    targetId: companyId,
+    afterState: {
+      slug,
+      display_name: displayName,
+      abn,
+      acn,
+      domain,
+      careers_url: careersUrl,
+    },
   });
 
   revalidatePath("/admin/companies");
@@ -103,6 +87,8 @@ export async function updateCompany(
   companyId: string,
   formData: FormData,
 ): Promise<void> {
+  const actor = await requireStaffSession("reviewer");
+
   const displayName = String(formData.get("display_name") ?? "").trim();
   if (!displayName) {
     throw new Error("Display name is required");
@@ -118,7 +104,6 @@ export async function updateCompany(
   if (acnRaw && !acn) throw new Error(`Invalid ACN: ${acnRaw}`);
 
   const pool = getPool();
-  const actorUserId = await ensureSystemActor(pool);
   const before = await pool.query(
     "SELECT display_name, abn, acn, domain, careers_url FROM companies WHERE id = $1",
     [companyId],
@@ -131,22 +116,29 @@ export async function updateCompany(
      WHERE id = $6`,
     [displayName, abn, acn, domain, careersUrl, companyId],
   );
-  await writeAudit(
-    actorUserId,
-    "company_edited",
-    companyId,
-    null,
-    before.rows[0],
-    { display_name: displayName, abn, acn, domain, careers_url: careersUrl },
-  );
+  await recordAudit(pool, {
+    actorUserId: actor.id,
+    action: "company_edited",
+    targetType: "company",
+    targetId: companyId,
+    beforeState: before.rows[0],
+    afterState: {
+      display_name: displayName,
+      abn,
+      acn,
+      domain,
+      careers_url: careersUrl,
+    },
+  });
 
   revalidatePath(`/admin/companies/${companyId}`);
   redirect(`/admin/companies/${companyId}`);
 }
 
 export async function verifyCompanyAction(companyId: string): Promise<void> {
+  const actor = await requireStaffSession("reviewer");
+
   const pool = getPool();
-  const actorUserId = await ensureSystemActor(pool);
   const before = await pool.query(
     "SELECT verified_at FROM companies WHERE id = $1",
     [companyId],
@@ -157,16 +149,14 @@ export async function verifyCompanyAction(companyId: string): Promise<void> {
   await pool.query("UPDATE companies SET verified_at = now() WHERE id = $1", [
     companyId,
   ]);
-  await writeAudit(
-    actorUserId,
-    "company_verified",
-    companyId,
-    null,
-    before.rows[0],
-    {
-      verified_at: "now",
-    },
-  );
+  await recordAudit(pool, {
+    actorUserId: actor.id,
+    action: "company_verified",
+    targetType: "company",
+    targetId: companyId,
+    beforeState: before.rows[0],
+    afterState: { verified_at: "now" },
+  });
 
   revalidatePath(`/admin/companies/${companyId}`);
 }
@@ -175,11 +165,12 @@ export async function disableCompanyAction(
   companyId: string,
   formData: FormData,
 ): Promise<void> {
+  const actor = await requireFreshMfa("admin");
+
   const reason = String(formData.get("reason") ?? "").trim();
   if (!reason) throw new Error("A reason is required to disable a company");
 
   const pool = getPool();
-  const actorUserId = await ensureSystemActor(pool);
   const before = await pool.query(
     "SELECT status FROM companies WHERE id = $1",
     [companyId],
@@ -195,17 +186,15 @@ export async function disableCompanyAction(
      WHERE id = $2`,
     [reason, companyId],
   );
-  await writeAudit(
-    actorUserId,
-    "company_disabled",
-    companyId,
+  await recordAudit(pool, {
+    actorUserId: actor.id,
+    action: "company_disabled",
+    targetType: "company",
+    targetId: companyId,
     reason,
-    before.rows[0],
-    {
-      status: "disabled",
-      disabled_reason: reason,
-    },
-  );
+    beforeState: before.rows[0],
+    afterState: { status: "disabled", disabled_reason: reason },
+  });
 
   revalidatePath(`/admin/companies/${companyId}`);
 }
@@ -214,6 +203,8 @@ export async function mergeCompanyAction(
   sourceId: string,
   formData: FormData,
 ): Promise<void> {
+  const actor = await requireFreshMfa("admin");
+
   const targetId = String(formData.get("target_company_id") ?? "").trim();
   const reason = String(formData.get("reason") ?? "").trim();
   if (!targetId) throw new Error("A target company id is required");
@@ -222,7 +213,6 @@ export async function mergeCompanyAction(
     throw new Error("cannot merge a company into itself");
 
   const pool = getPool();
-  const actorUserId = await ensureSystemActor(pool);
   const source = await pool.query(
     "SELECT status FROM companies WHERE id = $1",
     [sourceId],
@@ -247,17 +237,15 @@ export async function mergeCompanyAction(
     "UPDATE companies SET status = 'merged', merged_into_company_id = $1 WHERE id = $2",
     [targetId, sourceId],
   );
-  await writeAudit(
-    actorUserId,
-    "company_merged",
-    sourceId,
+  await recordAudit(pool, {
+    actorUserId: actor.id,
+    action: "company_merged",
+    targetType: "company",
+    targetId: sourceId,
     reason,
-    source.rows[0],
-    {
-      status: "merged",
-      merged_into_company_id: targetId,
-    },
-  );
+    beforeState: source.rows[0],
+    afterState: { status: "merged", merged_into_company_id: targetId },
+  });
 
   revalidatePath(`/admin/companies/${sourceId}`);
   redirect(`/admin/companies/${sourceId}`);

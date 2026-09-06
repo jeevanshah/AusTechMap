@@ -1,7 +1,7 @@
 # Australia Tech Map — Implementation Plan
 
 > Execution plan derived from [PRODUCT_SPEC.md](./PRODUCT_SPEC.md). [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) is authoritative for technology choices where it conflicts with either document.  
-> Version 4.0 · 5 September 2026
+> Version 4.1 · 7 September 2026
 
 ## 1. Objective
 
@@ -257,8 +257,8 @@ Goal: turn exploration into relevant, repeatable opportunity discovery.
 - [ ] Build a weighted Opportunity Match with component-level reasons.
 - [ ] Store query hash, score components, model version, and generation time.
 - [ ] Validate ranking against golden queries and product-review judgements.
-- [ ] Add authentication only where needed for saved state.
-- [ ] Implement saved searches and employer/region watchlists.
+- [x] Add authentication -- pulled forward from Phase 7/8 and built in full on 7 September 2026 (ARCHITECTURE_DECISIONS.md §4.1: Auth.js v5 + Postgres sessions, Resend magic-link sign-in, the three-role model, mandatory staff TOTP MFA, a consolidated audit module, a first-admin bootstrap CLI, and the full 5-step account-deletion lifecycle), ahead of any saved-state feature actually needing it -- driven instead by gating `/admin/*` before a private alpha. Full lint/typecheck/test/build all green; not yet verified against real infrastructure (no real Resend account/domain, R2 ledger write, or scheduled-job run observed yet -- see ARCHITECTURE_DECISIONS.md §4.1's own "not yet verified" note).
+- [ ] Implement saved searches and employer/region watchlists -- the sign-in/session system above exists to build this on top of, but the feature itself isn't built. The deletion pipeline's erasure-hook registry (`lib/deletion/erasure.ts::registerErasureHook`) is the extension point this feature must register against when it lands, so account deletion actually erases it.
 - [ ] Derive immutable, versioned change events from observations.
 - [ ] Implement stable event deduplication keys and replay-safe matching.
 - [ ] Add in-app alerts and transactional email delivery.
@@ -273,7 +273,7 @@ Exit gate: every ranked result explains its score; golden tests pass; one user/e
 Goal: reach operational and data-quality readiness for public V1.
 
 - [ ] Expand the alpha/beta cohort (100–200 employers) to at least 1,000 employers.
-- [ ] Complete threat modelling and protect admin routes with MFA and least privilege.
+- [~] Complete threat modelling and protect admin routes with MFA and least privilege. Admin-route protection is real and built (see Phase 7's authentication item above): every `/admin/*` page/layout and mutating server action now calls `requireStaffSession`/`requireFreshMfa`, mandatory TOTP MFA, role-ranked least privilege (`user < reviewer < admin`). A holistic threat-modelling exercise across the whole system has not been done -- this is one control, not the full activity.
 - [ ] Add input validation, rate limits, crawler egress/SSRF controls, and secret rotation procedures.
 - [ ] Verify database backups and complete a timed restore drill.
 - [ ] Add Sentry, dashboards, uptime checks, pipeline alerts, and data-anomaly detection.

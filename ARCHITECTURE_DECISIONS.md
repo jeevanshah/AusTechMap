@@ -2,7 +2,7 @@
 
 > Satisfies [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) Phase 0: "Record architecture decisions for the database, map provider, storage, hosting, authentication, email, and analytics."
 > This document is authoritative for technology choices — where it conflicts with [PRODUCT_SPEC.md](./PRODUCT_SPEC.md)'s recommendations, this document wins.
-> Version 3.8 · 5 September 2026
+> Version 3.9 · 7 September 2026
 
 ## 1. Decision summary
 
@@ -145,18 +145,24 @@ operational change.
   Protect both `/admin` pages and their APIs; hiding navigation is not access control. Return `401` for
   no valid session and `403` for insufficient role.
 
-  **Interim state (5 September 2026):** `/admin/geography` (Phase 2's import-status/geography-version
-  view) and `/admin/companies` and `/admin/review` (Phase 3's employer-management screens — create,
-  edit, merge, verify, disable, and resolve review-queue items) all ship with no access control at
-  all, a direct, deliberate, user-approved exception to the rule above — none of this section's
-  authentication/MFA/role system is built yet (only decided). The Phase 3 screens go further than the
-  read-only geography page: they mutate real data, and every mutation is currently attributed to one
-  fixed placeholder account (`apps/web/src/lib/actors.ts`'s `ensureSystemActor`), not a real
-  signed-in person — there is no per-actor accountability yet, only an audit trail that says "the
-  admin UI did this," not who. Safe only because no real employer or user data exists yet. This must
-  be gated — by the real system above, not a stopgap — before any real user, employer data, or
-  commercial activity, the same
-  trigger already used for the Vercel Hobby-tier deviation in §3.4.
+  **Built (7 September 2026):** the full system above — Auth.js v5 (`next-auth@beta`) with
+  `@auth/pg-adapter` against the Phase 1 schema, database sessions with a role-aware expiry wrapper,
+  Resend magic-link sign-in, the three-role model, mandatory staff TOTP MFA (enrollment, verification,
+  recovery codes, rate limiting), a role-aware `require-role.ts` enforcement layer called from every
+  `/admin/*` page/layout and every mutating server action (`ensureSystemActor`'s placeholder actor is
+  gone — every admin mutation now attributes to the real signed-in user), a consolidated audit module,
+  a first-admin bootstrap CLI (`scripts/grant-role.mjs`), and the full 5-step account-deletion
+  lifecycle (request/confirm, immediate session revocation, an extensible per-domain erasure-hook
+  registry, an `age`-encrypted R2 restore-suppression ledger mirroring §4.4's backup pattern, and an
+  hourly GitHub Actions job completing deletions within the 24h SLA). Verified: full lint/typecheck/
+  test/build all green, including a production `next build` confirming Next.js 16's `proxy.ts` (not
+  `middleware.ts`) is correctly picked up. **Not yet verified against real infrastructure** — no real
+  Resend account/verified sending domain exists yet (the sandbox sender `onboarding@resend.dev` is a
+  deliberate, named interim state, same pattern as this project's Nominatim-before-G-NAF precedent),
+  and a real magic-link round trip, real MFA enrollment with an actual authenticator app, a real R2
+  ledger write, and a real scheduled-job run have not yet been observed against production — this
+  environment has no `DATABASE_URL`/Resend/R2 credentials to run them from. Track these against
+  IMPLEMENTATION_PLAN.md before calling this phase closed.
 - Destructive merges, source disablement, role changes, and importer replay require `admin` plus an
   MFA assertion no older than 15 minutes; all staff mutations write an immutable audit record.
 

@@ -52,9 +52,6 @@ export default async function ReviewQueuePage() {
         <span className="text-sm font-semibold tracking-[0.18em] uppercase">
           Review queue
         </span>
-        <span className="rounded-full bg-amber-600 px-3 py-1 text-xs font-medium text-white">
-          Unauthenticated — internal use only
-        </span>
       </header>
 
       {error && (

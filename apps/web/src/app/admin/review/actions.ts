@@ -1,9 +1,9 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 
-import { ensureSystemActor } from "../../../lib/actors";
+import { requireStaffSession } from "../../../lib/auth/require-role";
+import { recordAudit } from "../../../lib/audit";
 import { getPool } from "../../../lib/db";
 
 interface CandidatePayload {
@@ -51,8 +51,9 @@ function normaliseCompanyName(raw: string): string {
 }
 
 export async function rejectReviewItem(reviewItemId: string): Promise<void> {
+  const actor = await requireStaffSession("reviewer");
+
   const pool = getPool();
-  const actorUserId = await ensureSystemActor(pool);
   const existing = await pool.query(
     "SELECT status FROM review_queue_items WHERE id = $1",
     [reviewItemId],
@@ -66,8 +67,14 @@ export async function rejectReviewItem(reviewItemId: string): Promise<void> {
     `UPDATE review_queue_items
      SET status = 'rejected', reviewed_by_user_id = $1, reviewed_at = now()
      WHERE id = $2`,
-    [actorUserId, reviewItemId],
+    [actor.id, reviewItemId],
   );
+  await recordAudit(pool, {
+    actorUserId: actor.id,
+    action: "review_item_rejected",
+    targetType: "review_queue_item",
+    targetId: reviewItemId,
+  });
   revalidatePath("/admin/review");
 }
 
@@ -79,8 +86,9 @@ interface SponsorshipMatchPayload {
 export async function approveSponsorshipMatch(
   reviewItemId: string,
 ): Promise<void> {
+  const actor = await requireStaffSession("reviewer");
+
   const pool = getPool();
-  const actorUserId = await ensureSystemActor(pool);
   const row = await pool.query<{
     status: string;
     company_id: string | null;
@@ -116,15 +124,14 @@ export async function approveSponsorshipMatch(
     `UPDATE review_queue_items
      SET status = 'approved', reviewed_by_user_id = $1, reviewed_at = now()
      WHERE id = $2`,
-    [actorUserId, reviewItemId],
+    [actor.id, reviewItemId],
   );
-  await pool.query(
-    `INSERT INTO audit_records (
-       actor_type, actor_id, action, target_type, target_id, request_id
-     )
-     VALUES ('user', $1, 'review_item_approved', 'company', $2, $3)`,
-    [String(actorUserId), reviewRow.company_id, randomUUID()],
-  );
+  await recordAudit(pool, {
+    actorUserId: actor.id,
+    action: "review_item_approved",
+    targetType: "company",
+    targetId: reviewRow.company_id,
+  });
 
   revalidatePath("/admin/review");
 }
@@ -133,11 +140,12 @@ export async function approveReviewItem(
   reviewItemId: string,
   formData: FormData,
 ): Promise<void> {
+  const actor = await requireStaffSession("reviewer");
+
   const matchedCompanyId =
     String(formData.get("matched_company_id") ?? "").trim() || null;
 
   const pool = getPool();
-  const actorUserId = await ensureSystemActor(pool);
   const row = await pool.query<{
     status: string;
     payload: CandidatePayload;
@@ -223,15 +231,14 @@ export async function approveReviewItem(
     `UPDATE review_queue_items
      SET status = 'approved', reviewed_by_user_id = $1, reviewed_at = now()
      WHERE id = $2`,
-    [actorUserId, reviewItemId],
+    [actor.id, reviewItemId],
   );
-  await pool.query(
-    `INSERT INTO audit_records (
-       actor_type, actor_id, action, target_type, target_id, request_id
-     )
-     VALUES ('user', $1, 'review_item_approved', 'company', $2, $3)`,
-    [String(actorUserId), resultingCompanyId, randomUUID()],
-  );
+  await recordAudit(pool, {
+    actorUserId: actor.id,
+    action: "review_item_approved",
+    targetType: "company",
+    targetId: resultingCompanyId,
+  });
 
   revalidatePath("/admin/review");
 }

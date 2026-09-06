@@ -42,9 +42,6 @@ export default async function CompaniesAdminPage() {
         <span className="text-sm font-semibold tracking-[0.18em] uppercase">
           Companies
         </span>
-        <span className="rounded-full bg-amber-600 px-3 py-1 text-xs font-medium text-white">
-          Unauthenticated — internal use only
-        </span>
       </header>
 
       <p className="rounded-xl border border-amber-600/40 bg-amber-50 p-4 text-sm text-amber-900">
