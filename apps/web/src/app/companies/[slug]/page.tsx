@@ -1,3 +1,4 @@
+/* Hallmark · macrostructure: long-document · theme: National Registry · system: DESIGN.md */
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
@@ -296,19 +297,19 @@ export default async function CompanyProfilePage({
         <div className="flex items-center justify-between gap-4">
           <Link
             href="/"
-            className="text-sm font-medium text-ochre-700 hover:underline"
+            className="inline-flex items-center gap-1.5 rounded text-sm font-medium text-ochre-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 focus-visible:ring-offset-2"
           >
             ← Back to directory
           </Link>
-          <span className="font-mono text-xs text-slate-500">
+          <span className="font-mono text-xs text-slate-500 tabular-nums">
             {lastCheckedLabel.toUpperCase()}:{" "}
             {new Date(lastCheckedDate).toLocaleDateString("en-AU")}
           </span>
         </div>
-        <h1 className="font-heading text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
+        <h1 className="font-heading text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl text-balance">
           {company.display_name}
         </h1>
-        <dl className="flex flex-wrap gap-x-6 gap-y-1 font-mono text-xs text-slate-600">
+        <dl className="flex flex-wrap gap-x-6 gap-y-1 font-mono text-xs text-slate-600 tabular-nums">
           <div className="flex items-center gap-1.5">
             <dt className="text-slate-400">STATUS</dt>
             <dd className="font-medium text-navy-900">
@@ -508,7 +509,7 @@ export default async function CompanyProfilePage({
             {company.open_jobs.map((job, index) => (
               <li
                 key={`${job.title}-${job.postedAt ?? index}-${index}`}
-                className="flex flex-col gap-2 rounded-lg border border-surface-border bg-white p-4 shadow-2xs transition hover:border-ochre-600/40"
+                className="flex flex-col gap-2 rounded-lg border border-surface-border bg-white p-4 shadow-2xs transition-colors duration-150 motion-reduce:transition-none hover:border-ochre-600/40"
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   {job.sourceUrl ? (
@@ -516,7 +517,7 @@ export default async function CompanyProfilePage({
                       href={job.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group inline-flex items-center gap-1.5 text-sm font-semibold text-navy-900 hover:text-ochre-700"
+                      className="group inline-flex items-center gap-1.5 rounded text-sm font-semibold text-navy-900 hover:text-ochre-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 focus-visible:ring-offset-2"
                     >
                       <span className="group-hover:underline">{job.title}</span>
                       <span
@@ -532,7 +533,7 @@ export default async function CompanyProfilePage({
                     </span>
                   )}
                   {job.postedAt && (
-                    <span className="font-mono text-xs text-slate-500">
+                    <span className="font-mono text-xs text-slate-500 tabular-nums">
                       {new Date(job.postedAt).toLocaleDateString("en-AU")}
                     </span>
                   )}

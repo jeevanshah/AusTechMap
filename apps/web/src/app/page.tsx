@@ -1,3 +1,5 @@
+/* Hallmark · macrostructure: map-diagram · theme: National Registry · system: DESIGN.md */
+
 import type { MapCompanyPoint } from "@austechmap/contracts";
 
 import { HomeMapShell } from "./_components/HomeMapShell";
@@ -47,6 +49,13 @@ export default async function Home() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-10 px-6 py-8 sm:px-10 sm:py-12">
+      <a
+        href="#directory-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-navy-900 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:outline-none focus:ring-2 focus:ring-ochre-600 focus:ring-offset-2"
+      >
+        Skip to directory content
+      </a>
+
       <header className="flex items-center justify-between border-b border-surface-border pb-5">
         <div className="flex items-center gap-2.5">
           <span className="flex h-7 w-7 items-center justify-center rounded bg-navy-900 text-white font-mono text-xs font-bold shadow-2xs">
@@ -65,12 +74,14 @@ export default async function Home() {
         <p className="mb-3 font-mono text-xs font-semibold tracking-wider text-ochre-700 uppercase">
           Australian Technology Opportunity Intelligence
         </p>
-        <h1 className="max-w-4xl font-heading text-4xl leading-[1.08] font-bold tracking-tight text-navy-900 sm:text-6xl">
+        <h1 className="max-w-4xl font-heading text-4xl leading-[1.08] font-bold tracking-tight text-navy-900 sm:text-6xl text-balance">
           A clearer map of employers, regions, and real opportunity.
         </h1>
         <p className="mt-4 font-mono text-sm font-medium text-slate-600">
-          <span className="font-semibold text-navy-900">{count}</span> verified
-          Australian tech employers indexed
+          <span className="font-semibold text-navy-900 tabular-nums">
+            {count}
+          </span>{" "}
+          verified Australian tech employers indexed
         </p>
       </section>
 
