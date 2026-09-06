@@ -69,6 +69,13 @@ body {
   font-family: var(--font-sans);
 }
 
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+a[href],
+select {
+  cursor: pointer;
+}
+
 @keyframes slide-up-subtle {
   from {
     opacity: 0;

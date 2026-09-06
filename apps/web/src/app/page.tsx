@@ -140,7 +140,16 @@ export default async function Home() {
         </div>
       </header>
 
-      <section className="relative flex flex-col gap-6 rounded-2xl border border-surface-border bg-white p-6 sm:p-8 shadow-2xs">
+      <section className="relative flex flex-col gap-6 overflow-hidden rounded-2xl border border-surface-border bg-white p-6 sm:p-8 shadow-2xs">
+        {/* Authentic Australian Topography & Geodetic Surveyor Blueprint (Slate & Desert Ochre on Pure White) */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-0 opacity-[0.10] mix-blend-multiply bg-center bg-cover"
+          style={{
+            backgroundImage: "url('/brand/hero_cartography.jpg')",
+          }}
+        />
+
         <div className="relative z-10 flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-ochre-600" />
@@ -169,7 +178,7 @@ export default async function Home() {
 
         {/* Hero Stat Strip with Kinetic Number Counters */}
         <div className="relative z-10 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-          <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
+          <div className="group rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-xs p-4 shadow-2xs hover:border-slate-300 transition-all duration-150">
             <div className="flex items-center justify-between mb-3">
               <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-navy-900 border border-slate-200/80 shadow-2xs group-hover:bg-navy-900 group-hover:text-white transition-colors duration-200">
                 <Building2 className="h-4.5 w-4.5" />
@@ -186,7 +195,7 @@ export default async function Home() {
             </span>
           </div>
 
-          <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
+          <div className="group rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-xs p-4 shadow-2xs hover:border-slate-300 transition-all duration-150">
             <div className="flex items-center justify-between mb-3">
               <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-navy-900 border border-slate-200/80 shadow-2xs group-hover:bg-navy-900 group-hover:text-white transition-colors duration-200">
                 <MapPin className="h-4.5 w-4.5" />
@@ -203,7 +212,7 @@ export default async function Home() {
             </span>
           </div>
 
-          <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
+          <div className="group rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-xs p-4 shadow-2xs hover:border-slate-300 transition-all duration-150">
             <div className="flex items-center justify-between mb-3">
               <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-navy-900 border border-slate-200/80 shadow-2xs group-hover:bg-navy-900 group-hover:text-white transition-colors duration-200">
                 <Compass className="h-4.5 w-4.5" />
@@ -220,7 +229,7 @@ export default async function Home() {
             </span>
           </div>
 
-          <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
+          <div className="group rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-xs p-4 shadow-2xs hover:border-slate-300 transition-all duration-150">
             <div className="flex items-center justify-between mb-3">
               <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-navy-900 border border-slate-200/80 shadow-2xs group-hover:bg-navy-900 group-hover:text-white transition-colors duration-200">
                 <ShieldCheck className="h-4.5 w-4.5" />

@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  Anchor,
   ArrowRight,
   Award,
   Building2,
@@ -125,7 +126,7 @@ const REGIONAL_HUBS = [
     center: [147.3272, -42.8821] as [number, number],
     zoom: 12,
     tag: "Antarctic, Marine & AgriTech",
-    icon: Compass,
+    icon: Anchor,
   },
 ];
 

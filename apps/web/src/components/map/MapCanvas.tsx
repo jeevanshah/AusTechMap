@@ -161,6 +161,20 @@ export function MapCanvas({
         paint: { "text-color": "#ffffff" },
       });
       map.addLayer({
+        id: "unclustered-point-halo",
+        type: "circle",
+        source: SOURCE_ID,
+        filter: ["!", ["has", "point_count"]],
+        paint: {
+          "circle-color": "#2563eb",
+          "circle-radius": 12,
+          "circle-opacity": 0.16,
+          "circle-stroke-width": 1.5,
+          "circle-stroke-color": "#2563eb",
+          "circle-stroke-opacity": 0.45,
+        },
+      });
+      map.addLayer({
         id: "unclustered-point",
         type: "circle",
         source: SOURCE_ID,
@@ -227,7 +241,7 @@ export function MapCanvas({
       map.on("mouseenter", "cluster-count", setPointerCursor);
       map.on("mouseleave", "cluster-count", resetCursor);
 
-      map.on("click", "unclustered-point", (event: MapLayerMouseEvent) => {
+      const handlePointClick = (event: MapLayerMouseEvent) => {
         const feature = event.features?.[0];
         const slug = feature?.properties?.slug as string | undefined;
         if (slug) onPointClickRef.current?.(slug);
@@ -240,9 +254,14 @@ export function MapCanvas({
             duration: 300,
           });
         }
-      });
+      };
+
+      map.on("click", "unclustered-point", handlePointClick);
+      map.on("click", "unclustered-point-halo", handlePointClick);
       map.on("mouseenter", "unclustered-point", setPointerCursor);
       map.on("mouseleave", "unclustered-point", resetCursor);
+      map.on("mouseenter", "unclustered-point-halo", setPointerCursor);
+      map.on("mouseleave", "unclustered-point-halo", resetCursor);
 
       if (interactive) {
         map.addControl(
