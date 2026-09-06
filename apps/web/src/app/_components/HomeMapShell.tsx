@@ -760,134 +760,206 @@ export function HomeMapShell({
 
       {/* 2. Docked Detail Panel (when a company is selected) */}
       {selectedEntry && (
-        <div className="animate-slide-up rounded-2xl border border-surface-border bg-white p-5 shadow-md">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="flex flex-col gap-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-md bg-navy-900 px-2 py-0.5 font-mono text-[11px] font-bold text-white uppercase tracking-wider">
-                  Verified Record
-                </span>
-                {selectedEntry.hasSponsorshipEvidence && (
-                  <span className="inline-flex items-center gap-1 rounded-md bg-forest-50 px-2 py-0.5 text-[11px] font-semibold text-forest-800 border border-forest-600/30">
-                    <Award className="h-3.5 w-3.5 text-forest-700 shrink-0" />
-                    Subclass 482 Visa Sponsor
-                  </span>
-                )}
-              </div>
-              <h2 className="font-heading text-xl font-bold tracking-tight text-navy-900 sm:text-2xl mt-1 truncate">
-                {selectedEntry.name}
-              </h2>
-              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 mt-0.5">
-                {selectedEntry.city && (
-                  <span className="flex items-center gap-1 font-medium text-slate-700">
-                    <MapPin className="h-3.5 w-3.5 text-pacific-600 shrink-0" />
-                    {selectedEntry.city}
-                  </span>
-                )}
-                {selectedEntry.primaryCategory && (
-                  <span className="rounded-md bg-slate-100 px-2 py-0.5 text-slate-700 font-medium">
-                    {selectedEntry.primaryCategory}
-                  </span>
-                )}
-                {(() => {
-                  const pt =
-                    displayedPoints.find((p) => p.slug === selectedEntry.slug) ??
-                    points.find((p) => p.slug === selectedEntry.slug);
-                  if (!pt) return null;
-                  return (
-                    <span className="font-mono text-[11px] text-slate-400">
-                      ({pt.lat.toFixed(2)}°, {pt.lng.toFixed(2)}°)
-                    </span>
-                  );
-                })()}
-              </div>
-            </div>
+        <div className="animate-slide-up rounded-2xl border border-surface-border bg-white p-4 sm:p-5 shadow-md">
+          {(() => {
+            const avatar = getCompanyAvatar(selectedEntry.slug, selectedEntry.name);
+            const pt =
+              displayedPoints.find((p) => p.slug === selectedEntry.slug) ??
+              points.find((p) => p.slug === selectedEntry.slug);
 
-            <button
-              type="button"
-              onClick={() => setSelectedSlug(null)}
-              aria-label="Close employer details"
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-navy-900 transition-colors"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
+            return (
+              <>
+                {/* Header Row: Avatar, Title & Metadata */}
+                <div className="flex items-start justify-between gap-3 sm:gap-4">
+                  <div className="flex items-start gap-3 sm:gap-3.5 min-w-0">
+                    {/* Brand Avatar */}
+                    <div
+                      className={`flex h-11 w-11 sm:h-13 sm:w-13 shrink-0 items-center justify-center rounded-xl font-heading font-black text-sm sm:text-base shadow-2xs ${avatar.bg} ${avatar.text}`}
+                    >
+                      {avatar.label}
+                    </div>
 
-          {/* Genuine Auditable Verification Checklist */}
-          <div className="mt-3.5 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-xl border border-slate-200/80 bg-[#faf8f5] p-3 text-xs text-slate-700 font-medium">
-            <div className="flex items-center gap-1.5 shrink-0">
-              <CheckCircle2 className="h-4 w-4 text-forest-700 shrink-0" />
-              <span>Entity Verified (ABN/ASIC)</span>
-            </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <Building2 className="h-4 w-4 text-forest-700 shrink-0" />
-              <span>Physical Premises (G-NAF)</span>
-            </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <Award
-                className={`h-4 w-4 shrink-0 ${
-                  selectedEntry.hasSponsorshipEvidence
-                    ? "text-forest-700"
-                    : "text-slate-400"
-                }`}
-              />
-              <span>
-                {selectedEntry.hasSponsorshipEvidence
-                  ? "Substantiated 482 Sponsor"
-                  : "No 482 Record on File"}
-              </span>
-            </div>
-          </div>
+                    {/* Metadata & Name */}
+                    <div className="flex flex-col gap-0.5 min-w-0">
+                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                        <span className="rounded-md bg-navy-900 px-2 py-0.5 font-mono text-[10px] font-bold text-white uppercase tracking-wider">
+                          Verified Record
+                        </span>
+                        {selectedEntry.hasSponsorshipEvidence ? (
+                          <span className="inline-flex items-center gap-1 rounded-md bg-forest-50 px-2 py-0.5 text-[11px] font-semibold text-forest-800 border border-forest-600/30">
+                            <Award className="h-3 w-3 text-forest-700 shrink-0" />
+                            Subclass 482 Visa Sponsor
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+                            Standard Employer
+                          </span>
+                        )}
+                        {selectedEntry.primaryCategory && (
+                          <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] text-slate-700 font-medium">
+                            {selectedEntry.primaryCategory}
+                          </span>
+                        )}
+                      </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-2.5">
-            {(() => {
-              const pt =
-                displayedPoints.find((p) => p.slug === selectedEntry.slug) ??
-                points.find((p) => p.slug === selectedEntry.slug);
-              if (!pt) return null;
-              return (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCameraTarget({
-                      center: [pt.lng, pt.lat],
-                      zoom: 14,
-                      timestamp: Date.now(),
-                    });
-                    setShowMapMobile(true);
-                  }}
-                  className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-pacific-500 bg-pacific-50 px-3.5 py-2 text-xs font-semibold text-pacific-800 hover:bg-pacific-100 transition-colors"
-                >
-                  <MapPin className="h-3.5 w-3.5 text-pacific-600" />
-                  Locate on map
-                </button>
-              );
-            })()}
+                      <h2 className="font-heading text-lg font-bold tracking-tight text-navy-900 sm:text-2xl mt-0.5 truncate">
+                        {selectedEntry.name}
+                      </h2>
 
-            {selectedEntry.careersUrl && (
-              <a
-                href={selectedEntry.careersUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() =>
-                  trackEvent("careers_link_clicked", {
-                    slug: selectedEntry.slug,
-                  })
-                }
-                className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-navy-900 px-3.5 py-2 text-xs font-medium text-white hover:bg-navy-800 transition-colors"
-              >
-                Careers page
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
-            )}
-            <Link
-              href={`/companies/${selectedEntry.slug}`}
-              className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-xs font-medium text-navy-900 hover:bg-slate-50 transition-colors"
-            >
-              View full profile
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 mt-0.5">
+                        {selectedEntry.city && (
+                          <span className="flex items-center gap-1 font-semibold text-slate-700">
+                            <MapPin className="h-3.5 w-3.5 text-pacific-600 shrink-0" />
+                            {selectedEntry.city}, Australia
+                          </span>
+                        )}
+                        {pt && (
+                          <>
+                            <span className="text-slate-300">•</span>
+                            <span className="font-mono text-[11px] text-slate-400">
+                              {Math.abs(pt.lat).toFixed(2)}° S, {Math.abs(pt.lng).toFixed(2)}° E
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Close Button */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedSlug(null)}
+                    aria-label="Close employer details"
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-navy-900 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+
+                {/* 3-Part Auditable Registry Checklist Grid */}
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  {/* Card 1: ASIC & ABN Registration */}
+                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-[#faf8f5] p-3 transition-colors hover:border-slate-300">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-forest-50 text-forest-700 border border-forest-600/20">
+                      <CheckCircle2 className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="block font-heading text-xs font-bold text-navy-900">
+                        Entity Verified
+                      </span>
+                      <span className="block text-[11px] text-slate-500 font-medium truncate">
+                        ABN &amp; ASIC Active
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Card 2: Australian Premises (G-NAF) */}
+                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-[#faf8f5] p-3 transition-colors hover:border-slate-300">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-pacific-50 text-pacific-700 border border-pacific-500/20">
+                      <Building2 className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="block font-heading text-xs font-bold text-navy-900">
+                        Physical Premises
+                      </span>
+                      <span className="block text-[11px] text-slate-500 font-medium truncate">
+                        G-NAF Geocoded
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Card 3: Visa Sponsorship Status */}
+                  <div
+                    className={`flex items-center gap-3 rounded-xl border p-3 transition-colors ${
+                      selectedEntry.hasSponsorshipEvidence
+                        ? "border-forest-600/30 bg-forest-50/60"
+                        : "border-slate-200/90 bg-[#faf8f5]"
+                    }`}
+                  >
+                    <div
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border ${
+                        selectedEntry.hasSponsorshipEvidence
+                          ? "bg-forest-100 text-forest-700 border-forest-600/30"
+                          : "bg-slate-100 text-slate-400 border-slate-200"
+                      }`}
+                    >
+                      <Award className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <span
+                        className={`block font-heading text-xs font-bold ${
+                          selectedEntry.hasSponsorshipEvidence
+                            ? "text-forest-900"
+                            : "text-navy-900"
+                        }`}
+                      >
+                        {selectedEntry.hasSponsorshipEvidence
+                          ? "482 Visa Sponsor"
+                          : "Visa Sponsorship"}
+                      </span>
+                      <span
+                        className={`block text-[11px] font-medium truncate ${
+                          selectedEntry.hasSponsorshipEvidence
+                            ? "text-forest-700"
+                            : "text-slate-500"
+                        }`}
+                      >
+                        {selectedEntry.hasSponsorshipEvidence
+                          ? "Substantiated on File"
+                          : "No 482 Record on File"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions Row */}
+                <div className="mt-4 flex flex-wrap items-center gap-2.5 pt-3 border-t border-slate-100">
+                  {pt && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCameraTarget({
+                          center: [pt.lng, pt.lat],
+                          zoom: 14,
+                          timestamp: Date.now(),
+                        });
+                        setShowMapMobile(true);
+                      }}
+                      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl border border-pacific-500/80 bg-pacific-50/70 px-3.5 py-2 text-xs font-semibold text-pacific-900 hover:bg-pacific-100 transition-colors shadow-2xs"
+                    >
+                      <MapPin className="h-3.5 w-3.5 text-pacific-600" />
+                      Locate on map
+                    </button>
+                  )}
+
+                  {selectedEntry.careersUrl && (
+                    <a
+                      href={selectedEntry.careersUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() =>
+                        trackEvent("careers_link_clicked", {
+                          slug: selectedEntry.slug,
+                        })
+                      }
+                      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl border border-slate-200/90 bg-white px-3.5 py-2 text-xs font-semibold text-navy-900 hover:bg-slate-50 transition-colors shadow-2xs"
+                    >
+                      Careers portal
+                      <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
+                    </a>
+                  )}
+
+                  <Link
+                    href={`/companies/${selectedEntry.slug}`}
+                    className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl bg-navy-900 px-4 py-2 text-xs font-semibold text-white hover:bg-navy-800 transition-all shadow-xs group sm:ml-auto"
+                  >
+                    <span>View full profile</span>
+                    <ArrowRight className="h-3.5 w-3.5 text-white/80 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                </div>
+              </>
+            );
+          })()}
         </div>
       )}
 
