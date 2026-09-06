@@ -34,6 +34,7 @@ import type {
   Category,
   CompanySearchResult,
   MapCompanyPoint,
+  RegionalHub,
 } from "@austechmap/contracts";
 
 import {
@@ -46,6 +47,7 @@ import { trackEvent } from "../../lib/analytics";
 export interface HomeMapShellProps {
   initialPoints: MapCompanyPoint[];
   initialBbox: Bbox;
+  initialHubs?: RegionalHub[];
 }
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -59,136 +61,127 @@ interface ListEntry {
   city: string | null;
   primaryCategory: string | null;
   hasSponsorshipEvidence: boolean;
+  isRegional: boolean;
 }
 
-const REGIONAL_HUBS = [
-  {
-    city: "Sydney",
-    state: "NSW",
-    count: 41,
-    center: [151.2093, -33.8688] as [number, number],
-    zoom: 11,
-    tag: "Flagship Tech Central & Barangaroo",
-    icon: Building2,
-  },
-  {
-    city: "Melbourne",
-    state: "VIC",
-    count: 25,
-    center: [144.9631, -37.8136] as [number, number],
-    zoom: 11,
-    tag: "Docklands & Cremorne Digital Cluster",
-    icon: Network,
-  },
-  {
-    city: "Brisbane",
-    state: "QLD",
-    count: 15,
-    center: [153.0251, -27.4698] as [number, number],
-    zoom: 11,
-    tag: "Fortitude Valley & Enterprise Hub",
-    icon: Building2,
-  },
-  {
-    city: "Perth",
+interface HubMeta {
+  state: string;
+  center: [number, number];
+  zoom: number;
+  tag: string;
+  icon: typeof Building2;
+}
+
+export interface DisplayedHub {
+  city: string;
+  state: string;
+  count: number;
+  center: [number, number];
+  zoom: number;
+  tag: string;
+  icon: typeof Building2;
+}
+
+const HUB_METADATA: Record<string, HubMeta> = {
+  Perth: {
     state: "WA",
-    count: 10,
-    center: [115.8605, -31.9505] as [number, number],
+    center: [115.8605, -31.9505],
     zoom: 11,
     tag: "Resources, Mining Tech & Autonomous Systems",
     icon: Cpu,
   },
-  {
-    city: "Adelaide",
+  Adelaide: {
     state: "SA",
-    count: 9,
-    center: [138.6007, -34.9285] as [number, number],
+    center: [138.6007, -34.9285],
     zoom: 11,
     tag: "Lot Fourteen Space, Defence & Machine Learning",
     icon: Rocket,
   },
-  {
-    city: "Canberra",
+  Canberra: {
     state: "ACT",
-    count: 8,
-    center: [149.13, -35.2809] as [number, number],
+    center: [149.13, -35.2809],
     zoom: 11,
     tag: "National Security, Cyber & GovTech",
     icon: Shield,
   },
-  {
-    city: "Wollongong",
+  Wollongong: {
     state: "NSW",
-    count: 6,
-    center: [150.8931, -34.4278] as [number, number],
+    center: [150.8931, -34.4278],
     zoom: 12,
     tag: "Illawarra Innovation Campus & CleanTech",
     icon: Network,
   },
-  {
-    city: "Newcastle",
+  Newcastle: {
     state: "NSW",
-    count: 5,
-    center: [151.7817, -32.9283] as [number, number],
+    center: [151.7817, -32.9283],
     zoom: 12,
     tag: "Hunter Energy Tech & Industrial Software",
     icon: Zap,
   },
-  {
-    city: "Darwin",
+  Darwin: {
     state: "NT",
-    count: 3,
-    center: [130.8456, -12.4634] as [number, number],
+    center: [130.8456, -12.4634],
     zoom: 12,
     tag: "Northern Territory Defence & Marine Systems",
     icon: Radio,
   },
-  {
-    city: "Hobart",
+  Hobart: {
     state: "TAS",
-    count: 3,
-    center: [147.3272, -42.8821] as [number, number],
+    center: [147.3272, -42.8821],
     zoom: 12,
     tag: "Antarctic, Marine Science & AgriTech",
     icon: Anchor,
   },
-  {
-    city: "Geelong",
+  Geelong: {
     state: "VIC",
-    count: 2,
-    center: [144.3607, -38.1499] as [number, number],
+    center: [144.3607, -38.1499],
     zoom: 12,
     tag: "Advanced Manufacturing & Regional Tech",
     icon: Cpu,
   },
-  {
-    city: "Gold Coast",
+  "Gold Coast": {
     state: "QLD",
-    count: 2,
-    center: [153.4, -28.0167] as [number, number],
+    center: [153.4, -28.0167],
     zoom: 12,
     tag: "Aerospace & Coastal Tech Startups",
     icon: Rocket,
   },
-  {
-    city: "Sunshine Coast",
+  "Sunshine Coast": {
     state: "QLD",
-    count: 2,
-    center: [153.0667, -26.65] as [number, number],
+    center: [153.0667, -26.65],
     zoom: 12,
     tag: "Subsea Cable & Digital Innovation Hub",
     icon: Network,
   },
-  {
-    city: "Bendigo",
+  Bendigo: {
     state: "VIC",
-    count: 2,
-    center: [144.2802, -36.757] as [number, number],
+    center: [144.2802, -36.757],
     zoom: 12,
     tag: "Regional Finance & Digital Services",
     icon: Building2,
   },
-];
+  Sydney: {
+    state: "NSW",
+    center: [151.2093, -33.8688],
+    zoom: 11,
+    tag: "Flagship Tech Central & Barangaroo",
+    icon: Building2,
+  },
+  Melbourne: {
+    state: "VIC",
+    center: [144.9631, -37.8136],
+    zoom: 11,
+    tag: "Docklands & Cremorne Digital Cluster",
+    icon: Network,
+  },
+  Brisbane: {
+    state: "QLD",
+    center: [153.0251, -27.4698],
+    zoom: 11,
+    tag: "Fortitude Valley & Enterprise Hub",
+    icon: Building2,
+  },
+};
 
 interface BrandAvatar {
   bg: string;
@@ -549,6 +542,7 @@ function pointsToListEntries(points: MapCompanyPoint[]): ListEntry[] {
     city: point.city,
     primaryCategory: point.primaryCategory,
     hasSponsorshipEvidence: point.hasSponsorshipEvidence,
+    isRegional: point.isRegional,
   }));
 }
 
@@ -563,14 +557,63 @@ function searchResultsToListEntries(
     city: result.city,
     primaryCategory: result.primaryCategory,
     hasSponsorshipEvidence: result.hasSponsorshipEvidence,
+    isRegional: result.isRegional,
   }));
 }
 
 export function HomeMapShell({
   initialPoints,
   initialBbox,
+  initialHubs,
 }: HomeMapShellProps) {
   const [points, setPoints] = useState(initialPoints);
+  const [hubs, setHubs] = useState<RegionalHub[]>(initialHubs ?? []);
+
+  useEffect(() => {
+    if (initialHubs && initialHubs.length > 0) return;
+    fetch("/api/regions")
+      .then((response) => response.json())
+      .then((body: { hubs?: RegionalHub[] }) => {
+        if (body.hubs && body.hubs.length > 0) {
+          setHubs(body.hubs);
+        }
+      })
+      .catch(() => {});
+  }, [initialHubs]);
+
+  const displayedHubs = useMemo<DisplayedHub[]>(() => {
+    if (hubs.length > 0) {
+      return hubs.map((hub) => {
+        const meta = HUB_METADATA[hub.city] ?? {
+          state: "AU",
+          center: [133.7751, -25.2744] as [number, number],
+          zoom: 11,
+          tag: "Designated Regional Innovation Zone",
+          icon: MapPin,
+        };
+        return {
+          city: hub.city,
+          state: meta.state,
+          count: hub.count,
+          center: meta.center,
+          zoom: meta.zoom,
+          tag: meta.tag,
+          icon: meta.icon,
+        };
+      });
+    }
+    return Object.entries(HUB_METADATA)
+      .filter(([city]) => city !== "Sydney" && city !== "Melbourne" && city !== "Brisbane")
+      .map(([city, meta]) => ({
+        city,
+        state: meta.state,
+        count: 0,
+        center: meta.center,
+        zoom: meta.zoom,
+        tag: meta.tag,
+        icon: meta.icon,
+      }));
+  }, [hubs]);
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<
     CompanySearchResult[] | null
@@ -679,8 +722,9 @@ export function HomeMapShell({
         ? `&category=${encodeURIComponent(selectedCategory)}`
         : "";
       const sponsorshipParam = sponsorshipOnly ? "&sponsorship=true" : "";
+      const regionalParam = regionalOnly ? "&regional=true" : "";
       fetch(
-        `/api/search/companies?q=${encodeURIComponent(trimmed)}${categoryParam}${sponsorshipParam}`,
+        `/api/search/companies?q=${encodeURIComponent(trimmed)}${categoryParam}${sponsorshipParam}${regionalParam}`,
       )
         .then((response) => response.json())
         .then((body: { results?: CompanySearchResult[] }) => {
@@ -695,7 +739,7 @@ export function HomeMapShell({
     return () => {
       if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     };
-  }, [query, selectedCategory, sponsorshipOnly]);
+  }, [query, selectedCategory, sponsorshipOnly, regionalOnly]);
 
   const handleMoveEnd = useCallback((bbox: Bbox, zoom: number) => {
     if (moveTimeoutRef.current) clearTimeout(moveTimeoutRef.current);
@@ -717,8 +761,9 @@ export function HomeMapShell({
       : "";
     const isSponsorshipActive = sponsorshipOnly || activeDirectoryTab === "sponsors";
     const sponsorshipParam = isSponsorshipActive ? "&sponsorship=true" : "";
+    const regionalParam = regionalOnly ? "&regional=true" : "";
     fetch(
-      `/api/map/companies?bbox=${bboxParam}${zoomParam}${categoryParam}${sponsorshipParam}`,
+      `/api/map/companies?bbox=${bboxParam}${zoomParam}${categoryParam}${sponsorshipParam}${regionalParam}`,
     )
       .then((response) => response.json())
       .then((body: { points?: MapCompanyPoint[] }) =>
@@ -727,7 +772,7 @@ export function HomeMapShell({
       .catch(() => {
         /* keep showing the last-known points rather than clearing the map */
       });
-  }, [currentBbox, currentZoom, selectedCategory, sponsorshipOnly, activeDirectoryTab]);
+  }, [currentBbox, currentZoom, selectedCategory, sponsorshipOnly, activeDirectoryTab, regionalOnly]);
 
   const handlePointClick = useCallback((slug: string) => {
     setSelectedSlug(slug);
@@ -750,10 +795,7 @@ export function HomeMapShell({
   // Apply regional-only filter on the list view
   const listEntries = useMemo(() => {
     if (!regionalOnly) return rawListEntries;
-    return rawListEntries.filter(
-      (entry) =>
-        entry.city && entry.city !== "Sydney" && entry.city !== "Melbourne",
-    );
+    return rawListEntries.filter((entry) => entry.isRegional);
   }, [rawListEntries, regionalOnly]);
 
   // Verified sponsorship count across currently loaded records
@@ -774,10 +816,7 @@ export function HomeMapShell({
   const displayedPoints = useMemo(() => {
     let pts = points;
     if (regionalOnly) {
-      pts = pts.filter(
-        (point) =>
-          point.city && point.city !== "Sydney" && point.city !== "Melbourne",
-      );
+      pts = pts.filter((point) => point.isRegional);
     }
     if (activeDirectoryTab === "sponsors") {
       pts = pts.filter((point) => point.hasSponsorshipEvidence);
@@ -805,7 +844,7 @@ export function HomeMapShell({
     });
   };
 
-  const handleSelectHub = (hub: (typeof REGIONAL_HUBS)[number]) => {
+  const handleSelectHub = (hub: DisplayedHub) => {
     if (activeHubCity === hub.city && activeDirectoryTab === "companies") {
       setActiveHubCity(null);
       setQuery("");
@@ -903,7 +942,7 @@ export function HomeMapShell({
                   setActiveHubCity(null);
                   setQuery("");
                 } else {
-                  const hub = REGIONAL_HUBS.find((h) => h.city === val);
+                  const hub = displayedHubs.find((h) => h.city === val);
                   if (hub) handleSelectHub(hub);
                   else {
                     setActiveHubCity(val);
@@ -913,8 +952,8 @@ export function HomeMapShell({
               }}
               className="text-xs font-semibold text-navy-900 bg-transparent focus:outline-none cursor-pointer py-1"
             >
-              <option value="">All regions &amp; cities ({REGIONAL_HUBS.length})</option>
-              {REGIONAL_HUBS.map((hub) => (
+              <option value="">All regional hubs ({displayedHubs.length})</option>
+              {displayedHubs.map((hub) => (
                 <option key={hub.city} value={hub.city}>
                   {hub.city}, {hub.state} ({hub.count})
                 </option>
@@ -1327,13 +1366,13 @@ export function HomeMapShell({
                       : "bg-slate-200/80 text-slate-700"
                   }`}
                 >
-                  {REGIONAL_HUBS.length}
+                  {displayedHubs.length}
                 </span>
               </button>
             </div>
             <span className="whitespace-nowrap font-mono text-[11px] text-slate-500 font-medium shrink-0 hidden sm:inline">
               {activeDirectoryTab === "regions"
-                ? `${REGIONAL_HUBS.length} hubs`
+                ? `${displayedHubs.length} hubs`
                 : `${displayedEntries.length} in view`}
             </span>
           </div>
@@ -1369,13 +1408,13 @@ export function HomeMapShell({
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                        14 regional tech hubs across Australia. Click any hub to explore local employers.
+                        {displayedHubs.length} designated regional tech hubs across Australia. Click any hub to explore local employers.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {REGIONAL_HUBS.map((hub) => {
+                {displayedHubs.map((hub) => {
                   const isActive = activeHubCity === hub.city;
                   return (
                     <button
@@ -1582,33 +1621,33 @@ export function HomeMapShell({
             </div>
 
             {/* Bottom-Left Floating Hub Spotlight Card */}
-            <div
-              onClick={() => {
-                const syd =
-                  REGIONAL_HUBS.find((h) => h.city === "Sydney") ??
-                  REGIONAL_HUBS[0]!;
-                handleSelectHub(syd);
-              }}
-              className="absolute bottom-3 left-3 sm:left-4 z-10 flex items-center gap-3 rounded-xl border border-surface-border bg-white/95 backdrop-blur-xs p-2.5 shadow-md hover:border-terracotta-700/60 transition-all cursor-pointer group max-w-xs"
-            >
-              <div className="relative h-10 w-12 rounded-lg bg-navy-900 text-white flex items-center justify-center font-mono font-bold text-xs uppercase overflow-hidden shrink-0">
-                <Image
-                  src="/brand/hero_cartography.jpg"
-                  alt="Sydney skyline"
-                  fill
-                  className="object-cover opacity-50 mix-blend-luminosity group-hover:scale-110 transition-transform"
-                />
-                <span className="relative z-10">SYD</span>
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="font-heading text-xs font-bold text-navy-900 group-hover:text-terracotta-700 transition-colors truncate">
-                  Sydney Flagship Cluster
-                </span>
-                <span className="font-mono text-[10px] text-slate-500">
-                  41 verified employers &gt;
-                </span>
-              </div>
-            </div>
+            {displayedHubs.length > 0 && (() => {
+              const spotlightHub = displayedHubs[0]!;
+              return (
+                <div
+                  onClick={() => handleSelectHub(spotlightHub)}
+                  className="absolute bottom-3 left-3 sm:left-4 z-10 flex items-center gap-3 rounded-xl border border-surface-border bg-white/95 backdrop-blur-xs p-2.5 shadow-md hover:border-terracotta-700/60 transition-all cursor-pointer group max-w-xs"
+                >
+                  <div className="relative h-10 w-12 rounded-lg bg-navy-900 text-white flex items-center justify-center font-mono font-bold text-xs uppercase overflow-hidden shrink-0">
+                    <Image
+                      src="/brand/hero_cartography.jpg"
+                      alt={`${spotlightHub.city} tech cluster`}
+                      fill
+                      className="object-cover opacity-50 mix-blend-luminosity group-hover:scale-110 transition-transform"
+                    />
+                    <span className="relative z-10">{spotlightHub.city.slice(0, 3).toUpperCase()}</span>
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-heading text-xs font-bold text-navy-900 group-hover:text-terracotta-700 transition-colors truncate">
+                      {spotlightHub.city} Regional Hub
+                    </span>
+                    <span className="font-mono text-[10px] text-slate-500">
+                      {spotlightHub.count} verified employers &gt;
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
 
 
           </div>

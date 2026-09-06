@@ -1,11 +1,12 @@
 import Image from "next/image";
 import { Building2, Compass, MapPin, ShieldCheck } from "lucide-react";
-import type { MapCompanyPoint } from "@austechmap/contracts";
+import type { MapCompanyPoint, RegionalHub } from "@austechmap/contracts";
 
 import { AnimatedCounter } from "../components/ui/AnimatedCounter";
 import { HomeMapShell } from "./_components/HomeMapShell";
 import { DatabaseNotConfiguredError, getPool } from "../lib/db";
 import { fetchMapCompanies } from "../lib/queries/mapCompanies";
+import { listRegionalHubs } from "../lib/queries/listRegionalHubs";
 
 export const dynamic = "force-dynamic";
 
@@ -29,11 +30,12 @@ export interface HomeStats {
 interface HomeData {
   stats: HomeStats;
   points: MapCompanyPoint[];
+  hubs: RegionalHub[];
 }
 
 async function loadHomeData(): Promise<HomeData> {
   const pool = getPool();
-  const [{ rows }, mapResult] = await Promise.all([
+  const [{ rows }, mapResult, hubs] = await Promise.all([
     pool.query<{
       total_employers: string;
       total_cities: string;
@@ -43,7 +45,11 @@ async function loadHomeData(): Promise<HomeData> {
       `SELECT 
         count(DISTINCT c.id) as total_employers,
         count(DISTINCT research.claim_value ->> 'city') as total_cities,
-        count(DISTINCT CASE WHEN (research.claim_value ->> 'city') NOT IN ('Sydney', 'Melbourne') AND (research.claim_value ->> 'city') IS NOT NULL THEN c.id END) as regional_employers,
+        count(DISTINCT CASE WHEN EXISTS (
+          SELECT 1 FROM company_locations cl2
+          JOIN resolved_locations rl2 ON rl2.id = cl2.resolved_location_id
+          WHERE cl2.company_id = c.id AND rl2.migration_category IS NOT NULL
+        ) THEN c.id END) as regional_employers,
         count(DISTINCT CASE WHEN EXISTS (
           SELECT 1 FROM evidence e2
           WHERE e2.entity_type = 'company' AND e2.entity_id = c.id::text
@@ -66,6 +72,7 @@ async function loadHomeData(): Promise<HomeData> {
       sponsorship: false,
       regional: false,
     }),
+    listRegionalHubs(pool),
   ]);
 
   const row = rows[0];
@@ -77,6 +84,7 @@ async function loadHomeData(): Promise<HomeData> {
       sponsorshipEmployers: Number(row?.sponsorship_employers ?? 0),
     },
     points: mapResult.points,
+    hubs,
   };
 }
 
@@ -88,11 +96,13 @@ export default async function Home() {
     sponsorshipEmployers: 0,
   };
   let points: MapCompanyPoint[] = [];
+  let hubs: RegionalHub[] = [];
   let error: string | null = null;
   try {
     const data = await loadHomeData();
     stats = data.stats;
     points = data.points;
+    hubs = data.hubs;
   } catch (caught) {
     error =
       caught instanceof DatabaseNotConfiguredError
@@ -287,7 +297,11 @@ export default async function Home() {
       )}
 
       {!error && (
-        <HomeMapShell initialPoints={points} initialBbox={AUSTRALIA_BBOX} />
+        <HomeMapShell
+          initialPoints={points}
+          initialBbox={AUSTRALIA_BBOX}
+          initialHubs={hubs}
+        />
       )}
     </main>
   );
