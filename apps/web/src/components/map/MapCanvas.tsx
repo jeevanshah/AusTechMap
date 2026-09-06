@@ -129,15 +129,15 @@ export function MapCanvas({
           "circle-color": [
             "step",
             ["get", "point_count"],
-            "#60a5fa", // 1-4: Regional hubs (Darwin, Hobart) - Sky Azure
+            "#475569", // 1-4: Regional hubs (Darwin, Hobart) - Slate 600
             5,
-            "#f59e0b", // 5-9: Emerging hubs (Adelaide, Canberra) - Warm Amber
+            "#334155", // 5-9: Emerging hubs (Adelaide, Canberra) - Slate 700
             10,
-            "#3b82f6", // 10-19: Established hubs (Brisbane, Perth) - Pacific Azure
+            "#1e293b", // 10-19: Established hubs (Brisbane, Perth) - Slate 800
             20,
-            "#2563eb", // 20-39: Major tech hub (Melbourne) - Royal Cobalt
+            "#0f172a", // 20-39: Major tech hub (Melbourne) - Midnight Navy
             40,
-            "#c2410c", // 40+: Flagship Innovation Center (Sydney) - Terracotta Red Earth
+            "#c2410c", // 40+: Flagship Innovation Center (Sydney) - Australian Terracotta
           ],
           "circle-stroke-color": "#ffffff",
           "circle-stroke-width": 2,
@@ -174,23 +174,19 @@ export function MapCanvas({
           "circle-color": [
             "case",
             ["==", ["get", "hasSponsorshipEvidence"], 1],
-            "#15803d",
-            ["==", ["get", "isRegional"], 1],
-            "#b45309",
-            "#2563eb",
+            "#c2410c",
+            "#0f172a",
           ],
-          "circle-radius": 12,
-          "circle-opacity": 0.18,
-          "circle-stroke-width": 1.5,
+          "circle-radius": 11,
+          "circle-opacity": 0.12,
+          "circle-stroke-width": 1,
           "circle-stroke-color": [
             "case",
             ["==", ["get", "hasSponsorshipEvidence"], 1],
-            "#15803d",
-            ["==", ["get", "isRegional"], 1],
-            "#b45309",
-            "#2563eb",
+            "#c2410c",
+            "#0f172a",
           ],
-          "circle-stroke-opacity": 0.45,
+          "circle-stroke-opacity": 0.25,
         },
       });
       map.addLayer({
@@ -202,10 +198,8 @@ export function MapCanvas({
           "circle-color": [
             "case",
             ["==", ["get", "hasSponsorshipEvidence"], 1],
-            "#15803d",
-            ["==", ["get", "isRegional"], 1],
-            "#b45309",
-            "#2563eb",
+            "#c2410c",
+            "#0f172a",
           ],
           "circle-radius": 6.5,
           "circle-stroke-width": 2,

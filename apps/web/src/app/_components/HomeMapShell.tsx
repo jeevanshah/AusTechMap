@@ -283,11 +283,7 @@ function getCompanyAvatar(slug: string, name: string): BrandAvatar {
       .toUpperCase() || "AU";
   const colors = [
     { bg: "bg-navy-900", text: "text-white" },
-    { bg: "bg-terracotta-700", text: "text-white" },
-    { bg: "bg-pacific-700", text: "text-white" },
-    { bg: "bg-forest-800", text: "text-white" },
-    { bg: "bg-ochre-700", text: "text-white" },
-    { bg: "bg-indigo-800", text: "text-white" },
+    { bg: "bg-slate-800", text: "text-white" },
   ];
   let hash = 0;
   for (let i = 0; i < slug.length; i++) {
@@ -872,7 +868,7 @@ export function HomeMapShell({
                 }
               }}
               placeholder="Search companies, roles, technologies... (Press ⌘K)"
-              className="w-full rounded-xl border border-slate-200/90 bg-[#faf8f5]/80 py-2.5 pr-20 pl-10 text-sm font-medium text-navy-900 placeholder:text-slate-400 focus:border-pacific-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-pacific-500/20 transition-all"
+              className="w-full rounded-xl border border-slate-200/90 bg-[#faf8f5]/80 py-2.5 pr-20 pl-10 text-sm font-medium text-navy-900 placeholder:text-slate-400 focus:border-navy-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-navy-900/15 transition-all"
             />
             <div className="absolute right-3 flex items-center gap-1.5">
               {query.length > 0 ? (
@@ -955,13 +951,13 @@ export function HomeMapShell({
               aria-pressed={sponsorshipOnly}
               className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
                 sponsorshipOnly
-                  ? "border border-forest-600 bg-forest-50 text-forest-900 shadow-xs"
-                  : "border border-slate-200/90 bg-white text-slate-700 hover:bg-slate-50"
+                  ? "border border-navy-900 bg-navy-900 text-white shadow-xs"
+                  : "border border-slate-200/90 bg-white text-slate-700 hover:border-slate-300 hover:bg-[#faf8f5]"
               }`}
             >
               <ShieldCheck
                 className={`h-3.5 w-3.5 ${
-                  sponsorshipOnly ? "text-forest-700" : "text-slate-400"
+                  sponsorshipOnly ? "text-white" : "text-slate-400"
                 }`}
               />
               Sponsorship
@@ -973,8 +969,8 @@ export function HomeMapShell({
               aria-pressed={regionalOnly}
               className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
                 regionalOnly
-                  ? "border border-amber-600 bg-amber-500 text-white shadow-xs"
-                  : "border border-slate-200/90 bg-white text-slate-700 hover:bg-slate-50"
+                  ? "border border-navy-900 bg-navy-900 text-white shadow-xs"
+                  : "border border-slate-200/90 bg-white text-slate-700 hover:border-slate-300 hover:bg-[#faf8f5]"
               }`}
             >
               <Compass
@@ -1065,17 +1061,17 @@ export function HomeMapShell({
                     {/* Metadata & Name */}
                     <div className="flex flex-col gap-0.5 min-w-0">
                       <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                        <span className="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-[10px] font-bold text-sky-800 uppercase tracking-wider shadow-2xs">
-                          <CheckCircle2 className="h-2.5 w-2.5 text-sky-600 shrink-0" />
+                        <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-[#faf8f5] px-2.5 py-0.5 text-[10px] font-bold text-slate-800 uppercase tracking-wider shadow-2xs">
+                          <CheckCircle2 className="h-2.5 w-2.5 text-emerald-600 shrink-0" />
                           Verified Record
                         </span>
                         {selectedEntry.hasSponsorshipEvidence ? (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-forest-50 px-2.5 py-0.5 text-[11px] font-semibold text-forest-800 border border-forest-600/30 shadow-2xs">
-                            <Award className="h-3 w-3 text-forest-700 shrink-0" />
+                          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-[#faf8f5] px-2.5 py-0.5 text-[11px] font-semibold text-slate-800 shadow-2xs">
+                            <Award className="h-3 w-3 text-slate-600 shrink-0" />
                             Subclass 482 Visa Sponsor
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-medium text-slate-600">
+                          <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-[#faf8f5] px-2.5 py-0.5 text-[11px] font-medium text-slate-600">
                             Standard Employer
                           </span>
                         )}
@@ -1094,7 +1090,7 @@ export function HomeMapShell({
                       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 mt-0.5">
                         {selectedEntry.city && (
                           <span className="flex items-center gap-1 font-semibold text-slate-700">
-                            <MapPin className="h-3.5 w-3.5 text-pacific-600 shrink-0" />
+                            <MapPin className="h-3.5 w-3.5 text-slate-500 shrink-0" />
                             {selectedEntry.city}, Australia
                           </span>
                         )}
@@ -1124,9 +1120,9 @@ export function HomeMapShell({
                 {/* 3-Part Auditable Registry Checklist Grid */}
                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   {/* Card 1: ASIC & ABN Registration */}
-                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-[#faf8f5] p-3 transition-colors hover:border-slate-300">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-forest-50 text-forest-700 border border-forest-600/20">
-                      <CheckCircle2 className="h-4 w-4" />
+                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-[#faf8f5] p-3 transition-colors hover:border-slate-300 shadow-2xs">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                     </div>
                     <div className="min-w-0">
                       <span className="block font-heading text-xs font-bold text-navy-900">
@@ -1139,9 +1135,9 @@ export function HomeMapShell({
                   </div>
 
                   {/* Card 2: Australian Premises (G-NAF) */}
-                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-[#faf8f5] p-3 transition-colors hover:border-slate-300">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-pacific-50 text-pacific-700 border border-pacific-500/20">
-                      <Building2 className="h-4 w-4" />
+                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-[#faf8f5] p-3 transition-colors hover:border-slate-300 shadow-2xs">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
+                      <Building2 className="h-4 w-4 text-slate-700" />
                     </div>
                     <div className="min-w-0">
                       <span className="block font-heading text-xs font-bold text-navy-900">
@@ -1154,41 +1150,21 @@ export function HomeMapShell({
                   </div>
 
                   {/* Card 3: Visa Sponsorship Status */}
-                  <div
-                    className={`flex items-center gap-3 rounded-xl border p-3 transition-colors ${
-                      selectedEntry.hasSponsorshipEvidence
-                        ? "border-forest-600/30 bg-forest-50/60"
-                        : "border-slate-200/90 bg-[#faf8f5]"
-                    }`}
-                  >
-                    <div
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border ${
-                        selectedEntry.hasSponsorshipEvidence
-                          ? "bg-forest-100 text-forest-700 border-forest-600/30"
-                          : "bg-slate-100 text-slate-400 border-slate-200"
-                      }`}
-                    >
-                      <Award className="h-4 w-4" />
+                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-[#faf8f5] p-3 transition-colors hover:border-slate-300 shadow-2xs">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
+                      <Award className={`h-4 w-4 ${selectedEntry.hasSponsorshipEvidence ? "text-terracotta-700" : "text-slate-400"}`} />
                     </div>
                     <div className="min-w-0">
-                      <span
-                        className={`block font-heading text-xs font-bold ${
-                          selectedEntry.hasSponsorshipEvidence
-                            ? "text-forest-900"
-                            : "text-navy-900"
-                        }`}
-                      >
+                      <span className="block font-heading text-xs font-bold text-navy-900">
                         {selectedEntry.hasSponsorshipEvidence
                           ? "482 Visa Sponsor"
                           : "Visa Sponsorship"}
                       </span>
-                      <span
-                        className={`block text-[11px] font-medium truncate ${
-                          selectedEntry.hasSponsorshipEvidence
-                            ? "text-forest-700"
-                            : "text-slate-500"
-                        }`}
-                      >
+                      <span className={`block text-[11px] font-medium truncate ${
+                        selectedEntry.hasSponsorshipEvidence
+                          ? "text-navy-900 font-semibold"
+                          : "text-slate-500"
+                      }`}>
                         {selectedEntry.hasSponsorshipEvidence
                           ? "Substantiated on File"
                           : "No 482 Record on File"}
@@ -1210,9 +1186,9 @@ export function HomeMapShell({
                         });
                         setShowMapMobile(true);
                       }}
-                      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl border border-pacific-500/80 bg-pacific-50/70 px-3.5 py-2 text-xs font-semibold text-pacific-900 hover:bg-pacific-100 transition-colors shadow-2xs"
+                      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl border border-slate-200/90 bg-white px-3.5 py-2 text-xs font-semibold text-navy-900 hover:bg-[#faf8f5] transition-colors shadow-2xs"
                     >
-                      <MapPin className="h-3.5 w-3.5 text-pacific-600" />
+                      <MapPin className="h-3.5 w-3.5 text-slate-500" />
                       Locate on map
                     </button>
                   )}
@@ -1261,7 +1237,7 @@ export function HomeMapShell({
         >
           {/* Active Region Hub Breadcrumb Banner */}
           {activeHubCity && (
-            <div className="flex items-center justify-between rounded-xl bg-orange-50/90 border border-orange-200/90 px-3 py-2 text-xs transition-all">
+            <div className="flex items-center justify-between rounded-xl bg-[#faf8f5] border border-surface-border px-3 py-2 text-xs transition-all shadow-2xs">
               <div className="flex items-center gap-2 min-w-0">
                 <button
                   type="button"
@@ -1275,12 +1251,12 @@ export function HomeMapShell({
                       timestamp: Date.now(),
                     });
                   }}
-                  className="inline-flex items-center gap-1 font-semibold text-terracotta-700 hover:text-terracotta-900 hover:underline shrink-0"
+                  className="inline-flex items-center gap-1 font-semibold text-terracotta-700 hover:text-terracotta-800 hover:underline shrink-0"
                 >
                   <ArrowLeft className="h-3.5 w-3.5" />
                   All regions
                 </button>
-                <span className="text-orange-300">•</span>
+                <span className="text-slate-300">•</span>
                 <span className="truncate font-bold text-navy-900">
                   📍 {activeHubCity} Hub
                 </span>
@@ -1319,7 +1295,7 @@ export function HomeMapShell({
                 onClick={() => setActiveDirectoryTab("sponsors")}
                 className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all ${
                   activeDirectoryTab === "sponsors"
-                    ? "bg-forest-800 text-white shadow-xs"
+                    ? "bg-navy-900 text-white shadow-xs"
                     : "text-slate-600 hover:text-navy-900 hover:bg-slate-100"
                 }`}
               >
@@ -1339,7 +1315,7 @@ export function HomeMapShell({
                 onClick={() => setActiveDirectoryTab("regions")}
                 className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all ${
                   activeDirectoryTab === "regions"
-                    ? "bg-terracotta-700 text-white shadow-xs"
+                    ? "bg-navy-900 text-white shadow-xs"
                     : "text-slate-600 hover:text-navy-900 hover:bg-slate-100"
                 }`}
               >
@@ -1408,15 +1384,15 @@ export function HomeMapShell({
                       onClick={() => handleSelectHub(hub)}
                       className={`flex items-center justify-between rounded-xl border p-3 text-left transition-all ${
                         isActive
-                          ? "border-terracotta-700 bg-orange-50/40 shadow-xs"
-                          : "border-surface-border bg-white hover:border-slate-300 hover:bg-slate-50/50"
+                          ? "border-navy-900 bg-[#faf8f5] shadow-xs"
+                          : "border-surface-border bg-white hover:border-slate-300 hover:bg-[#faf8f5]/50"
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <span
                           className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border ${
                             isActive
-                              ? "bg-terracotta-700 text-white border-terracotta-800"
+                              ? "bg-navy-900 text-white border-navy-900"
                               : "bg-[#faf8f5] text-navy-900 border-surface-border"
                           }`}
                         >
@@ -1471,9 +1447,9 @@ export function HomeMapShell({
                             timestamp: Date.now(),
                           });
                         }}
-                        className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-forest-800 px-3.5 py-2 text-xs font-semibold text-white hover:bg-forest-900 transition-all shadow-2xs"
+                        className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-navy-900 px-3.5 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition-all shadow-2xs"
                       >
-                        <Award className="h-3.5 w-3.5 text-forest-300" />
+                        <Award className="h-3.5 w-3.5 text-slate-300" />
                         View all 5 nationwide visa sponsors
                       </button>
                     )}
@@ -1519,8 +1495,8 @@ export function HomeMapShell({
                               {entry.name}
                             </span>
                             <div className="flex items-center gap-1.5 shrink-0">
-                              <span className="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[10px] font-semibold text-sky-800 shadow-2xs">
-                                <CheckCircle2 className="h-2.5 w-2.5 text-sky-600 shrink-0" />
+                              <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-[#faf8f5] px-2 py-0.5 text-[10px] font-semibold text-slate-800 shadow-2xs">
+                                <CheckCircle2 className="h-2.5 w-2.5 text-emerald-600 shrink-0" />
                                 Verified
                               </span>
                               <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-0.5 group-hover:text-navy-900 transition-all" />
@@ -1542,9 +1518,9 @@ export function HomeMapShell({
 
                           {entry.hasSponsorshipEvidence && (
                             <div className="flex items-center gap-1.5 mt-2">
-                              <span className="inline-flex items-center gap-1.5 rounded-full border border-forest-600/30 bg-forest-50 px-2.5 py-0.5 font-mono text-[10px] font-semibold text-forest-800 shadow-2xs">
-                                <Award className="h-2.5 w-2.5 text-forest-700 shrink-0" />
-                                Subclass 482 Visa Sponsor
+                              <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-[#faf8f5] px-2.5 py-0.5 font-mono text-[10px] font-semibold text-slate-800 shadow-2xs">
+                                <Award className="h-2.5 w-2.5 text-slate-600 shrink-0" />
+                                Subclass 482 Sponsor
                               </span>
                             </div>
                           )}

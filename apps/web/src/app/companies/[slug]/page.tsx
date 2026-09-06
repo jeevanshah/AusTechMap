@@ -291,7 +291,7 @@ export default async function CompanyProfilePage({
         <div className="flex items-center justify-between gap-4">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 rounded text-sm font-medium text-ochre-700 hover:text-ochre-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 focus-visible:ring-offset-2 transition-colors"
+            className="inline-flex items-center gap-2 rounded text-sm font-medium text-terracotta-700 hover:text-terracotta-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Back to directory</span>
@@ -442,23 +442,23 @@ export default async function CompanyProfilePage({
             {company.sponsorship_evidence.map((entry, index) => (
               <li
                 key={`${entry.claimType}-${entry.observedAt}-${index}`}
-                className="rounded-lg border border-forest-600/25 bg-forest-50 p-4 text-sm"
+                className="rounded-xl border border-surface-border bg-[#faf8f5] p-4 text-sm shadow-2xs"
               >
                 <div className="flex items-center justify-between gap-4">
-                  <span className="flex items-center gap-2 font-semibold text-forest-900">
-                    <ShieldCheck className="h-4 w-4 shrink-0 text-forest-700" />
+                  <span className="flex items-center gap-2 font-semibold text-navy-900">
+                    <ShieldCheck className="h-4 w-4 shrink-0 text-slate-700" />
                     {SPONSORSHIP_CLAIM_LABELS[entry.claimType] ??
                       entry.claimType}
                   </span>
                   <span
                     suppressHydrationWarning
-                    className="font-mono text-xs text-slate-600"
+                    className="font-mono text-xs text-slate-500"
                   >
                     {new Date(entry.observedAt).toLocaleDateString("en-AU")}
                   </span>
                 </div>
                 {entry.claimType === "sponsorship_labour_agreement" ? (
-                  <p className="mt-2 text-xs text-forest-900/80">
+                  <p className="mt-2 text-xs text-slate-600">
                     {[
                       entry.claimValue.agreement_type,
                       entry.claimValue.start_date
@@ -474,7 +474,7 @@ export default async function CompanyProfilePage({
                     , current labour agreements list
                   </p>
                 ) : (
-                  <p className="mt-2 text-xs text-forest-900/80">
+                  <p className="mt-2 text-xs text-slate-600">
                     {String(entry.claimValue.job_title ?? "")}
                     {typeof entry.claimValue.source_url === "string" && (
                       <>
@@ -516,7 +516,7 @@ export default async function CompanyProfilePage({
               href={company.careers_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs font-medium text-ochre-700 hover:underline"
+              className="inline-flex items-center gap-1 text-xs font-medium text-terracotta-700 hover:underline"
             >
               <span>Careers page</span>
               <ExternalLink className="h-3 w-3" />
@@ -535,7 +535,7 @@ export default async function CompanyProfilePage({
                   href={company.careers_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-medium text-ochre-700 underline hover:text-ochre-800"
+                  className="font-medium text-terracotta-700 underline hover:text-terracotta-800"
                 >
                   careers page
                 </a>{" "}
@@ -548,7 +548,7 @@ export default async function CompanyProfilePage({
             {company.open_jobs.map((job, index) => (
               <li
                 key={`${job.title}-${job.postedAt ?? index}-${index}`}
-                className="flex flex-col gap-2 rounded-lg border border-surface-border bg-white p-4 shadow-2xs transition-colors duration-150 motion-reduce:transition-none hover:border-ochre-600/40"
+                className="flex flex-col gap-2 rounded-lg border border-surface-border bg-white p-4 shadow-2xs transition-colors duration-150 motion-reduce:transition-none hover:border-slate-400"
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   {job.sourceUrl ? (
@@ -556,12 +556,12 @@ export default async function CompanyProfilePage({
                       href={job.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group inline-flex items-center gap-1.5 rounded text-sm font-semibold text-navy-900 hover:text-ochre-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 focus-visible:ring-offset-2"
+                      className="group inline-flex items-center gap-1.5 rounded text-sm font-semibold text-navy-900 hover:text-terracotta-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
                     >
                       <span className="group-hover:underline">{job.title}</span>
                       <ExternalLink
                         aria-hidden="true"
-                        className="h-3.5 w-3.5 text-slate-400 group-hover:text-ochre-700 transition-colors"
+                        className="h-3.5 w-3.5 text-slate-400 group-hover:text-terracotta-700 transition-colors"
                       />
                     </a>
                   ) : (
@@ -591,7 +591,7 @@ export default async function CompanyProfilePage({
                     </span>
                   )}
                   {REMOTE_TYPE_LABELS[job.remoteType] && (
-                    <span className="rounded bg-ochre-50 px-2.5 py-0.5 font-mono text-[11px] font-medium text-ochre-800">
+                    <span className="rounded bg-slate-100 px-2.5 py-0.5 font-mono text-[11px] font-medium text-slate-700">
                       {REMOTE_TYPE_LABELS[job.remoteType]}
                     </span>
                   )}

@@ -153,9 +153,9 @@ export default async function Home() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/80 px-3 py-1 font-mono text-[11px] font-semibold text-emerald-900 shadow-2xs">
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
-            Verified National Registry
+          <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-surface-border bg-white px-3 py-1 font-mono text-[11px] font-semibold text-slate-800 shadow-2xs">
+            <span className="h-2 w-2 rounded-full bg-emerald-600" />
+            Verified Registry
           </span>
           <a
             href="https://github.com/jeevanshah/AusTechMap"
@@ -209,12 +209,12 @@ export default async function Home() {
 
           {/* Right: Elevated 4-Stat Strip */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-4">
-            <div className="rounded-xl border border-surface-border bg-[#faf8f5]/80 p-3.5 shadow-2xs hover:border-slate-300 transition-all">
+            <div className="rounded-xl border border-surface-border bg-[#faf8f5]/90 p-3.5 shadow-2xs hover:border-slate-400 hover:bg-white transition-all">
               <div className="flex items-center justify-between mb-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-navy-900 border border-slate-200/80 shadow-2xs">
+                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
                   <Building2 className="h-3.5 w-3.5" />
                 </span>
-                <span className="font-mono text-[10px] font-semibold text-slate-400 uppercase">
+                <span className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                   Index
                 </span>
               </div>
@@ -226,12 +226,12 @@ export default async function Home() {
               </span>
             </div>
 
-            <div className="rounded-xl border border-surface-border bg-[#faf8f5]/80 p-3.5 shadow-2xs hover:border-pacific-300 transition-all">
+            <div className="rounded-xl border border-surface-border bg-[#faf8f5]/90 p-3.5 shadow-2xs hover:border-slate-400 hover:bg-white transition-all">
               <div className="flex items-center justify-between mb-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-pacific-700 border border-pacific-200/80 shadow-2xs">
+                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
                   <MapPin className="h-3.5 w-3.5" />
                 </span>
-                <span className="font-mono text-[10px] font-semibold text-pacific-600 uppercase">
+                <span className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                   Hubs
                 </span>
               </div>
@@ -243,12 +243,12 @@ export default async function Home() {
               </span>
             </div>
 
-            <div className="rounded-xl border border-surface-border bg-[#faf8f5]/80 p-3.5 shadow-2xs hover:border-amber-300 transition-all">
+            <div className="rounded-xl border border-surface-border bg-[#faf8f5]/90 p-3.5 shadow-2xs hover:border-slate-400 hover:bg-white transition-all">
               <div className="flex items-center justify-between mb-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-ochre-700 border border-amber-200/80 shadow-2xs">
+                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
                   <Compass className="h-3.5 w-3.5" />
                 </span>
-                <span className="font-mono text-[10px] font-semibold text-ochre-700 uppercase">
+                <span className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                   Regional
                 </span>
               </div>
@@ -260,12 +260,12 @@ export default async function Home() {
               </span>
             </div>
 
-            <div className="rounded-xl border border-surface-border bg-[#faf8f5]/80 p-3.5 shadow-2xs hover:border-emerald-300 transition-all">
+            <div className="rounded-xl border border-surface-border bg-[#faf8f5]/90 p-3.5 shadow-2xs hover:border-slate-400 hover:bg-white transition-all">
               <div className="flex items-center justify-between mb-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-forest-700 border border-emerald-200/80 shadow-2xs">
+                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
                   <ShieldCheck className="h-3.5 w-3.5" />
                 </span>
-                <span className="font-mono text-[10px] font-semibold text-forest-700 uppercase">
+                <span className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                   Visas
                 </span>
               </div>
