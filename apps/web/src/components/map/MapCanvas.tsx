@@ -344,59 +344,6 @@ export function MapCanvas({
   return (
     <div className="relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
-
-      {/* Cluster Density Sequential Legend */}
-      <div className="pointer-events-none absolute top-3 left-3 z-10 hidden sm:flex flex-col gap-1.5 rounded-xl border border-slate-200/90 bg-white/95 p-3 font-mono text-[11px] shadow-sm backdrop-blur-md">
-        <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-1.5">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-            Cluster Density
-          </span>
-          <span className="text-[9px] font-medium text-slate-400">
-            Employers
-          </span>
-        </div>
-        <div className="flex flex-col gap-1.5 pt-0.5">
-          <div className="flex items-center gap-2 text-slate-700">
-            <span className="flex h-3.5 w-3.5 items-center justify-center">
-              <span className="h-3 w-3 rounded-full bg-[#0f2963] ring-1 ring-white shadow-xs" />
-            </span>
-            <span className="font-semibold text-navy-950">40+</span>
-            <span className="text-slate-400 text-[10px]">
-              Metro tech centers
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-slate-700">
-            <span className="flex h-3.5 w-3.5 items-center justify-center">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#1d4ed8] ring-1 ring-white shadow-xs" />
-            </span>
-            <span className="font-medium text-navy-900">20–39</span>
-            <span className="text-slate-400 text-[10px]">Major tech hubs</span>
-          </div>
-          <div className="flex items-center gap-2 text-slate-700">
-            <span className="flex h-3.5 w-3.5 items-center justify-center">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#2563eb] ring-1 ring-white shadow-xs" />
-            </span>
-            <span className="font-medium text-navy-900">10–19</span>
-            <span className="text-slate-400 text-[10px]">Established hubs</span>
-          </div>
-          <div className="flex items-center gap-2 text-slate-700">
-            <span className="flex h-3.5 w-3.5 items-center justify-center">
-              <span className="h-2 w-2 rounded-full bg-[#3b82f6] ring-1 ring-white shadow-xs" />
-            </span>
-            <span className="text-slate-600">5–9</span>
-            <span className="text-slate-400 text-[10px]">Emerging hubs</span>
-          </div>
-          <div className="flex items-center gap-2 text-slate-700">
-            <span className="flex h-3.5 w-3.5 items-center justify-center">
-              <span className="h-2 w-2 rounded-full bg-[#60a5fa] ring-1 ring-white shadow-xs" />
-            </span>
-            <span className="text-slate-600">1–4</span>
-            <span className="text-slate-400 text-[10px]">
-              Regional clusters
-            </span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

@@ -346,9 +346,6 @@ export function HomeMapShell({
   const [activeDirectoryTab, setActiveDirectoryTab] = useState<
     "companies" | "sponsors" | "regions"
   >("companies");
-  const [mapLayerStyle, setMapLayerStyle] = useState<"map" | "satellite">(
-    "map",
-  );
   const moveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -1082,31 +1079,6 @@ export function HomeMapShell({
               onPointClick={handlePointClick}
             />
 
-            {/* Top-Left Floating Map Controls: Map / Satellite Mode */}
-            <div className="absolute top-3.5 left-3.5 z-10 flex items-center rounded-xl border border-surface-border bg-white/95 backdrop-blur-xs p-1 shadow-xs font-mono text-xs">
-              <button
-                type="button"
-                onClick={() => setMapLayerStyle("map")}
-                className={`px-3 py-1 rounded-lg font-semibold transition-all ${
-                  mapLayerStyle === "map"
-                    ? "bg-navy-900 text-white shadow-2xs"
-                    : "text-slate-600 hover:text-navy-900"
-                }`}
-              >
-                Map
-              </button>
-              <button
-                type="button"
-                onClick={() => setMapLayerStyle("satellite")}
-                className={`px-3 py-1 rounded-lg font-semibold transition-all ${
-                  mapLayerStyle === "satellite"
-                    ? "bg-navy-900 text-white shadow-2xs"
-                    : "text-slate-600 hover:text-navy-900"
-                }`}
-              >
-                Satellite
-              </button>
-            </div>
 
             {/* Top-Right Floating Zoom & Recenter Controls */}
             <div className="absolute top-3.5 right-3.5 z-10 flex flex-col items-center rounded-xl border border-surface-border bg-white/95 backdrop-blur-xs p-1 shadow-xs">
@@ -1168,28 +1140,7 @@ export function HomeMapShell({
               </div>
             </div>
 
-            {/* Bottom-Right Floating Legend Card */}
-            <div className="hidden sm:flex absolute bottom-3 right-3 z-10 flex-col gap-1.5 rounded-xl border border-surface-border bg-white/95 backdrop-blur-xs px-3 py-2 shadow-md text-[11px] font-medium text-slate-700">
-              <span className="font-mono text-[9px] uppercase tracking-wider text-slate-400 font-bold">
-                Map Legend
-              </span>
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-pacific-600" />
-                <span>Tech employers</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-forest-600" />
-                <span>Subclass 482 visa sponsor</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-amber-600" />
-                <span>Designated regional location</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-terracotta-700" />
-                <span>Sydney Flagship Cluster (40+)</span>
-              </div>
-            </div>
+
           </div>
         </div>
       </div>
