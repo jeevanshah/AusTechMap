@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Building2, Compass, MapPin, ShieldCheck } from "lucide-react";
 import type { MapCompanyPoint } from "@austechmap/contracts";
 
 import { AnimatedCounter } from "../components/ui/AnimatedCounter";
@@ -184,7 +185,14 @@ export default async function Home() {
         {/* Hero Stat Strip with Kinetic Number Counters */}
         <div className="relative z-10 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
-            <div className="h-1 w-8 rounded-full bg-navy-900 mb-3 group-hover:w-12 transition-all duration-200" />
+            <div className="flex items-center justify-between mb-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-navy-900 border border-slate-200/80 shadow-2xs group-hover:bg-navy-900 group-hover:text-white transition-colors duration-200">
+                <Building2 className="h-4.5 w-4.5" />
+              </span>
+              <span className="font-mono text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                Index
+              </span>
+            </div>
             <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
               <AnimatedCounter target={stats.totalEmployers} />
             </span>
@@ -192,8 +200,16 @@ export default async function Home() {
               verified employers
             </span>
           </div>
+
           <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
-            <div className="h-1 w-8 rounded-full bg-pacific-600 mb-3 group-hover:w-12 transition-all duration-200" />
+            <div className="flex items-center justify-between mb-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-pacific-50 text-pacific-700 border border-pacific-200/60 shadow-2xs group-hover:bg-pacific-600 group-hover:text-white transition-colors duration-200">
+                <MapPin className="h-4.5 w-4.5" />
+              </span>
+              <span className="font-mono text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                Coverage
+              </span>
+            </div>
             <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
               <AnimatedCounter target={stats.totalCities} />
             </span>
@@ -201,8 +217,16 @@ export default async function Home() {
               cities &amp; regions
             </span>
           </div>
+
           <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
-            <div className="h-1 w-8 rounded-full bg-amber-500 mb-3 group-hover:w-12 transition-all duration-200" />
+            <div className="flex items-center justify-between mb-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 text-ochre-700 border border-amber-200/60 shadow-2xs group-hover:bg-ochre-600 group-hover:text-white transition-colors duration-200">
+                <Compass className="h-4.5 w-4.5" />
+              </span>
+              <span className="font-mono text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                Regional
+              </span>
+            </div>
             <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
               <AnimatedCounter target={stats.regionalEmployers} />
             </span>
@@ -210,8 +234,16 @@ export default async function Home() {
               regional employers
             </span>
           </div>
+
           <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
-            <div className="h-1 w-8 rounded-full bg-forest-600 mb-3 group-hover:w-12 transition-all duration-200" />
+            <div className="flex items-center justify-between mb-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-forest-50 text-forest-800 border border-forest-200/60 shadow-2xs group-hover:bg-forest-700 group-hover:text-white transition-colors duration-200">
+                <ShieldCheck className="h-4.5 w-4.5" />
+              </span>
+              <span className="font-mono text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                Sponsors
+              </span>
+            </div>
             <span className="font-mono text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl tabular-nums">
               <AnimatedCounter target={stats.sponsorshipEmployers} />
             </span>

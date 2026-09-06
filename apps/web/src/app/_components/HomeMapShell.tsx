@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
-  ArrowUpRight,
   Award,
   Building2,
   CheckCircle2,
@@ -63,7 +62,6 @@ const REGIONAL_HUBS = [
     center: [153.0251, -27.4698] as [number, number],
     zoom: 11,
     tag: "Subtropical Enterprise Hub",
-    accentGradient: "from-sky-500 to-blue-600",
     icon: Building2,
   },
   {
@@ -73,7 +71,6 @@ const REGIONAL_HUBS = [
     center: [115.8605, -31.9505] as [number, number],
     zoom: 11,
     tag: "Resources & Autonomous Systems",
-    accentGradient: "from-amber-500 to-orange-600",
     icon: Cpu,
   },
   {
@@ -83,7 +80,6 @@ const REGIONAL_HUBS = [
     center: [138.6007, -34.9285] as [number, number],
     zoom: 11,
     tag: "Defence, Space & Machine Learning",
-    accentGradient: "from-emerald-500 to-teal-700",
     icon: Rocket,
   },
   {
@@ -93,7 +89,6 @@ const REGIONAL_HUBS = [
     center: [149.13, -35.2809] as [number, number],
     zoom: 11,
     tag: "GovTech, Cyber & National Security",
-    accentGradient: "from-slate-700 to-navy-900",
     icon: Shield,
   },
   {
@@ -103,7 +98,6 @@ const REGIONAL_HUBS = [
     center: [150.8931, -34.4278] as [number, number],
     zoom: 12,
     tag: "Illawarra Innovation Corridor",
-    accentGradient: "from-cyan-500 to-blue-600",
     icon: Network,
   },
   {
@@ -113,7 +107,6 @@ const REGIONAL_HUBS = [
     center: [151.7817, -32.9283] as [number, number],
     zoom: 12,
     tag: "CleanTech & Industrial Software",
-    accentGradient: "from-teal-500 to-emerald-600",
     icon: Zap,
   },
   {
@@ -123,7 +116,6 @@ const REGIONAL_HUBS = [
     center: [130.8456, -12.4634] as [number, number],
     zoom: 12,
     tag: "Tropical Gateway & Communications",
-    accentGradient: "from-orange-500 to-rose-600",
     icon: Radio,
   },
   {
@@ -133,7 +125,6 @@ const REGIONAL_HUBS = [
     center: [147.3272, -42.8821] as [number, number],
     zoom: 12,
     tag: "Antarctic, Marine & AgriTech",
-    accentGradient: "from-violet-500 to-indigo-700",
     icon: Compass,
   },
 ];
@@ -881,7 +872,7 @@ export function HomeMapShell({
                           }}
                           className="font-medium text-pacific-700 hover:underline inline-flex items-center gap-1 cursor-pointer"
                         >
-                          Map <ArrowUpRight className="h-3 w-3" />
+                          Map <ArrowRight className="h-3 w-3" />
                         </button>
                         <Link
                           href={`/companies/${entry.slug}`}
@@ -925,22 +916,13 @@ export function HomeMapShell({
                 type="button"
                 onClick={() => handleSelectHub(hub)}
                 aria-pressed={isActive}
-                className={`relative flex flex-col justify-between overflow-hidden rounded-xl border p-4 text-left shadow-2xs hover:-translate-y-1 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 transition-all duration-200 motion-reduce:transition-none group active:scale-[0.98] ${
+                className={`flex flex-col justify-between rounded-xl border p-4 text-left shadow-2xs hover:-translate-y-0.5 hover:shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 transition-all duration-150 motion-reduce:transition-none group active:scale-[0.98] ${
                   isActive
-                    ? "border-pacific-600 bg-pacific-50/40 ring-2 ring-pacific-500/50 shadow-sm"
-                    : "border-slate-200/90 bg-white hover:border-slate-300"
+                    ? "border-pacific-600 bg-pacific-50/40 ring-2 ring-pacific-500/40 shadow-xs"
+                    : "border-slate-200/90 bg-white hover:border-slate-300 hover:bg-slate-50/50"
                 }`}
               >
-                {/* Vibrant Top Geographic Accent Bar */}
-                <div
-                  className={`absolute top-0 inset-x-0 h-1 bg-gradient-to-r ${hub.accentGradient} ${
-                    isActive
-                      ? "h-1.5 opacity-100"
-                      : "opacity-80 group-hover:opacity-100 group-hover:h-1.5"
-                  } transition-all duration-200`}
-                />
-
-                <div className="pt-1 flex items-start gap-3">
+                <div className="flex items-start gap-3">
                   <span
                     className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors ${
                       isActive
@@ -985,13 +967,17 @@ export function HomeMapShell({
                     </strong>{" "}
                     employers
                   </span>
-                  <span className="text-pacific-600 font-bold group-hover:translate-x-1 transition-transform duration-200">
-                    {isActive ? (
-                      "●"
-                    ) : (
-                      <ArrowUpRight className="h-3.5 w-3.5 inline-block" />
-                    )}
-                  </span>
+                  {isActive ? (
+                    <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold text-pacific-700">
+                      <span className="h-1.5 w-1.5 rounded-full bg-pacific-600 animate-pulse" />
+                      Active
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 font-mono text-[11px] text-slate-400 group-hover:text-pacific-600 transition-colors">
+                      <span>Focus map</span>
+                      <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+                    </span>
+                  )}
                 </div>
               </button>
             );

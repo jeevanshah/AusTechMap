@@ -124,15 +124,15 @@ export function MapCanvas({
           "circle-color": [
             "step",
             ["get", "point_count"],
-            "#8b5cf6", // 1-4: Purple / Violet (Darwin, Hobart)
+            "#60a5fa", // 1-4: Sky Cobalt (Regional clusters: Darwin, Hobart)
             5,
-            "#10b981", // 5-9: Emerald Green (Adelaide, Canberra, Wollongong, Newcastle)
+            "#3b82f6", // 5-9: Medium Azure (Emerging hubs: Adelaide, Canberra, Wollongong, Newcastle)
             10,
-            "#2563eb", // 10-19: Cobalt Blue (Brisbane, Perth)
+            "#2563eb", // 10-19: Pacific Cobalt (Established hubs: Brisbane, Perth)
             20,
-            "#f97316", // 20-39: Sunset Orange (Melbourne)
+            "#1d4ed8", // 20-39: Royal Cobalt (Major tech hubs: Melbourne)
             40,
-            "#ef4444", // 40+: Crimson Red (Sydney)
+            "#0f2963", // 40+: Midnight Navy Cobalt (Metro tech center: Sydney)
           ],
           "circle-stroke-color": "#ffffff",
           "circle-stroke-width": 2,
@@ -300,30 +300,56 @@ export function MapCanvas({
     <div className="relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
 
-      {/* Hub Density Color Legend */}
-      <div className="pointer-events-none absolute top-3 left-3 z-10 hidden sm:flex flex-col gap-1 rounded-lg border border-surface-border/90 bg-white/95 px-2.5 py-2 font-mono text-[11px] shadow-xs backdrop-blur-xs">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-          Hub Density
-        </span>
-        <div className="flex items-center gap-1.5 text-slate-700">
-          <span className="h-2 w-2 rounded-full bg-[#ef4444]" />
-          <span>40+ companies</span>
+      {/* Cluster Density Sequential Legend */}
+      <div className="pointer-events-none absolute top-3 left-3 z-10 hidden sm:flex flex-col gap-1.5 rounded-xl border border-slate-200/90 bg-white/95 p-3 font-mono text-[11px] shadow-sm backdrop-blur-md">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-1.5">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+            Cluster Density
+          </span>
+          <span className="text-[9px] font-medium text-slate-400">
+            Employers
+          </span>
         </div>
-        <div className="flex items-center gap-1.5 text-slate-700">
-          <span className="h-2 w-2 rounded-full bg-[#f97316]" />
-          <span>20–39 companies</span>
-        </div>
-        <div className="flex items-center gap-1.5 text-slate-700">
-          <span className="h-2 w-2 rounded-full bg-[#2563eb]" />
-          <span>10–19 companies</span>
-        </div>
-        <div className="flex items-center gap-1.5 text-slate-700">
-          <span className="h-2 w-2 rounded-full bg-[#10b981]" />
-          <span>5–9 companies</span>
-        </div>
-        <div className="flex items-center gap-1.5 text-slate-700">
-          <span className="h-2 w-2 rounded-full bg-[#8b5cf6]" />
-          <span>1–4 companies</span>
+        <div className="flex flex-col gap-1.5 pt-0.5">
+          <div className="flex items-center gap-2 text-slate-700">
+            <span className="flex h-3.5 w-3.5 items-center justify-center">
+              <span className="h-3 w-3 rounded-full bg-[#0f2963] ring-1 ring-white shadow-xs" />
+            </span>
+            <span className="font-semibold text-navy-950">40+</span>
+            <span className="text-slate-400 text-[10px]">
+              Metro tech centers
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-slate-700">
+            <span className="flex h-3.5 w-3.5 items-center justify-center">
+              <span className="h-2.5 w-2.5 rounded-full bg-[#1d4ed8] ring-1 ring-white shadow-xs" />
+            </span>
+            <span className="font-medium text-navy-900">20–39</span>
+            <span className="text-slate-400 text-[10px]">Major tech hubs</span>
+          </div>
+          <div className="flex items-center gap-2 text-slate-700">
+            <span className="flex h-3.5 w-3.5 items-center justify-center">
+              <span className="h-2.5 w-2.5 rounded-full bg-[#2563eb] ring-1 ring-white shadow-xs" />
+            </span>
+            <span className="font-medium text-navy-900">10–19</span>
+            <span className="text-slate-400 text-[10px]">Established hubs</span>
+          </div>
+          <div className="flex items-center gap-2 text-slate-700">
+            <span className="flex h-3.5 w-3.5 items-center justify-center">
+              <span className="h-2 w-2 rounded-full bg-[#3b82f6] ring-1 ring-white shadow-xs" />
+            </span>
+            <span className="text-slate-600">5–9</span>
+            <span className="text-slate-400 text-[10px]">Emerging hubs</span>
+          </div>
+          <div className="flex items-center gap-2 text-slate-700">
+            <span className="flex h-3.5 w-3.5 items-center justify-center">
+              <span className="h-2 w-2 rounded-full bg-[#60a5fa] ring-1 ring-white shadow-xs" />
+            </span>
+            <span className="text-slate-600">1–4</span>
+            <span className="text-slate-400 text-[10px]">
+              Regional clusters
+            </span>
+          </div>
         </div>
       </div>
     </div>

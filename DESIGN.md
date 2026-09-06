@@ -72,11 +72,11 @@ Locked design system. All coding agents (Claude, Codex, Gemini) and Hallmark run
 
 ## Map Conventions (`MapCanvas.tsx`)
 
-- **Multi-Tier Density Clusters**:
-  - `40+ companies`: Crimson Red `#ef4444` (Major tech centers: Sydney)
-  - `20–39 companies`: Sunset Orange `#f97316` (Large tech hubs: Melbourne)
-  - `10–19 companies`: Cobalt Blue `#2563eb` (Established hubs: Brisbane, Perth)
-  - `5–9 companies`: Emerald Green `#10b981` (Emerging hubs: Adelaide, Canberra, Wollongong, Newcastle)
-  - `1–4 companies`: Vibrant Violet `#8b5cf6` (Regional clusters: Darwin, Hobart)
+- **Multi-Tier Density Clusters (Sequential Pacific Cobalt)**:
+  - `40+ companies`: Midnight Navy Cobalt `#0f2963` (Metro tech center: Sydney)
+  - `20–39 companies`: Royal Cobalt `#1d4ed8` (Major tech hubs: Melbourne)
+  - `10–19 companies`: Pacific Cobalt `#2563eb` (Established hubs: Brisbane, Perth)
+  - `5–9 companies`: Medium Azure `#3b82f6` (Emerging hubs: Adelaide, Canberra, Wollongong, Newcastle)
+  - `1–4 companies`: Sky Cobalt `#60a5fa` (Regional clusters: Darwin, Hobart)
 - **Unclustered Pins**: Filled with Pacific Cobalt `#2563eb` with a crisp 2px white `#ffffff` stroke.
 - **Interactions**: Smart click-to-zoom using `getClusterExpansionZoom`, plus navigation zoom controls.
