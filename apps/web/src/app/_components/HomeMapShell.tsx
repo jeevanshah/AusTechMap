@@ -386,7 +386,7 @@ export function HomeMapShell({
             >
               <ShieldCheck
                 className={`h-3.5 w-3.5 ${
-                  sponsorshipOnly ? "text-forest-700" : "text-purple-500"
+                  sponsorshipOnly ? "text-forest-700" : "text-slate-500"
                 }`}
               />
               Sponsorship verified
@@ -405,7 +405,7 @@ export function HomeMapShell({
             >
               <Compass
                 className={`h-3.5 w-3.5 ${
-                  regionalOnly ? "text-white" : "text-amber-600"
+                  regionalOnly ? "text-white" : "text-slate-500"
                 }`}
               />
               Regional hubs only
@@ -424,7 +424,7 @@ export function HomeMapShell({
                   : "text-slate-600 hover:text-navy-900"
               }`}
             >
-              <MapIcon className="h-3.5 w-3.5 text-pacific-600" />
+              <MapIcon className="h-3.5 w-3.5 text-navy-700" />
               Map view
             </button>
             <button
@@ -437,7 +437,7 @@ export function HomeMapShell({
                   : "text-slate-600 hover:text-navy-900"
               }`}
             >
-              <ListFilter className="h-3.5 w-3.5 text-navy-800" />
+              <ListFilter className="h-3.5 w-3.5 text-navy-700" />
               Directory list ({listEntries.length})
             </button>
           </div>

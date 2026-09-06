@@ -140,22 +140,7 @@ export default async function Home() {
         </div>
       </header>
 
-      <section className="relative flex flex-col gap-6 overflow-hidden rounded-2xl border border-surface-border bg-gradient-to-br from-white via-slate-50/90 to-blue-50/40 p-6 sm:p-8 shadow-2xs">
-        {/* Layered Cartographic Topography Blueprint Art */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-0 opacity-[0.14] mix-blend-multiply bg-center bg-cover"
-          style={{
-            backgroundImage: "url('/brand/hero_topography.jpg')",
-          }}
-        />
-
-        {/* Subtle oceanic aura in top right */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-blue-200/30 blur-3xl z-0"
-        />
-
+      <section className="relative flex flex-col gap-6 rounded-2xl border border-surface-border bg-white p-6 sm:p-8 shadow-2xs">
         <div className="relative z-10 flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-ochre-600" />
@@ -172,7 +157,7 @@ export default async function Home() {
             regional tech hubs.
           </p>
           <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-slate-500">
-            <span className="inline-flex items-center gap-1 rounded bg-white px-2 py-0.5 font-mono text-[11px] text-slate-600 border border-slate-200 shadow-2xs">
+            <span className="inline-flex items-center gap-1 rounded bg-slate-50 px-2 py-0.5 font-mono text-[11px] text-slate-600 border border-slate-200 shadow-2xs">
               <kbd className="font-semibold text-navy-900">⌘K</kbd> or{" "}
               <kbd className="font-semibold text-navy-900">Ctrl+K</kbd> to
               search
@@ -203,7 +188,7 @@ export default async function Home() {
 
           <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
             <div className="flex items-center justify-between mb-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-pacific-50 text-pacific-700 border border-pacific-200/60 shadow-2xs group-hover:bg-pacific-600 group-hover:text-white transition-colors duration-200">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-navy-900 border border-slate-200/80 shadow-2xs group-hover:bg-navy-900 group-hover:text-white transition-colors duration-200">
                 <MapPin className="h-4.5 w-4.5" />
               </span>
               <span className="font-mono text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
@@ -220,7 +205,7 @@ export default async function Home() {
 
           <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
             <div className="flex items-center justify-between mb-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 text-ochre-700 border border-amber-200/60 shadow-2xs group-hover:bg-ochre-600 group-hover:text-white transition-colors duration-200">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-navy-900 border border-slate-200/80 shadow-2xs group-hover:bg-navy-900 group-hover:text-white transition-colors duration-200">
                 <Compass className="h-4.5 w-4.5" />
               </span>
               <span className="font-mono text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
@@ -237,7 +222,7 @@ export default async function Home() {
 
           <div className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-xs transition-all duration-150">
             <div className="flex items-center justify-between mb-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-forest-50 text-forest-800 border border-forest-200/60 shadow-2xs group-hover:bg-forest-700 group-hover:text-white transition-colors duration-200">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-navy-900 border border-slate-200/80 shadow-2xs group-hover:bg-navy-900 group-hover:text-white transition-colors duration-200">
                 <ShieldCheck className="h-4.5 w-4.5" />
               </span>
               <span className="font-mono text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
