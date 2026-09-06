@@ -384,6 +384,7 @@ function CompanyBrandMark({
 
   return (
     <div
+      suppressHydrationWarning
       className={`relative flex shrink-0 items-center justify-center overflow-hidden border border-slate-200/90 bg-white shadow-2xs ${sizeClasses}`}
     >
       {logoUrl ? (
@@ -391,11 +392,13 @@ function CompanyBrandMark({
           src={logoUrl}
           alt={`${name} logo`}
           loading="lazy"
+          suppressHydrationWarning
           className="h-full w-full object-contain p-1.5"
           onError={() => setImgFailed(true)}
         />
       ) : (
         <div
+          suppressHydrationWarning
           className={`flex h-full w-full items-center justify-center font-heading font-black ${avatar.bg} ${avatar.text}`}
         >
           {avatar.label}

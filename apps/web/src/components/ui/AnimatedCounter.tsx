@@ -63,7 +63,10 @@ export function AnimatedCounter({
   }, [target, durationMs]);
 
   return (
-    <span className={`tabular-nums inline-block ${className}`}>
+    <span
+      suppressHydrationWarning
+      className={`tabular-nums inline-block ${className}`}
+    >
       {prefix}
       {count}
       {suffix}
