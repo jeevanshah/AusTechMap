@@ -8,9 +8,9 @@
   --font-mono:
     var(--font-jetbrains-mono), "SF Mono", Menlo, Monaco, Consolas, monospace;
 
-  --color-canvas: #faf8f5;
+  --color-canvas: #f8fafc;
   --color-surface: #ffffff;
-  --color-surface-border: #e8e3da;
+  --color-surface-border: #e2e8f0;
 
   --color-navy-50: #f0f4f8;
   --color-navy-100: #d9e2ec;

@@ -512,7 +512,7 @@ function CategoryBadge({
   const sizeClasses = size === "md" ? "h-4 w-4" : "h-3.5 w-3.5";
 
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-[#faf8f5] px-2.5 py-0.5 text-[11px] font-medium text-slate-700 shadow-2xs">
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-slate-50 px-2.5 py-0.5 text-[11px] font-medium text-slate-700 shadow-2xs">
       {iconPath && (
         <span className={`relative inline-block ${sizeClasses} shrink-0 overflow-hidden rounded-full`}>
           <Image
@@ -868,7 +868,7 @@ export function HomeMapShell({
                 }
               }}
               placeholder="Search companies, roles, technologies... (Press ⌘K)"
-              className="w-full rounded-xl border border-slate-200/90 bg-[#faf8f5]/80 py-2.5 pr-20 pl-10 text-sm font-medium text-navy-900 placeholder:text-slate-400 focus:border-navy-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-navy-900/15 transition-all"
+              className="w-full rounded-xl border border-slate-200/90 bg-slate-50/80 py-2.5 pr-20 pl-10 text-sm font-medium text-navy-900 placeholder:text-slate-400 focus:border-navy-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-navy-900/15 transition-all"
             />
             <div className="absolute right-3 flex items-center gap-1.5">
               {query.length > 0 ? (
@@ -893,7 +893,7 @@ export function HomeMapShell({
           </div>
 
           {/* Region Dropdown Selector */}
-          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200/90 bg-[#faf8f5]/80 px-3 py-1.5">
+          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200/90 bg-slate-50/80 px-3 py-1.5">
             <MapPin className="h-4 w-4 text-slate-400 shrink-0" />
             <select
               value={activeHubCity ?? ""}
@@ -923,7 +923,7 @@ export function HomeMapShell({
           </div>
 
           {/* Sector Category Dropdown */}
-          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200/90 bg-[#faf8f5]/80 px-3 py-1.5">
+          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200/90 bg-slate-50/80 px-3 py-1.5">
             <Layers className="h-4 w-4 text-slate-400 shrink-0" />
             <select
               value={selectedCategory}
@@ -952,7 +952,7 @@ export function HomeMapShell({
               className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
                 sponsorshipOnly
                   ? "border border-navy-900 bg-navy-900 text-white shadow-xs"
-                  : "border border-slate-200/90 bg-white text-slate-700 hover:border-slate-300 hover:bg-[#faf8f5]"
+                  : "border border-slate-200/90 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
               }`}
             >
               <ShieldCheck
@@ -970,7 +970,7 @@ export function HomeMapShell({
               className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
                 regionalOnly
                   ? "border border-navy-900 bg-navy-900 text-white shadow-xs"
-                  : "border border-slate-200/90 bg-white text-slate-700 hover:border-slate-300 hover:bg-[#faf8f5]"
+                  : "border border-slate-200/90 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
               }`}
             >
               <Compass
@@ -1010,7 +1010,7 @@ export function HomeMapShell({
                 className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition-all ${
                   isSelected
                     ? "border-navy-900 bg-navy-900 text-white shadow-2xs"
-                    : "border-slate-200/90 bg-[#faf8f5]/90 text-slate-700 hover:border-slate-300 hover:bg-white"
+                    : "border-slate-200/90 bg-slate-50/90 text-slate-700 hover:border-slate-300 hover:bg-white"
                 }`}
               >
                 <span className="relative inline-block h-3.5 w-3.5 shrink-0 overflow-hidden rounded-full">
@@ -1061,17 +1061,17 @@ export function HomeMapShell({
                     {/* Metadata & Name */}
                     <div className="flex flex-col gap-0.5 min-w-0">
                       <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                        <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-[#faf8f5] px-2.5 py-0.5 text-[10px] font-bold text-slate-800 uppercase tracking-wider shadow-2xs">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-slate-50 px-2.5 py-0.5 text-[10px] font-bold text-slate-800 uppercase tracking-wider shadow-2xs">
                           <CheckCircle2 className="h-2.5 w-2.5 text-emerald-600 shrink-0" />
                           Verified Record
                         </span>
                         {selectedEntry.hasSponsorshipEvidence ? (
-                          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-[#faf8f5] px-2.5 py-0.5 text-[11px] font-semibold text-slate-800 shadow-2xs">
+                          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-slate-50 px-2.5 py-0.5 text-[11px] font-semibold text-slate-800 shadow-2xs">
                             <Award className="h-3 w-3 text-slate-600 shrink-0" />
                             Subclass 482 Visa Sponsor
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-[#faf8f5] px-2.5 py-0.5 text-[11px] font-medium text-slate-600">
+                          <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-slate-50 px-2.5 py-0.5 text-[11px] font-medium text-slate-600">
                             Standard Employer
                           </span>
                         )}
@@ -1120,7 +1120,7 @@ export function HomeMapShell({
                 {/* 3-Part Auditable Registry Checklist Grid */}
                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   {/* Card 1: ASIC & ABN Registration */}
-                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-[#faf8f5] p-3 transition-colors hover:border-slate-300 shadow-2xs">
+                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-slate-50 p-3 transition-colors hover:border-slate-300 shadow-2xs">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
                       <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                     </div>
@@ -1135,7 +1135,7 @@ export function HomeMapShell({
                   </div>
 
                   {/* Card 2: Australian Premises (G-NAF) */}
-                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-[#faf8f5] p-3 transition-colors hover:border-slate-300 shadow-2xs">
+                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-slate-50 p-3 transition-colors hover:border-slate-300 shadow-2xs">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
                       <Building2 className="h-4 w-4 text-slate-700" />
                     </div>
@@ -1150,7 +1150,7 @@ export function HomeMapShell({
                   </div>
 
                   {/* Card 3: Visa Sponsorship Status */}
-                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-[#faf8f5] p-3 transition-colors hover:border-slate-300 shadow-2xs">
+                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-slate-50 p-3 transition-colors hover:border-slate-300 shadow-2xs">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
                       <Award className={`h-4 w-4 ${selectedEntry.hasSponsorshipEvidence ? "text-terracotta-700" : "text-slate-400"}`} />
                     </div>
@@ -1186,7 +1186,7 @@ export function HomeMapShell({
                         });
                         setShowMapMobile(true);
                       }}
-                      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl border border-slate-200/90 bg-white px-3.5 py-2 text-xs font-semibold text-navy-900 hover:bg-[#faf8f5] transition-colors shadow-2xs"
+                      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl border border-slate-200/90 bg-white px-3.5 py-2 text-xs font-semibold text-navy-900 hover:bg-slate-50 transition-colors shadow-2xs"
                     >
                       <MapPin className="h-3.5 w-3.5 text-slate-500" />
                       Locate on map
@@ -1237,7 +1237,7 @@ export function HomeMapShell({
         >
           {/* Active Region Hub Breadcrumb Banner */}
           {activeHubCity && (
-            <div className="flex items-center justify-between rounded-xl bg-[#faf8f5] border border-surface-border px-3 py-2 text-xs transition-all shadow-2xs">
+            <div className="flex items-center justify-between rounded-xl bg-slate-50 border border-surface-border px-3 py-2 text-xs transition-all shadow-2xs">
               <div className="flex items-center gap-2 min-w-0">
                 <button
                   type="button"
@@ -1350,7 +1350,7 @@ export function HomeMapShell({
             {activeDirectoryTab === "regions" && (
               <div className="flex flex-col gap-2.5">
                 {/* Featured Regional Hubs Illustrated Map Banner */}
-                <div className="relative overflow-hidden rounded-2xl border border-surface-border bg-gradient-to-b from-[#faf8f5] to-white p-3 shadow-2xs">
+                <div className="relative overflow-hidden rounded-2xl border border-surface-border bg-gradient-to-b from-slate-50 to-white p-3 shadow-2xs">
                   <div className="relative h-44 sm:h-52 w-full overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-2xs">
                     <Image
                       src="/assets/australia_hubs_map.png"
@@ -1384,8 +1384,8 @@ export function HomeMapShell({
                       onClick={() => handleSelectHub(hub)}
                       className={`flex items-center justify-between rounded-xl border p-3 text-left transition-all ${
                         isActive
-                          ? "border-navy-900 bg-[#faf8f5] shadow-xs"
-                          : "border-surface-border bg-white hover:border-slate-300 hover:bg-[#faf8f5]/50"
+                          ? "border-navy-900 bg-slate-50 shadow-xs"
+                          : "border-surface-border bg-white hover:border-slate-300 hover:bg-slate-50/50"
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
@@ -1393,7 +1393,7 @@ export function HomeMapShell({
                           className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border ${
                             isActive
                               ? "bg-navy-900 text-white border-navy-900"
-                              : "bg-[#faf8f5] text-navy-900 border-surface-border"
+                              : "bg-slate-50 text-navy-900 border-surface-border"
                           }`}
                         >
                           <hub.icon className="h-4 w-4" />
@@ -1475,7 +1475,7 @@ export function HomeMapShell({
                         }}
                         className={`group relative flex items-start gap-3 rounded-xl border p-3 text-left transition-all cursor-pointer ${
                           isSelected
-                            ? "border-navy-900 bg-[#faf8f5] shadow-xs"
+                            ? "border-navy-900 bg-slate-50 shadow-xs"
                             : "border-surface-border bg-white hover:border-slate-300 hover:shadow-xs"
                         }`}
                       >
@@ -1495,7 +1495,7 @@ export function HomeMapShell({
                               {entry.name}
                             </span>
                             <div className="flex items-center gap-1.5 shrink-0">
-                              <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-[#faf8f5] px-2 py-0.5 text-[10px] font-semibold text-slate-800 shadow-2xs">
+                              <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-800 shadow-2xs">
                                 <CheckCircle2 className="h-2.5 w-2.5 text-emerald-600 shrink-0" />
                                 Verified
                               </span>
@@ -1518,7 +1518,7 @@ export function HomeMapShell({
 
                           {entry.hasSponsorshipEvidence && (
                             <div className="flex items-center gap-1.5 mt-2">
-                              <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-[#faf8f5] px-2.5 py-0.5 font-mono text-[10px] font-semibold text-slate-800 shadow-2xs">
+                              <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-slate-50 px-2.5 py-0.5 font-mono text-[10px] font-semibold text-slate-800 shadow-2xs">
                                 <Award className="h-2.5 w-2.5 text-slate-600 shrink-0" />
                                 Subclass 482 Sponsor
                               </span>

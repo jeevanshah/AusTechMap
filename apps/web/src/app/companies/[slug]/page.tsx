@@ -371,7 +371,7 @@ export default async function CompanyProfilePage({
           return (
             <span
               key={category.key}
-              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-[#faf8f5] px-3 py-1 font-mono text-xs text-slate-700 shadow-2xs"
+              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-slate-50 px-3 py-1 font-mono text-xs text-slate-700 shadow-2xs"
             >
               {iconPath && (
                 <span className="relative inline-block h-3.5 w-3.5 shrink-0 overflow-hidden rounded-full">
@@ -442,7 +442,7 @@ export default async function CompanyProfilePage({
             {company.sponsorship_evidence.map((entry, index) => (
               <li
                 key={`${entry.claimType}-${entry.observedAt}-${index}`}
-                className="rounded-xl border border-surface-border bg-[#faf8f5] p-4 text-sm shadow-2xs"
+                className="rounded-xl border border-surface-border bg-slate-50 p-4 text-sm shadow-2xs"
               >
                 <div className="flex items-center justify-between gap-4">
                   <span className="flex items-center gap-2 font-semibold text-navy-900">

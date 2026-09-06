@@ -209,7 +209,7 @@ export default async function Home() {
 
           {/* Right: Elevated 4-Stat Strip */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-4">
-            <div className="rounded-xl border border-surface-border bg-[#faf8f5]/90 p-3.5 shadow-2xs hover:border-slate-400 hover:bg-white transition-all">
+            <div className="rounded-xl border border-surface-border bg-slate-50/90 p-3.5 shadow-2xs hover:border-slate-400 hover:bg-white transition-all">
               <div className="flex items-center justify-between mb-2">
                 <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
                   <Building2 className="h-3.5 w-3.5" />
@@ -226,7 +226,7 @@ export default async function Home() {
               </span>
             </div>
 
-            <div className="rounded-xl border border-surface-border bg-[#faf8f5]/90 p-3.5 shadow-2xs hover:border-slate-400 hover:bg-white transition-all">
+            <div className="rounded-xl border border-surface-border bg-slate-50/90 p-3.5 shadow-2xs hover:border-slate-400 hover:bg-white transition-all">
               <div className="flex items-center justify-between mb-2">
                 <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
                   <MapPin className="h-3.5 w-3.5" />
@@ -243,7 +243,7 @@ export default async function Home() {
               </span>
             </div>
 
-            <div className="rounded-xl border border-surface-border bg-[#faf8f5]/90 p-3.5 shadow-2xs hover:border-slate-400 hover:bg-white transition-all">
+            <div className="rounded-xl border border-surface-border bg-slate-50/90 p-3.5 shadow-2xs hover:border-slate-400 hover:bg-white transition-all">
               <div className="flex items-center justify-between mb-2">
                 <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
                   <Compass className="h-3.5 w-3.5" />
@@ -260,7 +260,7 @@ export default async function Home() {
               </span>
             </div>
 
-            <div className="rounded-xl border border-surface-border bg-[#faf8f5]/90 p-3.5 shadow-2xs hover:border-slate-400 hover:bg-white transition-all">
+            <div className="rounded-xl border border-surface-border bg-slate-50/90 p-3.5 shadow-2xs hover:border-slate-400 hover:bg-white transition-all">
               <div className="flex items-center justify-between mb-2">
                 <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
                   <ShieldCheck className="h-3.5 w-3.5" />

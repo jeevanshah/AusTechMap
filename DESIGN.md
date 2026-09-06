@@ -21,9 +21,9 @@ Locked design system. All coding agents (Claude, Codex, Gemini) and Hallmark run
 
 ```css
 @theme {
-  --color-canvas: #faf8f5; /* Warm Australian Sandstone ground */
-  --color-surface: #ffffff; /* Elevated card and panel fill */
-  --color-surface-border: #e8e3da; /* Warm tactile structural border */
+  --color-canvas: #f8fafc; /* Crisp Cool Slate off-white ground */
+  --color-surface: #ffffff; /* Elevated crisp white card and panel fill */
+  --color-surface-border: #e2e8f0; /* Precision slate structural border */
 
   /* Deep Navy (Institutional chrome, typography ink, headers) */
   --color-navy-50: #f0f4f8;
@@ -65,7 +65,7 @@ Locked design system. All coding agents (Claude, Codex, Gemini) and Hallmark run
 
 1. **No Invented Numbers or Social Proof**: Never display placeholder counts, fake testimonials, or fictional metrics. Real indexed data only (`{count} verified Australian tech employers indexed`).
 2. **60-30-10 Color Architecture (Colorize)**:
-   - **60% Ground**: Warm `#FAF8F5` Australian Sandstone canvas and `#FFFFFF` elevated cards with warm `#E8E3DA` hairlines.
+   - **60% Ground**: Crisp `#F8FAFC` Slate canvas and `#FFFFFF` elevated cards with precision `#E2E8F0` hairlines.
    - **30% Structural Ink**: Deep Navy `#0F172A` and Slate `#475569` for confident readability.
    - **10% Purposeful Semantics**: Terracotta `#C2410C` for primary action & Sydney cluster, Cobalt `#2563EB` for secondary hubs, Forest `#065F46` for trust.
 3. **No Decorative Numbered Steps**: Do not use `01 / 02 / 03` markers unless the UI represents a genuine chronological workflow.
