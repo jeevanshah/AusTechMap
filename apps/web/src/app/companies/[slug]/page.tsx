@@ -305,7 +305,10 @@ export default async function CompanyProfilePage({
                 className="h-full w-full object-cover"
               />
             </div>
-            <span className="font-mono text-xs text-slate-500 tabular-nums">
+            <span
+              suppressHydrationWarning
+              className="font-mono text-xs text-slate-500 tabular-nums"
+            >
               {lastCheckedLabel.toUpperCase()}:{" "}
               {new Date(lastCheckedDate).toLocaleDateString("en-AU")}
             </span>
@@ -332,7 +335,10 @@ export default async function CompanyProfilePage({
           )}
           <div className="flex items-center gap-1.5">
             <dt className="text-slate-400">REGISTERED</dt>
-            <dd className="font-medium text-navy-900 inline-flex items-center gap-1">
+            <dd
+              suppressHydrationWarning
+              className="font-medium text-navy-900 inline-flex items-center gap-1"
+            >
               <Calendar className="h-3 w-3 text-slate-400" />
               {new Date(company.created_at).toLocaleDateString("en-AU")}
             </dd>
@@ -340,7 +346,10 @@ export default async function CompanyProfilePage({
           {company.verified_at && (
             <div className="flex items-center gap-1.5">
               <dt className="text-slate-400">VERIFIED</dt>
-              <dd className="font-medium text-emerald-700 inline-flex items-center gap-1">
+              <dd
+                suppressHydrationWarning
+                className="font-medium text-emerald-700 inline-flex items-center gap-1"
+              >
                 <CheckCircle2 className="h-3 w-3 text-emerald-600" />
                 {new Date(company.verified_at).toLocaleDateString("en-AU")}
               </dd>
@@ -426,7 +435,10 @@ export default async function CompanyProfilePage({
                     {SPONSORSHIP_CLAIM_LABELS[entry.claimType] ??
                       entry.claimType}
                   </span>
-                  <span className="font-mono text-xs text-slate-600">
+                  <span
+                    suppressHydrationWarning
+                    className="font-mono text-xs text-slate-600"
+                  >
                     {new Date(entry.observedAt).toLocaleDateString("en-AU")}
                   </span>
                 </div>
@@ -543,7 +555,10 @@ export default async function CompanyProfilePage({
                     </span>
                   )}
                   {job.postedAt && (
-                    <span className="font-mono text-xs text-slate-500 tabular-nums">
+                    <span
+                      suppressHydrationWarning
+                      className="font-mono text-xs text-slate-500 tabular-nums"
+                    >
                       {new Date(job.postedAt).toLocaleDateString("en-AU")}
                     </span>
                   )}

@@ -388,6 +388,7 @@ function CompanyBrandMark({
       className={`relative flex shrink-0 items-center justify-center overflow-hidden border border-slate-200/90 bg-white shadow-2xs ${sizeClasses}`}
     >
       {logoUrl ? (
+        /* eslint-disable-next-line @next/next/no-img-element */
         <img
           src={logoUrl}
           alt={`${name} logo`}
@@ -727,6 +728,7 @@ export function HomeMapShell({
               autoComplete="off"
               autoCorrect="off"
               spellCheck={false}
+              suppressHydrationWarning
               value={query}
               onChange={(event) => {
                 setQuery(event.target.value);
