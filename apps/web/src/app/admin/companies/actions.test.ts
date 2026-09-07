@@ -21,7 +21,11 @@ import {
   requireFreshMfa,
   requireStaffSession,
 } from "../../../lib/auth/require-role";
-import { disableCompanyAction, verifyCompanyAction } from "./actions";
+import {
+  disableCompanyAction,
+  updateEvidenceStatusAction,
+  verifyCompanyAction,
+} from "./actions";
 
 function fakePool(rows: unknown[]): Pool {
   return { query: vi.fn().mockResolvedValue({ rows }) } as unknown as Pool;
@@ -83,5 +87,64 @@ describe("admin/companies actions -- authorization", () => {
     );
     expect(requireFreshMfa).toHaveBeenCalledWith("admin");
     expect(getPool).not.toHaveBeenCalled();
+  });
+
+  it("updateEvidenceStatusAction rejects an invalid lifecycle state", async () => {
+    vi.mocked(requireStaffSession).mockResolvedValue({
+      id: 7,
+      email: "reviewer@example.com",
+      role: "reviewer",
+      mfaVerifiedAt: new Date(),
+    });
+    const formData = new FormData();
+    formData.set("status", "unverified");
+    formData.set("reason", "source changed");
+
+    await expect(
+      updateEvidenceStatusAction("company-1", "evidence-1", formData),
+    ).rejects.toThrow(/Invalid evidence status/);
+    expect(getPool).not.toHaveBeenCalled();
+  });
+
+  it("updateEvidenceStatusAction records an auditable reviewer decision", async () => {
+    vi.mocked(requireStaffSession).mockResolvedValue({
+      id: 7,
+      email: "reviewer@example.com",
+      role: "reviewer",
+      mfaVerifiedAt: new Date(),
+    });
+    const query = vi
+      .fn()
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            status: "active",
+            claim_type: "sponsorship_labour_agreement",
+            company_slug: "example-company",
+          },
+        ],
+      })
+      .mockResolvedValue({ rows: [] });
+    vi.mocked(getPool).mockReturnValue({ query } as unknown as Pool);
+    const formData = new FormData();
+    formData.set("status", "stale");
+    formData.set("reason", "source is outside its refresh window");
+
+    await updateEvidenceStatusAction("company-1", "evidence-1", formData);
+
+    expect(query).toHaveBeenCalledWith(
+      "UPDATE evidence SET status = $1 WHERE id = $2",
+      ["stale", "evidence-1"],
+    );
+    expect(query).toHaveBeenCalledWith(
+      expect.stringContaining("INSERT INTO audit_records"),
+      expect.arrayContaining([
+        "7",
+        "evidence_status_changed",
+        "evidence",
+        "evidence-1",
+        "source is outside its refresh window",
+      ]),
+    );
   });
 });

@@ -54,6 +54,7 @@ async function loadHomeData(): Promise<HomeData> {
           SELECT 1 FROM evidence e2
           WHERE e2.entity_type = 'company' AND e2.entity_id = c.id::text
             AND e2.claim_type = ANY($1::text[])
+            AND e2.status = 'active'
         ) THEN c.id END) as sponsorship_employers
       FROM companies c
       LEFT JOIN LATERAL (
@@ -61,6 +62,7 @@ async function loadHomeData(): Promise<HomeData> {
         FROM evidence e
         WHERE e.entity_type = 'company' AND e.entity_id = c.id::text
           AND e.claim_type = 'employer_seed_research'
+          AND e.status = 'active'
         ORDER BY e.observed_at DESC LIMIT 1
       ) research ON true
       WHERE c.status NOT IN ('merged', 'disabled')`,

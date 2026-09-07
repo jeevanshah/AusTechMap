@@ -9,6 +9,7 @@ import {
 } from "../../../lib/auth/require-role";
 import { recordAudit } from "../../../lib/audit";
 import { getPool } from "../../../lib/db";
+import { isEvidenceStatus } from "../../../lib/evidence";
 import { normaliseAbn, normaliseAcn } from "../../../lib/normalisation";
 
 function slugify(displayName: string): string {
@@ -159,6 +160,59 @@ export async function verifyCompanyAction(companyId: string): Promise<void> {
   });
 
   revalidatePath(`/admin/companies/${companyId}`);
+}
+
+export async function updateEvidenceStatusAction(
+  companyId: string,
+  evidenceId: string,
+  formData: FormData,
+): Promise<void> {
+  const actor = await requireStaffSession("reviewer");
+  const status = String(formData.get("status") ?? "");
+  const reason = String(formData.get("reason") ?? "").trim();
+  if (!isEvidenceStatus(status)) {
+    throw new Error(`Invalid evidence status: ${status}`);
+  }
+  if (!reason) {
+    throw new Error("A reason is required to change evidence status");
+  }
+
+  const pool = getPool();
+  const before = await pool.query<{
+    status: string;
+    claim_type: string;
+    company_slug: string;
+  }>(
+    `SELECT e.status, e.claim_type, c.slug AS company_slug
+     FROM evidence e
+     JOIN companies c ON c.id = $1
+     WHERE e.id = $2
+       AND e.entity_type = 'company'
+       AND e.entity_id = c.id::text`,
+    [companyId, evidenceId],
+  );
+  const existing = before.rows[0];
+  if (!existing) {
+    throw new Error(`evidence not found for company: ${evidenceId}`);
+  }
+
+  await pool.query("UPDATE evidence SET status = $1 WHERE id = $2", [
+    status,
+    evidenceId,
+  ]);
+  await recordAudit(pool, {
+    actorUserId: actor.id,
+    action: "evidence_status_changed",
+    targetType: "evidence",
+    targetId: evidenceId,
+    reason,
+    beforeState: { status: existing.status },
+    afterState: { status },
+    metadata: { company_id: companyId, claim_type: existing.claim_type },
+  });
+
+  revalidatePath(`/admin/companies/${companyId}`);
+  revalidatePath(`/companies/${existing.company_slug}`);
 }
 
 export async function disableCompanyAction(

@@ -21,7 +21,7 @@ MIGRATIONS_DIRECTORY = REPOSITORY_ROOT / "db" / "migrations"
 def test_repository_migrations_are_contiguous_and_cover_foundation_contracts() -> None:
     migrations = discover_migrations(MIGRATIONS_DIRECTORY)
 
-    assert [migration.version for migration in migrations] == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    assert [migration.version for migration in migrations] == list(range(1, 14))
     combined_sql = "\n".join(migration.sql for migration in migrations)
     assert "CREATE EXTENSION IF NOT EXISTS postgis" in combined_sql
     assert "CREATE TABLE users" in combined_sql
@@ -43,6 +43,8 @@ def test_repository_migrations_are_contiguous_and_cover_foundation_contracts() -
     assert "CREATE TABLE company_ats_sources" in combined_sql
     assert "ALTER TYPE ats_provider ADD VALUE 'greenhouse'" in combined_sql
     assert "ALTER TYPE review_queue_kind ADD VALUE 'sponsorship_match'" in combined_sql
+    assert "CREATE TYPE evidence_status" in combined_sql
+    assert "ADD COLUMN status evidence_status" in combined_sql
 
 
 def test_discovery_rejects_a_gap_in_versions(tmp_path: Path) -> None:
@@ -69,10 +71,7 @@ def test_migrations_apply_idempotently_to_postgis() -> None:
     first_application = apply_migrations(database_url, MIGRATIONS_DIRECTORY)
     second_application = apply_migrations(database_url, MIGRATIONS_DIRECTORY)
 
-    assert [migration.version for migration in first_application] in (
-        [1, 2, 3, 4, 5, 6, 7],
-        [],
-    )
+    assert [migration.version for migration in first_application] in (list(range(1, 14)), [])
     assert second_application == ()
 
     with psycopg.connect(database_url) as connection:
@@ -409,4 +408,27 @@ def test_employer_identity_constraints() -> None:
             connection.execute(
                 "UPDATE review_queue_items SET status = 'approved' WHERE id = %s",
                 (review_id[0],),
+            )
+
+        evidence_status = connection.execute(
+            """
+            INSERT INTO evidence (
+              entity_type, entity_id, claim_type, claim_value,
+              source_id, confidence, observed_at
+            )
+            VALUES ('company', %s, 'integration_claim', '{}', %s, 0.75, now())
+            RETURNING status
+            """,
+            (str(second_company_id[0]), source_id[0]),
+        ).fetchone()
+        assert evidence_status == ("active",)
+
+        connection.execute(
+            "UPDATE evidence SET status = 'stale' WHERE entity_id = %s",
+            (str(second_company_id[0]),),
+        )
+        with pytest.raises(psycopg.errors.InvalidTextRepresentation):
+            connection.execute(
+                "UPDATE evidence SET status = 'unverified' WHERE entity_id = %s",
+                (str(second_company_id[0]),),
             )

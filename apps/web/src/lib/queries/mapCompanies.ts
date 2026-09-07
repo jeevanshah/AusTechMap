@@ -57,6 +57,7 @@ export async function fetchMapCompanies(
               SELECT 1 FROM evidence e2
               WHERE e2.entity_type = 'company' AND e2.entity_id = c.id::text
                 AND e2.claim_type = ANY($7::text[])
+                AND e2.status = 'active'
             ) AS has_sponsorship_evidence,
             rl.migration_category IS NOT NULL AS is_regional
      FROM company_locations cl
@@ -67,6 +68,7 @@ export async function fetchMapCompanies(
        FROM evidence e
        WHERE e.entity_type = 'company' AND e.entity_id = c.id::text
          AND e.claim_type = 'employer_seed_research'
+         AND e.status = 'active'
        ORDER BY e.observed_at DESC LIMIT 1
      ) research ON true
      LEFT JOIN LATERAL (
@@ -90,6 +92,7 @@ export async function fetchMapCompanies(
              SELECT 1 FROM evidence e
              WHERE e.entity_type = 'company' AND e.entity_id = c.id::text
                AND e.claim_type = ANY($7::text[])
+               AND e.status = 'active'
            ))
        AND (NOT $8::boolean OR rl.migration_category IS NOT NULL)
      ORDER BY c.display_name

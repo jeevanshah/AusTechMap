@@ -27,6 +27,7 @@ export async function listRegionalHubs(pool: Pool): Promise<RegionalHub[]> {
        FROM evidence e
        WHERE e.entity_type = 'company' AND e.entity_id = c.id::text
          AND e.claim_type = 'employer_seed_research'
+         AND e.status = 'active'
        ORDER BY e.observed_at DESC LIMIT 1
      ) research ON true
      WHERE c.status NOT IN ('merged', 'disabled')

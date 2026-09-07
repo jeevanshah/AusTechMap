@@ -3,8 +3,13 @@ import { notFound } from "next/navigation";
 
 import { getPool } from "../../../../lib/db";
 import {
+  EVIDENCE_STATUSES,
+  type EvidenceStatus,
+} from "../../../../lib/evidence";
+import {
   disableCompanyAction,
   mergeCompanyAction,
+  updateEvidenceStatusAction,
   updateCompany,
   verifyCompanyAction,
 } from "../actions";
@@ -26,6 +31,15 @@ interface CompanyDetail {
   verified_at: string | null;
 }
 
+interface EvidenceEntry {
+  id: string;
+  claim_type: string;
+  confidence: string;
+  status: EvidenceStatus;
+  observed_at: string;
+  source_name: string;
+}
+
 async function loadCompany(id: string): Promise<CompanyDetail | null> {
   const { rows } = await getPool().query<CompanyDetail>(
     `SELECT c.id, c.slug, c.display_name, c.abn, c.acn, c.domain, c.careers_url,
@@ -39,6 +53,19 @@ async function loadCompany(id: string): Promise<CompanyDetail | null> {
   return rows[0] ?? null;
 }
 
+async function loadEvidence(companyId: string): Promise<EvidenceEntry[]> {
+  const { rows } = await getPool().query<EvidenceEntry>(
+    `SELECT e.id, e.claim_type, e.confidence, e.status, e.observed_at,
+            ds.name AS source_name
+     FROM evidence e
+     JOIN data_sources ds ON ds.id = e.source_id
+     WHERE e.entity_type = 'company' AND e.entity_id = $1
+     ORDER BY e.observed_at DESC, e.created_at DESC`,
+    [companyId],
+  );
+  return rows;
+}
+
 export default async function CompanyDetailPage({
   params,
 }: {
@@ -47,6 +74,7 @@ export default async function CompanyDetailPage({
   const { id } = await params;
   const company = await loadCompany(id);
   if (!company) notFound();
+  const evidence = await loadEvidence(company.id);
 
   if (company.status === "merged") {
     return (
@@ -147,6 +175,86 @@ export default async function CompanyDetailPage({
             Save
           </button>
         </form>
+      </section>
+
+      <section>
+        <h2 className="mb-4 font-mono text-xs tracking-[0.18em] text-emerald-700 uppercase">
+          Evidence lifecycle
+        </h2>
+        {evidence.length === 0 ? (
+          <p className="rounded-lg border border-emerald-950/15 bg-emerald-950/5 p-4 text-sm">
+            No evidence has been recorded for this company.
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-4">
+            {evidence.map((entry) => {
+              const boundUpdateEvidenceStatus = updateEvidenceStatusAction.bind(
+                null,
+                company.id,
+                entry.id,
+              );
+              return (
+                <li
+                  key={entry.id}
+                  className="rounded-xl border border-emerald-950/15 p-4"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-2 text-sm">
+                    <div>
+                      <p className="font-medium">{entry.claim_type}</p>
+                      <p className="mt-1 text-xs text-slate-600">
+                        {entry.source_name} ·{" "}
+                        {Math.round(Number(entry.confidence) * 100)}% confidence
+                        · observed{" "}
+                        {new Date(entry.observed_at).toLocaleDateString(
+                          "en-AU",
+                        )}
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-emerald-950/10 px-3 py-1 text-xs font-medium">
+                      {entry.status.replace("_", " ")}
+                    </span>
+                  </div>
+                  <form
+                    action={boundUpdateEvidenceStatus}
+                    className="mt-4 grid gap-3 sm:grid-cols-[minmax(0,11rem)_1fr_auto]"
+                  >
+                    <label className="sr-only" htmlFor={`status-${entry.id}`}>
+                      Evidence status
+                    </label>
+                    <select
+                      id={`status-${entry.id}`}
+                      name="status"
+                      defaultValue={entry.status}
+                      className="rounded-lg border border-emerald-950/20 px-3 py-2 text-sm"
+                    >
+                      {EVIDENCE_STATUSES.map((status) => (
+                        <option key={status} value={status}>
+                          {status.replace("_", " ")}
+                        </option>
+                      ))}
+                    </select>
+                    <label className="sr-only" htmlFor={`reason-${entry.id}`}>
+                      Reason for status change
+                    </label>
+                    <input
+                      id={`reason-${entry.id}`}
+                      name="reason"
+                      required
+                      placeholder="Reason for change"
+                      className="rounded-lg border border-emerald-950/20 px-3 py-2 text-sm"
+                    />
+                    <button
+                      type="submit"
+                      className="rounded-full border border-emerald-900 px-4 py-2 text-sm font-medium text-emerald-900"
+                    >
+                      Update
+                    </button>
+                  </form>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </section>
 
       {!company.verified_at && (
