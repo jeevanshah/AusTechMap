@@ -1,4 +1,4 @@
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ForbiddenError, UnauthenticatedError } from "../../../lib/auth/errors";
@@ -115,6 +115,7 @@ describe("admin/companies actions -- authorization", () => {
     });
     const query = vi
       .fn()
+      .mockResolvedValueOnce({ rows: [] })
       .mockResolvedValueOnce({
         rows: [
           {
@@ -125,7 +126,11 @@ describe("admin/companies actions -- authorization", () => {
         ],
       })
       .mockResolvedValue({ rows: [] });
-    vi.mocked(getPool).mockReturnValue({ query } as unknown as Pool);
+    const release = vi.fn();
+    const client = { query, release } as unknown as PoolClient;
+    vi.mocked(getPool).mockReturnValue({
+      connect: vi.fn().mockResolvedValue(client),
+    } as unknown as Pool);
     const formData = new FormData();
     formData.set("status", "stale");
     formData.set("reason", "source is outside its refresh window");
@@ -146,5 +151,48 @@ describe("admin/companies actions -- authorization", () => {
         "source is outside its refresh window",
       ]),
     );
+    expect(query).toHaveBeenCalledWith("BEGIN");
+    expect(query).toHaveBeenCalledWith("COMMIT");
+    expect(release).toHaveBeenCalledOnce();
+  });
+
+  it("rolls back the status change when the audit write fails", async () => {
+    vi.mocked(requireStaffSession).mockResolvedValue({
+      id: 7,
+      email: "reviewer@example.com",
+      role: "reviewer",
+      mfaVerifiedAt: new Date(),
+    });
+    const query = vi
+      .fn()
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            status: "active",
+            claim_type: "sponsorship_labour_agreement",
+            company_slug: "example-company",
+          },
+        ],
+      })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockRejectedValueOnce(new Error("audit unavailable"))
+      .mockResolvedValueOnce({ rows: [] });
+    const release = vi.fn();
+    const client = { query, release } as unknown as PoolClient;
+    vi.mocked(getPool).mockReturnValue({
+      connect: vi.fn().mockResolvedValue(client),
+    } as unknown as Pool);
+    const formData = new FormData();
+    formData.set("status", "stale");
+    formData.set("reason", "source is outside its refresh window");
+
+    await expect(
+      updateEvidenceStatusAction("company-1", "evidence-1", formData),
+    ).rejects.toThrow("audit unavailable");
+
+    expect(query).toHaveBeenCalledWith("ROLLBACK");
+    expect(query).not.toHaveBeenCalledWith("COMMIT");
+    expect(release).toHaveBeenCalledOnce();
   });
 });

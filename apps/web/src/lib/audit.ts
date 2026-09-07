@@ -20,10 +20,10 @@ export interface RecordAuditInput {
 }
 
 export async function recordAudit(
-  pool: Pool,
+  database: Pick<Pool, "query">,
   input: RecordAuditInput,
 ): Promise<void> {
-  await pool.query(
+  await database.query(
     `INSERT INTO audit_records (
        actor_type, actor_id, action, target_type, target_id,
        reason, before_state, after_state, metadata, request_id
