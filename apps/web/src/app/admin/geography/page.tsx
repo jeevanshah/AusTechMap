@@ -83,13 +83,6 @@ export default async function GeographyStatusPage() {
         </span>
       </header>
 
-      <p className="rounded-xl border border-amber-600/40 bg-amber-50 p-4 text-sm text-amber-900">
-        This page has no access control. It is safe only because no real
-        employer or user data exists yet — it must not be relied on as
-        production-ready before an auth gate is added (see
-        ARCHITECTURE_DECISIONS.md §4.1).
-      </p>
-
       {error && (
         <p className="rounded-xl border border-red-600/40 bg-red-50 p-4 text-sm text-red-900">
           {error}
