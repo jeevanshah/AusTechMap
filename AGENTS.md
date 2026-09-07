@@ -1,10 +1,10 @@
 # Agent Workflow
 
 > Coding-agent roles, quality gates, and repository conventions for Australia Tech Map — anticipated in [PRODUCT_SPEC.md](./PRODUCT_SPEC.md) Appendix B.1. Read this before making any change in this repository.
-> Version 1.6 · 4 September 2026
+> Version 1.7 · 7 September 2026
 
 > [!IMPORTANT]
-> **Current status (4 September 2026):** Codex is unavailable (quota exhausted, duration unknown). **Claude is the active implementer**; Gemini continues its orchestration and UI/browser duties. This means there is currently **no independent third-party code reviewer** — Claude reviewing its own implementation work is a real gap, not a solved problem, until Codex returns or the user reviews directly. Per the fallback already defined in "Switching implementers" below, **merges go to the user directly**; no agent is currently authorized to merge. Update or remove this note once Codex resumes — the Roles table and Orchestration loop below still describe the default, steady-state assignment, not the current one.
+> **Current status (7 September 2026):** Codex resumes as active implementer and final integrator, per the user's explicit instruction — the default, steady-state assignment in the Roles table below is back in effect. Claude was active implementer from 4–7 September (Codex was on quota, then the user simply asked for Codex back); see `HANDOFF.md` for the full state of what was built in the interim (Phases 2–6A backend work, a full visual redesign, and the complete authentication/authorization system from §4.1) before touching anything.
 
 ## Roles
 
