@@ -56,6 +56,64 @@ describe("checkRateLimit", () => {
     expect(result.allowed).toBe(true);
   });
 
+  it("regression: the generated SQL locks only once attempt_count exceeds the limit, not merely reaches it (off-by-one)", async () => {
+    // The previous test above only proves the *mocked return row* says
+    // allowed -- it never actually exercised the SQL's own CASE WHEN, so
+    // it kept passing even when the real query used `>= $4` and locked
+    // out the 5th attempt itself. This asserts on the literal SQL text
+    // sent to the database, so reverting the operator fails this test
+    // directly rather than only failing in production.
+    const pool = fakePool({ attempt_count: 5, locked_until: null });
+    await checkRateLimit(pool, {
+      scope: "mfa_attempt",
+      key: "42",
+      limit: 5,
+      windowSeconds: 900,
+      lockSeconds: 900,
+    });
+    const [sql] = vi.mocked(pool.query).mock.calls[0]!;
+    expect(String(sql)).toMatch(/attempt_count\s*\+\s*1\s*>\s*\$4/);
+    expect(String(sql)).not.toMatch(/attempt_count\s*\+\s*1\s*>=\s*\$4/);
+  });
+
+  it("integration-style: permits attempts 1-5 and locks starting at attempt 6, across a real sequential run", async () => {
+    // A stateful fake that actually applies the same UPSERT semantics
+    // (attempt_count increments every call; locked_until is set once the
+    // real SQL's condition -- extracted from the query text itself, not
+    // re-guessed -- is met) rather than a fixed per-call mock, so this
+    // proves end-to-end sequential behavior, not just one isolated call.
+    let attemptCount = 0;
+    let lockedUntil: Date | null = null;
+    const pool = {
+      query: vi.fn().mockImplementation((sql: string, params: unknown[]) => {
+        const limit = params[3] as number;
+        const lockUntilParam = params[4] as Date;
+        attemptCount += 1;
+        const conditionMet = /attempt_count\s*\+\s*1\s*>\s*\$4/.test(sql)
+          ? attemptCount > limit
+          : attemptCount >= limit; // falls back to the buggy semantics if ever reintroduced
+        if (conditionMet) lockedUntil = lockUntilParam;
+        return Promise.resolve({
+          rows: [{ attempt_count: attemptCount, locked_until: lockedUntil }],
+        });
+      }),
+    } as unknown as Pool;
+
+    const results: boolean[] = [];
+    for (let i = 0; i < 6; i++) {
+      const result = await checkRateLimit(pool, {
+        scope: "mfa_attempt",
+        key: "42",
+        limit: 5,
+        windowSeconds: 900,
+        lockSeconds: 900,
+      });
+      results.push(result.allowed);
+    }
+
+    expect(results).toEqual([true, true, true, true, true, false]);
+  });
+
   it("disallows once the attempt count exceeds the limit", async () => {
     const pool = fakePool({ attempt_count: 6, locked_until: null });
     const result = await checkRateLimit(pool, {
