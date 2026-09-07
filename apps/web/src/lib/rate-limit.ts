@@ -5,9 +5,10 @@ import type { Pool } from "pg";
  * across invocations with no guaranteed shared process/isolate, so an
  * in-memory counter is unsafe (two concurrent requests can land on
  * different isolates and each see a fresh counter). Mirrors import_runs'
- * existing atomic claim pattern: a single INSERT ... ON CONFLICT ... DO
- * UPDATE round trip, never a read-then-write race. Table:
- * db/migrations/0012_auth_rate_limiting.sql.
+ * existing atomic claim pattern: one database-function round trip, with a
+ * transaction-scoped advisory lock serialising each scope/key. Table:
+ * db/migrations/0012_auth_rate_limiting.sql; hardened function:
+ * db/migrations/0014_harden_auth_rate_limiting.sql.
  */
 export interface RateLimitOptions {
   scope: string;
@@ -23,34 +24,38 @@ export interface RateLimitResult {
   lockedUntil: Date | null;
 }
 
-function windowStart(now: Date, windowSeconds: number): Date {
-  const epochSeconds = Math.floor(now.getTime() / 1000);
-  const bucketSeconds = epochSeconds - (epochSeconds % windowSeconds);
-  return new Date(bucketSeconds * 1000);
-}
-
 export async function checkRateLimit(
   pool: Pool,
   options: RateLimitOptions,
   now: Date = new Date(),
 ): Promise<RateLimitResult> {
-  const bucketStart = windowStart(now, options.windowSeconds);
-  const lockedUntil = new Date(now.getTime() + options.lockSeconds * 1000);
+  if (
+    !Number.isInteger(options.limit) ||
+    !Number.isInteger(options.windowSeconds) ||
+    !Number.isInteger(options.lockSeconds) ||
+    options.limit <= 0 ||
+    options.windowSeconds <= 0 ||
+    options.lockSeconds <= 0
+  ) {
+    throw new RangeError(
+      "Rate-limit limit, windowSeconds, and lockSeconds must be positive integers",
+    );
+  }
 
   const result = await pool.query<{
     attempt_count: number;
     locked_until: Date | null;
   }>(
-    `INSERT INTO auth_rate_limit_buckets (scope, key, window_start, attempt_count, locked_until)
-     VALUES ($1, $2, $3, 1, NULL)
-     ON CONFLICT (scope, key, window_start) DO UPDATE
-       SET attempt_count = auth_rate_limit_buckets.attempt_count + 1,
-           locked_until = CASE
-             WHEN auth_rate_limit_buckets.attempt_count + 1 > $4 THEN $5::timestamptz
-             ELSE auth_rate_limit_buckets.locked_until
-           END
-     RETURNING attempt_count, locked_until`,
-    [options.scope, options.key, bucketStart, options.limit, lockedUntil],
+    `SELECT attempt_count, locked_until
+     FROM check_auth_rate_limit($1, $2, $3, $4, $5, $6)`,
+    [
+      options.scope,
+      options.key,
+      now,
+      options.windowSeconds,
+      options.limit,
+      options.lockSeconds,
+    ],
   );
 
   const row = result.rows[0]!;

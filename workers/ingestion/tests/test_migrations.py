@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import os
 import uuid
+from concurrent.futures import ThreadPoolExecutor
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import psycopg
@@ -21,7 +23,7 @@ MIGRATIONS_DIRECTORY = REPOSITORY_ROOT / "db" / "migrations"
 def test_repository_migrations_are_contiguous_and_cover_foundation_contracts() -> None:
     migrations = discover_migrations(MIGRATIONS_DIRECTORY)
 
-    assert [migration.version for migration in migrations] == list(range(1, 14))
+    assert [migration.version for migration in migrations] == list(range(1, 15))
     combined_sql = "\n".join(migration.sql for migration in migrations)
     assert "CREATE EXTENSION IF NOT EXISTS postgis" in combined_sql
     assert "CREATE TABLE users" in combined_sql
@@ -45,6 +47,9 @@ def test_repository_migrations_are_contiguous_and_cover_foundation_contracts() -
     assert "ALTER TYPE review_queue_kind ADD VALUE 'sponsorship_match'" in combined_sql
     assert "CREATE TYPE evidence_status" in combined_sql
     assert "ADD COLUMN status evidence_status" in combined_sql
+    assert "CREATE FUNCTION check_auth_rate_limit" in combined_sql
+    assert "pg_advisory_xact_lock" in combined_sql
+    assert "bucket.attempt_count + 1 > p_limit" in combined_sql
 
 
 def test_discovery_rejects_a_gap_in_versions(tmp_path: Path) -> None:
@@ -71,7 +76,7 @@ def test_migrations_apply_idempotently_to_postgis() -> None:
     first_application = apply_migrations(database_url, MIGRATIONS_DIRECTORY)
     second_application = apply_migrations(database_url, MIGRATIONS_DIRECTORY)
 
-    assert [migration.version for migration in first_application] in (list(range(1, 14)), [])
+    assert [migration.version for migration in first_application] in (list(range(1, 15)), [])
     assert second_application == ()
 
     with psycopg.connect(database_url) as connection:
@@ -99,6 +104,81 @@ def test_migrations_apply_idempotently_to_postgis() -> None:
 
     assert extensions == {"postgis", "pg_trgm", "pgcrypto"}
     assert tables == {"users", "import_runs", "raw_snapshots", "audit_records"}
+
+
+@pytest.mark.integration
+def test_auth_rate_limit_lock_survives_window_boundary() -> None:
+    database_url = os.environ.get("TEST_DATABASE_URL")
+    if not database_url:
+        pytest.skip("TEST_DATABASE_URL is not configured")
+
+    apply_migrations(database_url, MIGRATIONS_DIRECTORY)
+    scope = f"mfa_boundary_{uuid.uuid4().hex}"
+    key = "account-42"
+    first_attempt = datetime(2026, 1, 1, 0, 14, 50, tzinfo=UTC)
+    statement = """
+        SELECT attempt_count, locked_until
+        FROM check_auth_rate_limit(%s, %s, %s, %s, %s, %s)
+        """
+
+    with psycopg.connect(database_url, autocommit=True) as connection:
+        for attempt_index in range(5):
+            row = connection.execute(
+                statement,
+                (scope, key, first_attempt + timedelta(seconds=attempt_index), 900, 5, 900),
+            ).fetchone()
+            assert row == (attempt_index + 1, None)
+
+        lock_started = first_attempt + timedelta(seconds=5)
+        locked_until = lock_started + timedelta(minutes=15)
+        sixth_attempt = connection.execute(
+            statement,
+            (scope, key, lock_started, 900, 5, 900),
+        ).fetchone()
+        assert sixth_attempt == (6, locked_until)
+
+        # The old fixed-window implementation created a new unlocked row at
+        # 00:15:00. The database function must retain the lock until 00:29:55.
+        across_boundary = connection.execute(
+            statement,
+            (scope, key, datetime(2026, 1, 1, 0, 15, tzinfo=UTC), 900, 5, 900),
+        ).fetchone()
+        assert across_boundary == (6, locked_until)
+
+        after_lock = connection.execute(
+            statement,
+            (scope, key, locked_until, 900, 5, 900),
+        ).fetchone()
+        assert after_lock == (1, None)
+
+
+@pytest.mark.integration
+def test_auth_rate_limit_serializes_concurrent_attempts() -> None:
+    database_url = os.environ.get("TEST_DATABASE_URL")
+    if not database_url:
+        pytest.skip("TEST_DATABASE_URL is not configured")
+
+    apply_migrations(database_url, MIGRATIONS_DIRECTORY)
+    scope = f"mfa_concurrency_{uuid.uuid4().hex}"
+    attempted_at = datetime(2026, 1, 1, tzinfo=UTC)
+
+    def make_attempt(_: int) -> tuple[int, datetime | None]:
+        with psycopg.connect(database_url, autocommit=True) as connection:
+            row = connection.execute(
+                """
+                SELECT attempt_count, locked_until
+                FROM check_auth_rate_limit(%s, %s, %s, %s, %s, %s)
+                """,
+                (scope, "account-42", attempted_at, 900, 5, 900),
+            ).fetchone()
+        assert row is not None
+        return row
+
+    with ThreadPoolExecutor(max_workers=6) as executor:
+        results = list(executor.map(make_attempt, range(6)))
+
+    assert sorted(result[0] for result in results) == [1, 2, 3, 4, 5, 6]
+    assert sum(result[1] is not None for result in results) == 1
 
 
 @pytest.mark.integration
