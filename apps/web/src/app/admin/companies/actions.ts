@@ -178,41 +178,54 @@ export async function updateEvidenceStatusAction(
   }
 
   const pool = getPool();
-  const before = await pool.query<{
-    status: string;
-    claim_type: string;
-    company_slug: string;
-  }>(
-    `SELECT e.status, e.claim_type, c.slug AS company_slug
-     FROM evidence e
-     JOIN companies c ON c.id = $1
-     WHERE e.id = $2
-       AND e.entity_type = 'company'
-       AND e.entity_id = c.id::text`,
-    [companyId, evidenceId],
-  );
-  const existing = before.rows[0];
-  if (!existing) {
-    throw new Error(`evidence not found for company: ${evidenceId}`);
+  const client = await pool.connect();
+  let companySlug: string;
+  try {
+    await client.query("BEGIN");
+    const before = await client.query<{
+      status: string;
+      claim_type: string;
+      company_slug: string;
+    }>(
+      `SELECT e.status, e.claim_type, c.slug AS company_slug
+       FROM evidence e
+       JOIN companies c ON c.id = $1
+       WHERE e.id = $2
+         AND e.entity_type = 'company'
+         AND e.entity_id = c.id::text
+       FOR UPDATE OF e`,
+      [companyId, evidenceId],
+    );
+    const existing = before.rows[0];
+    if (!existing) {
+      throw new Error(`evidence not found for company: ${evidenceId}`);
+    }
+
+    await client.query("UPDATE evidence SET status = $1 WHERE id = $2", [
+      status,
+      evidenceId,
+    ]);
+    await recordAudit(client, {
+      actorUserId: actor.id,
+      action: "evidence_status_changed",
+      targetType: "evidence",
+      targetId: evidenceId,
+      reason,
+      beforeState: { status: existing.status },
+      afterState: { status },
+      metadata: { company_id: companyId, claim_type: existing.claim_type },
+    });
+    await client.query("COMMIT");
+    companySlug = existing.company_slug;
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
   }
 
-  await pool.query("UPDATE evidence SET status = $1 WHERE id = $2", [
-    status,
-    evidenceId,
-  ]);
-  await recordAudit(pool, {
-    actorUserId: actor.id,
-    action: "evidence_status_changed",
-    targetType: "evidence",
-    targetId: evidenceId,
-    reason,
-    beforeState: { status: existing.status },
-    afterState: { status },
-    metadata: { company_id: companyId, claim_type: existing.claim_type },
-  });
-
   revalidatePath(`/admin/companies/${companyId}`);
-  revalidatePath(`/companies/${existing.company_slug}`);
+  revalidatePath(`/companies/${companySlug}`);
 }
 
 export async function disableCompanyAction(
