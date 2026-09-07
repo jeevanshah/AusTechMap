@@ -1,7 +1,7 @@
 # Australia Tech Map — Implementation Plan
 
 > Execution plan derived from [PRODUCT_SPEC.md](./PRODUCT_SPEC.md). [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md) is authoritative for technology choices where it conflicts with either document.  
-> Version 4.1 · 7 September 2026
+> Version 4.2 · 7 September 2026
 
 ## 1. Objective
 
@@ -257,7 +257,7 @@ Goal: turn exploration into relevant, repeatable opportunity discovery.
 - [ ] Build a weighted Opportunity Match with component-level reasons.
 - [ ] Store query hash, score components, model version, and generation time.
 - [ ] Validate ranking against golden queries and product-review judgements.
-- [x] Add authentication -- pulled forward from Phase 7/8 and built in full on 7 September 2026 (ARCHITECTURE_DECISIONS.md §4.1: Auth.js v5 + Postgres sessions, Resend magic-link sign-in, the three-role model, mandatory staff TOTP MFA, a consolidated audit module, a first-admin bootstrap CLI, and the full 5-step account-deletion lifecycle), ahead of any saved-state feature actually needing it -- driven instead by gating `/admin/*` before a private alpha. Full lint/typecheck/test/build all green; not yet verified against real infrastructure (no real Resend account/domain, R2 ledger write, or scheduled-job run observed yet -- see ARCHITECTURE_DECISIONS.md §4.1's own "not yet verified" note).
+- [x] Add authentication -- pulled forward from Phase 7/8 and built in full on 7 September 2026 (ARCHITECTURE_DECISIONS.md §4.1: Auth.js v5 + Postgres sessions, Resend magic-link sign-in, the three-role model, mandatory staff TOTP MFA, a consolidated audit module, a first-admin bootstrap CLI, and the full 5-step account-deletion lifecycle), ahead of any saved-state feature actually needing it -- driven instead by gating `/admin/*` before a private alpha. Full lint/typecheck/test/build all green. Verified against real infrastructure the same day: real Resend magic-link sign-in, real MFA enrollment with an actual authenticator app (Microsoft Authenticator, via a real QR code), and real, gated access to `/admin/companies`/`/admin/geography` with real data. The account-deletion R2 ledger and scheduled completion job remain unverified -- Cloudflare/R2 signup deliberately deferred until real users exist (see ARCHITECTURE_DECISIONS.md §4.1's own note).
 - [ ] Implement saved searches and employer/region watchlists -- the sign-in/session system above exists to build this on top of, but the feature itself isn't built. The deletion pipeline's erasure-hook registry (`lib/deletion/erasure.ts::registerErasureHook`) is the extension point this feature must register against when it lands, so account deletion actually erases it.
 - [ ] Derive immutable, versioned change events from observations.
 - [ ] Implement stable event deduplication keys and replay-safe matching.

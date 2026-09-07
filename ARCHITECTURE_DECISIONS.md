@@ -2,7 +2,7 @@
 
 > Satisfies [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) Phase 0: "Record architecture decisions for the database, map provider, storage, hosting, authentication, email, and analytics."
 > This document is authoritative for technology choices — where it conflicts with [PRODUCT_SPEC.md](./PRODUCT_SPEC.md)'s recommendations, this document wins.
-> Version 3.9 · 7 September 2026
+> Version 3.10 · 7 September 2026
 
 ## 1. Decision summary
 
@@ -156,13 +156,20 @@ operational change.
   registry, an `age`-encrypted R2 restore-suppression ledger mirroring §4.4's backup pattern, and an
   hourly GitHub Actions job completing deletions within the 24h SLA). Verified: full lint/typecheck/
   test/build all green, including a production `next build` confirming Next.js 16's `proxy.ts` (not
-  `middleware.ts`) is correctly picked up. **Not yet verified against real infrastructure** — no real
-  Resend account/verified sending domain exists yet (the sandbox sender `onboarding@resend.dev` is a
-  deliberate, named interim state, same pattern as this project's Nominatim-before-G-NAF precedent),
-  and a real magic-link round trip, real MFA enrollment with an actual authenticator app, a real R2
-  ledger write, and a real scheduled-job run have not yet been observed against production — this
-  environment has no `DATABASE_URL`/Resend/R2 credentials to run them from. Track these against
-  IMPLEMENTATION_PLAN.md before calling this phase closed.
+  `middleware.ts`) is correctly picked up. **Verified against real infrastructure on 7 September
+  2026**: migration `0012` applied to the real Neon database; the first two admins bootstrapped via
+  `scripts/grant-role.mjs` and confirmed by direct query; a real Resend account (sandbox sender
+  `onboarding@resend.dev` — no verified domain yet, a deliberate, named interim state) sent a real
+  magic-link email that was clicked and correctly created a real session; real MFA enrollment
+  completed with an actual Microsoft Authenticator TOTP code (including a real QR code, added after
+  the initial enrollment attempt showed the gap of text-only manual entry); `/admin/companies` and
+  `/admin/geography` confirmed live with real data, gated, and no longer showing the old "no access
+  control" placeholder banners (a second leftover instance of that stale text was found and removed
+  after the first pass only caught one of two copies). **Not yet verified**: the account-deletion
+  R2 ledger and the hourly GitHub Actions completion job — Cloudflare/R2 signup was deliberately
+  deferred until real users exist (no real deletion has anything to process yet), so `R2_ACCOUNT_ID`
+  et al. remain unset in the GitHub `production` environment; `DATABASE_URL` alone is set there so
+  the scheduled job runs cleanly with zero pending requests rather than failing on a missing secret.
 - Destructive merges, source disablement, role changes, and importer replay require `admin` plus an
   MFA assertion no older than 15 minutes; all staff mutations write an immutable audit record.
 
