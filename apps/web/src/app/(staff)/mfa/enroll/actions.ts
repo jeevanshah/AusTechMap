@@ -3,18 +3,17 @@
 import { Secret } from "otpauth";
 import { redirect } from "next/navigation";
 
-import {
-  currentClientIp,
-  requireRole,
-} from "../../../../lib/auth/require-role";
+import { requireRole } from "../../../../lib/auth/require-role";
 import { getPool } from "../../../../lib/db";
 import { decryptTotpSecret } from "../../../../lib/mfa/crypto";
 import { validateTotpToken } from "../../../../lib/mfa/totp";
 import { checkRateLimit } from "../../../../lib/rate-limit";
+import { currentClientIp } from "../../../../lib/request-ip";
 
-// See mfa/verify/actions.ts's comment -- same account+IP rationale.
+// See mfa/verify/actions.ts's comment -- same account+IP rationale, same
+// limit for both buckets per ARCHITECTURE_DECISIONS.md §4.1.
 const MFA_ATTEMPT_LIMIT = 5;
-const MFA_IP_LIMIT = 20;
+const MFA_IP_LIMIT = 5;
 const MFA_WINDOW_SECONDS = 15 * 60;
 const MFA_LOCK_SECONDS = 15 * 60;
 

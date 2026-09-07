@@ -46,7 +46,7 @@ export async function checkRateLimit(
      ON CONFLICT (scope, key, window_start) DO UPDATE
        SET attempt_count = auth_rate_limit_buckets.attempt_count + 1,
            locked_until = CASE
-             WHEN auth_rate_limit_buckets.attempt_count + 1 >= $4 THEN $5::timestamptz
+             WHEN auth_rate_limit_buckets.attempt_count + 1 > $4 THEN $5::timestamptz
              ELSE auth_rate_limit_buckets.locked_until
            END
      RETURNING attempt_count, locked_until`,
