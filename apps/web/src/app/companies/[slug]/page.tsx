@@ -19,6 +19,7 @@ import { getCategoryIconPath } from "../../_components/HomeMapShell";
 import { MapCanvas, type Bbox } from "../../../components/map/MapCanvas";
 import { trackEvent } from "../../../lib/analytics";
 import { DatabaseNotConfiguredError, getPool } from "../../../lib/db";
+import type { EvidenceStatus } from "../../../lib/evidence";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +50,8 @@ type SponsorshipClaimType =
 interface SponsorshipEvidenceEntry {
   claimType: SponsorshipClaimType;
   claimValue: Record<string, unknown>;
+  confidence: number;
+  status: Exclude<EvidenceStatus, "rejected" | "needs_review">;
   observedAt: string;
 }
 
@@ -103,6 +106,15 @@ const SPONSORSHIP_CLAIM_LABELS: Record<SponsorshipClaimType, string> = {
   sponsorship_historical_explicit: "Historical explicit evidence",
 };
 
+const EVIDENCE_STATUS_LABELS: Record<
+  Exclude<EvidenceStatus, "rejected" | "needs_review">,
+  string
+> = {
+  active: "Active evidence",
+  stale: "Stale evidence",
+  superseded: "Superseded evidence",
+};
+
 const STATUS_LABELS: Record<string, string> = {
   pending_review: "Pending review",
   active: "Active",
@@ -146,6 +158,7 @@ async function loadCompany(slug: string): Promise<CompanyProfileRow | null> {
        FROM evidence e JOIN data_sources ds ON ds.id = e.source_id
        WHERE e.entity_type = 'company' AND e.entity_id = c.id::text
          AND e.claim_type = 'employer_seed_research'
+         AND e.status = 'active'
        ORDER BY e.observed_at DESC LIMIT 1
      ) research ON true
      LEFT JOIN LATERAL (
@@ -153,6 +166,8 @@ async function loadCompany(slug: string): Promise<CompanyProfileRow | null> {
                 json_build_object(
                   'claimType', e.claim_type,
                   'claimValue', e.claim_value,
+                  'confidence', e.confidence,
+                  'status', e.status,
                   'observedAt', e.observed_at
                 ) ORDER BY e.observed_at DESC
               ) AS items
@@ -163,6 +178,7 @@ async function loadCompany(slug: string): Promise<CompanyProfileRow | null> {
                'sponsorship_historical_explicit',
                'sponsorship_labour_agreement'
              )
+         AND e.status IN ('active', 'stale', 'superseded')
      ) sponsorship ON true
      -- No LIMIT here: the largest current employer has 44 real open roles,
      -- trivial to render on one page at today's data scale. Revisit with a
@@ -455,6 +471,14 @@ export default async function CompanyProfilePage({
                     className="font-mono text-xs text-slate-500"
                   >
                     {new Date(entry.observedAt).toLocaleDateString("en-AU")}
+                  </span>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2 font-mono text-[11px]">
+                  <span className="rounded-full border border-slate-300 bg-white px-2 py-1 text-slate-700">
+                    {Math.round(Number(entry.confidence) * 100)}% confidence
+                  </span>
+                  <span className="rounded-full border border-slate-300 bg-white px-2 py-1 text-slate-700">
+                    {EVIDENCE_STATUS_LABELS[entry.status]}
                   </span>
                 </div>
                 {entry.claimType === "sponsorship_labour_agreement" ? (

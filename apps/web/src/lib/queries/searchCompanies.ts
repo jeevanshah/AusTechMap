@@ -32,6 +32,7 @@ const SIGNAL_COLUMNS_SQL = `research.claim_value ->> 'city' AS city,
               SELECT 1 FROM evidence e2
               WHERE e2.entity_type = 'company' AND e2.entity_id = c.id::text
                 AND e2.claim_type = ANY($4::text[])
+                AND e2.status = 'active'
             ) AS has_sponsorship_evidence,
             EXISTS (
               SELECT 1 FROM company_locations cl2
@@ -44,6 +45,7 @@ const SIGNAL_JOINS_SQL = `LEFT JOIN LATERAL (
        FROM evidence e
        WHERE e.entity_type = 'company' AND e.entity_id = c.id::text
          AND e.claim_type = 'employer_seed_research'
+         AND e.status = 'active'
        ORDER BY e.observed_at DESC LIMIT 1
      ) research ON true
      LEFT JOIN LATERAL (
@@ -74,6 +76,7 @@ const SPONSORSHIP_FILTER_SQL = `(NOT $3::boolean OR EXISTS (
              SELECT 1 FROM evidence e
              WHERE e.entity_type = 'company' AND e.entity_id = c.id::text
                AND e.claim_type = ANY($4::text[])
+               AND e.status = 'active'
            ))`;
 
 const REGIONAL_FILTER_SQL = `(NOT $5::boolean OR EXISTS (

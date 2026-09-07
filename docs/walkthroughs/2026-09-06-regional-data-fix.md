@@ -9,9 +9,10 @@ We replaced the static hardcoded hubs and naive city string exclusions (`city !=
 
 ## 1. Context & Motivation
 
-Under the Australian Department of Home Affairs migration regulations (e.g., Subclass 482 / 491 / 494 visas), regional Australia is strictly defined by specific postcodes and statistical areas (`migration_category IS NOT NULL`). 
+Under the Australian Department of Home Affairs migration regulations (e.g., Subclass 482 / 491 / 494 visas), regional Australia is strictly defined by specific postcodes and statistical areas (`migration_category IS NOT NULL`).
 
 Previously, two flawed heuristics were in place:
+
 1. **SQL query in `page.tsx`**: Naively excluded `city NOT IN ('Sydney', 'Melbourne')`, which erroneously treated metropolitan cities like Brisbane as regional.
 2. **Client-side filter in `HomeMapShell.tsx`**: Filtered displayed cards and pins with `city !== 'Sydney' && city !== 'Melbourne'`.
 3. **Hardcoded Hubs List**: Used a static `REGIONAL_HUBS` array with hardcoded company counts.
@@ -21,6 +22,7 @@ Previously, two flawed heuristics were in place:
 ## 2. Changes Made
 
 ### A. Database Query (`apps/web/src/app/page.tsx`)
+
 - Updated SQL query to compute real designated regional employers based on `migration_category IS NOT NULL`:
   ```sql
   count(DISTINCT CASE WHEN EXISTS (
@@ -32,6 +34,7 @@ Previously, two flawed heuristics were in place:
 - Added `listRegionalHubs(pool)` to `loadHomeData()` to load real regional hubs server-side and pass `initialHubs={hubs}` into `<HomeMapShell />`.
 
 ### B. Client & Map Shell (`apps/web/src/app/_components/HomeMapShell.tsx`)
+
 - **Props & Types**:
   - Imported `type RegionalHub` from `@austechmap/contracts`.
   - Added `initialHubs?: RegionalHub[]` to `HomeMapShellProps`.
@@ -57,11 +60,13 @@ Previously, two flawed heuristics were in place:
 ## 3. Verification
 
 ### Automated Tests
+
 - `npm test` in `apps/web`: 6 test files passed, 39 tests passed.
 - `npm run lint` in `apps/web`: 0 errors / 0 warnings.
 - `npx tsc --noEmit` in `apps/web`: 0 type errors.
 
 ### Live Endpoints
+
 - `GET /api/regions`: Returns 11 designated regional hubs (Perth 10, Adelaide 9, Canberra 8, Wollongong 6, Newcastle 5, Darwin 3, Geelong 2, Gold Coast 2, Hobart 2, Sunshine Coast 2, Bendigo 1).
 - `GET /api/search/companies?q=canberra&regional=true`: Returns Canberra Data Centres with `isRegional: true`.
 - `GET /api/search/companies?q=sydney&regional=true`: Returns `[]` (Sydney excluded).
@@ -71,4 +76,5 @@ Previously, two flawed heuristics were in place:
 ---
 
 ## 4. Future Refinements (Track 6B / Phase 3)
+
 - **Dynamic Sector Taglines**: Currently, the per-city taglines (e.g. "Lot Fourteen Space, Defence & Machine Learning" for Adelaide) in `HUB_METADATA` are curated editorial descriptions. These can eventually be dynamically derived from the top category frequencies per region in PostgreSQL.

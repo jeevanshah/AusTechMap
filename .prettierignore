@@ -17,3 +17,5 @@ workers/ingestion/.pytest_cache/
 workers/ingestion/.ruff_cache/
 .agents/
 agent/
+.local/
+scratch/
