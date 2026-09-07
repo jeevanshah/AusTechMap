@@ -1,26 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import type { ReactNode } from "react";
 
+import "@fontsource-variable/inter/wght.css";
+import "@fontsource-variable/jetbrains-mono/wght.css";
+import "@fontsource-variable/plus-jakarta-sans/wght.css";
 import "./globals.css";
-
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-plus-jakarta",
-  display: "swap",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains-mono",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -35,11 +19,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <html
-      lang="en-AU"
-      suppressHydrationWarning
-      className={`${plusJakartaSans.variable} ${inter.variable} ${jetbrainsMono.variable}`}
-    >
+    <html lang="en-AU" suppressHydrationWarning>
       <body
         suppressHydrationWarning
         className="min-h-screen bg-canvas text-navy-900 font-sans antialiased"
