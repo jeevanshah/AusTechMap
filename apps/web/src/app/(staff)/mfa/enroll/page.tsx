@@ -1,3 +1,5 @@
+import QRCode from "qrcode";
+
 import { requireRole } from "../../../../lib/auth/require-role";
 import { getPool } from "../../../../lib/db";
 import { encryptTotpSecret, EncryptedSecret } from "../../../../lib/mfa/crypto";
@@ -73,6 +75,11 @@ export default async function MfaEnrollPage() {
     );
   }
 
+  const qrCodeDataUrl = await QRCode.toDataURL(state.otpauthUri, {
+    margin: 1,
+    width: 240,
+  });
+
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-6 py-8">
       <header className="border-b border-emerald-950/15 pb-5">
@@ -81,12 +88,23 @@ export default async function MfaEnrollPage() {
         </span>
       </header>
 
-      <section className="flex flex-col gap-2 text-sm">
-        <p>Scan or manually enter this in your authenticator app:</p>
-        <code className="break-all rounded bg-slate-100 p-2 text-xs">
+      <section className="flex flex-col items-center gap-2 text-sm">
+        <p>Scan this with your authenticator app:</p>
+        {/* eslint-disable-next-line @next/next/no-img-element -- a server-generated data: URI, not an optimizable remote image */}
+        <img
+          src={qrCodeDataUrl}
+          alt="QR code for MFA enrollment"
+          width={240}
+          height={240}
+          className="rounded border border-emerald-950/15"
+        />
+        <p className="mt-2 self-start text-slate-600">
+          Can&apos;t scan? Enter manually:
+        </p>
+        <code className="w-full break-all rounded bg-slate-100 p-2 text-xs">
           {state.otpauthUri}
         </code>
-        <p className="text-slate-600">Secret: {state.secretBase32}</p>
+        <p className="w-full text-slate-600">Secret: {state.secretBase32}</p>
       </section>
 
       <section className="flex flex-col gap-2 text-sm">
