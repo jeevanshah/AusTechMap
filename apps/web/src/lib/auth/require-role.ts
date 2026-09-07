@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 import { auth } from "../../auth";
 import { ForbiddenError, MfaStaleError, UnauthenticatedError } from "./errors";
@@ -21,6 +21,15 @@ export async function currentSessionToken(): Promise<string | null> {
     if (value) return value;
   }
   return null;
+}
+
+/** Best-effort client IP for rate-limiting keys -- shared so every
+ * rate-limited action (sign-in, MFA attempts, deletion requests) uses the
+ * same extraction logic rather than each reimplementing it. */
+export async function currentClientIp(): Promise<string> {
+  return (
+    (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
+  );
 }
 
 /**

@@ -1,9 +1,9 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { signIn } from "../../../auth";
+import { currentClientIp } from "../../../lib/auth/require-role";
 import { getPool } from "../../../lib/db";
 import { checkRateLimit } from "../../../lib/rate-limit";
 
@@ -28,9 +28,7 @@ export async function requestMagicLink(formData: FormData): Promise<void> {
   if (!email) throw new Error("Email is required");
 
   const pool = getPool();
-  const ip =
-    (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    "unknown";
+  const ip = await currentClientIp();
 
   const emailCheck = await checkRateLimit(pool, {
     scope: "magic_link_email",

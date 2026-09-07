@@ -3,13 +3,18 @@
 import { Secret } from "otpauth";
 import { redirect } from "next/navigation";
 
-import { requireRole } from "../../../../lib/auth/require-role";
+import {
+  currentClientIp,
+  requireRole,
+} from "../../../../lib/auth/require-role";
 import { getPool } from "../../../../lib/db";
 import { decryptTotpSecret } from "../../../../lib/mfa/crypto";
 import { validateTotpToken } from "../../../../lib/mfa/totp";
 import { checkRateLimit } from "../../../../lib/rate-limit";
 
+// See mfa/verify/actions.ts's comment -- same account+IP rationale.
 const MFA_ATTEMPT_LIMIT = 5;
+const MFA_IP_LIMIT = 20;
 const MFA_WINDOW_SECONDS = 15 * 60;
 const MFA_LOCK_SECONDS = 15 * 60;
 
@@ -18,14 +23,22 @@ export async function confirmEnrollment(formData: FormData): Promise<void> {
   const token = String(formData.get("token") ?? "").trim();
 
   const pool = getPool();
-  const rateLimit = await checkRateLimit(pool, {
-    scope: "mfa_attempt",
+  const ip = await currentClientIp();
+  const accountCheck = await checkRateLimit(pool, {
+    scope: "mfa_attempt_account",
     key: String(actor.id),
     limit: MFA_ATTEMPT_LIMIT,
     windowSeconds: MFA_WINDOW_SECONDS,
     lockSeconds: MFA_LOCK_SECONDS,
   });
-  if (!rateLimit.allowed) {
+  const ipCheck = await checkRateLimit(pool, {
+    scope: "mfa_attempt_ip",
+    key: ip,
+    limit: MFA_IP_LIMIT,
+    windowSeconds: MFA_WINDOW_SECONDS,
+    lockSeconds: MFA_LOCK_SECONDS,
+  });
+  if (!accountCheck.allowed || !ipCheck.allowed) {
     throw new Error("Too many attempts -- try again in 15 minutes");
   }
 

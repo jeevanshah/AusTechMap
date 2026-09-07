@@ -4,6 +4,7 @@ import { Secret } from "otpauth";
 import { redirect } from "next/navigation";
 
 import {
+  currentClientIp,
   currentSessionToken,
   requireRole,
 } from "../../../../lib/auth/require-role";
@@ -13,7 +14,12 @@ import { verifyAndConsumeRecoveryCode } from "../../../../lib/mfa/recovery-codes
 import { validateTotpToken } from "../../../../lib/mfa/totp";
 import { checkRateLimit } from "../../../../lib/rate-limit";
 
+// ARCHITECTURE_DECISIONS.md §4.1: "TOTP/recovery attempts are limited to
+// five per account and IP per 15 minutes" -- both keys are checked, not
+// just the account, so a stolen session cookie can't be brute-forced from
+// an unlimited number of source IPs against a single account's cap alone.
 const MFA_ATTEMPT_LIMIT = 5;
+const MFA_IP_LIMIT = 20;
 const MFA_WINDOW_SECONDS = 15 * 60;
 const MFA_LOCK_SECONDS = 15 * 60;
 
@@ -25,15 +31,23 @@ export async function verifyMfaCode(formData: FormData): Promise<void> {
   const actor = await requireRole("reviewer");
   const token = String(formData.get("token") ?? "").trim();
   const pool = getPool();
+  const ip = await currentClientIp();
 
-  const rateLimit = await checkRateLimit(pool, {
-    scope: "mfa_attempt",
+  const accountCheck = await checkRateLimit(pool, {
+    scope: "mfa_attempt_account",
     key: String(actor.id),
     limit: MFA_ATTEMPT_LIMIT,
     windowSeconds: MFA_WINDOW_SECONDS,
     lockSeconds: MFA_LOCK_SECONDS,
   });
-  if (!rateLimit.allowed) {
+  const ipCheck = await checkRateLimit(pool, {
+    scope: "mfa_attempt_ip",
+    key: ip,
+    limit: MFA_IP_LIMIT,
+    windowSeconds: MFA_WINDOW_SECONDS,
+    lockSeconds: MFA_LOCK_SECONDS,
+  });
+  if (!accountCheck.allowed || !ipCheck.allowed) {
     throw new Error("Too many attempts -- try again in 15 minutes");
   }
 
