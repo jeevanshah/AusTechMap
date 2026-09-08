@@ -25,7 +25,7 @@ adapters, 92 observed jobs across 9 companies, employer search/profiles, and spo
 
 Phase 6A's sponsorship-evidence slice is deployed: Home Affairs labour-agreement evidence and
 job-derived claims are source-linked, confidence-scored, lifecycle-managed, and reviewable. Production
-migrations run through `0014`; health, homepage, and company search were verified after deployment.
+migrations run through `0015`; health, homepage, and company search were verified after deployment.
 Authentication, database sessions, staff TOTP MFA, role-gated admin routes, and account-deletion code
 are built. Cloudflare R2 configuration for the deletion suppression ledger remains deliberately
 deferred until real users are admitted.

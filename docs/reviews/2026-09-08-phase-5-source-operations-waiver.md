@@ -41,8 +41,10 @@ effect on `main`'s CI configuration.
 ## Residual risks
 
 - No independent AI review was completed for this change set.
-- Migration `0015_hiring_source_operations.sql` is verified in CI but is not yet applied to production
-  Neon. Production promotion requires separate explicit user approval.
+- The user separately approved production promotion of `0015_hiring_source_operations.sql`. The
+  checksum-locked runner applied exactly that migration and a read-only query confirmed version 15.
+  All 10 registered ATS sources remained active with non-null due timestamps; all 10 were initially
+  due. No crawl was started as part of migration deployment.
 - The anonymous MFA redirect fix is verified by tests/build but remains undeployed until this branch
   reaches `main` and Vercel finishes deployment.
 - Production magic-link and MFA submission flows were not exercised because doing so sends email,
