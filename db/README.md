@@ -15,6 +15,8 @@ forward migrations add the geographic, employer, hiring, authentication, and evi
 schemas. In particular, `0012` creates the authentication rate-limit buckets, `0013` adds evidence
 lifecycle states, `0014` serializes rate-limit decisions so locks survive window boundaries, and
 `0015` adds adaptive ATS scheduling, quarantine state, and source-level operational controls.
+Migration `0016` establishes append-only JSA regional observations and reproducible regional
+opportunity scores; it is not yet promoted to production.
 
 From the repository root:
 

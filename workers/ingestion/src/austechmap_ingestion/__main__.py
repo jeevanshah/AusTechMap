@@ -3,7 +3,7 @@ import json
 import os
 import uuid
 from collections.abc import Sequence
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import psycopg
@@ -52,6 +52,7 @@ from austechmap_ingestion.observability import (
     build_error_reporter_from_env,
     configure_structured_logging,
 )
+from austechmap_ingestion.regional.persistence import generate_region_opportunity_scores
 from austechmap_ingestion.sample_importer import run_sample_import
 from austechmap_ingestion.storage import (
     FilesystemSnapshotStore,
@@ -187,6 +188,19 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="labour-agreements CSV to match from (no default -- see employers/"
         "labour_agreements.py)",
+    )
+    regional_score_parser = subparsers.add_parser(
+        "score-regions",
+        help="append reproducible SA4 opportunity scores or explicit suppression records",
+    )
+    regional_score_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    regional_score_parser.add_argument(
+        "--region-code", help="score one active SA4 code instead of every active SA4"
+    )
+    regional_score_parser.add_argument(
+        "--period-end",
+        type=date.fromisoformat,
+        help="score window end date in YYYY-MM-DD format (defaults to today)",
     )
     return parser
 
@@ -572,6 +586,38 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "reviewQueueItemsCreated": labour_agreement_stats.review_queue_items_created,
                     "noMatch": labour_agreement_stats.no_match,
                 },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "score-regions":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        try:
+            scores = generate_region_opportunity_scores(
+                args.database_url,
+                region_code=args.region_code,
+                period_end=args.period_end,
+            )
+        except (ValueError, psycopg.Error) as error:
+            print(f"Regional scoring failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                [
+                    {
+                        "id": str(score.id),
+                        "regionCode": score.region_code,
+                        "score": score.score,
+                        "sufficient": score.sufficient,
+                        "suppressionReasons": list(score.suppression_reasons),
+                        "created": score.created,
+                    }
+                    for score in scores
+                ],
                 separators=(",", ":"),
                 sort_keys=True,
             )

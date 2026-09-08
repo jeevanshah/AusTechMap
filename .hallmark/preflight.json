@@ -1,0 +1,13 @@
+{
+  "scannedAt": "2026-09-08",
+  "framework": "Next.js 16 App Router with Tailwind CSS 4",
+  "designSystem": "DESIGN.md — National Registry",
+  "fonts": [
+    "Plus Jakarta Sans Variable",
+    "Inter Variable",
+    "JetBrains Mono Variable"
+  ],
+  "palette": "Tailwind @theme tokens in apps/web/src/app/globals.css",
+  "motion": "motion-cut; no animation library",
+  "spacing": "Tailwind 4-point-compatible utility scale"
+}

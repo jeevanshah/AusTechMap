@@ -9,6 +9,7 @@ from pathlib import Path
 import psycopg
 import pytest
 from _helpers import unique_valid_abn
+from psycopg.types.json import Jsonb
 
 from austechmap_ingestion.db.migrations import (
     MigrationError,
@@ -23,7 +24,7 @@ MIGRATIONS_DIRECTORY = REPOSITORY_ROOT / "db" / "migrations"
 def test_repository_migrations_are_contiguous_and_cover_foundation_contracts() -> None:
     migrations = discover_migrations(MIGRATIONS_DIRECTORY)
 
-    assert [migration.version for migration in migrations] == list(range(1, 16))
+    assert [migration.version for migration in migrations] == list(range(1, 17))
     combined_sql = "\n".join(migration.sql for migration in migrations)
     assert "CREATE EXTENSION IF NOT EXISTS postgis" in combined_sql
     assert "CREATE TABLE users" in combined_sql
@@ -50,6 +51,9 @@ def test_repository_migrations_are_contiguous_and_cover_foundation_contracts() -
     assert "CREATE FUNCTION check_auth_rate_limit" in combined_sql
     assert "pg_advisory_xact_lock" in combined_sql
     assert "bucket.attempt_count + 1 > p_limit" in combined_sql
+    assert "CREATE TABLE regional_labor_observations" in combined_sql
+    assert "CREATE TABLE region_opportunity_scores" in combined_sql
+    assert "reject_regional_intelligence_mutation" in combined_sql
 
 
 def test_discovery_rejects_a_gap_in_versions(tmp_path: Path) -> None:
@@ -76,7 +80,7 @@ def test_migrations_apply_idempotently_to_postgis() -> None:
     first_application = apply_migrations(database_url, MIGRATIONS_DIRECTORY)
     second_application = apply_migrations(database_url, MIGRATIONS_DIRECTORY)
 
-    assert [migration.version for migration in first_application] in (list(range(1, 16)), [])
+    assert [migration.version for migration in first_application] in (list(range(1, 17)), [])
     assert second_application == ()
 
     with psycopg.connect(database_url) as connection:
@@ -179,6 +183,95 @@ def test_auth_rate_limit_serializes_concurrent_attempts() -> None:
 
     assert sorted(result[0] for result in results) == [1, 2, 3, 4, 5, 6]
     assert sum(result[1] is not None for result in results) == 1
+
+
+@pytest.mark.integration
+def test_regional_intelligence_records_are_append_only() -> None:
+    database_url = os.environ.get("TEST_DATABASE_URL")
+    if not database_url:
+        pytest.skip("TEST_DATABASE_URL is not configured")
+
+    apply_migrations(database_url, MIGRATIONS_DIRECTORY)
+    suffix = uuid.uuid4().hex
+    with psycopg.connect(database_url, autocommit=True) as connection:
+        source_id = connection.execute(
+            """
+            INSERT INTO data_sources (source_key, name, kind)
+            VALUES (%s, 'Regional migration test', 'government')
+            RETURNING id
+            """,
+            (f"regional-migration-test-{suffix}",),
+        ).fetchone()
+        assert source_id is not None
+        release_id = connection.execute(
+            """
+            INSERT INTO geography_releases (
+              dataset, release_version, source_id, effective_from, content_hash
+            )
+            VALUES ('asgs_sa4', %s, %s, '2026-01-01', %s)
+            RETURNING id
+            """,
+            (f"regional-test-{suffix}", source_id[0], "d" * 64),
+        ).fetchone()
+        assert release_id is not None
+        region_id = connection.execute(
+            """
+            INSERT INTO regions (release_id, region_type, code, name, geom)
+            VALUES (
+              %s, 'sa4', %s, 'Regional Test',
+              ST_Multi(ST_GeomFromText(
+                'POLYGON((151.0 -33.9, 151.1 -33.9, 151.1 -33.8, 151.0 -33.8, 151.0 -33.9))',
+                4326
+              ))
+            )
+            RETURNING id
+            """,
+            (release_id[0], f"regional-{suffix}"),
+        ).fetchone()
+        assert region_id is not None
+        observation_id = connection.execute(
+            """
+            INSERT INTO regional_labor_observations (
+              region_id, dataset, metric_key, period_start, period_end,
+              value, unit, direction, source_version, source_id, observed_at
+            )
+            VALUES (%s, 'ivi', 'vacancy_direction', '2026-08-01', '2026-08-31',
+                    1, 'direction', 1, '2026-08', %s, now())
+            RETURNING id
+            """,
+            (region_id[0], source_id[0]),
+        ).fetchone()
+        assert observation_id is not None
+        score_id = connection.execute(
+            """
+            INSERT INTO region_opportunity_scores (
+              region_id, period_start, period_end, score, components_json,
+              methodology_version, sufficiency_json, input_fingerprint
+            )
+            VALUES (%s, '2026-07-03', '2026-08-31', NULL, %s,
+                    'regional-opportunity-v1', %s, %s)
+            RETURNING id
+            """,
+            (
+                region_id[0],
+                Jsonb({}),
+                Jsonb({"sufficient": False, "reasons": ["missing_nero"]}),
+                "e" * 64,
+            ),
+        ).fetchone()
+        assert score_id is not None
+
+        with pytest.raises(psycopg.errors.RaiseException, match="append-only"):
+            connection.execute(
+                "UPDATE regional_labor_observations SET value = 2 WHERE id = %s",
+                (observation_id[0],),
+            )
+        with pytest.raises(psycopg.errors.RaiseException, match="append-only"):
+            connection.execute(
+                "DELETE FROM region_opportunity_scores WHERE id = %s", (score_id[0],)
+            )
+        with pytest.raises(psycopg.errors.RaiseException, match="append-only"):
+            connection.execute("TRUNCATE regional_labor_observations")
 
 
 @pytest.mark.integration

@@ -90,3 +90,98 @@ export const RegionalHubsResponseSchema = z.object({
 });
 
 export type RegionalHubsResponse = z.infer<typeof RegionalHubsResponseSchema>;
+
+export const RegionScoreComponentSchema = z.object({
+  raw: z.unknown(),
+  normalized: z.number().min(0).max(1).nullable(),
+  weight: z.number().min(0).max(1),
+});
+
+export const RegionOpportunityResponseSchema = z
+  .object({
+    version: z.literal(1),
+    region: z.object({
+      code: z.string().min(1),
+      name: z.string().min(1),
+      type: z.literal("sa4"),
+    }),
+    summary: z.object({
+      employerCount: z.number().int().min(0),
+      monitoredEmployerCount: z.number().int().min(0),
+      activeJobCount: z.number().int().min(0),
+      industryCount: z.number().int().min(0),
+    }),
+    migrationContext: z.object({
+      categories: z.array(z.enum(["category_2", "category_3", "dama"])),
+      damaNames: z.array(z.string().min(1)),
+    }),
+    employers: z
+      .array(
+        z.object({
+          slug: z.string().min(1),
+          name: z.string().min(1),
+          primaryCategory: z.string().nullable(),
+          activeJobCount: z.number().int().min(0),
+        }),
+      )
+      .max(20),
+    jobs: z
+      .array(
+        z.object({
+          companySlug: z.string().min(1),
+          companyName: z.string().min(1),
+          title: z.string().min(1),
+          roleFamily: z.string().nullable(),
+          remoteType: z.enum([
+            "onsite",
+            "hybrid",
+            "remote",
+            "flexible_mixed",
+            "unknown",
+          ]),
+          sourceUrl: z.string().url(),
+          postedAt: z.string().nullable(),
+        }),
+      )
+      .max(20),
+    laborSignals: z
+      .array(
+        z.object({
+          dataset: z.enum(["nero", "ivi"]),
+          metricKey: z.string().min(1),
+          periodStart: z.string().date(),
+          periodEnd: z.string().date(),
+          value: z.number(),
+          unit: z.string().min(1),
+          direction: z.number().int().min(-1).max(1).nullable(),
+          sourceVersion: z.string().min(1),
+        }),
+      )
+      .max(20),
+    score: z.object({
+      value: z.number().min(0).max(100).nullable(),
+      methodologyVersion: z.string().nullable(),
+      periodStart: z.string().date().nullable(),
+      periodEnd: z.string().date().nullable(),
+      generatedAt: z.string().nullable(),
+      components: z.record(z.string(), RegionScoreComponentSchema),
+      sufficiency: z.object({
+        sufficient: z.boolean(),
+        reasons: z.array(z.string()),
+        thresholds: z.record(z.string(), z.number()).optional(),
+        observed: z.record(z.string(), z.number()).optional(),
+      }),
+    }),
+  })
+  .refine(
+    ({ score }) => score.sufficiency.sufficient === (score.value !== null),
+    {
+      message:
+        "score value must be present exactly when evidence is sufficient",
+      path: ["score", "value"],
+    },
+  );
+
+export type RegionOpportunityResponse = z.infer<
+  typeof RegionOpportunityResponseSchema
+>;
