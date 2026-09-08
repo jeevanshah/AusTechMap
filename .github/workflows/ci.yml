@@ -59,4 +59,8 @@ jobs:
       - run: python -m ruff check workers/ingestion
       - run: python -m mypy --config-file workers/ingestion/pyproject.toml workers/ingestion/src workers/ingestion/tests
       - run: python -m austechmap_ingestion migrate --database-url "$TEST_DATABASE_URL"
+      - name: Verify ATS source operations
+        run: python -m pytest -c workers/ingestion/pyproject.toml workers/ingestion/tests/test_company_sources.py
+      - name: Verify ATS crawl and replay pipeline
+        run: python -m pytest -c workers/ingestion/pyproject.toml workers/ingestion/tests/test_pipeline.py
       - run: python -m pytest -c workers/ingestion/pyproject.toml
