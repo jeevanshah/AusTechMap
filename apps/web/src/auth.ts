@@ -19,6 +19,7 @@ const MAGIC_LINK_MAX_AGE_S = 10 * 60;
 const RESEND_FROM = process.env.AUTH_RESEND_FROM ?? "onboarding@resend.dev";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   adapter: RoleAwareAdapter(getPool()),
   providers: [
     Resend({

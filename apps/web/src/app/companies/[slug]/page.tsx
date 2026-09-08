@@ -19,7 +19,7 @@ import type { MapCompanyPoint } from "@austechmap/contracts";
 import { auth } from "../../../auth";
 import { CareersLink } from "./CareersLink";
 import { WatchCompanyButton } from "./WatchCompanyButton";
-import { getCategoryIconPath } from "../../_components/HomeMapShell";
+import { getCategoryIconPath } from "../../../lib/category-icons";
 import { MapCanvas, type Bbox } from "../../../components/map/MapCanvas";
 import { trackEvent } from "../../../lib/analytics";
 import { DatabaseNotConfiguredError, getPool } from "../../../lib/db";

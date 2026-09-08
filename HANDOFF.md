@@ -120,7 +120,12 @@ Everything since the 2026-09-04 handoff:
   - Fulfills the Phase 8 Exit Gate: establishes standard operational procedures to diagnose, disable, replay, restore, and correct the system without direct database surgery.
 - **Controlled Beta Launch Protocol & Defect Triage Guide** (`docs/operations/beta-launch-guide.md`):
   - Onboarding protocol for Australian job seekers, skilled migrants, and regional movers; Severity 1–4 defect resolution SLA matrix.
-- Total test coverage: **175 automated tests passing** across contracts (33) and web (142), 0 lint errors, 0 type errors, Next.js Turbopack production build passing cleanly across 37 routes.
+- **Critical Discovery Journeys QA Verification (Desktop & Mobile)** (`apps/web/scripts/run-discovery-qa.mjs`, `docs/operations/discovery-journeys-qa-report.md`):
+  - Automated E2E verification of 4 core discovery journeys (Opportunity Discovery, Sponsorship Discovery, Regional Hubs, Retention Loop) across Desktop and Mobile User-Agents.
+  - 36/36 live E2E assertions passed with sub-110ms API latency and 100% evidence provenance.
+  - Extracted isomorphic category icon utility `apps/web/src/lib/category-icons.ts` resolving SSR Server Component boundary invocation on `/companies/[slug]`.
+  - Added `trustHost: true` in Auth.js and defensive null-coalescing in `matcher.ts`.
+- Total test coverage: **181 automated tests passing** across contracts (33) and web (148), 0 lint errors, 0 type errors, Next.js Turbopack production build passing cleanly across 37 routes.
 
 ## Work remaining
 

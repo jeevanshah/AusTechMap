@@ -206,7 +206,7 @@ export function scoreCompany(
   company: RawCompanyData,
   preferences: OpportunityMatchPreferences,
 ): OpportunityMatchResult | null {
-  const normTargetLocations = preferences.locations.map((l) =>
+  const normTargetLocations = (preferences.locations ?? []).map((l) =>
     l.trim().toLowerCase(),
   );
   const companyLocationsLower = company.locations.map((l) =>
@@ -336,7 +336,7 @@ export function scoreCompany(
 
   // --- 3. Skill Fit (Max 15) ---
   let skillFitScore = 0;
-  const userSkills = preferences.skills
+  const userSkills = (preferences.skills ?? [])
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean);
   const matchedSkills: string[] = [];
@@ -385,7 +385,7 @@ export function scoreCompany(
   }
 
   let workStyleScore = 0;
-  if (preferences.workStyle === "any") {
+  if (!preferences.workStyle || preferences.workStyle === "any") {
     workStyleScore = 5;
   } else {
     const requested = preferences.workStyle.toLowerCase();

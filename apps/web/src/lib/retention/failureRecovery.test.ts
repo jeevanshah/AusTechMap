@@ -163,8 +163,8 @@ describe("Notification Failure Handling & Backlog Recovery", () => {
 
     // Deliveries recorded
     expect(insertedDeliveries.length).toBe(2);
-    expect(insertedDeliveries[0].eventId).toBe("evt-backlog-001");
-    expect(insertedDeliveries[1].eventId).toBe("evt-backlog-002");
+    expect(insertedDeliveries[0]!.eventId).toBe("evt-backlog-001");
+    expect(insertedDeliveries[1]!.eventId).toBe("evt-backlog-002");
   });
 
   it("ensures partial batch resilience where failing user does not block successful user", async () => {
@@ -223,7 +223,7 @@ describe("Notification Failure Handling & Backlog Recovery", () => {
 
     // Only user 2's event recorded as delivered
     expect(insertedDeliveries.length).toBe(1);
-    expect(insertedDeliveries[0].userId).toBe(2);
-    expect(insertedDeliveries[0].eventId).toBe("evt-user2");
+    expect(insertedDeliveries[0]!.userId).toBe(2);
+    expect(insertedDeliveries[0]!.eventId).toBe("evt-user2");
   });
 });
