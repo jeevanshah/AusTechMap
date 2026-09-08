@@ -305,6 +305,20 @@ export async function approveEmployerClaim(
       [claim.user_id ? Number(claim.user_id) : reviewerUserId, claim.company_id],
     );
 
+    // 2b. Automatically grant employer_analytics entitlement if claimant has user account
+    if (claim.user_id) {
+      await client.query(
+        `INSERT INTO user_entitlements (user_id, entitlement, granted_by_user_id, metadata)
+         VALUES ($1, 'employer_analytics', $2, $3)
+         ON CONFLICT (user_id, entitlement) DO NOTHING`,
+        [
+          Number(claim.user_id),
+          reviewerUserId,
+          JSON.stringify({ company_id: claim.company_id, claim_id: claimId }),
+        ],
+      );
+    }
+
     // 3. Resolve review_queue_item
     await client.query(
       `UPDATE review_queue_items

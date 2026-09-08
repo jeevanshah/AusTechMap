@@ -150,6 +150,28 @@ Everything since the 2026-09-04 handoff:
   - Interactive cards rendering employer claims and community reports with direct staff approve and reject actions.
 - Total test coverage: **197 automated tests passing** across contracts (40) and web (157), 0 lint errors, 0 type errors, clean Next.js Turbopack build across 37 routes.
 
+**Phase 9.2 (Commercial Readiness — Analytics Entitlements, Export Controls & Sponsored Placement Boundaries) completed 9 September 2026**:
+- Migration `0020_entitlements_and_commercial_governance.sql` authored and applied to live Neon PostgreSQL:
+  - Created `user_entitlements` table with support for `'employer_analytics'`, `'institutional_export'`, `'extended_alerts'`, and `'api_stream'`.
+  - Created `billing_customers` table defining subscription tier boundaries (`'free'`, `'employer_pro'`, `'institutional_annual'`) and status tracking.
+  - Created `sponsored_placements` table for quarantined commercial employer promotions.
+- Contracts in `@austechmap/contracts`:
+  - `EntitlementTypeSchema`, `UserEntitlementSchema`, `BillingTierSchema`, `BillingCustomerStatusSchema`, `BillingCustomerSchema`, `SponsoredPlacementSchema`.
+  - Unit tests in `packages/contracts/tests/commercial.test.ts` (5 tests passing).
+- Commercial Query & Entitlement Engine (`apps/web/src/lib/commercial/`):
+  - `getUserEntitlements`, `hasEntitlement`, `grantEntitlement`, `revokeEntitlement`.
+  - `getActiveSponsoredPlacements`: context-aware filtering on target role families and regions.
+  - `approveEmployerClaim`: auto-grants `employer_analytics` entitlement to verified claimants.
+- Tiered Export Controls & Watermarking (`apps/web/src/app/api/export/`):
+  - Enforced dynamic rate limits: 10/min for public/community vs 120/min for institutional/staff.
+  - Institutional watermarking: adds signed licence comments to CSV header with actor attribution and timestamp.
+  - Extended institutional columns: ABN, ACN, active evidence counts, and regional score components.
+  - Audit logging: writes commercial export downloads directly to `audit_records`.
+- Promoted Opportunity Component (`PromotedOpportunityCard.tsx`):
+  - Strict quarantine adhering to `PRODUCT_SPEC.md §18.7`: rendered with amber styling, "Promoted Partner" badge, and explicit disclaimer: *"Promoted placement does not alter organic Opportunity Match scores or Home Affairs sponsorship evidence."*
+  - Organic 100-point algorithm, ranking order, and score components remain 100% mathematically unpolluted.
+- Total test coverage: **210 automated tests passing** across contracts (45) and web (165), 0 lint errors, 0 type errors, clean Next.js Turbopack build across 37 routes.
+
 ## Work remaining
 
 Per `IMPLEMENTATION_PLAN.md`'s own phase checklists:

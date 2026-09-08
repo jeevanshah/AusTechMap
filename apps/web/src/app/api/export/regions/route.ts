@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+import { auth } from "../../../../auth";
 import { getPool } from "../../../../lib/db";
+import { recordAudit } from "../../../../lib/audit";
+import { hasEntitlement } from "../../../../lib/commercial/entitlements";
 import { getRegionOpportunity } from "../../../../lib/queries/getRegionOpportunity";
 import { enforceApiRateLimit } from "../../../../lib/security/apiRateLimit";
 
@@ -16,9 +19,20 @@ function escapeCsvField(val: unknown): string {
 
 export async function GET() {
   const pool = getPool();
+  const session = await auth();
+  const user = session?.user;
+  const userId = user?.id ? Number(user.id) : null;
+  const userRole = (user as { role?: string })?.role;
+  const isStaff = userRole === "admin" || userRole === "reviewer";
+
+  const isInstitutional =
+    isStaff || (userId ? await hasEntitlement(pool, userId, "institutional_export") : false);
+
+  // Tiered rate limit: 120/min for institutional/staff, 10/min for community/anonymous
+  const limit = isInstitutional ? 120 : 10;
   const rateLimitResponse = await enforceApiRateLimit(pool, {
-    scope: "api_export_regions",
-    limit: 20,
+    scope: isInstitutional ? "api_export_regions_inst" : "api_export_regions_pub",
+    limit,
     windowSeconds: 60,
     lockSeconds: 60,
   });
@@ -47,10 +61,30 @@ export async function GET() {
       "Suppression Reason",
       "Mapped Employers",
       "Active Tech Roles",
-      "Profile URL",
     ];
 
-    const csvRows = [headers.map(escapeCsvField).join(",")];
+    if (isInstitutional) {
+      headers.push(
+        "Employer Depth Score",
+        "Vacancies Score",
+        "Momentum Score",
+        "Labour Market Direction",
+        "Industry Diversity Score",
+      );
+    }
+
+    headers.push("Profile URL");
+
+    const csvRows: string[] = [];
+
+    if (isInstitutional) {
+      csvRows.push(
+        `# AusTechMap Institutional Regional Intelligence Export (Licensed to: ${user?.email ?? "Staff"}, Generated: ${new Date().toISOString()})`,
+      );
+      csvRows.push("# Notice: Data governed by Australia Tech Map Institutional Terms and Source Attribution Registers.");
+    }
+
+    csvRows.push(headers.map(escapeCsvField).join(","));
 
     for (const r of regionRows) {
       const opp = await getRegionOpportunity(pool, r.code);
@@ -77,7 +111,7 @@ export async function GET() {
       const employerCount = opp?.summary.employerCount ?? 0;
       const activeRoles = opp?.summary.activeJobCount ?? 0;
 
-      const row = [
+      const row: unknown[] = [
         r.code,
         r.name,
         r.state,
@@ -88,10 +122,35 @@ export async function GET() {
         suppressionReason,
         employerCount,
         activeRoles,
-        `https://austechmap.com/regions/${r.code}`,
       ];
 
+      if (isInstitutional) {
+        row.push(
+          opp?.score.components.employerDepth ?? 0,
+          opp?.score.components.currentVacancies ?? 0,
+          opp?.score.components.hiringMomentum ?? 0,
+          opp?.score.components.laborMarketDirection ?? 0,
+          opp?.score.components.industryDiversity ?? 0,
+        );
+      }
+
+      row.push(`https://austechmap.com/regions/${r.code}`);
+
       csvRows.push(row.map(escapeCsvField).join(","));
+    }
+
+    // Audit logging for export event
+    if (userId) {
+      await recordAudit(pool, {
+        actorUserId: userId,
+        action: "export.regions.download",
+        targetType: "export_dataset",
+        targetId: "regions",
+        metadata: {
+          rowCount: regionRows.length,
+          isInstitutional,
+        },
+      });
     }
 
     const csvContent = "\uFEFF" + csvRows.join("\r\n"); // UTF-8 BOM

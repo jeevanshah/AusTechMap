@@ -25,8 +25,10 @@ import type {
   OpportunityMatchPreferences,
   OpportunityMatchResponse,
   OpportunityWorkStyle,
+  SponsoredPlacement,
 } from "@austechmap/contracts";
 
+import { PromotedOpportunityCard } from "./PromotedOpportunityCard";
 import { matchOpportunitiesAction } from "../../app/actions/opportunityActions";
 import {
   saveSearchAction,
@@ -80,6 +82,7 @@ const POPULAR_LOCATIONS = [
 interface OpportunityMatcherShellProps {
   initialResponse: OpportunityMatchResponse;
   initialPreferences: OpportunityMatchPreferences;
+  initialPromotedPlacements?: SponsoredPlacement[];
   user: { id: number; email: string } | null;
   watchedCompanyIds: string[];
 }
@@ -87,12 +90,16 @@ interface OpportunityMatcherShellProps {
 export function OpportunityMatcherShell({
   initialResponse,
   initialPreferences,
+  initialPromotedPlacements,
   user,
   watchedCompanyIds: initialWatched,
 }: OpportunityMatcherShellProps) {
   const router = useRouter();
   const [preferences, setPreferences] =
     useState<OpportunityMatchPreferences>(initialPreferences);
+  const [promotedPlacements, setPromotedPlacements] = useState<
+    SponsoredPlacement[]
+  >(initialPromotedPlacements ?? []);
   const [response, setResponse] =
     useState<OpportunityMatchResponse>(initialResponse);
   const [isPending, startTransition] = useTransition();
@@ -123,6 +130,9 @@ export function OpportunityMatcherShell({
       const res = await matchOpportunitiesAction(prefsToRun);
       if (res.success && res.response) {
         setResponse(res.response);
+        if (res.promotedPlacements !== undefined) {
+          setPromotedPlacements(res.promotedPlacements);
+        }
       }
     });
   };
@@ -649,6 +659,18 @@ export function OpportunityMatcherShell({
                 </span>
               </div>
             </div>
+
+            {/* Quarantined Promoted Partner Placements */}
+            {promotedPlacements.length > 0 && (
+              <div className="space-y-3">
+                {promotedPlacements.map((placement) => (
+                  <PromotedOpportunityCard
+                    key={placement.id}
+                    placement={placement}
+                  />
+                ))}
+              </div>
+            )}
 
             {/* Results Cards */}
             {response.matches.length === 0 ? (

@@ -9,12 +9,15 @@ import {
 
 import { getPool } from "../../lib/db";
 import { matchOpportunities } from "../../lib/opportunity/matcher";
+import { getActiveSponsoredPlacements } from "../../lib/commercial/sponsored";
+import type { SponsoredPlacement } from "@austechmap/contracts";
 
 export async function matchOpportunitiesAction(
   rawPreferences: OpportunityMatchPreferences,
 ): Promise<{
   success: boolean;
   response?: OpportunityMatchResponse;
+  promotedPlacements?: SponsoredPlacement[];
   error?: string;
 }> {
   try {
@@ -22,10 +25,14 @@ export async function matchOpportunitiesAction(
     const pool = getPool();
     const result = await matchOpportunities(pool, preferences);
     const validated = OpportunityMatchResponseSchema.parse(result);
+    const promoted = await getActiveSponsoredPlacements(pool, {
+      roleFamily: preferences.roleFamily,
+    });
 
     return {
       success: true,
       response: validated,
+      promotedPlacements: promoted,
     };
   } catch (error) {
     console.error("Failed to run opportunity match action:", error);

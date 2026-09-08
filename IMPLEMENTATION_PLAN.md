@@ -292,9 +292,9 @@ Begin only after qualified opportunity discovery, repeat usage, and data quality
 
 - [x] Add verified employer claims without overwriting independent observations -- migration 0019 applied to live Neon PostgreSQL (`employer_claims`, `companies.is_claimed`, `review_queue_kind`); Hallmark-styled claims portal at `/corrections`; verification badge on `/companies/[slug]`; staff approve/reject actions in `/admin/review` write to `audit_records` and preserve independent crawler observations (`PRODUCT_SPEC.md` §3.2 Rule 11).
 - [x] Add correction and contribution review workflows -- community discrepancy reporting at `/corrections` with SSRF egress validation (`validateSafeUrl`), Postgres-backed rate limiting, and staff review queue resolution (`data_corrections` table & review workflow with audit trails).
-- [ ] Define analytics entitlements and institutional export controls.
-- [ ] Add billing boundaries and audit logs.
-- [ ] Keep paid placement visibly labelled and separate from organic scores.
+- [x] Define analytics entitlements and institutional export controls -- migration 0020 applied to Neon (`user_entitlements`, `billing_customers`, `sponsored_placements`); tiered export rate limits and watermarking in `/api/export/*` with audit logging to `audit_records`.
+- [x] Add billing boundaries and audit logs -- `billing_customers` table with tier states (`free`, `employer_pro`, `institutional_annual`), entitlement verification helpers (`hasEntitlement`), and auto-granting on employer claim approval.
+- [x] Keep paid placement visibly labelled and separate from organic scores -- `sponsored_placements` table, `PromotedOpportunityCard` component with explicit disclosure and strict separation from the 100-point organic Opportunity Match algorithm (`PRODUCT_SPEC.md` §18.7).
 
 ## 7. Cross-cutting engineering requirements
 

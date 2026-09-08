@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+import { auth } from "../../../../auth";
 import { getPool } from "../../../../lib/db";
+import { recordAudit } from "../../../../lib/audit";
+import { hasEntitlement } from "../../../../lib/commercial/entitlements";
 import { enforceApiRateLimit } from "../../../../lib/security/apiRateLimit";
 
 export const dynamic = "force-dynamic";
@@ -15,9 +18,20 @@ function escapeCsvField(val: unknown): string {
 
 export async function GET(request: Request) {
   const pool = getPool();
+  const session = await auth();
+  const user = session?.user;
+  const userId = user?.id ? Number(user.id) : null;
+  const userRole = (user as { role?: string })?.role;
+  const isStaff = userRole === "admin" || userRole === "reviewer";
+
+  const isInstitutional =
+    isStaff || (userId ? await hasEntitlement(pool, userId, "institutional_export") : false);
+
+  // Tiered rate limit: 120/min for institutional/staff, 10/min for community/anonymous
+  const limit = isInstitutional ? 120 : 10;
   const rateLimitResponse = await enforceApiRateLimit(pool, {
-    scope: "api_export_companies",
-    limit: 20,
+    scope: isInstitutional ? "api_export_companies_inst" : "api_export_companies_pub",
+    limit,
     windowSeconds: 60,
     lockSeconds: 60,
   });
@@ -31,10 +45,14 @@ export async function GET(request: Request) {
 
   const query = `
     SELECT
+      c.id,
       c.slug,
       c.display_name,
+      c.abn,
+      c.acn,
       c.domain,
       c.careers_url,
+      c.is_claimed,
       cat.label AS primary_category,
       research.claim_value ->> 'city' AS city,
       EXISTS (
@@ -59,6 +77,10 @@ export async function GET(request: Request) {
         SELECT count(*)::int FROM jobs j
         WHERE j.company_id = c.id AND j.expired_at IS NULL
       ) AS active_jobs_count,
+      (
+        SELECT count(*)::int FROM evidence ev
+        WHERE ev.entity_id = c.id::text AND ev.status = 'active'
+      ) AS active_evidence_count,
       c.verified_at
     FROM companies c
     LEFT JOIN LATERAL (
@@ -107,11 +129,26 @@ export async function GET(request: Request) {
       "Has Sponsorship Evidence",
       "Sponsorship Type",
       "Active Tech Jobs",
-      "Verified At",
-      "Profile URL",
+      "Verified Employer Profile",
     ];
 
-    const csvRows = [headers.map(escapeCsvField).join(",")];
+    if (isInstitutional) {
+      headers.push("ABN", "ACN", "Active Evidence Count");
+    }
+
+    headers.push("Verified At", "Profile URL");
+
+    const csvRows: string[] = [];
+
+    // Watermark comments for institutional / licensed downloads
+    if (isInstitutional) {
+      csvRows.push(
+        `# AusTechMap Institutional Intelligence Export (Licensed to: ${user?.email ?? "Staff"}, Generated: ${new Date().toISOString()})`,
+      );
+      csvRows.push("# Notice: Data governed by Australia Tech Map Institutional Terms and Source Attribution Registers.");
+    }
+
+    csvRows.push(headers.map(escapeCsvField).join(","));
 
     for (const r of rows) {
       const sponType = r.agreement_type
@@ -120,7 +157,7 @@ export async function GET(request: Request) {
           ? "Home Affairs Accredited Sponsor"
           : "None";
 
-      const row = [
+      const row: unknown[] = [
         r.slug,
         r.display_name,
         r.primary_category || "",
@@ -131,11 +168,37 @@ export async function GET(request: Request) {
         r.has_sponsorship_evidence ? "TRUE" : "FALSE",
         sponType,
         r.active_jobs_count,
-        r.verified_at ? new Date(r.verified_at).toISOString().split("T")[0] : "",
-        `https://austechmap.com/companies/${r.slug}`,
+        r.is_claimed ? "TRUE" : "FALSE",
       ];
 
+      if (isInstitutional) {
+        row.push(r.abn || "", r.acn || "", r.active_evidence_count);
+      }
+
+      row.push(
+        r.verified_at ? new Date(r.verified_at).toISOString().split("T")[0] : "",
+        `https://austechmap.com/companies/${r.slug}`,
+      );
+
       csvRows.push(row.map(escapeCsvField).join(","));
+    }
+
+    // Audit logging for export event
+    if (userId) {
+      await recordAudit(pool, {
+        actorUserId: userId,
+        action: "export.companies.download",
+        targetType: "export_dataset",
+        targetId: "companies",
+        metadata: {
+          rowCount: rows.length,
+          isInstitutional,
+          category,
+          sponsorship,
+          regional,
+          hiring,
+        },
+      });
     }
 
     const csvContent = "\uFEFF" + csvRows.join("\r\n"); // UTF-8 BOM for Excel

@@ -597,4 +597,82 @@ export type ReviewCorrectionAction = z.infer<
   typeof ReviewCorrectionActionSchema
 >;
 
+// --- Phase 9.2: Analytics Entitlements, Billing Boundaries & Sponsored Placements ---
+
+export const EntitlementTypeSchema = z.enum([
+  "employer_analytics",
+  "institutional_export",
+  "extended_alerts",
+  "api_stream",
+]);
+export type EntitlementType = z.infer<typeof EntitlementTypeSchema>;
+
+export const UserEntitlementSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.number().int(),
+  entitlement: EntitlementTypeSchema,
+  grantedByUserId: z.number().int().nullable().optional(),
+  grantedAt: z.string(),
+  expiresAt: z.string().nullable().optional(),
+  metadata: z.record(z.string(), z.unknown()).default({}),
+});
+export type UserEntitlement = z.infer<typeof UserEntitlementSchema>;
+
+export const BillingTierSchema = z.enum([
+  "free",
+  "employer_pro",
+  "institutional_annual",
+]);
+export type BillingTier = z.infer<typeof BillingTierSchema>;
+
+export const BillingCustomerStatusSchema = z.enum([
+  "active",
+  "past_due",
+  "canceled",
+  "trialing",
+]);
+export type BillingCustomerStatus = z.infer<typeof BillingCustomerStatusSchema>;
+
+export const BillingCustomerSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.number().int(),
+  stripeCustomerId: z.string().nullable().optional(),
+  billingTier: BillingTierSchema,
+  status: BillingCustomerStatusSchema,
+  currentPeriodEnd: z.string().nullable().optional(),
+  metadata: z.record(z.string(), z.unknown()).default({}),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+export type BillingCustomer = z.infer<typeof BillingCustomerSchema>;
+
+export const SponsoredPlacementStatusSchema = z.enum([
+  "active",
+  "paused",
+  "expired",
+]);
+export type SponsoredPlacementStatus = z.infer<
+  typeof SponsoredPlacementStatusSchema
+>;
+
+export const SponsoredPlacementSchema = z.object({
+  id: z.string().uuid(),
+  companyId: z.string().uuid(),
+  companyName: z.string().optional(),
+  companySlug: z.string().optional(),
+  campaignName: z.string().trim().min(1),
+  headline: z.string().trim().min(1),
+  targetRoleFamilies: z.array(z.string()).default([]),
+  targetRegions: z.array(z.string()).default([]),
+  ctaLabel: z.string().default("View Verified Profile"),
+  ctaUrl: z.string().url().nullable().optional(),
+  status: SponsoredPlacementStatusSchema,
+  startDate: z.string(),
+  endDate: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string().optional(),
+});
+export type SponsoredPlacement = z.infer<typeof SponsoredPlacementSchema>;
+
+
 

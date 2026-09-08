@@ -4,6 +4,7 @@ import type { OpportunityMatchPreferences } from "@austechmap/contracts";
 import { auth } from "../../auth";
 import { getPool } from "../../lib/db";
 import { matchOpportunities } from "../../lib/opportunity/matcher";
+import { getActiveSponsoredPlacements } from "../../lib/commercial/sponsored";
 import { listWatchlist } from "../../lib/queries/watchlists";
 import { OpportunityMatcherShell } from "../../components/opportunity/OpportunityMatcherShell";
 
@@ -45,7 +46,12 @@ export default async function OpportunitiesPage() {
     }
   }
 
-  const initialResponse = await matchOpportunities(pool, DEFAULT_PREFERENCES);
+  const [initialResponse, initialPromotedPlacements] = await Promise.all([
+    matchOpportunities(pool, DEFAULT_PREFERENCES),
+    getActiveSponsoredPlacements(pool, {
+      roleFamily: DEFAULT_PREFERENCES.roleFamily,
+    }),
+  ]);
 
   const safeUser = session?.user?.id
     ? {
@@ -58,6 +64,7 @@ export default async function OpportunitiesPage() {
     <OpportunityMatcherShell
       initialResponse={initialResponse}
       initialPreferences={DEFAULT_PREFERENCES}
+      initialPromotedPlacements={initialPromotedPlacements}
       user={safeUser}
       watchedCompanyIds={watchedCompanyIds}
     />
