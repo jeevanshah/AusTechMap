@@ -8,6 +8,7 @@ import {
   Anchor,
   ArrowLeft,
   ArrowRight,
+  ArrowUpRight,
   Award,
   Building2,
   CheckCircle2,
@@ -70,6 +71,7 @@ interface HubMeta {
   zoom: number;
   tag: string;
   icon: typeof Building2;
+  sa4Code?: string;
 }
 
 export interface DisplayedHub {
@@ -80,6 +82,7 @@ export interface DisplayedHub {
   zoom: number;
   tag: string;
   icon: typeof Building2;
+  sa4Code?: string;
 }
 
 const HUB_METADATA: Record<string, HubMeta> = {
@@ -89,6 +92,7 @@ const HUB_METADATA: Record<string, HubMeta> = {
     zoom: 11,
     tag: "Resources, Mining Tech & Autonomous Systems",
     icon: Cpu,
+    sa4Code: "503",
   },
   Adelaide: {
     state: "SA",
@@ -96,6 +100,7 @@ const HUB_METADATA: Record<string, HubMeta> = {
     zoom: 11,
     tag: "Lot Fourteen Space, Defence & Machine Learning",
     icon: Rocket,
+    sa4Code: "401",
   },
   Canberra: {
     state: "ACT",
@@ -103,6 +108,7 @@ const HUB_METADATA: Record<string, HubMeta> = {
     zoom: 11,
     tag: "National Security, Cyber & GovTech",
     icon: Shield,
+    sa4Code: "801",
   },
   Wollongong: {
     state: "NSW",
@@ -110,6 +116,7 @@ const HUB_METADATA: Record<string, HubMeta> = {
     zoom: 12,
     tag: "Illawarra Innovation Campus & CleanTech",
     icon: Network,
+    sa4Code: "107",
   },
   Newcastle: {
     state: "NSW",
@@ -117,6 +124,7 @@ const HUB_METADATA: Record<string, HubMeta> = {
     zoom: 12,
     tag: "Hunter Energy Tech & Industrial Software",
     icon: Zap,
+    sa4Code: "111",
   },
   Darwin: {
     state: "NT",
@@ -124,6 +132,7 @@ const HUB_METADATA: Record<string, HubMeta> = {
     zoom: 12,
     tag: "Northern Territory Defence & Marine Systems",
     icon: Radio,
+    sa4Code: "701",
   },
   Hobart: {
     state: "TAS",
@@ -131,6 +140,7 @@ const HUB_METADATA: Record<string, HubMeta> = {
     zoom: 12,
     tag: "Antarctic, Marine Science & AgriTech",
     icon: Anchor,
+    sa4Code: "601",
   },
   Geelong: {
     state: "VIC",
@@ -138,6 +148,7 @@ const HUB_METADATA: Record<string, HubMeta> = {
     zoom: 12,
     tag: "Advanced Manufacturing & Regional Tech",
     icon: Cpu,
+    sa4Code: "203",
   },
   "Gold Coast": {
     state: "QLD",
@@ -145,6 +156,7 @@ const HUB_METADATA: Record<string, HubMeta> = {
     zoom: 12,
     tag: "Aerospace & Coastal Tech Startups",
     icon: Rocket,
+    sa4Code: "309",
   },
   "Sunshine Coast": {
     state: "QLD",
@@ -152,6 +164,7 @@ const HUB_METADATA: Record<string, HubMeta> = {
     zoom: 12,
     tag: "Subsea Cable & Digital Innovation Hub",
     icon: Network,
+    sa4Code: "316",
   },
   Bendigo: {
     state: "VIC",
@@ -159,6 +172,7 @@ const HUB_METADATA: Record<string, HubMeta> = {
     zoom: 12,
     tag: "Regional Finance & Digital Services",
     icon: Building2,
+    sa4Code: "202",
   },
   Sydney: {
     state: "NSW",
@@ -166,6 +180,7 @@ const HUB_METADATA: Record<string, HubMeta> = {
     zoom: 11,
     tag: "Flagship Tech Central & Barangaroo",
     icon: Building2,
+    sa4Code: "117",
   },
   Melbourne: {
     state: "VIC",
@@ -173,6 +188,7 @@ const HUB_METADATA: Record<string, HubMeta> = {
     zoom: 11,
     tag: "Docklands & Cremorne Digital Cluster",
     icon: Network,
+    sa4Code: "206",
   },
   Brisbane: {
     state: "QLD",
@@ -180,6 +196,7 @@ const HUB_METADATA: Record<string, HubMeta> = {
     zoom: 11,
     tag: "Fortitude Valley & Enterprise Hub",
     icon: Building2,
+    sa4Code: "305",
   },
 };
 
@@ -613,6 +630,7 @@ export function HomeMapShell({
           zoom: meta.zoom,
           tag: meta.tag,
           icon: meta.icon,
+          sa4Code: meta.sa4Code,
         };
       });
     }
@@ -629,6 +647,7 @@ export function HomeMapShell({
         zoom: meta.zoom,
         tag: meta.tag,
         icon: meta.icon,
+        sa4Code: meta.sa4Code,
       }));
   }, [hubs]);
   const [query, setQuery] = useState("");
@@ -1159,7 +1178,17 @@ export function HomeMapShell({
                         {selectedEntry.city && (
                           <span className="flex items-center gap-1 font-semibold text-slate-700">
                             <MapPin className="h-3.5 w-3.5 text-slate-500 shrink-0" />
-                            {selectedEntry.city}, Australia
+                            {HUB_METADATA[selectedEntry.city]?.sa4Code ? (
+                              <Link
+                                href={`/regions/${HUB_METADATA[selectedEntry.city]!.sa4Code}`}
+                                className="hover:text-terracotta-700 underline decoration-slate-300 hover:decoration-terracotta-700 transition-colors"
+                                title={`View ${selectedEntry.city} Regional Opportunity Report`}
+                              >
+                                {selectedEntry.city}, Australia
+                              </Link>
+                            ) : (
+                              `${selectedEntry.city}, Australia`
+                            )}
                           </span>
                         )}
                         {pt && (
@@ -1454,47 +1483,64 @@ export function HomeMapShell({
                 {displayedHubs.map((hub) => {
                   const isActive = activeHubCity === hub.city;
                   return (
-                    <button
+                    <div
                       key={hub.city}
-                      type="button"
                       onClick={() => handleSelectHub(hub)}
-                      className={`flex items-center justify-between rounded-xl border p-3 text-left transition-all ${
+                      className={`group flex flex-col gap-2.5 rounded-xl border p-3.5 text-left transition-all cursor-pointer ${
                         isActive
                           ? "border-navy-900 bg-slate-50 shadow-xs"
                           : "border-surface-border bg-white hover:border-slate-300 hover:bg-slate-50/50"
                       }`}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <span
-                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border ${
-                            isActive
-                              ? "bg-navy-900 text-white border-navy-900"
-                              : "bg-slate-50 text-navy-900 border-surface-border"
-                          }`}
-                        >
-                          <hub.icon className="h-4 w-4" />
-                        </span>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="font-heading text-sm font-bold text-navy-900 truncate">
-                              {hub.city}
-                            </span>
-                            <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-slate-600 uppercase">
-                              {hub.state}
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <span
+                            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border ${
+                              isActive
+                                ? "bg-navy-900 text-white border-navy-900"
+                                : "bg-slate-50 text-navy-900 border-surface-border"
+                            }`}
+                          >
+                            <hub.icon className="h-4 w-4" />
+                          </span>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-heading text-sm font-bold text-navy-900 truncate">
+                                {hub.city}
+                              </span>
+                              <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-slate-600 uppercase">
+                                {hub.state}
+                              </span>
+                            </div>
+                            <span className="text-xs text-slate-500 line-clamp-1">
+                              {hub.tag}
                             </span>
                           </div>
-                          <span className="text-xs text-slate-500 line-clamp-1">
-                            {hub.tag}
+                        </div>
+                        <div className="flex items-center gap-1.5 shrink-0 font-mono text-xs">
+                          <span className="font-bold text-navy-900">
+                            {hub.count}
                           </span>
+                          <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-0.5 group-hover:text-navy-900 transition-all" />
                         </div>
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0 font-mono text-xs">
-                        <span className="font-bold text-navy-900">
-                          {hub.count}
-                        </span>
-                        <ChevronRight className="h-4 w-4 text-slate-400" />
-                      </div>
-                    </button>
+
+                      {hub.sa4Code && (
+                        <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                          <span className="text-[11px] text-slate-400 font-mono">
+                            ABS SA4 {hub.sa4Code}
+                          </span>
+                          <Link
+                            href={`/regions/${hub.sa4Code}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 font-semibold text-terracotta-700 hover:text-terracotta-800 hover:underline transition-colors"
+                          >
+                            <span>Labour &amp; Opportunity Report</span>
+                            <ArrowUpRight className="h-3 w-3" />
+                          </Link>
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
               </div>
@@ -1685,9 +1731,22 @@ export function HomeMapShell({
                       <span className="font-heading text-xs font-bold text-navy-900 group-hover:text-terracotta-700 transition-colors truncate">
                         {spotlightHub.city} Regional Hub
                       </span>
-                      <span className="font-mono text-[10px] text-slate-500">
-                        {spotlightHub.count} verified employers &gt;
-                      </span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="font-mono text-[10px] text-slate-500">
+                          {spotlightHub.count} verified employers &gt;
+                        </span>
+                        {spotlightHub.sa4Code && (
+                          <Link
+                            href={`/regions/${spotlightHub.sa4Code}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="font-mono text-[10px] font-semibold text-terracotta-700 hover:underline flex items-center"
+                            title="View Regional Labour Report"
+                          >
+                            <span>Report</span>
+                            <ArrowUpRight className="h-2.5 w-2.5 ml-0.5" />
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
