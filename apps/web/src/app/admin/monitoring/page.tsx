@@ -46,8 +46,8 @@ async function loadMonitoringData(): Promise<MonitoringData> {
     noCategoryRes,
     staleEvidenceRes,
   ] = await Promise.all([
-    pool.query<{ name: string }>(
-      "SELECT name FROM schema_migrations ORDER BY version DESC LIMIT 1;",
+    pool.query<{ filename: string }>(
+      "SELECT filename FROM schema_migrations ORDER BY version DESC LIMIT 1;",
     ),
     pool.query<{ total: string; active: string }>(
       `SELECT count(*)::text AS total,
@@ -85,7 +85,7 @@ async function loadMonitoringData(): Promise<MonitoringData> {
 
   return {
     dbLatencyMs,
-    latestMigration: migrationRes.rows[0]?.name || "None",
+    latestMigration: migrationRes.rows[0]?.filename || "None",
     totalCompanies: Number(companiesRes.rows[0]?.total || 0),
     activeCompanies: Number(companiesRes.rows[0]?.active || 0),
     totalJobs: Number(jobsRes.rows[0]?.total || 0),

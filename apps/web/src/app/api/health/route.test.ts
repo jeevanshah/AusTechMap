@@ -31,7 +31,7 @@ describe("GET /api/health", () => {
 
   it("returns deep health diagnostics when requested with deep=true", async () => {
     vi.mocked(getPool).mockReturnValue(
-      fakePool([{ name: "0018_change_events_and_notification_delivery.sql" }]),
+      fakePool([{ filename: "0018_change_events_and_notification_delivery.sql" }]),
     );
 
     const request = new Request("http://localhost/api/health?deep=true");

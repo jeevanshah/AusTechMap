@@ -20,8 +20,8 @@ export async function GET(request?: Request): Promise<Response> {
   const start = performance.now();
   try {
     const pool = getPool();
-    const result = await pool.query<{ name: string }>(
-      "SELECT name FROM schema_migrations ORDER BY version DESC LIMIT 1;",
+    const result = await pool.query<{ filename: string }>(
+      "SELECT filename FROM schema_migrations ORDER BY version DESC LIMIT 1;",
     );
     const latencyMs = Math.round(performance.now() - start);
 
@@ -32,7 +32,7 @@ export async function GET(request?: Request): Promise<Response> {
       diagnostics: {
         database: "connected",
         latencyMs,
-        latestMigration: result.rows[0]?.name || null,
+        latestMigration: result.rows[0]?.filename || null,
       },
     };
 
