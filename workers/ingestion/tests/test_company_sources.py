@@ -174,7 +174,7 @@ def test_three_terminal_failures_quarantine_and_audit_the_source() -> None:
             SELECT action, metadata->>'error_code'
             FROM audit_records
             WHERE target_type = 'company_ats_source' AND target_id = %s
-            ORDER BY created_at DESC LIMIT 1
+            ORDER BY occurred_at DESC LIMIT 1
             """,
             (str(source.id),),
         ).fetchone()
