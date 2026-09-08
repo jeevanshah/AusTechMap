@@ -52,6 +52,7 @@ from austechmap_ingestion.observability import (
     build_error_reporter_from_env,
     configure_structured_logging,
 )
+from austechmap_ingestion.regional.jsa import JsaImportError, run_ivi_import, run_nero_import
 from austechmap_ingestion.regional.persistence import generate_region_opportunity_scores
 from austechmap_ingestion.sample_importer import run_sample_import
 from austechmap_ingestion.storage import (
@@ -189,6 +190,24 @@ def build_parser() -> argparse.ArgumentParser:
         help="labour-agreements CSV to match from (no default -- see employers/"
         "labour_agreements.py)",
     )
+    jsa_parser = subparsers.add_parser(
+        "import-jsa",
+        help="import a downloaded JSA NERO or IVI release with an immutable raw snapshot",
+    )
+    jsa_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    jsa_parser.add_argument("--dataset", choices=["nero", "ivi"], required=True)
+    jsa_parser.add_argument(
+        "--source-version",
+        required=True,
+        help="official release identifier, such as 2026-08 for NERO or 2026-07 for IVI",
+    )
+    jsa_parser.add_argument("--worker-id", default="jsa-importer")
+    jsa_parser.add_argument(
+        "--snapshot-root",
+        type=Path,
+        help="force filesystem storage at this path instead of RAW_SNAPSHOT_BACKEND",
+    )
+    jsa_parser.add_argument("input", type=Path, help="official NERO ZIP or IVI XLSX file")
     regional_score_parser = subparsers.add_parser(
         "score-regions",
         help="append reproducible SA4 opportunity scores or explicit suppression records",
@@ -585,6 +604,51 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "exactMatches": labour_agreement_stats.exact_matches,
                     "reviewQueueItemsCreated": labour_agreement_stats.review_queue_items_created,
                     "noMatch": labour_agreement_stats.no_match,
+                },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "import-jsa":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        try:
+            store = (
+                FilesystemSnapshotStore(args.snapshot_root)
+                if args.snapshot_root is not None
+                else build_snapshot_store_from_env()
+            )
+            importer = run_nero_import if args.dataset == "nero" else run_ivi_import
+            jsa_result = importer(
+                JobRepository(args.database_url),
+                store,
+                args.database_url,
+                source_version=args.source_version,
+                file_path=args.input,
+                worker_id=args.worker_id,
+            )
+        except (
+            JobError,
+            JsaImportError,
+            OSError,
+            SnapshotStorageError,
+            ValueError,
+            psycopg.Error,
+        ) as error:
+            print(f"JSA import failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "created": jsa_result.created,
+                    "dataset": jsa_result.dataset,
+                    "recordsInserted": jsa_result.records_inserted,
+                    "recordsSeen": jsa_result.records_seen,
+                    "recordsUnchanged": jsa_result.records_unchanged,
+                    "runId": str(jsa_result.run_id),
                 },
                 separators=(",", ":"),
                 sort_keys=True,

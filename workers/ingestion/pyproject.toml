@@ -5,7 +5,9 @@ description = "Independent ingestion worker for Australia Tech Map"
 requires-python = ">=3.12"
 dependencies = [
     "boto3==1.43.88",
+    "defusedxml==0.7.1",
     "duckdb==1.5.5",
+    "openpyxl==3.1.5",
     "psycopg[binary]==3.3.5",
     "pyogrio==0.13.0",
     "sentry-sdk==2.68.1",
