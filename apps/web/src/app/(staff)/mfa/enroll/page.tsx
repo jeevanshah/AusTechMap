@@ -1,6 +1,6 @@
 import QRCode from "qrcode";
 
-import { requireRole } from "../../../../lib/auth/require-role";
+import { requirePageRole } from "../../../../lib/auth/page-access";
 import { getPool } from "../../../../lib/db";
 import { encryptTotpSecret, EncryptedSecret } from "../../../../lib/mfa/crypto";
 import { generateRecoveryCodes } from "../../../../lib/mfa/recovery-codes";
@@ -64,7 +64,7 @@ async function ensurePendingEnrollment(
 }
 
 export default async function MfaEnrollPage() {
-  const actor = await requireRole("reviewer");
+  const actor = await requirePageRole("reviewer");
   const state = await ensurePendingEnrollment(actor.id, actor.email);
 
   if (state.alreadyEnrolled) {
