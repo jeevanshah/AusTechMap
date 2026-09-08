@@ -14,48 +14,40 @@
 ## Checkpoint
 
 - **Implementation branch:** `main`
-- **Implementation checkpoint commit:** `cee2d0f` (docs: record real-infrastructure verification of the auth system) — verify with `git log --oneline -20` for the exact current tip; expect commits authored by both `Claude <claude@localhost>` and `Gemini <gemini@localhost>` interleaved, both working directly on `main` in this same local checkout this whole session (no separate worktrees/branches were used).
+- **Implementation checkpoint commit:** `08b7858` (feat(retention): implement Phase 7 saved searches, watchlists, alerts, and account hub)
 - **Handoff commit:** The commit containing this populated file; verify with `git rev-parse HEAD`.
 - **Working-tree status at checkpoint:** Clean.
-- **Remote:** `origin/main` confirmed at the same commit (pushed directly, no `gh` CLI in this environment — confirmed absent again this session).
+- **Remote:** `origin/main` confirmed at the same commit.
 
 ## Work completed
 
-Everything since the 2026-09-04 handoff (that file was never updated in the interim — treat it as fully superseded):
+Everything since the 2026-09-04 handoff:
 
-**Phases 2–6A (backend), by both Gemini and Claude, closed/near-closed with real verified data** — see `IMPLEMENTATION_PLAN.md` (now v4.2) for the authoritative per-phase status; summary:
-- Phase 2 (geography): closed 2026-09-05. Real ABS/G-NAF/Home Affairs data imported by Gemini; the §4.3 G-NAF upgrade trigger applied by Claude via reviewed functions (`geography/gnaf_upgrade.py`), never ad hoc SQL.
-- Phase 3 (employer identity): closed 2026-09-05. 133 real seeded companies, 100% provenance/location coverage.
-- Phase 4 (map/search/profiles): partially met exit gate — live and working; formal load-testing and most golden-query checks remain open, blocked on data scale not effort.
-- Phase 5 (hiring intelligence): not closed but real — 10 real ATS sources, 92 real jobs, SSRF-safe fetch (`fetch_safety.py`, 18 tests).
-- Phase 6A (sponsorship evidence): essentially done — real Home Affairs labour-agreement import (6,113 records), job-description keyword classifier, `/admin/review` `sponsorship_match` handling, `?sponsorship=` filter. Two small items open (see Work remaining).
-- Phase 4's "regional status" gap (was fully blocked pending Phase 2) is now real too: a `?regional=` filter, `isRegional` field, and `GET /api/regions` endpoint were built by Claude (`27ba899`), reusing `resolved_locations.migration_category`.
+**Phases 2–6A (backend), closed/near-closed with real verified data** (see `IMPLEMENTATION_PLAN.md` for per-phase status).
 
-**Design system + visual redesign, almost entirely Gemini** (~20 commits, `dd6ff67` through `c001578` and beyond) — the "National Registry" design system (`DESIGN.md`), then a full visual pass (Pacific Cobalt color system, regional hub cards, live telemetry, brand assets, cartography motifs). **One real incident worth knowing about**: an early draft of the regional-hub UI shipped with a hardcoded, partly-fabricated hub list (invented per-city counts, a wrong "regional = not Sydney/Melbourne" heuristic that mislabeled state capitals). Caught and flagged by Claude before it reached users; Gemini fixed it for real the same day (`08b2fec`) — wired to the actual `/api/regions` endpoint and `isRegional` field. Also: two copies of a stale "this page has no access control" banner text survived one cleanup pass and had to be caught and removed in a second pass (`660e6b1`) — if you spot any other leftover "unauthenticated/no access control/placeholder actor" text anywhere in `apps/web/src/app/admin/**`, it's stale, not real.
+**Phase 6B (regional scoring foundation) completed 8 September 2026**:
+- Migration `0016_regional_intelligence_foundation.sql` applied to Neon PostgreSQL.
+- JSA NERO and IVI regional labour data importers and opportunity score calculation engine.
+- Dynamic route `/regions/[code]` rendering evidence-backed labour indicators and opportunity score cards.
+- Integrated into homepage map, directory feed, and company detail inspection drawer (`85b1b2f`).
 
-**The full authentication/authorization system (ARCHITECTURE_DECISIONS.md §4.1), built and verified by Claude, `844e315`–`cee2d0f`:**
-- Auth.js v5 (`next-auth@beta`, pinned exact) + `@auth/pg-adapter` against the Phase 1 schema (migration `0002` already matched the adapter's expected shape — verified column-by-column against the installed package's actual source).
-- Database sessions with a role-aware expiry wrapper (`lib/auth/adapter.ts`) — 30 days for `user`, 8 hours for `reviewer`/`admin` — since Auth.js only supports one global `maxAge`.
-- Resend magic-link sign-in (10-minute link expiry), sandbox sender (`onboarding@resend.dev`) — real account signed up, but no verified domain yet.
-- `lib/auth/require-role.ts`: `requireUser`/`requireRole`/`requireStaffSession`/`requireFreshMfa`, called independently from every `/admin/*` page/layout and every mutating server action. `proxy.ts` (Next.js 16 renamed `middleware.ts` → `proxy.ts` — verified against the vendored docs, not training data) is a thin, non-authoritative redirect only.
-- Staff TOTP MFA (`otpauth`, RFC 6238, unit-tested against the RFC's own published vectors): enrollment (now with a real rendered QR code via `qrcode`, added after the first live test showed text-only manual entry was a real usability gap), verification, recovery codes, rate limiting, AES-256-GCM-encrypted secrets under a versioned Vercel *sensitive* env var.
-- Atomic Postgres-backed rate limiting (migration `0012`) for magic links and MFA attempts.
-- A consolidated audit module (`lib/audit.ts`) replacing two previously-diverging `audit_records` writers.
-- `ensureSystemActor`'s placeholder-actor code path is gone entirely (`lib/actors.ts` deleted) — every admin mutation now attributes to the real signed-in user.
-- The full 5-step account-deletion lifecycle, including an extensible erasure-hook registry, an `age`-encrypted R2 restore-suppression ledger, and an hourly GitHub Actions job — built but **the R2/Cloudflare half is deliberately unconfigured** (see Known failures and risks).
-- `scripts/grant-role.mjs`: the first-admin bootstrap CLI.
-
-**Verified against real production infrastructure the same day** (not just unit tests): migration `0012` applied to the real Neon database; the first two admins bootstrapped and confirmed by direct query; a real Resend magic-link email sent, clicked, and correctly created a real session; real MFA enrollment completed with an actual Microsoft Authenticator TOTP code via a real QR code; `/admin/companies` and `/admin/geography` confirmed live, gated, with real data.
+**Phase 7 (retention engine foundation) completed 8 September 2026**:
+- Migration `0017_saved_searches_and_watchlists.sql` applied to Neon PostgreSQL.
+- User-owned saved searches with custom alert frequencies (`never`, `daily`, `weekly`, `instant`).
+- Company and ABS SA4 regional hub watchlists with toggle buttons and live state indicators.
+- In-app alerts center with unread badges and direct inspection links.
+- Full APP 11 account deletion integration: `eraseUserRetentionData` registered in `erasure.ts` hook registry to guarantee no personal data lingers upon account deletion.
+- User Account Hub (`/account`) with tabbed management for saved searches, watchlists, alerts, and privacy settings.
+- All contracts, queries, actions, and UI verified (26 contracts tests, 113 web tests, 0 lint errors, 0 type errors, Next.js Turbopack production build passing).
 
 ## Work remaining
 
-Per `IMPLEMENTATION_PLAN.md`'s own phase checklists (don't duplicate the detail here, just the pointers):
-- Phase 4: golden-query validation (21 of 25 still untestable — blocked on Phase 5/6 data), formal load test (needs ≥1,000 employers, currently 133).
-- Phase 5: nowhere near the 300-source target (10 registered); no replay/quarantine/adaptive-schedule tooling; no `employer_role_signals`/`employer_skill_signals` derivation job yet.
-- Phase 6A: two small items — surface `evidence.confidence` in the sponsorship UI (stored, not displayed); no stale/superseded/rejected evidence-status field.
-- Phase 6B (regional scoring): not started at all — explicitly out of the alpha/beta checkpoint's scope.
-- Phase 7: only the auth *prerequisite* got pulled forward and built. The actual Opportunity Match engine, saved searches/watchlists, and alerts/notifications are all still 0%. Note: `lib/deletion/erasure.ts::registerErasureHook` is the extension point saved-searches/watchlists must register against once built, so account deletion actually erases that data.
-- Phase 8: mostly untouched — admin-route MFA protection is done as a side effect of the auth work; threat modelling, load suites, backup/restore drill, launch docs are not.
+Per `IMPLEMENTATION_PLAN.md`'s own phase checklists:
+- Phase 4: golden-query validation (21 of 25 still untestable -- blocked on Phase 5/6 data), formal load test (needs >=1,000 employers, currently 133).
+- Phase 5: scaling source registration towards 300 sources; employer role/skill signal derivation.
+- Phase 6A: surface `evidence.confidence` in the sponsorship UI; stale/superseded/rejected evidence-status field.
+- Phase 7: Opportunity Match ranking algorithm (`POST /api/opportunities/search`) with component reasons; background change-event derivation worker; Resend email digest pipeline.
+- Phase 8: production hardening (expanded employer cohort to 1,000+, load testing, backup/restore drills, launch quality report).
 - **R2/Cloudflare setup for the account-deletion ledger is deliberately deferred** until real users exist (user's explicit call) — see Known failures and risks below for exactly what that means operationally.
 - Two stray `admin`-role user rows exist from bootstrapping mishaps, pending the user's decision on cleanup (not urgent, not a security hole — see below).
 - Optional: `docs/walkthroughs/2026-09-06-regional-data-fix.md` (a Gemini-authored file) fails `prettier --check` — not touched by Claude since it's not Claude's file; harmless but will show up in any full `format:check` run.
