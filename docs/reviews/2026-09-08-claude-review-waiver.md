@@ -45,14 +45,18 @@ review for the Codex-authored commits above.
 
 - No valid Claude review was completed for the waived Codex-authored changes. Automated verification
   is strong but is not represented as a substitute independent opinion.
-- A read-only production Neon query on 8 September 2026 showed `schema_migrations` only through
-  `0012_auth_rate_limiting.sql`. Migrations `0013_evidence_lifecycle.sql` and
-  `0014_harden_auth_rate_limiting.sql` were green in CI but **not applied to production**.
-- Read-only live checks at that point returned `200` for `/api/health` and `/`, but `500` for
-  `/api/search/companies?q=Atlassian`, consistent with application code referencing the missing
-  evidence-status schema. Authentication rate-limit calls also require the missing `0014` function.
-- Applying migrations `0013` and `0014` to production is an external write and requires explicit user
-  approval. After promotion, recheck the schema version, search endpoint, magic-link rate limiting,
-  and staff MFA rate limiting before declaring production healthy.
+- An initial read-only production Neon query on 8 September 2026 showed `schema_migrations` only
+  through `0012_auth_rate_limiting.sql`. At that point, `/api/health` and `/` returned `200`, while
+  `/api/search/companies?q=Atlassian` returned `500`, consistent with the missing evidence-status
+  schema.
+- The user then explicitly approved applying migrations `0013` and `0014` to production Neon. The
+  checksum-locked migration runner applied exactly `0013_evidence_lifecycle.sql` and
+  `0014_harden_auth_rate_limiting.sql` and exited successfully with a count of two.
+- A separate read-only query confirmed versions 13 and 14 in `schema_migrations`. Post-deployment GET
+  checks returned `200` for `/api/health`, `/`, and `/api/search/companies?q=Atlassian`; the search
+  response contained the expected Atlassian result.
+- A real production magic-link and staff-MFA round trip was not performed during this deployment.
+  Their rate-limit paths are covered by the passing unit and live-PostGIS CI tests described above,
+  but remain an explicit end-to-end verification item.
 - The GitHub warning that older action releases target Node.js 20 is non-blocking maintenance; the
   runner forced Node.js 24 and both final jobs still passed.
