@@ -110,7 +110,9 @@ Everything since the 2026-09-04 handoff:
 - **Data Licensing, Attribution & Source Governance Register** (`docs/operations/data-licensing-and-attribution.md`):
   - Comprehensive statutory audit of open government and commercial data licences: ABS ASGS (CC BY 4.0), G-NAF (Open licence), JSA IVI/NERO (CC BY 4.0), Home Affairs accredited sponsor registers, and MapTiler/OSM cartography.
   - Documents formal employer dispute, correction, and APP 11 cryptographic erasure procedures.
-- Total test coverage: **171 automated tests passing** across contracts (33) and web (138), 0 lint errors, 0 type errors, Next.js Turbopack production build passing cleanly across 37 routes.
+- **Notification Provider Failure Handling & Backlog Recovery Suite** (`apps/web/src/lib/retention/failureRecovery.test.ts`):
+  - 4 automated integration tests verifying Resend API 500 error handling, network drops, backlog recovery replay, and partial batch resilience without recording false deliveries.
+- Total test coverage: **175 automated tests passing** across contracts (33) and web (142), 0 lint errors, 0 type errors, Next.js Turbopack production build passing cleanly across 37 routes.
 
 ## Work remaining
 
