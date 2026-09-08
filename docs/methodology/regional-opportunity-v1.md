@@ -1,7 +1,7 @@
 # Regional Tech Opportunity Score — methodology v1
 
 Status: the schema and suppression-first scorer are deployed, but no production score has been
-generated. Raw NERO/IVI import is an implementation candidate on `feat/phase-6b-jsa-importers`.
+generated. Raw NERO/IVI import is implemented, but production ingestion remains paused pending R2.
 
 ## Purpose
 

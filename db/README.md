@@ -17,9 +17,9 @@ lifecycle states, `0014` serializes rate-limit decisions so locks survive window
 `0015` adds adaptive ATS scheduling, quarantine state, and source-level operational controls.
 Migration `0016` establishes append-only JSA regional observations and reproducible regional
 opportunity scores. It was promoted to production Neon on 8 September 2026; the initial observation
-and score tables were deliberately empty. A fixture-backed NERO/IVI importer is being developed on
-`feat/phase-6b-jsa-importers`, but production ingestion and score generation remain paused pending
-durable R2 snapshot storage and the documented methodology gates.
+and score tables were deliberately empty. A fixture-backed NERO/IVI importer is available, but
+production ingestion and score generation remain paused pending durable R2 snapshot storage and the
+documented methodology gates.
 
 From the repository root:
 

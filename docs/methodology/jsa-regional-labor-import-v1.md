@@ -1,9 +1,8 @@
 # JSA regional labour import — methodology v1
 
-Status: implementation candidate on `feat/phase-6b-jsa-importers`. Fixture and parser verification
-is complete; live PostGIS verification must pass in CI before merge. Production imports remain
-paused until durable Cloudflare R2 snapshot storage is configured and the user lifts the pause in
-`docs/operations/2026-09-08-r2-ingestion-pause.md`.
+Status: version 1 is implemented with fixture and live-PostGIS integration coverage. Production
+imports remain paused until durable Cloudflare R2 snapshot storage is configured and the user lifts
+the pause in `docs/operations/2026-09-08-r2-ingestion-pause.md`.
 
 ## Sources and supported releases
 
