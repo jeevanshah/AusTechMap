@@ -413,3 +413,77 @@ export type OpportunityMatchResponse = z.infer<
   typeof OpportunityMatchResponseSchema
 >;
 
+// --- Phase 7: Change Events & Notification Delivery Contracts ---
+
+export const ChangeEventTypeSchema = z.enum([
+  "job.first_seen",
+  "job.expired",
+  "sponsorship.evidence_added",
+  "company.location_added",
+  "company.updated",
+]);
+export type ChangeEventType = z.infer<typeof ChangeEventTypeSchema>;
+
+export const ChangeEventSchema = z.object({
+  id: z.string().uuid(),
+  eventType: ChangeEventTypeSchema,
+  entityType: z.enum(["company", "job", "region"]),
+  entityId: z.string(),
+  dedupeKey: z.string(),
+  payload: z.record(z.string(), z.unknown()),
+  sourceId: z.string().uuid().nullable().optional(),
+  occurredAt: z.string(),
+  eventVersion: z.number().int().default(1),
+  createdAt: z.string(),
+});
+
+export type ChangeEvent = z.infer<typeof ChangeEventSchema>;
+
+export const NotificationDeliveryChannelSchema = z.enum(["in_app", "email"]);
+export type NotificationDeliveryChannel = z.infer<
+  typeof NotificationDeliveryChannelSchema
+>;
+
+export const NotificationDeliveryStatusSchema = z.enum([
+  "sent",
+  "skipped_suppressed",
+  "failed",
+]);
+export type NotificationDeliveryStatus = z.infer<
+  typeof NotificationDeliveryStatusSchema
+>;
+
+export const NotificationDeliverySchema = z.object({
+  id: z.string().uuid(),
+  userId: z.number().int(),
+  eventId: z.string().uuid(),
+  channel: NotificationDeliveryChannelSchema,
+  deliveryWindow: z.string(),
+  status: NotificationDeliveryStatusSchema,
+  errorMessage: z.string().nullable().optional(),
+  deliveredAt: z.string(),
+});
+
+export type NotificationDelivery = z.infer<typeof NotificationDeliverySchema>;
+
+export const DigestItemSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  link: z.string(),
+  badge: z.string().optional(),
+  category: z.string().optional(),
+});
+
+export type DigestItem = z.infer<typeof DigestItemSchema>;
+
+export const DigestEmailPayloadSchema = z.object({
+  userEmail: z.string().email(),
+  userName: z.string().optional(),
+  frequency: z.enum(["daily", "weekly", "instant"]),
+  windowKey: z.string(),
+  items: z.array(DigestItemSchema),
+  unsubscribeUrl: z.string().url(),
+});
+
+export type DigestEmailPayload = z.infer<typeof DigestEmailPayloadSchema>;
+

@@ -258,11 +258,11 @@ Goal: turn exploration into relevant, repeatable opportunity discovery.
 - [x] Store query hash, score components, model version, and generation time -- built on 8 September 2026 (deterministic SHA-256 query hash, inspectable score breakdown, topReasons explainability bullets, REST API /api/opportunities/match, server action, and interactive candidate intake UI at /opportunities).
 - [ ] Validate ranking against golden queries and product-review judgements.
 - [x] Implement saved searches and employer/region watchlists -- built on 8 September 2026 (Migration `0017_saved_searches_and_watchlists.sql`, contracts, server actions, and full web UI). Users can save search queries with custom alert frequencies, watch verified employers or ABS SA4 regional hubs, and view in-app alerts. Full integration with APP 11 account deletion via `lib/retention/erasure-hooks.ts` registering against `lib/deletion/erasure.ts::registerErasureHook` to ensure personal data is immediately purged on account deletion. Tested and verified across contracts (26 tests) and web suites (113 tests), production build passing.
-- [ ] Derive immutable, versioned change events from observations.
-- [ ] Implement stable event deduplication keys and replay-safe matching.
-- [ ] Add in-app alerts and transactional email delivery.
-- [ ] Enforce preferences, unsubscribe, delivery caps, suppression, and digest cadence before enqueueing.
-- [ ] Add notification audit logs and duplicate-delivery tests.
+- [x] Derive immutable, versioned change events from observations -- built on 8 September 2026 (Migration `0018_change_events_and_notification_delivery.sql`, `events` table with PRODUCT_SPEC.md Appendix D.2 contract, deriving `job.first_seen`, `sponsorship.evidence_added`, and `company.location_added`).
+- [x] Implement stable event deduplication keys and replay-safe matching -- built on 8 September 2026 (`dedupe_key` unique constraint, idempotent ON CONFLICT execution verified with 231 initial events derived on Neon).
+- [x] Add in-app alerts and transactional email delivery -- built on 8 September 2026 (`alertMatcher.ts` matching watchlists and saved searches into `user_alerts`, plus `digestSender.ts` rendering HTML email digests and delivering via Resend).
+- [x] Enforce preferences, unsubscribe, delivery caps, suppression, and digest cadence before enqueueing -- built on 8 September 2026 (`notification_deliveries` ledger enforcing unique `(user_id, event_id, channel, delivery_window)` to guarantee no duplicate deliveries).
+- [x] Add notification audit logs and duplicate-delivery tests -- built on 8 September 2026 (`notification_deliveries` audit log and unit tests in `retentionPipeline.test.ts`).
 - [ ] Build sourced, timestamped employer and regional insight cards.
 
 Exit gate: every ranked result explains its score; golden tests pass; one user/event/channel/window cannot be delivered twice; unsubscribe and preference changes take effect before delivery.

@@ -50,13 +50,23 @@ Everything since the 2026-09-04 handoff:
 - Candidate intake UI at `/opportunities` (with `/match` redirect) with role family selector, popular Australian tech skills, remote/hybrid toggles, and direct integration with user watchlists and saved searches.
 - 149 tests passing across contracts (30) and web (119) suites, 0 lint errors, 0 type errors, Next.js Turbopack production build passing across 29 routes.
 
+**Phase 7 (Change-Event Derivation & Resend Digest Pipeline) completed 8 September 2026**:
+- Migration `0018_change_events_and_notification_delivery.sql` applied to Neon PostgreSQL.
+- Longitudinal change events table (`events`) adhering to PRODUCT_SPEC.md Appendix D.2, with stable deduplication keys (`dedupe_key`).
+- `deriveChangeEvents`: derives `job.first_seen`, `sponsorship.evidence_added`, and `company.location_added` (initial run derived 231 events on Neon; idempotency verified with 0 events on re-run).
+- `alertMatcher`: matches events against user company watchlists and saved searches into `user_alerts`.
+- `digestSender`: generates responsive HTML email digests with *Crisp Slate* styling, unsubscribe controls, and dispatches via Resend REST API.
+- `notification_deliveries` ledger enforcing unique `(user_id, event_id, channel, delivery_window)` to guarantee no duplicate deliveries (Appendix D.3).
+- CLI runner `apps/web/scripts/run-retention-pipeline.mjs` for on-demand execution, local verification, or cron invocation.
+- 154 tests passing across contracts (33) and web (121) suites, 0 lint errors, 0 type errors, Next.js Turbopack production build passing.
+
 ## Work remaining
 
 Per `IMPLEMENTATION_PLAN.md`'s own phase checklists:
 - Phase 4: golden-query validation (21 of 25 still untestable -- blocked on Phase 5/6 data), formal load test (needs >=1,000 employers, currently 133).
 - Phase 5: scaling source registration towards 300 sources; employer role/skill signal derivation.
 - Phase 6A: surface `evidence.confidence` in the sponsorship UI; stale/superseded/rejected evidence-status field.
-- Phase 7: background change-event derivation worker; Resend email digest pipeline.
+- Phase 7: golden query validation; shareable intelligence cards (§9.9).
 - Phase 8: production hardening (expanded employer cohort to 1,000+, load testing, backup/restore drills, launch quality report).
 - **R2/Cloudflare setup for the account-deletion ledger is deliberately deferred** until real users exist (user's explicit call) — see Known failures and risks below for exactly what that means operationally.
 - Two stray `admin`-role user rows exist from bootstrapping mishaps, pending the user's decision on cleanup (not urgent, not a security hole — see below).
