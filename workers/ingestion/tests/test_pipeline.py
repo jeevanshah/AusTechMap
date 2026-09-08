@@ -5,6 +5,7 @@ import tempfile
 import uuid
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import cast
 
 import psycopg
 import pytest
@@ -13,6 +14,7 @@ from austechmap_ingestion.db.migrations import apply_migrations
 from austechmap_ingestion.fetch_safety import SafeFetchResult
 from austechmap_ingestion.hiring.company_sources import CompanyAtsSource
 from austechmap_ingestion.hiring.pipeline import run_ats_crawl
+from austechmap_ingestion.hiring.replay import replay_ats_snapshot
 from austechmap_ingestion.jobs import JobRepository
 from austechmap_ingestion.storage import FilesystemSnapshotStore
 
@@ -45,16 +47,19 @@ def _setup_company_ats_source(
             (f"pipeline-test-{suffix}", f"Pipeline Test Co {suffix}"),
         ).fetchone()
         assert company_row is not None
-        connection.execute(
+        company_ats_source_row = connection.execute(
             """
             INSERT INTO company_ats_sources (
               company_id, ats_provider, ats_identifier, discovered_method, source_id
             )
             VALUES (%s, %s, %s, 'manual_verified', %s)
+            RETURNING id
             """,
             (company_row[0], ats_provider, unique_identifier, source_id),
-        )
+        ).fetchone()
+        assert company_ats_source_row is not None
     return CompanyAtsSource(
+        id=cast(uuid.UUID, company_ats_source_row[0]),
         company_id=company_row[0],
         ats_provider=ats_provider,  # type: ignore[arg-type]
         ats_identifier=unique_identifier,
@@ -98,6 +103,32 @@ def test_run_ats_crawl_persists_real_lever_postings() -> None:
             "SELECT count(*) FROM jobs WHERE company_id = %s", (company_ats_source.company_id,)
         ).fetchone()
     assert job_count == (7,)
+
+    replay = replay_ats_snapshot(
+        database_url,
+        store,
+        run_id=result.run_id,
+        skills=(),
+    )
+    assert replay.ats_provider == "lever"
+    assert replay.ats_identifier == company_ats_source.ats_identifier
+    assert len(replay.jobs) == 7
+    assert [job.external_id for job in replay.jobs] == sorted(
+        job.external_id for job in replay.jobs
+    )
+    assert all(len(job.content_hash) == 64 for job in replay.jobs)
+
+    with psycopg.connect(database_url) as connection:
+        job_count_after_replay = connection.execute(
+            "SELECT count(*) FROM jobs WHERE company_id = %s",
+            (company_ats_source.company_id,),
+        ).fetchone()
+        replay_run_count = connection.execute(
+            "SELECT count(*) FROM import_runs WHERE replay_of_run_id = %s",
+            (result.run_id,),
+        ).fetchone()
+    assert job_count_after_replay == job_count
+    assert replay_run_count == (0,)
 
 
 @pytest.mark.integration

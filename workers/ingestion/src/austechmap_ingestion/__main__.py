@@ -1,7 +1,9 @@
 import argparse
 import json
 import os
+import uuid
 from collections.abc import Sequence
+from datetime import UTC, datetime
 from pathlib import Path
 
 import psycopg
@@ -36,9 +38,14 @@ from austechmap_ingestion.employers.sponsorship_evidence import (
 )
 from austechmap_ingestion.health import build_health
 from austechmap_ingestion.hiring.ats_source_seed import AtsSourceSeedError, seed_ats_sources
-from austechmap_ingestion.hiring.company_sources import list_active_ats_sources
+from austechmap_ingestion.hiring.company_sources import (
+    AtsSourceOperationError,
+    list_active_ats_sources,
+    set_ats_source_status,
+)
 from austechmap_ingestion.hiring.normalisation import SkillDef
 from austechmap_ingestion.hiring.pipeline import run_ats_crawl
+from austechmap_ingestion.hiring.replay import AtsReplayError, replay_ats_snapshot
 from austechmap_ingestion.hiring.taxonomy_seed import SKILLS, seed_taxonomy
 from austechmap_ingestion.jobs import JobError, JobRepository
 from austechmap_ingestion.observability import (
@@ -126,10 +133,38 @@ def build_parser() -> argparse.ArgumentParser:
         "crawl-jobs", help="fetch job postings from a registered ATS source and persist them"
     )
     crawl_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
-    crawl_parser.add_argument("--ats-identifier")
-    crawl_parser.add_argument("--all", action="store_true")
+    crawl_selection = crawl_parser.add_mutually_exclusive_group(required=True)
+    crawl_selection.add_argument("--ats-identifier")
+    crawl_selection.add_argument("--all", action="store_true")
+    crawl_selection.add_argument(
+        "--due", action="store_true", help="crawl only active sources whose due time has arrived"
+    )
     crawl_parser.add_argument("--worker-id", default="ats-crawler")
     crawl_parser.add_argument(
+        "--snapshot-root",
+        type=Path,
+        help="force filesystem storage at this path instead of RAW_SNAPSHOT_BACKEND",
+    )
+    source_status_parser = subparsers.add_parser(
+        "set-ats-source-status", help="pause, quarantine, disable, or reactivate an ATS source"
+    )
+    source_status_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    source_status_parser.add_argument(
+        "--ats-provider", choices=["lever", "ashby", "greenhouse"], required=True
+    )
+    source_status_parser.add_argument("--ats-identifier", required=True)
+    source_status_parser.add_argument(
+        "--status", choices=["active", "paused", "quarantined", "disabled"], required=True
+    )
+    source_status_parser.add_argument("--reason", required=True)
+    source_status_parser.add_argument("--actor-id", default="ats-source-operator")
+    replay_parser = subparsers.add_parser(
+        "replay-ats-snapshot",
+        help="read and re-parse a succeeded ATS snapshot without mutating current jobs",
+    )
+    replay_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    replay_parser.add_argument("--run-id", type=uuid.UUID, required=True)
+    replay_parser.add_argument(
         "--snapshot-root",
         type=Path,
         help="force filesystem storage at this path instead of RAW_SNAPSHOT_BACKEND",
@@ -367,12 +402,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         if not args.database_url:
             print("DATABASE_URL or --database-url is required")
             return 2
-        if not args.ats_identifier and not args.all:
-            print("either --ats-identifier NAME or --all is required")
-            return 2
         try:
             sources = list_active_ats_sources(
-                args.database_url, ats_identifier=args.ats_identifier
+                args.database_url,
+                ats_identifier=args.ats_identifier,
+                due_at=datetime.now(UTC) if args.due else None,
             )
             store = (
                 FilesystemSnapshotStore(args.snapshot_root)
@@ -392,7 +426,14 @@ def main(argv: Sequence[str] | None = None) -> int:
                 )
                 for source in sources
             ]
-        except (JobError, OSError, SnapshotStorageError, ValueError, psycopg.Error) as error:
+        except (
+            AtsSourceOperationError,
+            JobError,
+            OSError,
+            SnapshotStorageError,
+            ValueError,
+            psycopg.Error,
+        ) as error:
             print(f"Job crawl failed: {error}")
             return 1
         print(
@@ -409,6 +450,82 @@ def main(argv: Sequence[str] | None = None) -> int:
                     }
                     for result in results
                 ],
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "set-ats-source-status":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        try:
+            state = set_ats_source_status(
+                args.database_url,
+                ats_provider=args.ats_provider,
+                ats_identifier=args.ats_identifier,
+                status=args.status,
+                reason=args.reason,
+                actor_id=args.actor_id,
+            )
+        except (AtsSourceOperationError, ValueError, psycopg.Error) as error:
+            print(f"ATS source status change failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "id": str(state.id),
+                    "status": state.status,
+                    "consecutiveFailures": state.consecutive_failures,
+                    "nextCrawlAt": state.next_crawl_at.isoformat(),
+                },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "replay-ats-snapshot":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        try:
+            store = (
+                FilesystemSnapshotStore(args.snapshot_root)
+                if args.snapshot_root is not None
+                else build_snapshot_store_from_env()
+            )
+            skills = tuple(SkillDef(key=s.key, label=s.label, aliases=s.aliases) for s in SKILLS)
+            replay = replay_ats_snapshot(
+                args.database_url,
+                store,
+                run_id=args.run_id,
+                skills=skills,
+            )
+        except (AtsReplayError, SnapshotStorageError, ValueError, psycopg.Error) as error:
+            print(f"ATS snapshot replay failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "originalRunId": str(replay.original_run_id),
+                    "atsProvider": replay.ats_provider,
+                    "atsIdentifier": replay.ats_identifier,
+                    "snapshotSha256": replay.snapshot_sha256,
+                    "jobCount": len(replay.jobs),
+                    "jobs": [
+                        {
+                            "externalId": job.external_id,
+                            "title": job.title,
+                            "contentHash": job.content_hash,
+                            "roleFamilyKey": job.role_family_key,
+                            "seniority": job.seniority,
+                            "remoteType": job.remote_type,
+                        }
+                        for job in replay.jobs
+                    ],
+                },
                 separators=(",", ":"),
                 sort_keys=True,
             )

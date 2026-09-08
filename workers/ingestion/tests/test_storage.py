@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 from io import BytesIO
+from pathlib import Path
 from typing import Any, cast
 
 import boto3
@@ -111,6 +113,44 @@ def test_r2_store_wraps_transport_error() -> None:
 
     with pytest.raises(SnapshotStorageError, match="EndpointConnectionError"):
         _store(client).put(source_key="sample-source", content=b"private")
+
+
+def test_filesystem_store_reads_and_verifies_a_snapshot(tmp_path: Path) -> None:
+    store = FilesystemSnapshotStore(tmp_path)
+    stored = store.put(source_key="sample-source", content=b"replay me")
+
+    assert store.get(
+        object_key=stored.object_key, expected_sha256=stored.sha256
+    ) == b"replay me"
+
+
+def test_filesystem_store_rejects_a_tampered_snapshot(tmp_path: Path) -> None:
+    store = FilesystemSnapshotStore(tmp_path)
+    stored = store.put(source_key="sample-source", content=b"original")
+    path = tmp_path.joinpath(*stored.object_key.split("/"))
+    path.write_bytes(b"tampered")
+
+    with pytest.raises(SnapshotStorageError, match="checksum"):
+        store.get(object_key=stored.object_key, expected_sha256=stored.sha256)
+
+
+def test_snapshot_read_rejects_a_path_outside_the_content_addressed_layout(
+    tmp_path: Path,
+) -> None:
+    store = FilesystemSnapshotStore(tmp_path)
+
+    with pytest.raises(ValueError, match="content-addressed"):
+        store.get(object_key="../private", expected_sha256="0" * 64)
+
+
+def test_r2_store_reads_and_verifies_a_snapshot() -> None:
+    content = b"remote replay"
+    digest = hashlib.sha256(content).hexdigest()
+    object_key = f"raw/sample-source/{digest[:2]}/{digest}"
+
+    assert _store(FakeS3Client(existing=content)).get(
+        object_key=object_key, expected_sha256=digest
+    ) == content
 
 
 def test_storage_factory_defaults_to_filesystem() -> None:

@@ -19,6 +19,9 @@ if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
 
 SOURCE_KEY = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
+OBJECT_KEY = re.compile(
+    r"^raw/[a-z0-9][a-z0-9_-]*/(?P<prefix>[0-9a-f]{2})/(?P<digest>[0-9a-f]{64})$"
+)
 
 
 class SnapshotStorageError(RuntimeError):
@@ -37,6 +40,8 @@ class SnapshotStore(Protocol):
         self, *, source_key: str, content: bytes, content_type: str = "application/octet-stream"
     ) -> StoredSnapshot: ...
 
+    def get(self, *, object_key: str, expected_sha256: str) -> bytes: ...
+
 
 def _snapshot_identity(source_key: str, content: bytes) -> StoredSnapshot:
     if SOURCE_KEY.fullmatch(source_key) is None:
@@ -44,6 +49,22 @@ def _snapshot_identity(source_key: str, content: bytes) -> StoredSnapshot:
     digest = hashlib.sha256(content).hexdigest()
     object_key = str(PurePosixPath("raw", source_key, digest[:2], digest))
     return StoredSnapshot(object_key, digest, len(content))
+
+
+def _validated_snapshot_digest(object_key: str, expected_sha256: str) -> str:
+    match = OBJECT_KEY.fullmatch(object_key)
+    if match is None:
+        raise ValueError("object_key is not a valid content-addressed snapshot path")
+    digest = match.group("digest")
+    if match.group("prefix") != digest[:2] or digest != expected_sha256:
+        raise SnapshotStorageError("Snapshot object key does not match its expected checksum")
+    return digest
+
+
+def _verify_snapshot_content(content: bytes, expected_sha256: str) -> bytes:
+    if hashlib.sha256(content).hexdigest() != expected_sha256:
+        raise SnapshotStorageError("Snapshot content checksum does not match metadata")
+    return content
 
 
 class FilesystemSnapshotStore:
@@ -78,6 +99,15 @@ class FilesystemSnapshotStore:
             temporary.unlink(missing_ok=True)
 
         return snapshot
+
+    def get(self, *, object_key: str, expected_sha256: str) -> bytes:
+        _validated_snapshot_digest(object_key, expected_sha256)
+        source = self._root.joinpath(*PurePosixPath(object_key).parts)
+        try:
+            content = source.read_bytes()
+        except OSError as error:
+            raise SnapshotStorageError(f"Could not read snapshot {object_key}") from error
+        return _verify_snapshot_content(content, expected_sha256)
 
 
 @dataclass(frozen=True)
@@ -160,6 +190,20 @@ class R2SnapshotStore:
                 f"Content-address collision at {snapshot.object_key}"
             )
         return snapshot
+
+    def get(self, *, object_key: str, expected_sha256: str) -> bytes:
+        _validated_snapshot_digest(object_key, expected_sha256)
+        try:
+            response = self._client.get_object(Bucket=self._bucket, Key=object_key)
+            content = response["Body"].read()
+        except ClientError as error:
+            code = str(error.response.get("Error", {}).get("Code", "unknown"))
+            raise SnapshotStorageError(f"R2 get failed with code {code}") from error
+        except BotoCoreError as error:
+            raise SnapshotStorageError(
+                f"R2 get failed with {type(error).__name__}"
+            ) from error
+        return _verify_snapshot_content(content, expected_sha256)
 
 
 def build_snapshot_store_from_env(

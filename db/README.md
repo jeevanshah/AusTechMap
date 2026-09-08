@@ -13,7 +13,8 @@ the official `postgis/postgis:17-3.5` image. Migration `0001` enables `postgis`,
 observations of one content-addressed object; and `0005` enforces the six-attempt ceiling. Later
 forward migrations add the geographic, employer, hiring, authentication, and evidence-lifecycle
 schemas. In particular, `0012` creates the authentication rate-limit buckets, `0013` adds evidence
-lifecycle states, and `0014` serializes rate-limit decisions so locks survive window boundaries.
+lifecycle states, `0014` serializes rate-limit decisions so locks survive window boundaries, and
+`0015` adds adaptive ATS scheduling, quarantine state, and source-level operational controls.
 
 From the repository root:
 

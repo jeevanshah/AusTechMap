@@ -17,12 +17,16 @@ import psycopg
 
 from austechmap_ingestion.fetch_safety import SafeFetchResult, safe_fetch
 from austechmap_ingestion.hiring.ashby import fetch_ashby_postings
-from austechmap_ingestion.hiring.company_sources import CompanyAtsSource
+from austechmap_ingestion.hiring.company_sources import (
+    CompanyAtsSource,
+    record_ats_source_success,
+    record_ats_source_terminal_failure,
+)
 from austechmap_ingestion.hiring.greenhouse import fetch_greenhouse_postings
 from austechmap_ingestion.hiring.lever import fetch_lever_postings
 from austechmap_ingestion.hiring.normalisation import SkillDef, normalise_job
 from austechmap_ingestion.hiring.persistence import mark_expired_jobs, persist_job_posting
-from austechmap_ingestion.jobs import JobRepository, SnapshotRecord
+from austechmap_ingestion.jobs import JobRepository, RunStatus, SnapshotRecord
 from austechmap_ingestion.storage import SnapshotStore
 
 
@@ -163,13 +167,28 @@ def run_ats_crawl(
             now=crawl_time,
         )
     except Exception as error:
-        repository.fail(
+        failure_status = repository.fail(
             claim,
             retryable=True,
             error_code=type(error).__name__,
             error_message=str(error),
             now=crawl_time,
         )
+        if failure_status is RunStatus.DEAD_LETTER:
+            record_ats_source_terminal_failure(
+                database_url,
+                source_id=company_ats_source.id,
+                failed_at=crawl_time,
+                error_code=type(error).__name__,
+                actor_id=worker_id,
+            )
         raise
+
+    record_ats_source_success(
+        database_url,
+        source_id=company_ats_source.id,
+        observed_at=crawl_time,
+        fetched_jobs=len(postings),
+    )
 
     return AtsCrawlResult(claim.run_id, True, len(postings), created, updated, unchanged, expired)
