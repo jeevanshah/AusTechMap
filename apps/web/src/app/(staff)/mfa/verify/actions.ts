@@ -4,7 +4,6 @@ import { Secret } from "otpauth";
 import { redirect } from "next/navigation";
 
 import {
-  currentClientIp,
   currentSessionToken,
   requireRole,
 } from "../../../../lib/auth/require-role";
@@ -13,13 +12,15 @@ import { decryptTotpSecret } from "../../../../lib/mfa/crypto";
 import { verifyAndConsumeRecoveryCode } from "../../../../lib/mfa/recovery-codes";
 import { validateTotpToken } from "../../../../lib/mfa/totp";
 import { checkRateLimit } from "../../../../lib/rate-limit";
+import { currentClientIp } from "../../../../lib/request-ip";
 
 // ARCHITECTURE_DECISIONS.md §4.1: "TOTP/recovery attempts are limited to
-// five per account and IP per 15 minutes" -- both keys are checked, not
-// just the account, so a stolen session cookie can't be brute-forced from
-// an unlimited number of source IPs against a single account's cap alone.
+// five per account and IP per 15 minutes" -- both keys are checked at the
+// same limit the ADR states, not just the account, so a stolen session
+// cookie can't be brute-forced from an unlimited number of source IPs
+// against a single account's cap alone.
 const MFA_ATTEMPT_LIMIT = 5;
-const MFA_IP_LIMIT = 20;
+const MFA_IP_LIMIT = 5;
 const MFA_WINDOW_SECONDS = 15 * 60;
 const MFA_LOCK_SECONDS = 15 * 60;
 

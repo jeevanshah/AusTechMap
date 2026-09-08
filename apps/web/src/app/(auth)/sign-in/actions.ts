@@ -3,8 +3,8 @@
 import { redirect } from "next/navigation";
 
 import { signIn } from "../../../auth";
-import { currentClientIp } from "../../../lib/auth/require-role";
 import { getPool } from "../../../lib/db";
+import { currentClientIp } from "../../../lib/request-ip";
 import { checkRateLimit } from "../../../lib/rate-limit";
 
 const EMAIL_LIMIT = 5;

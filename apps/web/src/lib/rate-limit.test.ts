@@ -26,21 +26,24 @@ describe("checkRateLimit", () => {
     expect(result.attemptCount).toBe(1);
   });
 
-  it("issues a single atomic INSERT ... ON CONFLICT round trip", async () => {
+  it("issues one call to the database-serialized rate-limit function", async () => {
     const pool = fakePool({ attempt_count: 1, locked_until: null });
-    await checkRateLimit(pool, {
-      scope: "mfa_attempt",
-      key: "42",
-      limit: 5,
-      windowSeconds: 900,
-      lockSeconds: 900,
-    });
+    const now = new Date("2026-01-01T00:00:00Z");
+    await checkRateLimit(
+      pool,
+      {
+        scope: "mfa_attempt",
+        key: "42",
+        limit: 5,
+        windowSeconds: 900,
+        lockSeconds: 900,
+      },
+      now,
+    );
     expect(pool.query).toHaveBeenCalledTimes(1);
     expect(pool.query).toHaveBeenCalledWith(
-      expect.stringContaining(
-        "ON CONFLICT (scope, key, window_start) DO UPDATE",
-      ),
-      expect.any(Array),
+      expect.stringContaining("FROM check_auth_rate_limit"),
+      ["mfa_attempt", "42", now, 900, 5, 900],
     );
   });
 
@@ -54,6 +57,27 @@ describe("checkRateLimit", () => {
       lockSeconds: 900,
     });
     expect(result.allowed).toBe(true);
+  });
+
+  it.each([
+    { field: "limit", value: 0 },
+    { field: "windowSeconds", value: -1 },
+    { field: "lockSeconds", value: 1.5 },
+  ] as const)("rejects invalid $field options", async ({ field, value }) => {
+    const pool = fakePool({ attempt_count: 1, locked_until: null });
+    const options = {
+      scope: "mfa_attempt",
+      key: "42",
+      limit: 5,
+      windowSeconds: 900,
+      lockSeconds: 900,
+      [field]: value,
+    };
+
+    await expect(checkRateLimit(pool, options)).rejects.toBeInstanceOf(
+      RangeError,
+    );
+    expect(pool.query).not.toHaveBeenCalled();
   });
 
   it("disallows once the attempt count exceeds the limit", async () => {

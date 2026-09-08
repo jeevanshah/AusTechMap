@@ -3,14 +3,12 @@
 import { redirect } from "next/navigation";
 
 import { signIn } from "../../../../auth";
-import {
-  currentClientIp,
-  requireUser,
-} from "../../../../lib/auth/require-role";
+import { requireUser } from "../../../../lib/auth/require-role";
 import { getPool } from "../../../../lib/db";
 import { emailDigest } from "../../../../lib/deletion/erasure";
 import { startAccountDeletionRequest } from "../../../../lib/deletion/pipeline";
 import { checkRateLimit } from "../../../../lib/rate-limit";
+import { currentClientIp } from "../../../../lib/request-ip";
 
 // Same rate-limit shape as the main sign-in flow (lib/auth/sign-in's
 // requestMagicLink) -- this path sends a magic-link email too and was
