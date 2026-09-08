@@ -92,6 +92,24 @@ workers/ingestion/.venv/Scripts/python.exe -m austechmap_ingestion score-regions
 The command is idempotent for the same region, period, methodology, and input fingerprint. A score
 can be `null`; inspect `suppressionReasons` rather than treating that as a failed run.
 
+Parse and persist a manually downloaded official JSA release against local or disposable
+development infrastructure with a local snapshot store:
+
+```powershell
+workers/ingestion/.venv/Scripts/python.exe -m austechmap_ingestion import-jsa `
+  --dataset nero --source-version 2026-08 --snapshot-root .local/raw-snapshots `
+  C:\path\to\2026-08_nero.zip
+workers/ingestion/.venv/Scripts/python.exe -m austechmap_ingestion import-jsa `
+  --dataset ivi --source-version 2026-07 --snapshot-root .local/raw-snapshots `
+  C:\path\to\internet_vacancies_sa4_july_2026.xlsx
+```
+
+The accepted source shapes, conservative role mapping, IVI geography limitation, attribution, and
+score-readiness gate are defined in
+[`docs/methodology/jsa-regional-labor-import-v1.md`](methodology/jsa-regional-labor-import-v1.md).
+Never use `--snapshot-root` with the production database. Production JSA imports stay paused until
+the R2 resume gate is satisfied.
+
 Pause, quarantine, disable, or reactivate one exact provider/identifier pair with an operator reason:
 
 ```powershell

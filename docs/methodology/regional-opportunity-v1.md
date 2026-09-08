@@ -1,7 +1,7 @@
 # Regional Tech Opportunity Score — methodology v1
 
-Status: implementation candidate on `feat/phase-6b-region-profiles`; not deployed or generated in
-production. Independent review or a user-approved review waiver is still required.
+Status: the schema and suppression-first scorer are deployed, but no production score has been
+generated. Raw NERO/IVI import is an implementation candidate on `feat/phase-6b-jsa-importers`.
 
 ## Purpose
 
@@ -47,4 +47,8 @@ every employer office would create false regional precision.
 - Confirm that the Product Spec's illustrative weights should become the fixed v1 weights.
 - Confirm the 25-employer, 20-vacancy, and 8-industry saturation points against real distributions.
 - Confirm that Category 2/3/DAMA should contribute 0.25/0.75/1 rather than remain descriptive only.
-- Map NERO/IVI occupations to product role families and document how each direction value is derived.
+- Independently review the narrow NERO ANZSCO-4 mapping documented in
+  [`jsa-regional-labor-import-v1.md`](jsa-regional-labor-import-v1.md).
+- Define and review the NERO/IVI comparison intervals and neutral thresholds before populating
+  direction; the importer deliberately leaves direction null until then.
+- Decide how to handle IVI's GCCSA capital-city rows without manufacturing SA4 precision.
