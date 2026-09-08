@@ -5,6 +5,11 @@ import { revalidatePath } from "next/cache";
 import { requireStaffSession } from "../../../lib/auth/require-role";
 import { recordAudit } from "../../../lib/audit";
 import { getPool } from "../../../lib/db";
+import {
+  approveEmployerClaim,
+  rejectEmployerClaim,
+  resolveDataCorrection,
+} from "../../../lib/queries/claims";
 
 interface CandidatePayload {
   candidate_display_name: string;
@@ -242,3 +247,41 @@ export async function approveReviewItem(
 
   revalidatePath("/admin/review");
 }
+
+export async function approveEmployerClaimAction(
+  claimId: string,
+  reviewNotes?: string,
+): Promise<void> {
+  const actor = await requireStaffSession("reviewer");
+  const pool = getPool();
+  await approveEmployerClaim(pool, claimId, actor.id, reviewNotes);
+  revalidatePath("/admin/review");
+}
+
+export async function rejectEmployerClaimAction(
+  claimId: string,
+  reviewNotes: string,
+): Promise<void> {
+  const actor = await requireStaffSession("reviewer");
+  const pool = getPool();
+  await rejectEmployerClaim(pool, claimId, actor.id, reviewNotes);
+  revalidatePath("/admin/review");
+}
+
+export async function resolveDataCorrectionAction(
+  correctionId: string,
+  decision: "approved" | "rejected",
+  reviewNotes?: string,
+): Promise<void> {
+  const actor = await requireStaffSession("reviewer");
+  const pool = getPool();
+  await resolveDataCorrection(
+    pool,
+    correctionId,
+    decision,
+    actor.id,
+    reviewNotes,
+  );
+  revalidatePath("/admin/review");
+}
+

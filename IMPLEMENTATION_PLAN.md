@@ -290,8 +290,8 @@ Exit gate: all launch gates pass and the operational owner can diagnose, disable
 
 Begin only after qualified opportunity discovery, repeat usage, and data quality demonstrate demand.
 
-- [ ] Add verified employer claims without overwriting independent observations.
-- [ ] Add correction and contribution review workflows.
+- [x] Add verified employer claims without overwriting independent observations -- migration 0019 applied to live Neon PostgreSQL (`employer_claims`, `companies.is_claimed`, `review_queue_kind`); Hallmark-styled claims portal at `/corrections`; verification badge on `/companies/[slug]`; staff approve/reject actions in `/admin/review` write to `audit_records` and preserve independent crawler observations (`PRODUCT_SPEC.md` §3.2 Rule 11).
+- [x] Add correction and contribution review workflows -- community discrepancy reporting at `/corrections` with SSRF egress validation (`validateSafeUrl`), Postgres-backed rate limiting, and staff review queue resolution (`data_corrections` table & review workflow with audit trails).
 - [ ] Define analytics entitlements and institutional export controls.
 - [ ] Add billing boundaries and audit logs.
 - [ ] Keep paid placement visibly labelled and separate from organic scores.

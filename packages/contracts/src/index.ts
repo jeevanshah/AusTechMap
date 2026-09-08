@@ -494,3 +494,107 @@ export const DigestEmailPayloadSchema = z.object({
 
 export type DigestEmailPayload = z.infer<typeof DigestEmailPayloadSchema>;
 
+// --- Phase 9: Commercial Readiness — Verified Claims & Corrections ---
+
+export const EmployerClaimStatusSchema = z.enum([
+  "pending",
+  "approved",
+  "rejected",
+  "revoked",
+]);
+export type EmployerClaimStatus = z.infer<typeof EmployerClaimStatusSchema>;
+
+export const DataCorrectionTypeSchema = z.enum([
+  "location_incorrect",
+  "careers_url_broken",
+  "sponsorship_dispute",
+  "category_mismatch",
+  "other",
+]);
+export type DataCorrectionType = z.infer<typeof DataCorrectionTypeSchema>;
+
+export const DataCorrectionStatusSchema = z.enum([
+  "pending",
+  "approved",
+  "rejected",
+]);
+export type DataCorrectionStatus = z.infer<typeof DataCorrectionStatusSchema>;
+
+export const CreateEmployerClaimRequestSchema = z.object({
+  companyId: z.string().uuid(),
+  claimantName: z.string().trim().min(2).max(100),
+  claimantEmail: z.string().trim().email(),
+  claimantRole: z.string().trim().min(2).max(100),
+  claimType: z.string().trim().default("profile_verification"),
+  claimedData: z.record(z.string(), z.unknown()).default({}),
+  evidenceUrl: z.string().url().nullable().optional(),
+});
+export type CreateEmployerClaimRequest = z.infer<
+  typeof CreateEmployerClaimRequestSchema
+>;
+
+export const EmployerClaimSchema = z.object({
+  id: z.string().uuid(),
+  companyId: z.string().uuid(),
+  userId: z.number().int().nullable().optional(),
+  claimantName: z.string(),
+  claimantEmail: z.string().email(),
+  claimantRole: z.string(),
+  claimType: z.string(),
+  claimedData: z.record(z.string(), z.unknown()),
+  evidenceUrl: z.string().nullable().optional(),
+  status: EmployerClaimStatusSchema,
+  reviewNotes: z.string().nullable().optional(),
+  reviewedByUserId: z.number().int().nullable().optional(),
+  reviewedAt: z.string().nullable().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+export type EmployerClaim = z.infer<typeof EmployerClaimSchema>;
+
+export const CreateDataCorrectionRequestSchema = z.object({
+  companyId: z.string().uuid().nullable().optional(),
+  submitterName: z.string().trim().max(100).optional(),
+  submitterEmail: z.string().trim().email(),
+  correctionType: DataCorrectionTypeSchema,
+  details: z.string().trim().min(10).max(2000),
+  evidenceUrl: z.string().url().nullable().optional(),
+});
+export type CreateDataCorrectionRequest = z.infer<
+  typeof CreateDataCorrectionRequestSchema
+>;
+
+export const DataCorrectionSchema = z.object({
+  id: z.string().uuid(),
+  companyId: z.string().uuid().nullable().optional(),
+  userId: z.number().int().nullable().optional(),
+  submitterName: z.string().nullable().optional(),
+  submitterEmail: z.string().email(),
+  correctionType: DataCorrectionTypeSchema,
+  details: z.string(),
+  evidenceUrl: z.string().nullable().optional(),
+  status: DataCorrectionStatusSchema,
+  reviewNotes: z.string().nullable().optional(),
+  reviewedByUserId: z.number().int().nullable().optional(),
+  reviewedAt: z.string().nullable().optional(),
+  createdAt: z.string(),
+});
+export type DataCorrection = z.infer<typeof DataCorrectionSchema>;
+
+export const ReviewClaimActionSchema = z.object({
+  claimId: z.string().uuid(),
+  action: z.enum(["approve", "reject"]),
+  reviewNotes: z.string().trim().max(1000).optional(),
+});
+export type ReviewClaimAction = z.infer<typeof ReviewClaimActionSchema>;
+
+export const ReviewCorrectionActionSchema = z.object({
+  correctionId: z.string().uuid(),
+  action: z.enum(["approve", "reject"]),
+  reviewNotes: z.string().trim().max(1000).optional(),
+});
+export type ReviewCorrectionAction = z.infer<
+  typeof ReviewCorrectionActionSchema
+>;
+
+

@@ -127,6 +127,29 @@ Everything since the 2026-09-04 handoff:
   - Added `trustHost: true` in Auth.js and defensive null-coalescing in `matcher.ts`.
 - Total test coverage: **181 automated tests passing** across contracts (33) and web (148), 0 lint errors, 0 type errors, Next.js Turbopack production build passing cleanly across 37 routes.
 
+**Phase 9.1 (Commercial Readiness — Verified Employer Claims & Review Workflows) completed 9 September 2026**:
+- Migration `0019_employer_claims_and_corrections.sql` authored and applied to live Neon PostgreSQL:
+  - Extended `review_queue_kind` enum with `'employer_claim'` and `'data_correction'`.
+  - Created `employer_claims` table with claimant details, role, JSON claimed data, corroborating evidence link, status, and review timestamps.
+  - Created `data_corrections` table with community submission fields (`submitter_email`, `correction_type`, `details`, `evidence_url`, `status`).
+  - Added `is_claimed`, `claimed_at`, and `claimed_by_user_id` to `companies`.
+- Contracts in `@austechmap/contracts`:
+  - `CreateEmployerClaimRequestSchema`, `EmployerClaimSchema`, `ReviewClaimActionSchema`.
+  - `CreateDataCorrectionRequestSchema`, `DataCorrectionSchema`, `ReviewCorrectionActionSchema`.
+  - Unit tests in `packages/contracts/tests/claims.test.ts` (7 tests passing).
+- Query and Review Actions (`apps/web/src/lib/queries/claims.ts` & `admin/review/actions.ts`):
+  - `createEmployerClaim`, `createDataCorrection`, `approveEmployerClaim`, `rejectEmployerClaim`, `resolveDataCorrection`.
+  - Approve action sets `companies.is_claimed = true` while strictly preserving raw crawler and gazette observations without mutation (`PRODUCT_SPEC.md` §3.2 Rule 11).
+  - All review decisions write immutable audit records to `audit_records`.
+- Public Submissions Portal (`/corrections`):
+  - Hallmark-styled tabbed interface (`CorrectionsPortalClient.tsx`) allowing employers to claim profiles and community members to submit discrepancy reports.
+  - Guarded with Postgres-backed rate limiting (`checkRateLimit`) and SSRF egress inspection (`validateSafeUrl`).
+- Profile UI (`/companies/[slug]`):
+  - Renders the "Verified Employer Profile" badge when `company.isClaimed` is true, or an unobtrusive "Claim this profile" link.
+- Unified Staff Review Queue (`/admin/review`):
+  - Interactive cards rendering employer claims and community reports with direct staff approve and reject actions.
+- Total test coverage: **197 automated tests passing** across contracts (40) and web (157), 0 lint errors, 0 type errors, clean Next.js Turbopack build across 37 routes.
+
 ## Work remaining
 
 Per `IMPLEMENTATION_PLAN.md`'s own phase checklists:

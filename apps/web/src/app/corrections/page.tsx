@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Building2, FileText, Mail, MapPin, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Building2, FileText, MapPin, ShieldCheck } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Data Corrections, Claims & Employer Updates — Australia Tech Map",
@@ -9,7 +9,33 @@ export const metadata: Metadata = {
   alternates: { canonical: "/corrections" },
 };
 
-export default function CorrectionsPage() {
+import { getPool } from "../../lib/db";
+import { CorrectionsPortalClient } from "./CorrectionsPortalClient";
+
+export const dynamic = "force-dynamic";
+
+async function loadActiveCompanies() {
+  try {
+    const { rows } = await getPool().query<{
+      id: string;
+      slug: string;
+      name: string;
+      domain: string | null;
+    }>(
+      `SELECT id, slug, display_name AS name, domain
+       FROM companies
+       WHERE status = 'active'
+       ORDER BY display_name ASC`,
+    );
+    return rows;
+  } catch {
+    return [];
+  }
+}
+
+export default async function CorrectionsPage() {
+  const companies = await loadActiveCompanies();
+
   return (
     <main className="mx-auto min-h-screen max-w-4xl px-6 py-10 sm:px-10 sm:py-16">
       {/* Navigation Header */}
@@ -67,6 +93,9 @@ export default function CorrectionsPage() {
           </div>
         </section>
 
+        {/* Interactive Claims & Corrections Submission Portal */}
+        <CorrectionsPortalClient companies={companies} />
+
         {/* Verification Standards */}
         <section className="space-y-4 rounded-2xl border border-surface-border bg-white p-7 shadow-2xs">
           <h2 className="font-heading text-2xl font-bold text-navy-900">Verification & Review Standards</h2>
@@ -77,30 +106,8 @@ export default function CorrectionsPage() {
             <li><strong>Authorised Domain Email:</strong> Submissions must originate from an email address matching the company’s primary operating domain (e.g. <code>jane@atlassian.com</code>).</li>
             <li><strong>Official Address Corroboration:</strong> Premises modifications must correspond to a valid physical G-NAF Australian address.</li>
             <li><strong>Evidence Trail:</strong> Every approved edit is recorded in an immutable audit ledger with the approving staff reviewer’s ID and timestamp.</li>
+            <li><strong>Separation Guarantee:</strong> Employer-provided claims never overwrite independent platform observations; both are displayed with distinct provenance tags.</li>
           </ul>
-        </section>
-
-        {/* How to Submit */}
-        <section className="space-y-6 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-7">
-          <div className="flex items-center gap-3 text-navy-900">
-            <Mail className="h-5 w-5 text-emerald-800" />
-            <h2 className="font-heading text-2xl font-bold text-emerald-950">Submit a Correction Request</h2>
-          </div>
-          <p className="text-sm leading-relaxed text-emerald-900">
-            Please email our verification research desk with the following details:
-          </p>
-          <div className="rounded-xl border border-emerald-200 bg-white p-5 font-mono text-xs text-slate-800 space-y-1.5 leading-relaxed">
-            <p><strong>To:</strong> verification@austechmap.com</p>
-            <p><strong>Subject:</strong> Profile Update Request: [Company Name] (ABN: [ABN])</p>
-            <p><strong>Body Details:</strong></p>
-            <p>1. Company Slug on Australia Tech Map (e.g. /companies/atlassian)</p>
-            <p>2. Requested Change (Location / Careers URL / Niche Category / Sponsorship)</p>
-            <p>3. Official Corroborating Link or Documentation</p>
-            <p>4. Submitter Full Name & Corporate Title</p>
-          </div>
-          <p className="text-xs text-emerald-800">
-            Standard review turnaround time is 1 to 2 business days.
-          </p>
         </section>
       </article>
     </main>
