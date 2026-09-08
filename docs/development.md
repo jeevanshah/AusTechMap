@@ -72,6 +72,32 @@ Set the server-side `SENTRY_DSN` to enable worker exception reporting. `APP_ENV`
 label reports. Sentry's default PII collection and performance tracing are disabled; reports contain
 only the approved run, source, company, parser-version, and correlation identifiers.
 
+### ATS source operations
+
+After migration `0015`, scheduled workers should crawl only due active sources:
+
+```powershell
+workers/ingestion/.venv/Scripts/python.exe -m austechmap_ingestion crawl-jobs --due
+```
+
+Pause, quarantine, disable, or reactivate one exact provider/identifier pair with an operator reason:
+
+```powershell
+workers/ingestion/.venv/Scripts/python.exe -m austechmap_ingestion set-ats-source-status `
+  --ats-provider lever --ats-identifier immutable --status paused `
+  --reason "Planned source maintenance" --actor-id "operator@example.com"
+```
+
+Replay a succeeded ATS run through the current parser and normalizer without changing live jobs:
+
+```powershell
+workers/ingestion/.venv/Scripts/python.exe -m austechmap_ingestion replay-ats-snapshot `
+  --run-id 00000000-0000-0000-0000-000000000000
+```
+
+All commands require `DATABASE_URL`. Snapshot commands also use the configured
+`RAW_SNAPSHOT_BACKEND`; pass `--snapshot-root` to force a local filesystem store.
+
 ## Quality checks
 
 ```powershell

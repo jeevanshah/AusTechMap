@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main, feat/phase-5-source-operations]
+    branches: [main]
 
 permissions:
   contents: read
@@ -59,14 +59,4 @@ jobs:
       - run: python -m ruff check workers/ingestion
       - run: python -m mypy --config-file workers/ingestion/pyproject.toml workers/ingestion/src workers/ingestion/tests
       - run: python -m austechmap_ingestion migrate --database-url "$TEST_DATABASE_URL"
-      - name: Verify adaptive ATS intervals
-        run: python -m pytest -c workers/ingestion/pyproject.toml workers/ingestion/tests/test_company_sources.py -k adaptive
-      - name: Verify due and paused ATS selection
-        run: python -m pytest -c workers/ingestion/pyproject.toml workers/ingestion/tests/test_company_sources.py -k due_listing
-      - name: Verify automatic ATS quarantine
-        run: python -m pytest -c workers/ingestion/pyproject.toml workers/ingestion/tests/test_company_sources.py -k terminal_failures
-      - name: Verify manual ATS kill switch
-        run: python -m pytest -c workers/ingestion/pyproject.toml workers/ingestion/tests/test_company_sources.py -k manual_kill
-      - name: Verify ATS crawl and replay pipeline
-        run: python -m pytest -c workers/ingestion/pyproject.toml workers/ingestion/tests/test_pipeline.py
       - run: python -m pytest -c workers/ingestion/pyproject.toml

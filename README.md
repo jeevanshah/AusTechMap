@@ -30,8 +30,10 @@ Authentication, database sessions, staff TOTP MFA, role-gated admin routes, and 
 are built. Cloudflare R2 configuration for the deletion suppression ledger remains deliberately
 deferred until real users are admitted.
 
-The current engineering priority is Phase 5 reliability and source coverage, followed by private-alpha
-feedback. Phase 7 matching, saved-state, and alerts remain gated on that feedback checkpoint.
+Phase 5 now includes checksum-verified snapshot replay, adaptive due-time scheduling, automatic source
+quarantine, and audited operator kill switches. The current priority is expanding verified source
+coverage and proving the refresh cadence in production, followed by private-alpha feedback. Phase 7
+matching, saved-state, and alerts remain gated on that feedback checkpoint.
 
 ## Delivery approach
 
