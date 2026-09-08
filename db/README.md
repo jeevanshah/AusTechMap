@@ -16,7 +16,8 @@ schemas. In particular, `0012` creates the authentication rate-limit buckets, `0
 lifecycle states, `0014` serializes rate-limit decisions so locks survive window boundaries, and
 `0015` adds adaptive ATS scheduling, quarantine state, and source-level operational controls.
 Migration `0016` establishes append-only JSA regional observations and reproducible regional
-opportunity scores; it is not yet promoted to production.
+opportunity scores. It was promoted to production Neon on 8 September 2026; the initial observation
+and score tables were deliberately empty because NERO/IVI ingestion remains unimplemented.
 
 From the repository root:
 

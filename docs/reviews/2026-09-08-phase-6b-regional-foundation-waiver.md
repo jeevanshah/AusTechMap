@@ -43,5 +43,8 @@ waive review for later Phase 6B work or production database promotion. See `AGEN
   320/375/414/768 px browser pass remains outstanding.
 - Cloudflare R2 and production ingestion remain paused under
   `docs/operations/2026-09-08-r2-ingestion-pause.md`.
-- The user separately approved production promotion of migration `0016`. Its actual deployment and
-  post-deployment verification will be recorded after execution.
+- The user separately approved production promotion of migration `0016`. The checksum-locked runner
+  applied exactly `0016_regional_intelligence_foundation.sql` on 8 September 2026. A read-only
+  post-deployment query confirmed version 16 with a checksum matching the repository file, both new
+  tables, the `nero`/`ivi` enum values, and all four append-only triggers. Both tables contained zero
+  rows; no NERO/IVI import or score generation was run.
