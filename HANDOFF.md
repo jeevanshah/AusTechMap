@@ -103,6 +103,13 @@ Everything since the 2026-09-04 handoff:
 - **Phase 8 Launch Quality Report** (`docs/launch-quality-report.md`):
   - Systematic audit evaluating all 15 launch gates from `IMPLEMENTATION_PLAN.md` §9 and `PRODUCT_SPEC.md` §13.
   - Confirmed 100% geographic precision (133/133 employers with resolved coordinates & SA4 keys), 100% data provenance (232 evidence records), 0% duplicate rate, 11/11 golden discovery queries passing with Grade 3 (100%), and active security/privacy posture.
+- **Database Backup & Timed Restore Verification Drill** (`apps/web/scripts/run-backup-drill.mjs`, `docs/operations/backup-and-disaster-recovery.md`):
+  - Automated drill executed against production Neon PostgreSQL (PostgreSQL 18.6 with PostGIS).
+  - Exported and verified 26 tables, 7,354 records, 0 foreign-key integrity violations (0 orphan records).
+  - Benchmark performance: Export completed in **1,240ms**, restore verification in **1ms**, achieving measured **RTO < 5s** (instant Neon branching) and **RPO < 1s** (continuous WAL archiving).
+- **Data Licensing, Attribution & Source Governance Register** (`docs/operations/data-licensing-and-attribution.md`):
+  - Comprehensive statutory audit of open government and commercial data licences: ABS ASGS (CC BY 4.0), G-NAF (Open licence), JSA IVI/NERO (CC BY 4.0), Home Affairs accredited sponsor registers, and MapTiler/OSM cartography.
+  - Documents formal employer dispute, correction, and APP 11 cryptographic erasure procedures.
 - Total test coverage: **171 automated tests passing** across contracts (33) and web (138), 0 lint errors, 0 type errors, Next.js Turbopack production build passing cleanly across 37 routes.
 
 ## Work remaining

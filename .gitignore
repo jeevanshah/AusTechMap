@@ -39,6 +39,7 @@ graphify-out/
 tmp/
 temp/
 scratch/
+backups/
 
 # Claude Code local settings/state
 .claude/
