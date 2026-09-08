@@ -197,7 +197,7 @@ def test_regional_intelligence_records_are_append_only() -> None:
         source_id = connection.execute(
             """
             INSERT INTO data_sources (source_key, name, kind)
-            VALUES (%s, 'Regional migration test', 'government')
+            VALUES (%s, 'Regional migration test', 'government_open_data')
             RETURNING id
             """,
             (f"regional-migration-test-{suffix}",),
