@@ -181,6 +181,7 @@ def run_ats_crawl(
                 failed_at=crawl_time,
                 error_code=type(error).__name__,
                 actor_id=worker_id,
+                request_id=claim.log_correlation_id,
             )
         raise
 

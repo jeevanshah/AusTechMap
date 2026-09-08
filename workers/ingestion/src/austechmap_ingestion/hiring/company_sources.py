@@ -114,6 +114,7 @@ def record_ats_source_terminal_failure(
     failed_at: datetime,
     error_code: str,
     actor_id: str,
+    request_id: str | None = None,
 ) -> AtsSourceOperationalState:
     failure_time = _aware(failed_at)
     cleaned_code = error_code.strip()
@@ -164,9 +165,11 @@ def record_ats_source_terminal_failure(
                 """
                 INSERT INTO audit_records (
                   actor_type, actor_id, action, target_type, target_id,
-                  after_state, metadata
+                  after_state, metadata, request_id
                 )
-                VALUES ('worker', %s, 'ats_source_quarantined', 'company_ats_source', %s, %s, %s)
+                VALUES (
+                  'worker', %s, 'ats_source_quarantined', 'company_ats_source', %s, %s, %s, %s
+                )
                 """,
                 (
                     actor_id,
@@ -178,6 +181,7 @@ def record_ats_source_terminal_failure(
                             "error_code": cleaned_code,
                         }
                     ),
+                    request_id or uuid.uuid4().hex,
                 ),
             )
     return state
@@ -192,6 +196,7 @@ def set_ats_source_status(
     reason: str,
     actor_id: str,
     changed_at: datetime | None = None,
+    request_id: str | None = None,
 ) -> AtsSourceOperationalState:
     if ats_provider not in {"lever", "ashby", "greenhouse"}:
         raise ValueError(f"invalid ATS provider: {ats_provider!r}")
@@ -244,9 +249,11 @@ def set_ats_source_status(
             """
             INSERT INTO audit_records (
               actor_type, actor_id, action, target_type, target_id,
-              before_state, after_state, metadata
+              before_state, after_state, metadata, request_id
             )
-            VALUES ('worker', %s, 'ats_source_status_changed', 'company_ats_source', %s, %s, %s, %s)
+            VALUES (
+              'worker', %s, 'ats_source_status_changed', 'company_ats_source', %s, %s, %s, %s, %s
+            )
             """,
             (
                 actor_id,
@@ -260,6 +267,7 @@ def set_ats_source_status(
                         "ats_identifier": ats_identifier,
                     }
                 ),
+                request_id or uuid.uuid4().hex,
             ),
         )
     return state
