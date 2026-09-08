@@ -14,12 +14,15 @@ import {
 
 import type { MapCompanyPoint } from "@austechmap/contracts";
 
+import { auth } from "../../../auth";
 import { CareersLink } from "./CareersLink";
+import { WatchCompanyButton } from "./WatchCompanyButton";
 import { getCategoryIconPath } from "../../_components/HomeMapShell";
 import { MapCanvas, type Bbox } from "../../../components/map/MapCanvas";
 import { trackEvent } from "../../../lib/analytics";
 import { DatabaseNotConfiguredError, getPool } from "../../../lib/db";
 import type { EvidenceStatus } from "../../../lib/evidence";
+import { isWatchingCompany } from "../../../lib/queries/watchlists";
 
 export const dynamic = "force-dynamic";
 
@@ -301,6 +304,12 @@ export default async function CompanyProfilePage({
     ? Number(company.research_confidence)
     : null;
 
+  const session = await auth();
+  const userId = session?.user?.id ? Number(session.user.id) : null;
+  const isWatching = userId
+    ? await isWatchingCompany(getPool(), userId, company.id)
+    : false;
+
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-10 px-6 py-8 sm:px-10 sm:py-12">
       <header className="flex flex-col gap-4 border-b border-surface-border pb-6">
@@ -331,9 +340,17 @@ export default async function CompanyProfilePage({
             </span>
           </div>
         </div>
-        <h1 className="font-heading text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl text-balance">
-          {company.display_name}
-        </h1>
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <h1 className="font-heading text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl text-balance">
+            {company.display_name}
+          </h1>
+          <WatchCompanyButton
+            companyId={company.id}
+            companySlug={company.slug}
+            initialWatching={isWatching}
+            isSignedIn={Boolean(userId)}
+          />
+        </div>
         <dl className="flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs text-slate-600 tabular-nums">
           <div className="flex items-center gap-1.5">
             <dt className="text-slate-400">STATUS</dt>

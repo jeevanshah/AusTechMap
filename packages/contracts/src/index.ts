@@ -185,3 +185,133 @@ export const RegionOpportunityResponseSchema = z
 export type RegionOpportunityResponse = z.infer<
   typeof RegionOpportunityResponseSchema
 >;
+
+// --- Phase 7: Retention & Opportunity Engine Contracts ---
+
+export const SavedSearchFilterSchema = z.object({
+  query: z.string().optional(),
+  category: z.string().optional(),
+  roleFamily: z.string().optional(),
+  hiring: z.boolean().optional(),
+  sponsorship: z.string().optional(),
+  regional: z.boolean().optional(),
+  remote: z.string().optional(),
+  hubCity: z.string().optional(),
+  sa4Code: z.string().optional(),
+});
+
+export type SavedSearchFilter = z.infer<typeof SavedSearchFilterSchema>;
+
+export const AlertFrequencySchema = z.enum(["never", "daily", "weekly", "instant"]);
+export type AlertFrequency = z.infer<typeof AlertFrequencySchema>;
+
+export const SavedSearchSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.number().int(),
+  name: z.string().min(1),
+  filters: SavedSearchFilterSchema,
+  alertFrequency: AlertFrequencySchema,
+  lastAlertedAt: z.string().nullable(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export type SavedSearch = z.infer<typeof SavedSearchSchema>;
+
+export const CreateSavedSearchRequestSchema = z.object({
+  name: z.string().trim().min(1).max(255),
+  filters: SavedSearchFilterSchema,
+  alertFrequency: AlertFrequencySchema.default("never"),
+});
+
+export type CreateSavedSearchRequest = z.infer<typeof CreateSavedSearchRequestSchema>;
+
+export const SavedSearchListResponseSchema = z.object({
+  version: z.literal(1),
+  searches: z.array(SavedSearchSchema),
+});
+
+export type SavedSearchListResponse = z.infer<typeof SavedSearchListResponseSchema>;
+
+export const WatchlistEntityTypeSchema = z.enum(["company", "region"]);
+export type WatchlistEntityType = z.infer<typeof WatchlistEntityTypeSchema>;
+
+export const WatchlistEntrySchema = z.object({
+  id: z.string().uuid(),
+  userId: z.number().int(),
+  entityType: WatchlistEntityTypeSchema,
+  companyId: z.string().uuid().nullable(),
+  regionId: z.string().uuid().nullable(),
+  sa4Code: z.string().nullable(),
+  notes: z.string().nullable().optional(),
+  createdAt: z.string(),
+  company: z
+    .object({
+      id: z.string().uuid(),
+      slug: z.string(),
+      name: z.string(),
+      city: z.string().nullable().optional(),
+      primaryCategory: z.string().nullable().optional(),
+      hasSponsorshipEvidence: z.boolean().optional(),
+      isRegional: z.boolean().optional(),
+    })
+    .optional(),
+  region: z
+    .object({
+      code: z.string(),
+      name: z.string(),
+      opportunityScore: z.number().nullable().optional(),
+    })
+    .optional(),
+});
+
+export type WatchlistEntry = z.infer<typeof WatchlistEntrySchema>;
+
+export const ToggleWatchlistRequestSchema = z.object({
+  entityType: WatchlistEntityTypeSchema,
+  companyId: z.string().uuid().optional(),
+  sa4Code: z.string().optional(),
+  regionId: z.string().uuid().optional(),
+});
+
+export type ToggleWatchlistRequest = z.infer<typeof ToggleWatchlistRequestSchema>;
+
+export const WatchlistListResponseSchema = z.object({
+  version: z.literal(1),
+  watchlist: z.array(WatchlistEntrySchema),
+});
+
+export type WatchlistListResponse = z.infer<typeof WatchlistListResponseSchema>;
+
+export const AlertTypeSchema = z.enum([
+  "new_job",
+  "sponsorship_change",
+  "company_update",
+  "region_update",
+  "saved_search_match",
+]);
+export type AlertType = z.infer<typeof AlertTypeSchema>;
+
+export const UserAlertSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.number().int(),
+  alertType: AlertTypeSchema,
+  title: z.string().min(1),
+  message: z.string().min(1),
+  link: z.string().nullable(),
+  entityType: z.string().nullable().optional(),
+  entityId: z.string().nullable().optional(),
+  readAt: z.string().nullable(),
+  createdAt: z.string(),
+});
+
+export type UserAlert = z.infer<typeof UserAlertSchema>;
+
+export const UserAlertsResponseSchema = z.object({
+  version: z.literal(1),
+  unreadCount: z.number().int().min(0),
+  alerts: z.array(UserAlertSchema),
+});
+
+export type UserAlertsResponse = z.infer<typeof UserAlertsResponseSchema>;
+

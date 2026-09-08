@@ -1,7 +1,9 @@
 import Image from "next/image";
-import { Building2, Compass, MapPin, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { Building2, Compass, MapPin, ShieldCheck, User } from "lucide-react";
 import type { MapCompanyPoint, RegionalHub } from "@austechmap/contracts";
 
+import { auth } from "../auth";
 import { AnimatedCounter } from "../components/ui/AnimatedCounter";
 import { HomeMapShell } from "./_components/HomeMapShell";
 import { DatabaseNotConfiguredError, getPool } from "../lib/db";
@@ -112,6 +114,14 @@ export default async function Home() {
         : `Could not load employers: ${String(caught)}`;
   }
 
+  const session = await auth();
+  const user = session?.user?.email
+    ? {
+        email: session.user.email,
+        role: (session.user as { role?: string }).role ?? "user",
+      }
+    : null;
+
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-6 px-4 py-6 sm:px-8 sm:py-8">
       <a
@@ -164,11 +174,27 @@ export default async function Home() {
           <span className="text-slate-400 cursor-not-allowed">About</span>
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-surface-border bg-white px-3 py-1 font-mono text-[11px] font-semibold text-slate-800 shadow-2xs">
             <span className="h-2 w-2 rounded-full bg-emerald-600" />
             Verified Registry
           </span>
+          {user ? (
+            <Link
+              href="/account"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-surface-border bg-white px-3 py-1.5 text-xs font-semibold text-navy-900 shadow-2xs hover:bg-slate-50 hover:border-slate-300 transition-all"
+            >
+              <User className="h-3.5 w-3.5 text-slate-500" />
+              <span className="max-w-[100px] truncate sm:max-w-[160px]">{user.email}</span>
+            </Link>
+          ) : (
+            <Link
+              href="/sign-in"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-surface-border bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:border-slate-300 hover:text-navy-900 transition-all"
+            >
+              <span>Sign in</span>
+            </Link>
+          )}
           <a
             href="https://github.com/jeevanshah/AusTechMap"
             target="_blank"
@@ -303,6 +329,7 @@ export default async function Home() {
           initialPoints={points}
           initialBbox={AUSTRALIA_BBOX}
           initialHubs={hubs}
+          currentUser={user}
         />
       )}
     </main>

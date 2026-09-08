@@ -14,8 +14,11 @@ import {
 import type { RegionOpportunityResponse } from "@austechmap/contracts";
 
 import styles from "./page.module.css";
+import { auth } from "../../../auth";
 import { DatabaseNotConfiguredError, getPool } from "../../../lib/db";
 import { getRegionOpportunity } from "../../../lib/queries/getRegionOpportunity";
+import { isWatchingRegion } from "../../../lib/queries/watchlists";
+import { WatchRegionButton } from "./WatchRegionButton";
 
 export const dynamic = "force-dynamic";
 
@@ -124,6 +127,12 @@ export default async function RegionPage({
     score,
   } = opportunity;
 
+  const session = await auth();
+  const userId = session?.user?.id ? Number(session.user.id) : null;
+  const isWatching = userId
+    ? await isWatchingRegion(getPool(), userId, region.code)
+    : false;
+
   return (
     <main
       className={`${styles.page} mx-auto min-h-screen max-w-6xl px-5 py-6 sm:px-8 sm:py-10 lg:px-10`}
@@ -148,9 +157,17 @@ export default async function RegionPage({
           <p className="font-mono text-xs font-semibold tracking-[0.12em] text-slate-500">
             SA4 {region.code}
           </p>
-          <h1 className="mt-3 min-w-0 font-heading text-4xl font-bold leading-tight tracking-tight text-navy-900 sm:text-5xl">
-            {region.name}
-          </h1>
+          <div className="mt-3 flex items-center justify-between gap-4 flex-wrap">
+            <h1 className="min-w-0 font-heading text-4xl font-bold leading-tight tracking-tight text-navy-900 sm:text-5xl">
+              {region.name}
+            </h1>
+            <WatchRegionButton
+              sa4Code={region.code}
+              regionName={region.name}
+              initialWatching={isWatching}
+              isSignedIn={Boolean(userId)}
+            />
+          </div>
           <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
             Mapped employers, location-confirmed roles, labour indicators and
             migration context. Counts are evidence, not an estimate of the

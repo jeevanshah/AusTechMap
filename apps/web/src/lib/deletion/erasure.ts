@@ -2,21 +2,17 @@ import { createHash } from "node:crypto";
 import type { Pool } from "pg";
 
 import { writeDeletionLedgerRecord } from "./ledger";
+import { eraseUserRetentionData } from "../retention/erasure-hooks";
 
 /**
- * §4.1 step 3's extensible hook registry. Today's real, honest scope:
- * only the Auth.js identity tables (accounts) have real rows to erase,
- * plus the users row itself is tombstoned (PII cleared, row kept -- other
- * tables reference users.id, e.g. review_queue_items.reviewed_by_user_id
- * and audit_records' historical actor attribution). No saved-searches/
- * watches/notification-preference hooks exist yet because those features
- * don't exist yet (Phase 7) -- this registry is the extension point future
- * features must register against when they're built, not a pipeline that
- * pretends to erase data that doesn't exist.
+ * §4.1 step 3's extensible hook registry.
+ * Erases Auth.js identity tables (accounts), tombstones users row (PII cleared,
+ * row kept for historical audit attribution), and invokes registered hooks
+ * (such as retention erasure for saved searches, watchlists, and alerts).
  */
 export type ErasureHook = (pool: Pool, userId: number) => Promise<void>;
 
-const erasureHooks: ErasureHook[] = [];
+const erasureHooks: ErasureHook[] = [eraseUserRetentionData];
 
 export function registerErasureHook(hook: ErasureHook): void {
   erasureHooks.push(hook);

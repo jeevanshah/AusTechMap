@@ -3,6 +3,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Anchor,
@@ -10,6 +11,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   Award,
+  Bookmark,
   Building2,
   CheckCircle2,
   ChevronRight,
@@ -18,6 +20,7 @@ import {
   Crosshair,
   ExternalLink,
   Layers,
+  Loader2,
   MapPin,
   Minus,
   Network,
@@ -32,11 +35,15 @@ import {
 } from "lucide-react";
 
 import type {
+  AlertFrequency,
   Category,
   CompanySearchResult,
   MapCompanyPoint,
   RegionalHub,
+  SavedSearchFilter,
 } from "@austechmap/contracts";
+
+import { saveSearchAction } from "../actions/retentionActions";
 
 import {
   MapCanvas,
@@ -49,6 +56,7 @@ export interface HomeMapShellProps {
   initialPoints: MapCompanyPoint[];
   initialBbox: Bbox;
   initialHubs?: RegionalHub[];
+  currentUser?: { email: string; role: string } | null;
 }
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -596,9 +604,21 @@ export function HomeMapShell({
   initialPoints,
   initialBbox,
   initialHubs,
+  currentUser,
 }: HomeMapShellProps) {
   const [points, setPoints] = useState(initialPoints);
   const [hubs, setHubs] = useState<RegionalHub[]>(initialHubs ?? []);
+
+  // Phase 7: Save Search Modal State
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [saveSearchName, setSaveSearchName] = useState("");
+  const [saveAlertFrequency, setSaveAlertFrequency] =
+    useState<AlertFrequency>("never");
+  const [isSavingSearch, setIsSavingSearch] = useState(false);
+  const [saveSuccessMessage, setSaveSuccessMessage] = useState<string | null>(
+    null,
+  );
+  const [saveErrorMessage, setSaveErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialHubs && initialHubs.length > 0) return;
@@ -650,7 +670,11 @@ export function HomeMapShell({
         sa4Code: meta.sa4Code,
       }));
   }, [hubs]);
-  const [query, setQuery] = useState("");
+  const router = useRouter();
+  const [query, setQuery] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return new URLSearchParams(window.location.search).get("q") ?? "";
+  });
   const [searchResults, setSearchResults] = useState<
     CompanySearchResult[] | null
   >(null);
@@ -658,11 +682,36 @@ export function HomeMapShell({
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [showMapMobile, setShowMapMobile] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [sponsorshipOnly, setSponsorshipOnly] = useState(false);
-  const [regionalOnly, setRegionalOnly] = useState(false);
-  const [activeHubCity, setActiveHubCity] = useState<string | null>(null);
-  const [cameraTarget, setCameraTarget] = useState<CameraTarget | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return new URLSearchParams(window.location.search).get("category") ?? "";
+  });
+  const [sponsorshipOnly, setSponsorshipOnly] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return Boolean(new URLSearchParams(window.location.search).get("sponsorship"));
+  });
+  const [regionalOnly, setRegionalOnly] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return Boolean(new URLSearchParams(window.location.search).get("regional"));
+  });
+  const [activeHubCity, setActiveHubCity] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    const hub = new URLSearchParams(window.location.search).get("hub");
+    return hub && HUB_METADATA[hub] ? hub : null;
+  });
+  const [cameraTarget, setCameraTarget] = useState<CameraTarget | null>(() => {
+    if (typeof window === "undefined") return null;
+    const hub = new URLSearchParams(window.location.search).get("hub");
+    if (hub && HUB_METADATA[hub]) {
+      const hubMeta = HUB_METADATA[hub];
+      return {
+        center: hubMeta.center,
+        zoom: hubMeta.zoom,
+        timestamp: Date.now(),
+      };
+    }
+    return null;
+  });
   const [currentBbox, setCurrentBbox] = useState<Bbox>(initialBbox);
   const [currentZoom, setCurrentZoom] = useState<number | null>(null);
   const [activeDirectoryTab, setActiveDirectoryTab] = useState<
@@ -672,6 +721,56 @@ export function HomeMapShell({
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const didMountMapFetchRef = useRef(false);
+
+  const computeDefaultSearchName = useCallback(() => {
+    const parts: string[] = [];
+    if (activeHubCity) parts.push(activeHubCity);
+    if (selectedCategory) {
+      const catObj = categories.find((c) => c.key === selectedCategory);
+      parts.push(catObj ? catObj.label : selectedCategory);
+    }
+    if (sponsorshipOnly) parts.push("482 Sponsors");
+    if (regionalOnly && !activeHubCity) parts.push("Regional Hubs");
+    if (query) parts.push(`"${query}"`);
+    return parts.length > 0 ? parts.join(" · ") : "Australia Tech Ecosystem";
+  }, [activeHubCity, categories, query, regionalOnly, selectedCategory, sponsorshipOnly]);
+
+  const handleSaveSearchSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentUser) {
+      router.push("/sign-in?callbackUrl=/");
+      return;
+    }
+    setIsSavingSearch(true);
+    setSaveErrorMessage(null);
+    setSaveSuccessMessage(null);
+
+    const activeHubMeta = activeHubCity ? HUB_METADATA[activeHubCity] : undefined;
+    const filters: SavedSearchFilter = {
+      query: query || undefined,
+      category: selectedCategory || undefined,
+      sponsorship: sponsorshipOnly ? "current" : undefined,
+      regional: regionalOnly || undefined,
+      hubCity: activeHubCity || undefined,
+      sa4Code: activeHubMeta?.sa4Code,
+    };
+
+    const res = await saveSearchAction(
+      saveSearchName.trim() || computeDefaultSearchName(),
+      filters,
+      saveAlertFrequency,
+    );
+    setIsSavingSearch(false);
+    if (res.success) {
+      setSaveSuccessMessage("Saved! Manage in your Account.");
+      setTimeout(() => {
+        setShowSaveModal(false);
+        setSaveSuccessMessage(null);
+      }, 1500);
+    } else {
+      setSaveErrorMessage(res.error ?? "Failed to save search");
+    }
+  };
 
   const handleZoomIn = () => {
     const zoom = (currentZoom ?? 4) + 1;
@@ -1077,6 +1176,21 @@ export function HomeMapShell({
                 Reset
               </button>
             )}
+
+            <button
+              type="button"
+              onClick={() => {
+                setSaveSearchName(computeDefaultSearchName());
+                setSaveErrorMessage(null);
+                setSaveSuccessMessage(null);
+                setShowSaveModal(true);
+              }}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition-all shadow-2xs sm:ml-auto"
+              title="Save current search criteria and set opportunity alerts"
+            >
+              <Bookmark className="h-3.5 w-3.5 text-terracotta-700" />
+              <span>Save Search</span>
+            </button>
           </div>
         </div>
 
@@ -1115,6 +1229,161 @@ export function HomeMapShell({
           })}
         </div>
       </div>
+
+      {/* Save Search Modal */}
+      {showSaveModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-900/50 backdrop-blur-xs">
+          <div className="relative w-full max-w-md rounded-2xl border border-surface-border bg-white p-6 shadow-xl">
+            <button
+              type="button"
+              onClick={() => setShowSaveModal(false)}
+              className="absolute top-4 right-4 rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            <div className="flex items-center gap-2.5 mb-4">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-terracotta-50 text-terracotta-700 border border-terracotta-200/80">
+                <Bookmark className="h-4 w-4" />
+              </span>
+              <div>
+                <h3 className="font-heading text-base font-bold text-navy-900">
+                  Save Opportunity Search
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Bookmark these criteria &amp; receive verified vacancy alerts
+                </p>
+              </div>
+            </div>
+
+            {saveSuccessMessage ? (
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center">
+                <CheckCircle2 className="mx-auto h-6 w-6 text-emerald-600 mb-1" />
+                <p className="text-xs font-bold text-emerald-900">{saveSuccessMessage}</p>
+              </div>
+            ) : !currentUser ? (
+              <div className="space-y-4">
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Signing in with your email lets you save search criteria, track companies and
+                    regional hubs, and receive low-noise opportunity alerts.
+                  </p>
+                </div>
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowSaveModal(false)}
+                    className="rounded-xl border border-surface-border px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  >
+                    Cancel
+                  </button>
+                  <Link
+                    href="/sign-in?callbackUrl=/"
+                    className="rounded-xl bg-navy-900 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-slate-800 transition-colors"
+                  >
+                    Sign in to Save
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleSaveSearchSubmit} className="space-y-4">
+                {saveErrorMessage && (
+                  <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-800">
+                    {saveErrorMessage}
+                  </div>
+                )}
+
+                <div>
+                  <label className="block font-heading text-xs font-bold text-navy-900 mb-1">
+                    Search Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={saveSearchName}
+                    onChange={(e) => setSaveSearchName(e.target.value)}
+                    placeholder="e.g. Adelaide Space & AI Companies"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-navy-900 placeholder:text-slate-400 focus:border-navy-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-navy-900/15"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-heading text-xs font-bold text-navy-900 mb-1">
+                    Alert Frequency
+                  </label>
+                  <select
+                    value={saveAlertFrequency}
+                    onChange={(e) => setSaveAlertFrequency(e.target.value as AlertFrequency)}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-navy-900 focus:border-navy-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-navy-900/15 cursor-pointer"
+                  >
+                    <option value="never">In-App Only (No email digest)</option>
+                    <option value="daily">Daily Opportunity Digest</option>
+                    <option value="weekly">Weekly Opportunity Digest</option>
+                    <option value="instant">Instant Updates (Material changes)</option>
+                  </select>
+                </div>
+
+                <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+                  <span className="block font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                    Active Filters:
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {query && (
+                      <span className="rounded bg-white px-2 py-0.5 text-[10px] font-medium text-slate-700 border border-slate-200">
+                        Query: &quot;{query}&quot;
+                      </span>
+                    )}
+                    {activeHubCity && (
+                      <span className="rounded bg-white px-2 py-0.5 text-[10px] font-medium text-slate-700 border border-slate-200">
+                        Hub: {activeHubCity}
+                      </span>
+                    )}
+                    {selectedCategory && (
+                      <span className="rounded bg-white px-2 py-0.5 text-[10px] font-medium text-slate-700 border border-slate-200">
+                        Sector: {selectedCategory}
+                      </span>
+                    )}
+                    {sponsorshipOnly && (
+                      <span className="rounded bg-terracotta-50 text-terracotta-800 px-2 py-0.5 text-[10px] font-medium border border-terracotta-200">
+                        482 Sponsor
+                      </span>
+                    )}
+                    {regionalOnly && (
+                      <span className="rounded bg-emerald-50 text-emerald-800 px-2 py-0.5 text-[10px] font-medium border border-emerald-200">
+                        Regional
+                      </span>
+                    )}
+                    {!query && !activeHubCity && !selectedCategory && !sponsorshipOnly && !regionalOnly && (
+                      <span className="text-[11px] text-slate-500 italic">
+                        All verified technology employers in Australia
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => setShowSaveModal(false)}
+                    disabled={isSavingSearch}
+                    className="rounded-xl border border-surface-border px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingSearch}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-terracotta-700 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-terracotta-800 transition-colors disabled:opacity-70"
+                  >
+                    {isSavingSearch && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                    <span>Save Search</span>
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Screen reader live region */}
       <div aria-live="polite" className="sr-only">
