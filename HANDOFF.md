@@ -112,6 +112,10 @@ Everything since the 2026-09-04 handoff:
   - Documents formal employer dispute, correction, and APP 11 cryptographic erasure procedures.
 - **Notification Provider Failure Handling & Backlog Recovery Suite** (`apps/web/src/lib/retention/failureRecovery.test.ts`):
   - 4 automated integration tests verifying Resend API 500 error handling, network drops, backlog recovery replay, and partial batch resilience without recording false deliveries.
+- **System Threat Model & Security Architecture** (`docs/security/threat-model.md`):
+  - Comprehensive STRIDE threat analysis covering public endpoints, SSRF egress guards, TOTP MFA, least-privilege staff roles (`user < reviewer < admin`), audit ledgers, and secret rotation procedures.
+- **API Concurrency & Load Benchmark Report** (`apps/web/scripts/run-load-benchmark.mjs`, `docs/operations/load-benchmark-results.md`):
+  - Benchmarked public APIs under 10 concurrent workers (200 requests total): Shallow health check at **309 req/s** (23ms median), Trigram company search at **76 req/s** (64ms median), and Opportunity Match engine at **55 req/s** (129ms median) with 100% success rate.
 - Total test coverage: **175 automated tests passing** across contracts (33) and web (142), 0 lint errors, 0 type errors, Next.js Turbopack production build passing cleanly across 37 routes.
 
 ## Work remaining
