@@ -116,6 +116,10 @@ Everything since the 2026-09-04 handoff:
   - Comprehensive STRIDE threat analysis covering public endpoints, SSRF egress guards, TOTP MFA, least-privilege staff roles (`user < reviewer < admin`), audit ledgers, and secret rotation procedures.
 - **API Concurrency & Load Benchmark Report** (`apps/web/scripts/run-load-benchmark.mjs`, `docs/operations/load-benchmark-results.md`):
   - Benchmarked public APIs under 10 concurrent workers (200 requests total): Shallow health check at **309 req/s** (23ms median), Trigram company search at **76 req/s** (64ms median), and Opportunity Match engine at **55 req/s** (129ms median) with 100% success rate.
+- **System Operator Manual & Runbook** (`docs/operations/operator-manual.md`):
+  - Fulfills the Phase 8 Exit Gate: establishes standard operational procedures to diagnose, disable, replay, restore, and correct the system without direct database surgery.
+- **Controlled Beta Launch Protocol & Defect Triage Guide** (`docs/operations/beta-launch-guide.md`):
+  - Onboarding protocol for Australian job seekers, skilled migrants, and regional movers; Severity 1–4 defect resolution SLA matrix.
 - Total test coverage: **175 automated tests passing** across contracts (33) and web (142), 0 lint errors, 0 type errors, Next.js Turbopack production build passing cleanly across 37 routes.
 
 ## Work remaining

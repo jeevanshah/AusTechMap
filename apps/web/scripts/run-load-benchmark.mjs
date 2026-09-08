@@ -103,7 +103,7 @@ async function main() {
   try {
     const probe = await fetch(`${BASE_URL}/api/health`);
     if (!probe.ok) throw new Error(`Status ${probe.status}`);
-  } catch (err) {
+  } catch {
     console.error(`ERROR: Server at ${BASE_URL} is not reachable. Ensure 'npm run start -w apps/web' is running.`);
     process.exit(1);
   }

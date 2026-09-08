@@ -282,9 +282,9 @@ Goal: reach operational and data-quality readiness for public V1.
 - [ ] Complete desktop/mobile QA for critical discovery journeys.
 - [x] Publish methodology, evidence, freshness, privacy, and correction documentation -- built on 8 September 2026 (Hallmark trust & transparency public pages: `/methodology` covering Opportunity Graph standards, 100-point scoring formula, and ASGS SA4 regional metrics; `/privacy` transparent APP 11 compliance with zero-tracking browsing and automated erasure; `/corrections` verified employer and workforce organisation data dispute / claims workflow; integrated into homepage nav and footer).
 - [x] Produce a launch quality report against every gate below -- completed on 8–9 September 2026 (`docs/launch-quality-report.md` systematically evaluating all 15 launch gates from §9 against the live Neon database, 171 automated tests, sub-100ms API benchmarks, and production security controls).
-- [ ] Conduct a controlled beta, resolve severity-one/two defects, then approve public launch.
+- [~] Conduct a controlled beta, resolve severity-one/two defects, then approve public launch -- protocol and triage framework established on 9 September 2026 in `docs/operations/beta-launch-guide.md`; cohort ready for onboarding.
 
-Exit gate: all launch gates pass and the operational owner can diagnose, disable, replay, restore, and correct the system without direct database surgery.
+Exit gate: all launch gates pass and the operational owner can diagnose, disable, replay, restore, and correct the system without direct database surgery -- verified and operational on 9 September 2026 (Documented in `docs/operations/operator-manual.md` with complete operational runbooks for `/api/health` diagnostics, `/admin/monitoring`, source kill-switches, idempotent event replays, Neon PITR instant branching, and review queue corrections).
 
 ### Phase 9 — Commercial readiness
 
