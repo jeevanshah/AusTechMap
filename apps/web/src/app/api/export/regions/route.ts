@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPool } from "../../../../lib/db";
 import { getRegionOpportunity } from "../../../../lib/queries/getRegionOpportunity";
+import { enforceApiRateLimit } from "../../../../lib/security/apiRateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,13 @@ function escapeCsvField(val: unknown): string {
 
 export async function GET() {
   const pool = getPool();
+  const rateLimitResponse = await enforceApiRateLimit(pool, {
+    scope: "api_export_regions",
+    limit: 20,
+    windowSeconds: 60,
+    lockSeconds: 60,
+  });
+  if (rateLimitResponse) return rateLimitResponse;
 
   try {
     const { rows: regionRows } = await pool.query<{

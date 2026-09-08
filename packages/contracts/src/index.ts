@@ -2,9 +2,16 @@ import { z } from "zod";
 
 export const HealthResponseSchema = z.object({
   service: z.enum(["web", "ingestion"]),
-  status: z.literal("ok"),
+  status: z.enum(["ok", "degraded"]),
   version: z.literal(1),
   runId: z.string().min(1).optional(),
+  diagnostics: z
+    .object({
+      database: z.string(),
+      latencyMs: z.number().optional(),
+      latestMigration: z.string().nullable().optional(),
+    })
+    .optional(),
 });
 
 export type HealthResponse = z.infer<typeof HealthResponseSchema>;

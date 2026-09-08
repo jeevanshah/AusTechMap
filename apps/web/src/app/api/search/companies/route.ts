@@ -2,6 +2,7 @@ import { CompanySearchResponseSchema } from "@austechmap/contracts";
 
 import { DatabaseNotConfiguredError, getPool } from "../../../../lib/db";
 import { searchCompanies } from "../../../../lib/queries/searchCompanies";
+import { enforceApiRateLimit } from "../../../../lib/security/apiRateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -20,8 +21,17 @@ export async function GET(request: Request): Promise<Response> {
   const regional = searchParams.get("regional") === "true";
 
   try {
+    const pool = getPool();
+    const rateLimitResponse = await enforceApiRateLimit(pool, {
+      scope: "api_search_companies",
+      limit: 120,
+      windowSeconds: 60,
+      lockSeconds: 60,
+    });
+    if (rateLimitResponse) return rateLimitResponse;
+
     const results = await searchCompanies(
-      getPool(),
+      pool,
       query,
       category,
       sponsorship,

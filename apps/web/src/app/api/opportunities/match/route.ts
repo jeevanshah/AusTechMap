@@ -5,6 +5,7 @@ import {
 
 import { DatabaseNotConfiguredError, getPool } from "../../../../lib/db";
 import { matchOpportunities } from "../../../../lib/opportunity/matcher";
+import { enforceApiRateLimit } from "../../../../lib/security/apiRateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -32,7 +33,16 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   try {
-    const result = await matchOpportunities(getPool(), parsed.data);
+    const pool = getPool();
+    const rateLimitResponse = await enforceApiRateLimit(pool, {
+      scope: "api_opportunities_match",
+      limit: 60,
+      windowSeconds: 60,
+      lockSeconds: 60,
+    });
+    if (rateLimitResponse) return rateLimitResponse;
+
+    const result = await matchOpportunities(pool, parsed.data);
     const validated = OpportunityMatchResponseSchema.parse(result);
 
     return Response.json(validated, {
@@ -94,7 +104,16 @@ export async function GET(request: Request): Promise<Response> {
   });
 
   try {
-    const result = await matchOpportunities(getPool(), preferences);
+    const pool = getPool();
+    const rateLimitResponse = await enforceApiRateLimit(pool, {
+      scope: "api_opportunities_match",
+      limit: 60,
+      windowSeconds: 60,
+      lockSeconds: 60,
+    });
+    if (rateLimitResponse) return rateLimitResponse;
+
+    const result = await matchOpportunities(pool, preferences);
     const validated = OpportunityMatchResponseSchema.parse(result);
 
     return Response.json(validated, {

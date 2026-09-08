@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPool } from "../../../../lib/db";
+import { enforceApiRateLimit } from "../../../../lib/security/apiRateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -13,13 +14,20 @@ function escapeCsvField(val: unknown): string {
 }
 
 export async function GET(request: Request) {
+  const pool = getPool();
+  const rateLimitResponse = await enforceApiRateLimit(pool, {
+    scope: "api_export_companies",
+    limit: 20,
+    windowSeconds: 60,
+    lockSeconds: 60,
+  });
+  if (rateLimitResponse) return rateLimitResponse;
+
   const { searchParams } = new URL(request.url);
   const category = searchParams.get("category");
   const sponsorship = searchParams.get("sponsorship") === "true";
   const regional = searchParams.get("regional") === "true";
   const hiring = searchParams.get("hiring") === "true";
-
-  const pool = getPool();
 
   const query = `
     SELECT

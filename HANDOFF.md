@@ -77,6 +77,31 @@ Everything since the 2026-09-04 handoff:
   - "Share Card" and "Export CSV" action buttons added to employer and regional profile headers.
 - Total test coverage: **161 automated tests passing** across contracts (33) and web (128), 0 lint errors, 0 type errors, clean Next.js Turbopack build across 33 routes.
 
+**Phase 8 (Production Hardening, Security, Observability & Launch Readiness) completed 8 September 2026**:
+- **Strict HTTP Security Headers** (`next.config.ts`):
+  - Content-Security-Policy (CSP) restricting scripts, styles, fonts, connect, frames, and objects with strict defaults.
+  - Strict-Transport-Security (`max-age=63072000; includeSubDomains; preload`).
+  - `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`.
+  - Granular Permissions-Policy disabling camera, microphone, geolocation, and browsing-topics.
+- **SSRF Protection & Safe URL Resolution** (`apps/web/src/lib/security/ssrf.ts` + `ssrf.test.ts`):
+  - Robust IP inspection blocking IPv4/IPv6 loopback, link-local, private networks (RFC 1918, RFC 4193), multicast, reserved ranges, and AWS/GCP/Azure link-local metadata addresses (`169.254.169.254`).
+  - Pre-request DNS resolution verification preventing DNS rebinding attacks on crawler or outbound fetch operations.
+- **Postgres-Backed Public Rate Limiting** (`apps/web/src/lib/security/apiRateLimit.ts`):
+  - Built-in IP rate limiter guarding abuse-prone public endpoints: `/api/opportunities/match`, `/api/export/companies`, `/api/export/regions`, and `/api/search/companies`.
+  - Integrated with `checkRateLimit` and `currentClientIp` with graceful fail-open protection.
+- **Deep Diagnostic Health Check** (`/api/health?deep=true`, contracts `HealthResponseSchema`):
+  - Validates Neon database connection latency (ms) and queries `schema_migrations` for the latest applied migration.
+  - Returns `200 ok` or `503 degraded` with diagnostics.
+- **Staff-Only Monitoring & Anomaly Detection Dashboard** (`/admin/monitoring`):
+  - Live dashboard inspecting Neon database roundtrip latency, schema migration state, and entity inventories (companies, jobs, events, deliveries).
+  - Automated anomaly detectors highlighting data quality gaps: active companies with missing geographic coordinates, unassigned taxonomy categories, and evidence older than 90 days.
+- **Hallmark Trust & Transparency Public Pages**:
+  - `/methodology`: comprehensive documentation covering Opportunity Graph standards, 100-point Opportunity Match scoring model, ABS ASGS SA4 regional labour indicators, and Home Affairs visa sponsorship verification criteria.
+  - `/privacy`: APP 11 compliant transparent policy detailing zero-tracking anonymous browsing and automated cryptographic account erasure.
+  - `/corrections`: verified employer and workforce organisation profile updates, claims, and data dispute workflow.
+  - Homepage masthead navigation and footer wired to public trust pages and CSV exports.
+- Total test coverage: **171 automated tests passing** across contracts (33) and web (138), 0 lint errors, 0 type errors, Next.js Turbopack production build passing cleanly across 37 routes.
+
 ## Work remaining
 
 Per `IMPLEMENTATION_PLAN.md`'s own phase checklists:

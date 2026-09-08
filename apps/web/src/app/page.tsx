@@ -179,7 +179,12 @@ export default async function Home() {
           >
             Regions
           </a>
-          <span className="text-slate-400 cursor-not-allowed">Insights</span>
+          <Link
+            href="/methodology"
+            className="hover:text-navy-900 transition-colors"
+          >
+            Methodology
+          </Link>
         </nav>
 
         <div className="flex items-center gap-2.5">
@@ -340,6 +345,31 @@ export default async function Home() {
           currentUser={user}
         />
       )}
+
+      <footer className="mt-8 border-t border-surface-border pt-6 pb-10 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-500 font-mono">
+        <div className="flex items-center gap-2">
+          <span className="font-semibold text-navy-900">Australia Tech Map</span>
+          <span>•</span>
+          <span>National Opportunity Graph</span>
+        </div>
+        <div className="flex items-center gap-5 flex-wrap font-sans text-xs text-slate-600">
+          <Link href="/methodology" className="hover:text-navy-900 transition-colors">
+            Methodology
+          </Link>
+          <Link href="/privacy" className="hover:text-navy-900 transition-colors">
+            Privacy Policy (APP 11)
+          </Link>
+          <Link href="/corrections" className="hover:text-navy-900 transition-colors">
+            Corrections & Claims
+          </Link>
+          <a href="/api/export/companies" download className="hover:text-navy-900 transition-colors">
+            Export Companies (CSV)
+          </a>
+          <a href="/api/export/regions" download className="hover:text-navy-900 transition-colors">
+            Export Regions (CSV)
+          </a>
+        </div>
+      </footer>
     </main>
   );
 }

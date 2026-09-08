@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import {
@@ -47,8 +48,17 @@ export default async function AdminLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <div className="border-b border-emerald-950/15 bg-slate-50 px-4 py-2 text-xs text-slate-600">
-        Signed in as {actor.email} ({actor.role})
+      <div className="flex items-center justify-between border-b border-emerald-950/15 bg-slate-50 px-6 py-2 text-xs text-slate-600">
+        <div className="flex items-center gap-4 font-mono">
+          <span className="font-bold text-slate-900 uppercase">Staff</span>
+          <Link href="/admin/companies" className="hover:text-slate-900 transition-colors">Companies</Link>
+          <Link href="/admin/review" className="hover:text-slate-900 transition-colors">Review</Link>
+          <Link href="/admin/geography" className="hover:text-slate-900 transition-colors">Geography</Link>
+          <Link href="/admin/monitoring" className="text-emerald-800 font-semibold hover:underline">Monitoring</Link>
+        </div>
+        <div>
+          Signed in as {actor.email} ({actor.role})
+        </div>
       </div>
       {children}
     </div>
