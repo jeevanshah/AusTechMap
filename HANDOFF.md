@@ -60,13 +60,29 @@ Everything since the 2026-09-04 handoff:
 - CLI runner `apps/web/scripts/run-retention-pipeline.mjs` for on-demand execution, local verification, or cron invocation.
 - 154 tests passing across contracts (33) and web (121) suites, 0 lint errors, 0 type errors, Next.js Turbopack production build passing.
 
+**Phase 7 (Golden Query Validation & Sourced Insight Cards) completed 8 September 2026**:
+- Golden Query Scorecard Harness (`evaluate-golden-queries.mjs`, `goldenQueries.ts`, `goldenQueries.test.ts`):
+  - Validated all golden discovery queries against `docs/golden-queries.md`.
+  - Achieved **11 / 11 queries passing with Grade 3 (100%)** and **0 hard constraint violations** (average query latency 72ms).
+  - Strictly verified empty-state behavior for GQ-24 (`quantum blockchain astronaut` in Hobart) via Opportunity Match relevance filtering.
+  - Strictly verified explicit sponsorship constraint for GQ-19 (`software engineer` in Sydney needing sponsorship).
+- Sourced, Timestamped Insight Cards (`next/og`):
+  - Dynamic 1200x630 OpenGraph employer intelligence card at `/api/og/company/[slug]` with verified active role counts, sponsorship status, and regional classification.
+  - Dynamic 1200x630 OpenGraph regional ecosystem card at `/api/og/region/[code]` with ABS ASGS SA4 regional opportunity score, mapped employer depth, and migration badges.
+  - OpenGraph and Twitter cards integrated into company and region profiles.
+- CSV Data Exports:
+  - `/api/export/companies`: filtered CSV stream with verified employer details, domain, careers URL, regional status, sponsorship evidence, and active role counts.
+  - `/api/export/regions`: complete ASGS SA4 regional ecosystem CSV export with opportunity scores, suppression states, mapped employers, and migration categories.
+- User Experience:
+  - "Share Card" and "Export CSV" action buttons added to employer and regional profile headers.
+- Total test coverage: **161 automated tests passing** across contracts (33) and web (128), 0 lint errors, 0 type errors, clean Next.js Turbopack build across 33 routes.
+
 ## Work remaining
 
 Per `IMPLEMENTATION_PLAN.md`'s own phase checklists:
-- Phase 4: golden-query validation (21 of 25 still untestable -- blocked on Phase 5/6 data), formal load test (needs >=1,000 employers, currently 133).
+- Phase 4: formal load test (needs >=1,000 employers, currently 133).
 - Phase 5: scaling source registration towards 300 sources; employer role/skill signal derivation.
 - Phase 6A: surface `evidence.confidence` in the sponsorship UI; stale/superseded/rejected evidence-status field.
-- Phase 7: golden query validation; shareable intelligence cards (§9.9).
 - Phase 8: production hardening (expanded employer cohort to 1,000+, load testing, backup/restore drills, launch quality report).
 - **R2/Cloudflare setup for the account-deletion ledger is deliberately deferred** until real users exist (user's explicit call) — see Known failures and risks below for exactly what that means operationally.
 - Two stray `admin`-role user rows exist from bootstrapping mishaps, pending the user's decision on cleanup (not urgent, not a security hole — see below).

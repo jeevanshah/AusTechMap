@@ -68,10 +68,32 @@ export async function generateMetadata({
   try {
     const opportunity = await loadRegion(code);
     if (!opportunity) return { title: "Region not found" };
+    const ogImageUrl = `/api/og/region/${opportunity.region.code}`;
     return {
       title: `${opportunity.region.name} tech opportunities`,
       description: `Evidence-backed technology employers, active roles, labour signals and migration context for ${opportunity.region.name}.`,
       alternates: { canonical: `/regions/${opportunity.region.code}` },
+      openGraph: {
+        title: `${opportunity.region.name} Tech Ecosystem — Australia Tech Map`,
+        description: `Evidence-backed technology employers, active roles, labour signals and migration context for ${opportunity.region.name}.`,
+        url: `/regions/${opportunity.region.code}`,
+        siteName: "Australia Tech Map",
+        images: [
+          {
+            url: ogImageUrl,
+            width: 1200,
+            height: 630,
+            alt: `${opportunity.region.name} Tech Opportunities`,
+          },
+        ],
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${opportunity.region.name} Tech Ecosystem — Australia Tech Map`,
+        description: `Evidence-backed technology employers, active roles, labour signals and migration context for ${opportunity.region.name}.`,
+        images: [ogImageUrl],
+      },
     };
   } catch {
     return { title: "Australia Tech Map" };
@@ -144,12 +166,31 @@ export default async function RegionPage({
         >
           <ArrowLeft className="mr-2 h-4 w-4" /> Directory
         </Link>
-        <a
-          href={`/api/regions/${region.code}/opportunity`}
-          className="inline-flex min-h-11 items-center whitespace-nowrap text-sm font-semibold text-terracotta-700 underline decoration-slate-300 underline-offset-4 hover:decoration-terracotta-700 active:text-terracotta-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
-        >
-          API record <ArrowUpRight className="ml-1.5 h-4 w-4" />
-        </a>
+        <div className="flex items-center gap-4 flex-wrap">
+          <a
+            href={`/api/og/region/${region.code}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-11 items-center whitespace-nowrap text-sm font-semibold text-slate-700 hover:text-navy-900 active:text-terracotta-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
+            title="Open high-resolution regional share card"
+          >
+            Share card <ArrowUpRight className="ml-1.5 h-4 w-4" />
+          </a>
+          <a
+            href="/api/export/regions"
+            download
+            className="inline-flex min-h-11 items-center whitespace-nowrap text-sm font-semibold text-slate-700 hover:text-navy-900 active:text-terracotta-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
+            title="Download Australian regional ecosystem dataset"
+          >
+            Export CSV <ArrowUpRight className="ml-1.5 h-4 w-4" />
+          </a>
+          <a
+            href={`/api/regions/${region.code}/opportunity`}
+            className="inline-flex min-h-11 items-center whitespace-nowrap text-sm font-semibold text-terracotta-700 underline decoration-slate-300 underline-offset-4 hover:decoration-terracotta-700 active:text-terracotta-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
+          >
+            API record <ArrowUpRight className="ml-1.5 h-4 w-4" />
+          </a>
+        </div>
       </nav>
 
       <header className="grid gap-5 py-10 sm:py-14 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">

@@ -243,6 +243,11 @@ export function scoreCompany(
     }
   }
 
+  // --- HARD FILTER: Sponsorship ---
+  if (preferences.requiresSponsorship && !company.has_sponsorship_evidence) {
+    return null;
+  }
+
   // --- 1. Role Fit (Max 30) ---
   let roleFitScore = 0;
   const targetRoleFamily = preferences.roleFamily?.trim().toLowerCase();
@@ -263,13 +268,40 @@ export function scoreCompany(
     roleFitScore = company.jobs.length > 0 ? 25 : 18;
   } else if (matchingRoleJobs.length > 0) {
     roleFitScore = 30;
-  } else if (
-    company.primary_category?.toLowerCase().includes("software") ||
-    company.primary_category?.toLowerCase().includes("tech")
-  ) {
-    roleFitScore = 18;
   } else {
-    roleFitScore = 8;
+    const knownRoleFamilies = [
+      "software-engineering",
+      "data",
+      "ai-ml",
+      "cloud-platform",
+      "security",
+      "quality",
+      "product-delivery",
+      "design",
+      "architecture",
+      "it-infrastructure",
+    ];
+    if (knownRoleFamilies.includes(targetRoleFamily)) {
+      if (company.jobs.length > 0) {
+        roleFitScore = 15;
+      } else if (
+        !company.primary_category ||
+        company.primary_category.toLowerCase().includes("software") ||
+        company.primary_category.toLowerCase().includes("tech") ||
+        company.primary_category.toLowerCase().includes("saas") ||
+        company.primary_category.toLowerCase().includes("cloud") ||
+        company.primary_category.toLowerCase().includes("data") ||
+        company.primary_category.toLowerCase().includes("ai") ||
+        company.primary_category.toLowerCase().includes("fintech") ||
+        company.primary_category.toLowerCase().includes("security")
+      ) {
+        roleFitScore = 10;
+      } else {
+        roleFitScore = 0;
+      }
+    } else {
+      roleFitScore = 0;
+    }
   }
 
   // Seniority adjustment (+3 bonus if matches requested experience band)
@@ -417,6 +449,21 @@ export function scoreCompany(
       ),
     ),
   );
+
+  // Relevance Cutoff:
+  // If user specified role family or skills, but company matches neither, reject match.
+  if (
+    (targetRoleFamily || userSkills.length > 0) &&
+    roleFitScore === 0 &&
+    matchedSkills.length === 0
+  ) {
+    return null;
+  }
+
+  // Baseline relevance threshold
+  if (totalScore < 40) {
+    return null;
+  }
 
   const scoreComponents: OpportunityScoreComponents = {
     roleFit: roleFitScore,

@@ -7,8 +7,10 @@ import {
   ArrowLeft,
   Calendar,
   CheckCircle2,
+  Download,
   ExternalLink,
   Globe,
+  Share2,
   ShieldCheck,
 } from "lucide-react";
 
@@ -257,11 +259,34 @@ export async function generateMetadata({
     ? company.research_claim.reason.slice(0, 150)
     : `${company.display_name} on Australia Tech Map.`;
 
+  const ogImageUrl = `/api/og/company/${company.slug}`;
+
   return {
     title: company.display_name,
     description,
     alternates: { canonical: `/companies/${company.slug}` },
     robots: company.status === "disabled" ? { index: false } : undefined,
+    openGraph: {
+      title: `${company.display_name} — Australian Tech Intelligence`,
+      description,
+      url: `/companies/${company.slug}`,
+      siteName: "Australia Tech Map",
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: company.display_name,
+        },
+      ],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${company.display_name} — Australian Tech Intelligence`,
+      description,
+      images: [ogImageUrl],
+    },
   };
 }
 
@@ -344,12 +369,33 @@ export default async function CompanyProfilePage({
           <h1 className="font-heading text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl text-balance">
             {company.display_name}
           </h1>
-          <WatchCompanyButton
-            companyId={company.id}
-            companySlug={company.slug}
-            initialWatching={isWatching}
-            isSignedIn={Boolean(userId)}
-          />
+          <div className="flex items-center gap-2 flex-wrap">
+            <a
+              href={`/api/og/company/${company.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors"
+              title="View high-resolution shareable card"
+            >
+              <Share2 className="h-3.5 w-3.5 text-slate-500" />
+              <span>Share Card</span>
+            </a>
+            <a
+              href="/api/export/companies"
+              download
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors"
+              title="Download verified employer CSV dataset"
+            >
+              <Download className="h-3.5 w-3.5 text-slate-500" />
+              <span>Export CSV</span>
+            </a>
+            <WatchCompanyButton
+              companyId={company.id}
+              companySlug={company.slug}
+              initialWatching={isWatching}
+              isSignedIn={Boolean(userId)}
+            />
+          </div>
         </div>
         <dl className="flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs text-slate-600 tabular-nums">
           <div className="flex items-center gap-1.5">
