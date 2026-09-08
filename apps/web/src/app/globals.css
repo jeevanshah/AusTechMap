@@ -67,6 +67,11 @@
   color-scheme: light;
 }
 
+html,
+body {
+  overflow-x: clip;
+}
+
 * {
   box-sizing: border-box;
 }

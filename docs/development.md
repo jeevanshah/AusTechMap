@@ -80,6 +80,18 @@ After migration `0015`, scheduled workers should crawl only due active sources:
 workers/ingestion/.venv/Scripts/python.exe -m austechmap_ingestion crawl-jobs --due
 ```
 
+After migration `0016`, generate append-only SA4 score or suppression records without using raw
+snapshot storage:
+
+```powershell
+$env:PYTHONPATH = "workers/ingestion/src"
+workers/ingestion/.venv/Scripts/python.exe -m austechmap_ingestion score-regions
+workers/ingestion/.venv/Scripts/python.exe -m austechmap_ingestion score-regions --region-code 101 --period-end 2026-08-31
+```
+
+The command is idempotent for the same region, period, methodology, and input fingerprint. A score
+can be `null`; inspect `suppressionReasons` rather than treating that as a failed run.
+
 Pause, quarantine, disable, or reactivate one exact provider/identifier pair with an operator reason:
 
 ```powershell
