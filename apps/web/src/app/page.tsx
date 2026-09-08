@@ -158,6 +158,15 @@ export default async function Home() {
           <span className="text-navy-900 font-semibold cursor-default border-b-2 border-terracotta-700 pb-0.5">
             Map
           </span>
+          <Link
+            href="/opportunities"
+            className="text-slate-700 hover:text-navy-900 transition-colors font-medium flex items-center gap-1"
+          >
+            <span>Opportunity Match</span>
+            <span className="rounded-full bg-terracotta-50 border border-terracotta-200 px-1.5 py-0.2 text-[10px] font-bold text-terracotta-800">
+              New
+            </span>
+          </Link>
           <a
             href="#directory-content"
             className="hover:text-navy-900 transition-colors"
@@ -171,7 +180,6 @@ export default async function Home() {
             Regions
           </a>
           <span className="text-slate-400 cursor-not-allowed">Insights</span>
-          <span className="text-slate-400 cursor-not-allowed">About</span>
         </nav>
 
         <div className="flex items-center gap-2.5">

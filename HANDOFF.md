@@ -40,13 +40,23 @@ Everything since the 2026-09-04 handoff:
 - User Account Hub (`/account`) with tabbed management for saved searches, watchlists, alerts, and privacy settings.
 - All contracts, queries, actions, and UI verified (26 contracts tests, 113 web tests, 0 lint errors, 0 type errors, Next.js Turbopack production build passing).
 
+**Phase 7 (Opportunity Match & Explainability Engine) completed 8 September 2026**:
+- Full 100-point weighted Opportunity Match algorithm according to PRODUCT_SPEC.md §18.2 (30% role fit, 20% active hiring, 15% skill alignment, 15% location/work-style fit, 10% momentum, 10% sponsorship/regional bonus).
+- Hard constraint filtering for strict location and strict work-style candidate requirements.
+- Deterministic SHA-256 query hashing for query deduplication, caching, and saved-search alerts.
+- Explainability breakdown (`topReasons` factual bullets, matched vs missing skills, component score bars, active open role links).
+- Contracts in `@austechmap/contracts` (`OpportunityMatchPreferences`, `OpportunityScoreComponents`, `OpportunityMatchResult`, `OpportunityMatchResponse`).
+- API route `POST /api/opportunities/match` & Server Action `matchOpportunitiesAction`.
+- Candidate intake UI at `/opportunities` (with `/match` redirect) with role family selector, popular Australian tech skills, remote/hybrid toggles, and direct integration with user watchlists and saved searches.
+- 149 tests passing across contracts (30) and web (119) suites, 0 lint errors, 0 type errors, Next.js Turbopack production build passing across 29 routes.
+
 ## Work remaining
 
 Per `IMPLEMENTATION_PLAN.md`'s own phase checklists:
 - Phase 4: golden-query validation (21 of 25 still untestable -- blocked on Phase 5/6 data), formal load test (needs >=1,000 employers, currently 133).
 - Phase 5: scaling source registration towards 300 sources; employer role/skill signal derivation.
 - Phase 6A: surface `evidence.confidence` in the sponsorship UI; stale/superseded/rejected evidence-status field.
-- Phase 7: Opportunity Match ranking algorithm (`POST /api/opportunities/search`) with component reasons; background change-event derivation worker; Resend email digest pipeline.
+- Phase 7: background change-event derivation worker; Resend email digest pipeline.
 - Phase 8: production hardening (expanded employer cohort to 1,000+, load testing, backup/restore drills, launch quality report).
 - **R2/Cloudflare setup for the account-deletion ledger is deliberately deferred** until real users exist (user's explicit call) — see Known failures and risks below for exactly what that means operationally.
 - Two stray `admin`-role user rows exist from bootstrapping mishaps, pending the user's decision on cleanup (not urgent, not a security hole — see below).

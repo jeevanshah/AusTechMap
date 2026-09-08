@@ -315,3 +315,101 @@ export const UserAlertsResponseSchema = z.object({
 
 export type UserAlertsResponse = z.infer<typeof UserAlertsResponseSchema>;
 
+// --- Phase 7: Opportunity Match & Explainability Engine ---
+
+export const OpportunityExperienceBandSchema = z.enum([
+  "entry",
+  "mid",
+  "senior",
+  "lead_principal",
+  "any",
+]);
+export type OpportunityExperienceBand = z.infer<
+  typeof OpportunityExperienceBandSchema
+>;
+
+export const OpportunityWorkStyleSchema = z.enum([
+  "onsite",
+  "hybrid",
+  "remote",
+  "any",
+]);
+export type OpportunityWorkStyle = z.infer<typeof OpportunityWorkStyleSchema>;
+
+export const OpportunityMatchPreferencesSchema = z.object({
+  roleFamily: z.string().optional(),
+  skills: z.array(z.string()).default([]),
+  experienceBand: OpportunityExperienceBandSchema.default("any"),
+  locations: z.array(z.string()).default([]),
+  locationRequired: z.boolean().default(false),
+  workStyle: OpportunityWorkStyleSchema.default("any"),
+  workStyleRequired: z.boolean().default(false),
+  requiresSponsorship: z.boolean().default(false),
+  prefersRegional: z.boolean().default(false),
+  limit: z.number().int().min(1).max(100).default(20),
+});
+
+export type OpportunityMatchPreferences = z.infer<
+  typeof OpportunityMatchPreferencesSchema
+>;
+
+export const OpportunityScoreComponentsSchema = z.object({
+  roleFit: z.number().min(0).max(30),
+  currentHiring: z.number().min(0).max(20),
+  skillFit: z.number().min(0).max(15),
+  locationWorkStyleFit: z.number().min(0).max(15),
+  hiringMomentum: z.number().min(0).max(10),
+  sponsorshipRegionalFit: z.number().min(0).max(10),
+  totalScore: z.number().min(0).max(100),
+});
+
+export type OpportunityScoreComponents = z.infer<
+  typeof OpportunityScoreComponentsSchema
+>;
+
+export const SampleActiveRoleSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string(),
+  locationText: z.string().nullable().optional(),
+  remoteType: z.string().nullable().optional(),
+  sourceUrl: z.string(),
+});
+
+export type SampleActiveRole = z.infer<typeof SampleActiveRoleSchema>;
+
+export const OpportunityMatchResultSchema = z.object({
+  companyId: z.string().uuid(),
+  companyName: z.string(),
+  companySlug: z.string(),
+  primaryCategory: z.string().nullable().optional(),
+  hqCity: z.string().nullable().optional(),
+  matchScore: z.number().min(0).max(100),
+  scoreComponents: OpportunityScoreComponentsSchema,
+  topReasons: z.array(z.string()),
+  matchedSkills: z.array(z.string()),
+  missingSkills: z.array(z.string()),
+  activeRolesCount: z.number().int().min(0),
+  sampleActiveRoles: z.array(SampleActiveRoleSchema),
+  hasSponsorshipEvidence: z.boolean(),
+  sponsorshipSummary: z.string().nullable().optional(),
+  isRegional: z.boolean(),
+  dataQuality: z.enum(["high", "medium", "low", "insufficient"]),
+  methodologyVersion: z.string(),
+  generatedAt: z.string(),
+});
+
+export type OpportunityMatchResult = z.infer<
+  typeof OpportunityMatchResultSchema
+>;
+
+export const OpportunityMatchResponseSchema = z.object({
+  version: z.literal(1),
+  queryHash: z.string(),
+  totalMatches: z.number().int().min(0),
+  matches: z.array(OpportunityMatchResultSchema),
+});
+
+export type OpportunityMatchResponse = z.infer<
+  typeof OpportunityMatchResponseSchema
+>;
+

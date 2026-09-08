@@ -253,9 +253,9 @@ Ship the Phase 0–6A slice — 100–200 employers, 3 ATS integrations, map/sea
 
 Goal: turn exploration into relevant, repeatable opportunity discovery.
 
-- [ ] Implement canonical preference filters for role, skills, location, work style, hiring state, and evidence preferences.
-- [ ] Build a weighted Opportunity Match with component-level reasons.
-- [ ] Store query hash, score components, model version, and generation time.
+- [x] Implement canonical preference filters for role, skills, location, work style, hiring state, and evidence preferences -- built on 8 September 2026.
+- [x] Build a weighted Opportunity Match with component-level reasons -- built on 8 September 2026 (PRODUCT_SPEC.md §18.2 100-point algorithm: 30% role fit, 20% active hiring, 15% skill alignment, 15% location/work style, 10% momentum, 10% sponsorship/regional bonus).
+- [x] Store query hash, score components, model version, and generation time -- built on 8 September 2026 (deterministic SHA-256 query hash, inspectable score breakdown, topReasons explainability bullets, REST API /api/opportunities/match, server action, and interactive candidate intake UI at /opportunities).
 - [ ] Validate ranking against golden queries and product-review judgements.
 - [x] Implement saved searches and employer/region watchlists -- built on 8 September 2026 (Migration `0017_saved_searches_and_watchlists.sql`, contracts, server actions, and full web UI). Users can save search queries with custom alert frequencies, watch verified employers or ABS SA4 regional hubs, and view in-app alerts. Full integration with APP 11 account deletion via `lib/retention/erasure-hooks.ts` registering against `lib/deletion/erasure.ts::registerErasureHook` to ensure personal data is immediately purged on account deletion. Tested and verified across contracts (26 tests) and web suites (113 tests), production build passing.
 - [ ] Derive immutable, versioned change events from observations.
