@@ -14,7 +14,7 @@
 ## Checkpoint
 
 - **Implementation branch:** `main`
-- **Implementation checkpoint commit:** `08b7858` (feat(retention): implement Phase 7 saved searches, watchlists, alerts, and account hub)
+- **Implementation checkpoint commit:** `f2a3f23` (docs(launch): author Phase 8 launch quality report across all 15 product gates)
 - **Handoff commit:** The commit containing this populated file; verify with `git rev-parse HEAD`.
 - **Working-tree status at checkpoint:** Clean.
 - **Remote:** `origin/main` confirmed at the same commit.
