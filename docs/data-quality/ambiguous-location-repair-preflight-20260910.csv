@@ -1,0 +1,20 @@
+name,domain,street_address,suburb,state,postcode,source_confidence,source_note,source_url
+Anatara Lifesciences,anataralifesciences.com,81 Flinders Street,Adelaide,SA,5000,High,single complete first-party address candidate,https://anataralifesciences.com/contact/
+Archer Materials,archerx.com.au,477 Pitt Street,Haymarket,NSW,2000,High,single complete first-party address candidate,https://www.archerx.com.au/
+Boomaroo Tech,boomaroo.com,142 Harelmar Road,Southbrook,QLD,4363,High,single complete first-party address candidate,https://boomaroo.com/contact/
+CIM Tech,cim.io,156 Clarence Street,Sydney,NSW,2000,High,single complete first-party address candidate,https://www.cim.io/contact
+Dimerix,dimerix.com,425 Smith Street,Fitzroy,VIC,3065,High,single complete first-party address candidate,https://dimerix.com/contact/
+Kablamo,kablamo.com.au,20 York Street,Sydney,NSW,2000,High,single complete first-party address candidate,https://www.kablamo.com.au/contact
+Moula Money,moula.com.au,535 Bourke Street,Melbourne,VIC,3000,High,single complete first-party address candidate,https://moula.com.au/contact-us
+Mount Isa Mineral Sensors,mountisaminerals.com.au,339 Coronation Drive,Milton,QLD,4064,High,single complete first-party address candidate,https://www.mountisaminerals.com.au/
+Murray Irrigation Tech,murrayirrigation.com.au,443 Charlotte Street,Deniliquin,NSW,2710,High,single complete first-party address candidate,https://www.murrayirrigation.com.au/contact-us
+Opmantek Software,opmantek.com,50 Cavill Avenue,Surfers Paradise,QLD,4217,High,single complete first-party address candidate,https://firstwave.com/contact/
+Opthea,opthea.com,117 Camberwell Road,Hawthorn East,VIC,3123,High,single complete first-party address candidate,https://ceryvyn.com/
+Pepperstone,pepperstone.com,727 Collins Street,Melbourne,VIC,3008,High,single complete first-party address candidate,https://pepperstone.com/en-au/support
+Planet Innovation,planetinnovation.com.au,436 Elgar Rd,Box Hill,VIC,3128,High,single complete first-party address candidate,https://planetinnovation.com/contact/
+Rayner,rayner.com.au,25 Money Street,Perth,WA,6000,High,single complete first-party address candidate,https://www.rayner.com.au/
+VAPAR,vapar.co,11 Grosvenor Street,Neutral Bay,NSW,2089,High,single complete first-party address candidate,https://www.vapar.co/
+Versent,versent.com.au,19/8 Exhibition Street,Melbourne,VIC,3000,High,complete first-party address candidate matching existing ambiguous locality,https://versent.com.au/contact/
+Vix Technology,vixtechnology.com,550 Bourke Street,Melbourne,VIC,3000,High,single complete first-party address candidate,https://vixtechnology.com/
+Xref,xref.com,135 King Street,Sydney,NSW,2000,High,single complete first-party address candidate,https://www.xref.com/
+Yarno,yarno.com.au,275 Alfred St,North Sydney,NSW,2060,High,single complete first-party address candidate,https://www.yarno.com.au/contact-us

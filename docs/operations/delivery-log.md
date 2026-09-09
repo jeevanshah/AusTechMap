@@ -105,3 +105,11 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Scope: brings root `README.md` status and `HANDOFF.md` current with Wave 2/3 seed + location-discovery outcomes; clarifies next gate is verified address fixtures only.
 - Verification: documentation-only; `git diff --check`.
 - Residual risk: live Neon employer/job totals in older HANDOFF verification bullets may lag post-seed creates until the next live inventory query.
+
+## 2026-09-10 — ambiguous-location first-party repair preflight
+
+- Commit: `data: prepare ambiguous-location repair preflight` (this commit)
+- Scope: read-only bulk research against 357 live ambiguous-location companies without active location-source evidence. It records reachability, homepage capture outcomes, exact first-party page/address candidates, the current ambiguous input context, and a conservative selection/review split.
+- Result: 191 domains were reachable; 190 homepages were captured; 29 domains produced AU-street candidate text. The 19 single or locality-matching complete candidates in `ambiguous-location-repair-preflight-20260910.csv` pass `validate-address-fixture`. Ten candidate-bearing domains remain in explicit review because they have multiple complete offices or incomplete addresses; 328 domains have no safe selection from this bounded pass.
+- Verification: bounded first-party fetches only, strict address-fixture validation (19 rows, no errors or duplicate addresses), and `git diff --check`.
+- Residual risk: no candidate has been geocoded or imported, and no Neon write occurred. Production geocoding/import remains an explicit approval gate; non-selected domains remain quarantined rather than inferred.

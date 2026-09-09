@@ -1,0 +1,30 @@
+domain,name,decision,complete_candidate_count,incomplete_candidate_count,candidate_addresses
+agridigital.io,Agridigital,manual_review_incomplete_candidate_only,0,1,"167 Brisbane Street, Dubbo, NSW"
+anataralifesciences.com,Anatara Lifesciences,selected_single_complete_candidate,1,0,"81 Flinders Street, Adelaide SA 5000"
+archerx.com.au,Archer Materials,selected_single_complete_candidate,1,0,477 Pitt Street Haymarket NSW 2000 | 477 Pitt Street Haymarket NSW 2000
+assemblypayments.com,Assembly Payments,manual_review_incomplete_candidate_only,0,1,"121 Castlereagh Street Sydney, NSW"
+bartondeakin.com,Barton Deakin,manual_review_multiple_complete_candidates,2,1,"1 Shelley Street Barangaroo, NSW | 2 Southbank Boulevard, Southbank VIC 3006 | 556 Wellington Street, Perth WA 6000"
+boomaroo.com,Boomaroo Tech,selected_single_complete_candidate,1,0,"142 Harelmar Road, Southbrook, QLD 4363"
+cim.io,CIM Tech,selected_single_complete_candidate,1,0,"156 Clarence Street, Sydney NSW 2000"
+dimerix.com,Dimerix,selected_single_complete_candidate,1,0,425 Smith Street Fitzroy VIC 3065
+geneticsignatures.com,Genetic Signatures,manual_review_incomplete_candidate_only,0,2,"7 Eliza Street Newtown, NSW | 7 Eliza Street Newtown, NSW"
+geographe.com.au,Geographe,manual_review_multiple_complete_candidates,2,0,"480 Abernethy Road, Kewdale, WA 6105 | 57 Craigie Street, Davenport WA 6230"
+inauro.com.au,Inauro,manual_review_incomplete_candidate_only,0,2,"644 Chapel Street, South Yarra, VIC | 644 Chapel Street, South Yarra, VIC"
+kablamo.com.au,Kablamo,selected_single_complete_candidate,1,0,"20 York Street Sydney NSW 2000 | 20 York Street, Sydney NSW 2000"
+legalvision.com.au,Legalvision,manual_review_multiple_complete_candidates,3,0,221 St Georges Terrace Perth WA 6000 | 221 St Georges Terrace Perth WA 6000 | 241 Commonwealth Street Surry Hills NSW 2010 | 241 Commonwealth Street Surry Hills NSW 2010 | 71 Eagle Street Brisbane QLD 4000 | 71 Eagle Street Brisbane QLD 4000
+moula.com.au,Moula Money,selected_single_complete_candidate,1,0,"535 Bourke Street, Melbourne, VIC 3000"
+mountisaminerals.com.au,Mount Isa Mineral Sensors,selected_single_complete_candidate,1,0,339 Coronation Drive Milton QLD 4064 | 339 Coronation Drive Milton QLD 4064
+murrayirrigation.com.au,Murray Irrigation Tech,selected_single_complete_candidate,1,0,443 Charlotte Street Deniliquin NSW 2710
+opmantek.com,Opmantek Software,selected_single_complete_candidate,1,0,50 Cavill Avenue Surfers Paradise QLD 4217
+opthea.com,Opthea,selected_single_complete_candidate,1,0,"117 Camberwell Road, Hawthorn East VIC 3123 | 117 Camberwell Road, Hawthorn East VIC 3123"
+pepperstone.com,Pepperstone,selected_single_complete_candidate,1,0,"727 Collins Street, Melbourne, VIC 3008 | 727 Collins Street, Melbourne, VIC 3008"
+planetinnovation.com.au,Planet Innovation,selected_single_complete_candidate,1,0,436 Elgar Rd Box Hill VIC 3128
+rayner.com.au,Rayner,selected_single_complete_candidate,1,0,25 Money Street Perth WA 6000 | 25 Money Street Perth WA 6000
+scancam.com.au,Scancam,manual_review_multiple_complete_candidates,2,1,"140 St Georges Terrace, Perth, WA | 3 Spring St, Sydney, NSW 2000 | 570 City Rd, South Melbourne, VIC 3205 | 570 City Rd, South Melbourne, VIC 3205"
+splend.com.au,Splend Tech,manual_review_multiple_complete_candidates,4,1,"101 Stirling Highway, Nedlands, WA | 14 Wormald Street, Symonston, ACT 2609 | 29 Croydon Road, Keswick SA 5035 | 35 Brolga Ave, Southport, QLD 4215 | 453 Beaudesert Road, Moorooka, QLD 4105"
+vantage-dc.com,Vantage Data Centres,manual_review_incomplete_candidate_only,0,1,"2101 M Street NE Quincy, WA"
+vapar.co,VAPAR,selected_single_complete_candidate,1,0,"11 Grosvenor Street, Neutral Bay NSW AU 2089 | 11 Grosvenor Street, Neutral Bay NSW AU 2089"
+versent.com.au,Versent,selected_candidate_matching_existing_locality,4,0,"111 Elizabeth St, Sydney NSW 2000 | 17/125 St Georges Terrace, Perth, WA 6000 | 19/8 Exhibition Street, Melbourne, VIC 3000 | 4/275 George St, Brisbane City, QLD 4000"
+vixtechnology.com,Vix Technology,selected_single_complete_candidate,1,0,550 Bourke Street Melbourne VIC 3000 | 550 Bourke Street Melbourne VIC 3000
+xref.com,Xref,selected_single_complete_candidate,1,0,"135 King Street, Sydney NSW 2000 | 135 King Street, Sydney NSW 2000 | 135 King Street, Sydney NSW 2000"
+yarno.com.au,Yarno,selected_single_complete_candidate,1,0,"275 Alfred St North Sydney NSW 2060 | 275 Alfred St, North Sydney, NSW 2060 | 275 Alfred St, North Sydney, NSW 2060 | 275 Alfred St, North Sydney, NSW 2060"
