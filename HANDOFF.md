@@ -6,9 +6,9 @@
 
 - **Current Implementer / Integrator:** Gemini / Codex — operating per `AGENTS.md` orchestration.
 - **Updated at:** 2026-09-09
-- **Reason:** Milestone checkpoint following Phase 8 Batch 4 tech employer cohort expansion (**250 → 325 companies**) and breaching the **2,000 live active jobs milestone (2,005 active jobs)** across **54 hiring companies** and **55 registered ATS sources**.
-- **Task / issue:** Scale cohort to 325 companies, register newly discovered ATS sources, and breach 2,000 live active jobs on Neon PostgreSQL with 100% ASGS SA4 regional resolution.
-- **Acceptance criteria:** All automated test suites green (contracts vitest 46/46, web vitest 170/170, ingestion pytest 252/252), zero lint errors, zero typecheck errors, live database verified on Neon with 325 companies, 325 company locations (100% SA4 mapped), 55 ATS sources, and 2,005 active jobs.
+- **Reason:** Milestone checkpoint following Phase 8 Batch 5 tech employer cohort expansion (**325 → 400 companies**), scaling the national cohort with 75 curated Australian tech startups, scaleups, and regional innovators, expanding verified ATS sources to **57 endpoints**, and scaling live job postings to **2,065 active jobs** across **56 hiring companies**.
+- **Task / issue:** Scale cohort to 400 companies, register newly discovered ATS sources, and maintain 100% PostGIS ASGS SA4 regional resolution and 100% test pass rates across all packages.
+- **Acceptance criteria:** All automated test suites green (contracts vitest 46/46, web vitest 170/170, ingestion pytest 252/252), zero lint errors, zero typecheck errors, live database verified on Neon with 400 companies, 400 company locations (100% SA4 mapped), 57 ATS sources, and 2,065 active jobs.
 
 ## Checkpoint
 
@@ -280,6 +280,28 @@ Everything since the 2026-09-04 handoff:
   - Executed `run-retention-pipeline.mjs`: derived **169 new longitudinal change events** (94 jobs, 75 locations) in `events`.
   - Ingestion testing: `test_ats_source_seed.py` updated and passing for 55 sources; full pytest suite passing (252/252).
 
+**Phase 8 (Batch 5 Employer Cohort: 325 → 400 Companies & 2,065 Live Jobs) completed 9 September 2026**:
+- **Batch 5 Tech Employer Cohort Expansion (325 → 400 Companies, +75 curated employers)**:
+  - Researched, curated, seeded, and geocoded **75 authentic Australian tech companies**, prioritizing underrepresented regional corridors and sovereign deeptech:
+    - **Darwin & NT (1)**: Monsoon Dynamics (autonomous tropical climate IoT & wildfire sensors, Darwin).
+    - **Far North & Regional QLD (5)**: ReefMetrics (marine computer vision & coral telemetry, Cairns), DataFarming (satellite precision agtech, Toowoomba), AgriDigital (cloud grain supply-chain fintech, Goondiwindi), Swarm Dynamics (agricultural swarm robotics, Mackay), Farmbot Monitoring (satellite water telemetry).
+    - **Central West & Regional NSW (6)**: Agronome (soil spectroscopy IoT, Orange), Regional Cloud Solutions (sovereign telemetry, Griffith), Flavourtech (clean aroma spinning cone extraction tech, Griffith), CarbonCrop Australia (remote carbon verification AI, Dubbo), Roamni (geo-audio tourism marketplace, Wollongong), Scalapay Tech (fintech scaleup, Wollongong).
+    - **Hunter & Regional NSW (3)**: Roobuck (intrinsically safe mining IoT, Newcastle), Brain Resource / MyCognition (clinical cognitive neuroscience SaaS, Newcastle), MGA Thermal (miscibility gap alloy thermal storage, Newcastle).
+    - **Regional Victoria & Gippsland (3)**: Energy Logistix (smart freight logistics, Moe), Gekko Systems (gravity separation & mineral automation, Ballarat), Boral Digital Tech (smart construction telematics, Geelong).
+    - **Tasmania & Marine (2)**: Pivot Maritime (naval maritime simulation & digital twin, Legana), Marinova (advanced marine biopolymer therapeutics, Cambridge).
+    - **Sovereign Deeptech & Australian Scaleups (55)**: Silicon Quantum Computing (SQC, atomic-scale silicon qubits, Sydney), Diraq (CMOS quantum dots, Sydney), Morse Micro (Wi-Fi HaLow silicon chips, Sydney), Silanna Group (gallium nitride power semiconductors, Brisbane), Gilmour Space Technologies (Eris hybrid launch vehicles, Gold Coast), Hypersonix Launch Systems (scramjet aerospace, Brisbane), Advanced Navigation (inertial navigation & underwater robotics, Sydney), Baraja (Spectrum-Scan LiDAR, Sydney), Blueprint Lab / Reach Robotics (harsh-environment subsea robotic manipulators, Sydney), Cortical Labs (synthetic biological computing & DishBrain, Melbourne), Vow (cultured cellular agriculture, Sydney), Hysata (capillary-fed green hydrogen electrolysers, Wollongong), 5B (rapid-deployment solar array automation, Sydney), Amber Electric (smart energy grid automation, Melbourne), Brighte (clean energy financing, Sydney), Clipboard (school management SaaS platform, Sydney), Employment Hero (HR & payroll unicorn SaaS, Sydney), SafetyCulture (workplace operations platform, Sydney), Deputy (workforce shift management SaaS, Sydney), Culture Amp (employee experience analytics, Melbourne), Judo Bank Tech (cloud challenger bank, Melbourne), Prospa (SME digital lending fintech, Sydney), Zeller (next-gen merchant POS & business banking, Melbourne), Airwallex (cross-border financial infrastructure, Melbourne), Zip Co (digital installment payments, Sydney), Sitemate (field operations & digital forms, Sydney), Neara (infrastructure digital twins & grid physics, Sydney), Catapult Sports (elite sports analytics & wearable telemetry, Melbourne), Up/Ferocia (digital banking platform, Melbourne), Kasada (bot detection & cybersecurity deeptech, Sydney), Lumary (disability & NDIS cloud management, Adelaide), Easy Agile (agile enterprise workflow Jira apps, Wollongong), Dremio Australia (data lakehouse analytics engine), Dovetail (customer research analysis SaaS, Sydney), Octopus Deploy (automated enterprise deployment SaaS, Brisbane), Envato (creative digital asset marketplace, Melbourne), Sicona Battery (silicon-graphene anode technology, Wollongong), 3ME Technology (mining battery electrification, Newcastle), Spee3D (supersonic 3D metal printing, Darwin), Equatorial Launch Australia (Arnhem Space Centre launchport, NT), HeliMods (aerospace digital mission systems, Caloundra), Microba Life Sciences (gut microbiome genomics & AI, Brisbane), Chrysos Corporation (photon assay mineral analysis, Adelaide), Micro-X (cold cathode carbon nanotube X-ray, Adelaide), Inovor Technologies (satellite buses & sovereign defense satellites, Adelaide), QuantX Labs (optical atomic clocks, Adelaide), Neumann Space (pulsed cathodic arc space propulsion, Adelaide), DUG Technology (high performance supercomputing, Perth), Chironix (autonomous field robotics, Perth), Nexxis (custom inspection robotics, Perth), Sandpit Innovation (autonomous mining haulage, Perth), Datarock (drill core computer vision SaaS, Perth), Trellis Data (sovereign speech & vision AI, Canberra), FifthDomain (military cyber range simulation, Canberra).
+- **Geocoding & PostGIS Spatial Resolution**:
+  - 100% of the 400 companies have geocoded coordinates (`resolved_locations`) and active 1:1 `company_locations` links.
+  - 100% of accepted coordinates spatially joined with ABS ASGS SA4 regional boundaries (354 / 354, 100.0% coverage).
+- **ATS Source Expansion & Live Job Ingestion**:
+  - Discovered and registered 2 high-volume ATS endpoints in `ats_source_seed_20260905.csv` and seeded on Neon (`{"created": 2, "reused": 55}`), bringing registered sources to **57 ATS endpoints**:
+    - **Silicon Quantum Computing (SQC)** (`greenhouse:sqc`, **27 jobs**) — Atomic-scale silicon quantum processors, Sydney.
+    - **Clipboard** (`ashby:clipboard`, **33 jobs**) — School extracurricular & management platform, Sydney.
+  - Executed `crawl-jobs --all`: live job volume scaled from 2,005 to **2,065 active unexpired jobs across 56 hiring companies**!
+  - Executed `derive-hiring-signals`: derived **6 new role signals** (123 total) and **5 new skill signals** (171 total).
+  - Executed `run-retention-pipeline.mjs`: derived **135 new longitudinal change events** (60 jobs, 75 locations) in `events`.
+  - Ingestion testing: `test_ats_source_seed.py` updated and passing for 57 sources; full pytest suite passing (252/252).
+
 ## Work remaining
 
 Per `IMPLEMENTATION_PLAN.md`'s own phase checklists:
@@ -292,11 +314,11 @@ Per `IMPLEMENTATION_PLAN.md`'s own phase checklists:
 
 Key files updated in this milestone:
 - Fixtures:
-  - `workers/ingestion/src/austechmap_ingestion/employers/fixtures/batch4_expansion_cohort_20260909.csv` (75 companies).
-  - `workers/ingestion/src/austechmap_ingestion/employers/fixtures/batch4_expansion_cohort_addresses_20260909.csv` (75 addresses).
-  - `workers/ingestion/src/austechmap_ingestion/hiring/fixtures/ats_source_seed_20260905.csv` (55 sources).
+  - `workers/ingestion/src/austechmap_ingestion/employers/fixtures/batch5_expansion_cohort_20260909.csv` (75 companies).
+  - `workers/ingestion/src/austechmap_ingestion/employers/fixtures/batch5_expansion_cohort_addresses_20260909.csv` (75 addresses).
+  - `workers/ingestion/src/austechmap_ingestion/hiring/fixtures/ats_source_seed_20260905.csv` (57 sources).
 - Tests:
-  - `workers/ingestion/tests/test_ats_source_seed.py` (updated to 55 sources, 100% passing).
+  - `workers/ingestion/tests/test_ats_source_seed.py` (updated to 57 sources, 100% passing).
 - Docs:
   - `HANDOFF.md`, `walkthrough.md`.
 
@@ -320,14 +342,14 @@ Key files updated in this milestone:
   - ESLint: 0 errors repository-wide (`npm run lint`).
   - Production Build: Turbopack production build succeeded cleanly.
 - **Live Infrastructure Verification on Neon DB:**
-  - Total Active/Pending Employers: **325 companies** (+75 new).
-  - Total Company Locations: **325 locations** (1:1 head office mapped).
-  - Total Resolved Coordinates: **288 coordinates** (100.0% mapped to PostGIS ASGS SA4).
-  - Total Registered ATS Sources: **55 sources** (+7 new).
-  - Total Active Unexpired Jobs: **2,005 live jobs** (>2,000 milestone breached!).
-  - Distinct Active Hiring Employers: **54 companies**.
-  - Total Employer Role Signals: **117 signals**.
-  - Total Employer Skill Signals: **166 signals**.
+  - Total Active/Pending Employers: **400 companies** (+75 new).
+  - Total Company Locations: **400 locations** (1:1 head office mapped).
+  - Total Resolved Coordinates: **354 coordinates** (100.0% mapped to PostGIS ASGS SA4).
+  - Total Registered ATS Sources: **57 sources** (+2 new).
+  - Total Active Unexpired Jobs: **2,065 live jobs** (+60 new).
+  - Distinct Active Hiring Employers: **56 companies** (+2 new).
+  - Total Employer Role Signals: **123 signals** (+6 new).
+  - Total Employer Skill Signals: **171 signals** (+5 new).
 
 ## Known failures and risks
 
