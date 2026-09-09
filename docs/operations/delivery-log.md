@@ -31,3 +31,10 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Result: one address candidate (InDebted); 66 companies had no reliable street-address text found by the bounded page sweep.
 - Verification: candidate-only result; no location fixture was produced, validated, geocoded, or imported.
 - Residual risk: company websites can render contact details client-side or keep them on untested paths. The one candidate remains unverified until its exact first-party evidence URL is captured.
+
+## 2026-09-09 — Wave 2 / Wave 3 triage, homepage evidence, seed preflight
+
+- Commit: `data: prepare Wave 2/3 cohort evidence preflight` (this commit)
+- Scope: records non-mutating Wave 2/3 cohort fixtures, triage manifests, homepage metadata harvests, and evidence-backed seed preflights (135 + 114 rows). Updates `docs/data-quality/README.md` with counts.
+- Verification: strict `validate_seed_fixture_evidence` passed for both preflights; `git diff --check`.
+- Residual risk: homepage metadata is only an initial source signal. Neon `seed-employers` remains a separate production write requiring explicit user approval.

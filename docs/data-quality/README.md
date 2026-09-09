@@ -9,3 +9,12 @@ Candidates may move into a seed fixture only after a public first-party source U
 `wave1-seed-preflight-20260909.csv` is the bulk preflight derived from the homepage-evidence manifest. Its entries meet the fixture's syntactic source-evidence contract, but it is **not** an import instruction: applying it to Neon remains a production write requiring explicit user approval.
 
 `wave1-location-candidates-20260909.csv` is a bulk, first-party page sweep. Its address text is discovery-only: every candidate still needs its exact supporting page URL and a strict address-fixture validation before geocoding.
+
+Wave 2 / Wave 3 follow the same non-mutating pipeline (`triage` → `homepage-evidence` → `seed-preflight`). Counts as of 9 September 2026:
+
+| Wave | Triage reachable | Metadata captured | Seed preflight rows |
+| --- | ---: | ---: | ---: |
+| 2 | 152 | 140 | 135 |
+| 3 | 141 | 121 | 114 |
+
+`wave2-seed-preflight-20260909.csv` and `wave3-seed-preflight-20260909.csv` are also **not** import instructions. Neon `seed-employers` still needs explicit user approval.

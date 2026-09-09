@@ -1,0 +1,197 @@
+name,domain,city,reachability_status,http_status,final_url,diagnostic,next_action
+Phocas Software,phocassoftware.com,Melbourne,reachable_needs_primary_evidence,200,https://www.phocassoftware.com/,,"Record first-party company, technology, and street-address evidence."
+Splend,splend.com,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Ipscape,ipscape.com,Sydney,reachable_needs_primary_evidence,200,https://ipscape.com,,"Record first-party company, technology, and street-address evidence."
+Reejig,reejig.com,Sydney,reachable_needs_primary_evidence,200,https://www.reejig.com/,,"Record first-party company, technology, and street-address evidence."
+Simply Wall St,simplywall.st,Sydney,reachable_needs_primary_evidence,403,https://simplywall.st,HTTP 403,"Record first-party company, technology, and street-address evidence."
+Transurban Digital,transurban.com,Melbourne,reachable_needs_primary_evidence,200,https://www.transurban.com/,,"Record first-party company, technology, and street-address evidence."
+Credabl,credabl.com.au,Sydney,reachable_needs_primary_evidence,200,https://www.credabl.com.au/,,"Record first-party company, technology, and street-address evidence."
+Nookal,nookal.com,Brisbane,reachable_needs_primary_evidence,200,https://www.nookal.com/,,"Record first-party company, technology, and street-address evidence."
+Planit Testing,planittesting.com,Melbourne,reachable_needs_primary_evidence,200,https://www.planit.com/,,"Record first-party company, technology, and street-address evidence."
+CEVO,cevo.com.au,Melbourne,reachable_needs_primary_evidence,200,https://cevo.com.au,,"Record first-party company, technology, and street-address evidence."
+Bugwolf,bugwolf.com,Adelaide,reachable_needs_primary_evidence,200,https://bugwolf.com,,"Record first-party company, technology, and street-address evidence."
+Liven,liven.gg,Melbourne,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Doshii,doshii.com.au,Melbourne,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Biarri Networks,biarri.com,Melbourne,reachable_needs_primary_evidence,200,https://biarri.com,,"Record first-party company, technology, and street-address evidence."
+Athena Home Loans,athenahomeloan.com.au,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Spaceship,spaceship.com.au,Sydney,reachable_needs_primary_evidence,200,https://www.spaceship.com.au:443/,,"Record first-party company, technology, and street-address evidence."
+Squiz,squiz.net,Sydney,reachable_needs_primary_evidence,403,https://squiz.net,HTTP 403,"Record first-party company, technology, and street-address evidence."
+Coles Digital,colesgroup.com.au,Melbourne,reachable_needs_primary_evidence,200,https://www.colesgroup.com.au/home/,,"Record first-party company, technology, and street-address evidence."
+Latent Space,latentspace.com.au,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Tella,tella.tv,Melbourne,reachable_needs_primary_evidence,200,https://www.tella.com/,,"Record first-party company, technology, and street-address evidence."
+Sighthound AU,sighthound.com,Melbourne,reachable_needs_primary_evidence,200,https://www.sighthound.com/,,"Record first-party company, technology, and street-address evidence."
+Thinkmill,thinkmill.com.au,Sydney,reachable_needs_primary_evidence,200,https://www.thinkmill.com.au/,,"Record first-party company, technology, and street-address evidence."
+Eliiza,eliiza.com,Melbourne,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Swoop Aero,swoop.aero,Melbourne,reachable_needs_primary_evidence,200,https://kite.aero/,,"Record first-party company, technology, and street-address evidence."
+Tiliter,tiliter.com,Sydney,reachable_needs_primary_evidence,200,https://www.tiliter.com/,,"Record first-party company, technology, and street-address evidence."
+Tanka,tanka.ai,Melbourne,reachable_needs_primary_evidence,200,https://www.tanka.ai/,,"Record first-party company, technology, and street-address evidence."
+Oculo,oculo.com.au,Melbourne,reachable_needs_primary_evidence,200,https://www.oculo.com.au/,,"Record first-party company, technology, and street-address evidence."
+SunSHIFT,sunshift.com.au,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Konnective,konnective.com.au,Brisbane,reachable_needs_primary_evidence,200,https://konnective.com.au,,"Record first-party company, technology, and street-address evidence."
+FYI App,fyiapp.com.au,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Ektus,ektus.com.au,Adelaide,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Hypr,hypr.com.au,Melbourne,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Lumi Nova AU,luminova.com.au,Brisbane,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Elantec,elantec.com.au,Darwin,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Locofy,locofyai.com,Perth,reachable_needs_primary_evidence,200,https://locofyai.com,,"Record first-party company, technology, and street-address evidence."
+Pelikin,pelikin.com.au,Brisbane,reachable_needs_primary_evidence,200,https://pelikin.com.au,,"Record first-party company, technology, and street-address evidence."
+Streamotion,streamotion.com.au,Melbourne,reachable_needs_primary_evidence,200,https://kayosports.com.au/,,"Record first-party company, technology, and street-address evidence."
+Gridcognition,gridcognition.com,Melbourne,reachable_needs_primary_evidence,525,https://gridcognition.com,HTTP 525,"Record first-party company, technology, and street-address evidence."
+Hnry,hnry.com.au,Sydney,reachable_needs_primary_evidence,200,https://hnry.com.au,,"Record first-party company, technology, and street-address evidence."
+Barcats,barcats.com.au,Melbourne,reachable_needs_primary_evidence,200,https://www.barcats.com.au/,,"Record first-party company, technology, and street-address evidence."
+Wiise,wiise.com,Melbourne,reachable_needs_primary_evidence,200,https://www.wiise.com/,,"Record first-party company, technology, and street-address evidence."
+TalentVine,talentvine.com.au,Melbourne,reachable_needs_primary_evidence,200,https://www.talentvine.com.au/,,"Record first-party company, technology, and street-address evidence."
+Proda,proda.ai,Sydney,reachable_needs_primary_evidence,200,https://proda.ai,,"Record first-party company, technology, and street-address evidence."
+Prospection,prospection.com,Sydney,reachable_needs_primary_evidence,200,https://www.prospection.com/,,"Record first-party company, technology, and street-address evidence."
+Acredia,acredia.com.au,Sydney,reachable_needs_primary_evidence,200,https://acredia.au/,,"Record first-party company, technology, and street-address evidence."
+Meld Gold,meld.gold,Sydney,reachable_needs_primary_evidence,200,https://www.meld.gold/,,"Record first-party company, technology, and street-address evidence."
+Valocity,valocity.co,Auckland,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Moshi,moshi.ai,Melbourne,reachable_needs_primary_evidence,200,https://moshi.ai,,"Record first-party company, technology, and street-address evidence."
+Glow,glow.earth,Melbourne,reachable_needs_primary_evidence,403,https://glow.earth,HTTP 403,"Record first-party company, technology, and street-address evidence."
+Verifyy,verifyy.com.au,Brisbane,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Kambr,kambr.com,Melbourne,reachable_needs_primary_evidence,200,https://amadeus.com/en/airlines/products/segment-revenue-management-flex,,"Record first-party company, technology, and street-address evidence."
+CancerAid,canceraid.com,Sydney,reachable_needs_primary_evidence,200,https://osarahealth.com/,,"Record first-party company, technology, and street-address evidence."
+PayTo Platform,payto.net.au,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Pearlii,pearlii.com,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Mobi Technologies,mobi.com.au,Melbourne,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Actionstep,actionstep.com,Auckland,reachable_needs_primary_evidence,200,https://www.actionstep.com/,,"Record first-party company, technology, and street-address evidence."
+RocketBoots,rocketboots.com,Brisbane,reachable_needs_primary_evidence,200,https://www.rocketboots.com/,,"Record first-party company, technology, and street-address evidence."
+Openn Negotiation,openn.com.au,Perth,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Limepay,limepay.com.au,Sydney,reachable_needs_primary_evidence,200,https://meetapril.com/,,"Record first-party company, technology, and street-address evidence."
+Cognian Technologies,cognian.com,Perth,reachable_needs_primary_evidence,202,https://www.aeristech.com/,,"Record first-party company, technology, and street-address evidence."
+Tandem,tandem.com.au,Melbourne,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Koda Capital,kodacapital.com,Sydney,reachable_needs_primary_evidence,200,https://kodacapital.com,,"Record first-party company, technology, and street-address evidence."
+Coder Academy,coderacademy.edu.au,Brisbane,reachable_needs_primary_evidence,200,https://coderacademy.edu.au,,"Record first-party company, technology, and street-address evidence."
+Airsheet,airsheet.co,Melbourne,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Cover More,covermore.com.au,Sydney,reachable_needs_primary_evidence,200,https://www.covermore.com.au/,,"Record first-party company, technology, and street-address evidence."
+Siteassist,siteassist.co,Sydney,reachable_needs_primary_evidence,200,https://www.siteassist.com/,,"Record first-party company, technology, and street-address evidence."
+Paydirt,paydirt.com.au,Brisbane,reachable_needs_primary_evidence,200,https://www.paydirt.com.au/,,"Record first-party company, technology, and street-address evidence."
+Serenity Forge,serenityforge.com,Brisbane,reachable_needs_primary_evidence,200,https://serenityforge.com,,"Record first-party company, technology, and street-address evidence."
+Azility,azility.com,Brisbane,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Cirralto,cirralto.com.au,Adelaide,reachable_needs_primary_evidence,200,https://cirralto.com.au,,"Record first-party company, technology, and street-address evidence."
+Meticore,meticore.com.au,Perth,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Neto,netohq.com,Brisbane,reachable_needs_primary_evidence,200,https://netohq.com,,"Record first-party company, technology, and street-address evidence."
+Scape Australia,scape.com.au,Brisbane,reachable_needs_primary_evidence,200,https://www.scape.com.au/,,"Record first-party company, technology, and street-address evidence."
+Fareharbor AU,fareharbor.com,Gold Coast,reachable_needs_primary_evidence,200,https://fareharbor.com,,"Record first-party company, technology, and street-address evidence."
+Machinify AU,machinify.com,Sydney,reachable_needs_primary_evidence,200,https://www.machinify.com/,,"Record first-party company, technology, and street-address evidence."
+Airvantage AU,airvantage.io,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Arpa,arpa.com.au,Sydney,reachable_needs_primary_evidence,200,https://arpa.com.au,,"Record first-party company, technology, and street-address evidence."
+Opsian,opsian.com,Sydney,unreachable_needs_manual_review,,,TimeoutError,Check the claimed domain against an authoritative company source before seeding.
+Mimecast AU,mimecast.com,Sydney,reachable_needs_primary_evidence,200,https://www.mimecast.com/,,"Record first-party company, technology, and street-address evidence."
+Tablo Publishing,tablo.io,Melbourne,reachable_needs_primary_evidence,200,https://tablo.io,,"Record first-party company, technology, and street-address evidence."
+Geoscience Australia Digital,ga.gov.au,Canberra,reachable_needs_primary_evidence,200,https://www.ga.gov.au/,,"Record first-party company, technology, and street-address evidence."
+Agflow,agflow.com,Sydney,reachable_needs_primary_evidence,200,https://agflow.com,,"Record first-party company, technology, and street-address evidence."
+Airposium,airposium.com.au,Melbourne,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+DX Labs,dxlabs.com.au,Perth,reachable_needs_primary_evidence,200,https://dxlabs.com.au,,"Record first-party company, technology, and street-address evidence."
+Fyfe,fyfe.com.au,Perth,reachable_needs_primary_evidence,200,https://fyfe.com.au,,"Record first-party company, technology, and street-address evidence."
+Groundswell Ag,groundswellag.com.au,Toowoomba,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Farmwall,farmwall.io,Adelaide,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Lumos Energy,lumosenergy.com.au,Melbourne,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Powow,powow.com.au,Adelaide,reachable_needs_primary_evidence,200,https://powow.com.au,,"Record first-party company, technology, and street-address evidence."
+Resi,resi.com.au,Brisbane,reachable_needs_primary_evidence,200,https://resi.com.au,,"Record first-party company, technology, and street-address evidence."
+Scamwatch Tech,scamwatch.tech,Canberra,reachable_needs_primary_evidence,200,https://scamwatch.tech/login,,"Record first-party company, technology, and street-address evidence."
+Aptree,aptree.com.au,Melbourne,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Commusoft AU,commusoft.com,Sydney,reachable_needs_primary_evidence,200,https://www.commusoft.com/en-us/,,"Record first-party company, technology, and street-address evidence."
+WaterNSW Digital,waternsw.com.au,Sydney,reachable_needs_primary_evidence,403,https://www.waternsw.com.au/,HTTP 403,"Record first-party company, technology, and street-address evidence."
+Corelink,corelink.com.au,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Limelight Health AU,limelighthealth.com,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Relectrify,relectrify.com,Melbourne,reachable_needs_primary_evidence,200,https://www.relectrify.com/au,,"Record first-party company, technology, and street-address evidence."
+Jord Winkel,jordwinkel.com.au,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Domo AU,domo.com,Sydney,reachable_needs_primary_evidence,405,https://domo.com,HTTP 405,"Record first-party company, technology, and street-address evidence."
+Zeelo AU,zeelo.co,Sydney,reachable_needs_primary_evidence,200,https://zeelo.co,,"Record first-party company, technology, and street-address evidence."
+Skodel,skodel.com,Sydney,reachable_needs_primary_evidence,200,https://skodel.com,,"Record first-party company, technology, and street-address evidence."
+VenueNow,venuenow.com.au,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Meltwater AU,meltwater.com,Sydney,reachable_needs_primary_evidence,200,https://www.meltwater.com/en,,"Record first-party company, technology, and street-address evidence."
+Rollit,rollit.com.au,Brisbane,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Parbery,parbery.com.au,Canberra,reachable_needs_primary_evidence,200,https://www.parbery.com.au/,,"Record first-party company, technology, and street-address evidence."
+Avanade AU,avanade.com,Sydney,reachable_needs_primary_evidence,200,https://www.avanade.com/en,,"Record first-party company, technology, and street-address evidence."
+Assembly Label,assemblylabel.com,Melbourne,reachable_needs_primary_evidence,200,https://assemblylabel.com,,"Record first-party company, technology, and street-address evidence."
+Modibodi,modibodi.com,Sydney,reachable_needs_primary_evidence,200,https://www.modibodi.com/,,"Record first-party company, technology, and street-address evidence."
+Dronedesk AU,dronedesk.net,Brisbane,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Ecoplanet,ecoplanet.com.au,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Blueshift AU,blueshift.com,Sydney,reachable_needs_primary_evidence,200,https://blueshift.com,,"Record first-party company, technology, and street-address evidence."
+Yoti AU,yoti.com,Melbourne,reachable_needs_primary_evidence,200,https://www.yoti.com/,,"Record first-party company, technology, and street-address evidence."
+Brightflag AU,brightflag.com,Sydney,reachable_needs_primary_evidence,200,https://brightflag.com,,"Record first-party company, technology, and street-address evidence."
+Workgrid AU,workgrid.com,Sydney,reachable_needs_primary_evidence,200,https://www.workgrid.com/,,"Record first-party company, technology, and street-address evidence."
+Synapse,synapse.com.au,Perth,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+LCI Education AU,lcieducation.com,Sydney,reachable_needs_primary_evidence,429,https://lcieducation.com,HTTP 429,"Record first-party company, technology, and street-address evidence."
+LeafLink AU,leaflink.com,Sydney,reachable_needs_primary_evidence,200,https://www.leaflink.com/,,"Record first-party company, technology, and street-address evidence."
+Dataro,dataro.io,Sydney,reachable_needs_primary_evidence,200,https://dataro.io,,"Record first-party company, technology, and street-address evidence."
+Pax8 AU,pax8.com,Sydney,reachable_needs_primary_evidence,200,https://www.pax8.com/en-au/,,"Record first-party company, technology, and street-address evidence."
+Canary Technologies AU,canarytechnologies.com,Sydney,reachable_needs_primary_evidence,200,https://canarytechnologies.com,,"Record first-party company, technology, and street-address evidence."
+Nudge Education,nudge.com.au,Melbourne,reachable_needs_primary_evidence,200,https://www.nudge.com.au/,,"Record first-party company, technology, and street-address evidence."
+Birdseye Analytics,birdseye.com.au,Brisbane,reachable_needs_primary_evidence,200,https://birdseye.com.au,,"Record first-party company, technology, and street-address evidence."
+Neccton AU,neccton.com,Melbourne,reachable_needs_primary_evidence,429,https://www.openbet.com/products/neccton,HTTP 429,"Record first-party company, technology, and street-address evidence."
+Lexis Nexis AU,lexisnexis.com.au,Sydney,reachable_needs_primary_evidence,200,https://www.lexisnexis.com/en-au,,"Record first-party company, technology, and street-address evidence."
+Fulcrum GT,fulcrumgt.com,Sydney,reachable_needs_primary_evidence,200,https://fulcrumgt.com,,"Record first-party company, technology, and street-address evidence."
+Juno Journey AU,junojourney.com,Melbourne,reachable_needs_primary_evidence,200,https://www.junojourney.com/,,"Record first-party company, technology, and street-address evidence."
+Judo Bank,judo.bank,Melbourne,reachable_needs_primary_evidence,200,https://www.judo.bank:443/,,"Record first-party company, technology, and street-address evidence."
+Penzo,penzo.com.au,Canberra,reachable_needs_primary_evidence,200,https://penzo.com.au,,"Record first-party company, technology, and street-address evidence."
+Fynd AU,fynd.in,Melbourne,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Bubblegum,bubblegum.work,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+1spatial AU,1spatial.com,Sydney,reachable_needs_primary_evidence,200,https://1spatial.com,,"Record first-party company, technology, and street-address evidence."
+Ohmie Go AU,ohmie-go.com,Melbourne,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Isobar AU,isobar.com,Sydney,reachable_needs_primary_evidence,429,https://www.dentsucreative.com/,HTTP 429,"Record first-party company, technology, and street-address evidence."
+Cohort Go,cohortgo.com,Brisbane,reachable_needs_primary_evidence,200,https://www.flywire.com/,,"Record first-party company, technology, and street-address evidence."
+Beforepay,beforepay.com.au,Sydney,reachable_needs_primary_evidence,200,https://www.beforepay.com.au:443/,,"Record first-party company, technology, and street-address evidence."
+Cashrewards,cashrewards.com.au,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Lumi Business,lumi.com.au,Sydney,reachable_needs_primary_evidence,200,https://www.lumi.com.au/,,"Record first-party company, technology, and street-address evidence."
+Stockspot,stockspot.com.au,Sydney,reachable_needs_primary_evidence,200,https://stockspot.com.au,,"Record first-party company, technology, and street-address evidence."
+Pearler,pearler.com,Sydney,reachable_needs_primary_evidence,200,https://pearler.com,,"Record first-party company, technology, and street-address evidence."
+Selfwealth,selfwealth.com.au,Melbourne,reachable_needs_primary_evidence,200,https://www.selfwealth.com.au/,,"Record first-party company, technology, and street-address evidence."
+Six Park,sixpark.com.au,Melbourne,reachable_needs_primary_evidence,401,https://sixpark.com.au,HTTP 401,"Record first-party company, technology, and street-address evidence."
+iSelect,iselect.com.au,Melbourne,reachable_needs_primary_evidence,200,https://www.iselect.com.au/,,"Record first-party company, technology, and street-address evidence."
+Choosi,choosi.com.au,Sydney,reachable_needs_primary_evidence,200,https://www.choosi.com.au/,,"Record first-party company, technology, and street-address evidence."
+Elmo Software,elmosoftware.com.au,Sydney,reachable_needs_primary_evidence,200,https://elmosoftware.com.au,,"Record first-party company, technology, and street-address evidence."
+Coassemble,coassemble.com,Newcastle,reachable_needs_primary_evidence,200,https://coassemble.com,,"Record first-party company, technology, and street-address evidence."
+Honey Insurance,honey.com.au,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Huddle Insurance,huddle.com.au,Melbourne,reachable_needs_primary_evidence,200,https://huddle.com.au,,"Record first-party company, technology, and street-address evidence."
+Valiant Finance,valiantfinance.com.au,Sydney,reachable_needs_primary_evidence,200,https://www.valiantfinance.com/?utm_source=valiant&utm_campaign=organic&utm_content=valiantfinance.com.au,,"Record first-party company, technology, and street-address evidence."
+Get Capital,getcapital.com.au,Sydney,reachable_needs_primary_evidence,200,https://www.shift.com.au/,,"Record first-party company, technology, and street-address evidence."
+Tiimely,tiimely.com,Adelaide,reachable_needs_primary_evidence,200,https://tiimely.com,,"Record first-party company, technology, and street-address evidence."
+Cirrus Networks,cirrusnetworks.com.au,Perth,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Calxa,calxa.com,Brisbane,reachable_needs_primary_evidence,403,https://calxa.com,HTTP 403,"Record first-party company, technology, and street-address evidence."
+Open Insurance,open.com.au,Sydney,reachable_needs_primary_evidence,200,https://radiatorsoftware.com/,,"Record first-party company, technology, and street-address evidence."
+Laybuy,laybuy.com,Auckland,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+FERO Finance,fero.com.au,Melbourne,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Flybuys Digital,flybuys.com.au,Melbourne,reachable_needs_primary_evidence,200,https://experience.flybuys.com.au/,,"Record first-party company, technology, and street-address evidence."
+Everyday Rewards,everydayrewards.com.au,Sydney,reachable_needs_primary_evidence,200,https://www.everyday.com.au/,,"Record first-party company, technology, and street-address evidence."
+Xemplo,xemplo.com,Brisbane,reachable_needs_primary_evidence,200,https://www.xemplo.com/,,"Record first-party company, technology, and street-address evidence."
+Tic:toc,tictoc.com.au,Adelaide,reachable_needs_primary_evidence,200,https://tiimelyhome.com.au/,,"Record first-party company, technology, and street-address evidence."
+Uno Home Loans,uno.com.au,Sydney,reachable_needs_primary_evidence,200,https://www.unohomeloans.com.au/,,"Record first-party company, technology, and street-address evidence."
+Sub60 Mortgages,sub60.com.au,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Tixel,tixel.com,Brisbane,reachable_needs_primary_evidence,200,https://tixel.com/au/,,"Record first-party company, technology, and street-address evidence."
+Moshtix,moshtix.com.au,Melbourne,reachable_needs_primary_evidence,200,https://moshtix.com.au/v2/,,"Record first-party company, technology, and street-address evidence."
+Ticketbooth,ticketbooth.com.au,Brisbane,reachable_needs_primary_evidence,200,https://leapevents.com/,,"Record first-party company, technology, and street-address evidence."
+Rezgo AU,rezgo.com,Sydney,reachable_needs_primary_evidence,200,https://www.rezgo.com/,,"Record first-party company, technology, and street-address evidence."
+YOUniverse,youniversetech.com.au,Melbourne,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+MePAY,mepay.com.au,Sydney,reachable_needs_primary_evidence,200,https://www.propertyme.com.au/tenant/features/mepay,,"Record first-party company, technology, and street-address evidence."
+Openfort AU,openfort.xyz,Melbourne,reachable_needs_primary_evidence,200,https://www.openfort.io/,,"Record first-party company, technology, and street-address evidence."
+Zulu Republic AU,zulurepublic.io,Sydney,reachable_needs_primary_evidence,200,https://www.ecomoto.io/,,"Record first-party company, technology, and street-address evidence."
+Finantix AU,finantix.com,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Quantaco,quantaco.co,Sydney,reachable_needs_primary_evidence,200,https://www.quantaco.co/,,"Record first-party company, technology, and street-address evidence."
+Hospitality Hero,hospitalityhero.com.au,Melbourne,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Coda Payments AU,coda.io,Sydney,reachable_needs_primary_evidence,200,https://coda.io,,"Record first-party company, technology, and street-address evidence."
+Axlr8r,axlr8r.com,Melbourne,reachable_needs_primary_evidence,200,https://axlr8r.com,,"Record first-party company, technology, and street-address evidence."
+GigHQ,gighq.com.au,Brisbane,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Skilio,skilio.com.au,Melbourne,reachable_needs_primary_evidence,200,https://skilio.com.au,,"Record first-party company, technology, and street-address evidence."
+LegalEagle AU,legaleagle.com.au,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Docuware AU,docuware.com,Sydney,reachable_needs_primary_evidence,200,https://start.docuware.com/,,"Record first-party company, technology, and street-address evidence."
+Trackability,trackability.com.au,Melbourne,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Muru-D,muru-d.com,Sydney,reachable_needs_primary_evidence,200,https://www.telstra.com.au/business-enterprise/muru-d,,"Record first-party company, technology, and street-address evidence."
+Startmate,startmate.com,Sydney,reachable_needs_primary_evidence,200,https://www.startmate.com/,,"Record first-party company, technology, and street-address evidence."
+BlueRock,bluerock.com.au,Melbourne,reachable_needs_primary_evidence,200,https://www.bluerock.com.au/,,"Record first-party company, technology, and street-address evidence."
+Campfire Labs,campfirelabs.com.au,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Campaign Monitor,campaignmonitor.com,Sydney,reachable_needs_primary_evidence,200,https://www.campaignmonitor.com/,,"Record first-party company, technology, and street-address evidence."
+Fluent Commerce,fluentcommerce.com,Sydney,reachable_needs_primary_evidence,200,https://fluentcommerce.com,,"Record first-party company, technology, and street-address evidence."
+Spectur,spectur.com.au,Perth,reachable_needs_primary_evidence,200,https://spectur.com.au,,"Record first-party company, technology, and street-address evidence."
+Auror,auror.com,Auckland,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Techboard,techboard.com.au,Perth,reachable_needs_primary_evidence,200,https://techboard.com.au,,"Record first-party company, technology, and street-address evidence."
+LocalAgentFinder,localagentfinder.com.au,Melbourne,reachable_needs_primary_evidence,200,https://www.localagentfinder.com.au/,,"Record first-party company, technology, and street-address evidence."
+HashChing,hashching.com.au,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+DXC Technology AU,dxc.com,Melbourne,reachable_needs_primary_evidence,200,https://dxc.com,,"Record first-party company, technology, and street-address evidence."
+Unison,unison.com.au,Melbourne,reachable_needs_primary_evidence,200,https://www.unison.au/,,"Record first-party company, technology, and street-address evidence."
+Atmail,atmail.com,Noosa,reachable_needs_primary_evidence,200,https://www.atmail.com/,,"Record first-party company, technology, and street-address evidence."
+Cipherpoint,cipherpoint.com,Sydney,reachable_needs_primary_evidence,200,https://excitecyber.com/,,"Record first-party company, technology, and street-address evidence."
+LearnUpon AU,learnupon.com,Dublin,reachable_needs_primary_evidence,200,https://www.learnupon.com/,,"Record first-party company, technology, and street-address evidence."
+Open Energy AU,openenergy.com.au,Adelaide,reachable_needs_primary_evidence,200,https://www.openenergy.com.au/,,"Record first-party company, technology, and street-address evidence."

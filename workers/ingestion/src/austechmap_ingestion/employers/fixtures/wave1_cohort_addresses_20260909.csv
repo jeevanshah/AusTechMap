@@ -1,0 +1,201 @@
+name,domain,street_address,suburb,state,postcode,source_confidence,source_note
+HiveUAV,hiveuav.com,Hunter Street,Newcastle,NSW,2300,High,Newcastle autonomous drone robotics
+Devicie,devicie.com,Walker Street,North Sydney,NSW,2060,High,North Sydney cybersecurity software hub
+Precision Agriculture Australia,precisionagriculture.com.au,Peisley Street,Orange,NSW,2800,High,Orange agricultural technology centre
+Farmdeck,farmdeck.com,Summer Street,Orange,NSW,2800,High,Orange regional IoT hardware hub
+AgDNA,agdna.com,Macquarie Street,Dubbo,NSW,2830,High,Dubbo regional agtech software lab
+Kurrajong Tech,kurrajong.com.au,Chaston Street,Wagga Wagga,NSW,2650,High,Wagga Wagga assistive tech precinct
+AgriFutures Australia Tech,agrifutures.com.au,"Building 007, Boorooma Street",Wagga Wagga,NSW,2650,High,CSU Wagga Wagga agricultural science precinct
+Flow Hive Tech,honeyflow.com.au,Centennial Circuit,Byron Bay,NSW,2481,High,Byron Bay industrial design and cleantech campus
+SMART Farm UNE,smartfarmune.com.au,Madgwick Drive,Armidale,NSW,2350,High,University of New England SMART Farm lab
+Precision Pastures,precisionpastures.com.au,Beardy Street,Armidale,NSW,2350,High,Armidale agritech and carbon measurement office
+BeefLedger,beefledger.io,Peel Street,Tamworth,NSW,2340,High,Tamworth livestock fintech and traceability hub
+Agile Digital,agiledigital.com.au,University Avenue,Canberra,ACT,2601,High,Canberra agile software engineering facility
+Noetic Group Tech,noeticgroup.com,National Circuit,Barton,ACT,2600,High,Barton defence strategic analytics hub
+CEA Technologies,cea.com.au,Gladstone Street,Fyshwick,ACT,2609,High,Fyshwick phased array radar engineering campus
+Koala Tech,koala.com,Bourke Road,Alexandria,NSW,2015,High,Alexandria consumer design and e-commerce lab
+Forter Australia,forter.com,Martin Place,Sydney,NSW,2000,High,Sydney digital fraud prevention engineering hub
+Smart Cities IoT Australia,smartcitiesiot.com.au,Crown Street,Wollongong,NSW,2500,High,Wollongong smart sensor development center
+Me3D,me3d.com.au,Squires Way,North Wollongong,NSW,2500,High,Innovation Campus North Wollongong lab
+Outpost Central,outpostcentral.com,Bolton Street,Newcastle,NSW,2300,High,Newcastle water infrastructure telemetry lab
+Geolyse Tech,geolyse.com,Kite Street,Orange,NSW,2800,High,Orange geospatial data analytics office
+SproutX Regional Tech,sproutx.com.au,Dean Street,Albury,NSW,2640,High,Albury regional venture and agtech center
+Southern Riverina IoT,southernriverinaiot.com.au,Cressy Street,Deniliquin,NSW,2710,High,Deniliquin irrigation automation workshop
+Subzero Robotics,subzerorobotics.com.au,Harbour Drive,Coffs Harbour,NSW,2450,High,Coffs Harbour marine robotics research base
+Sol-Secure,sol-secure.com.au,Clarence Street,Port Macquarie,NSW,2444,High,Port Macquarie renewable cybersecurity lab
+Livestock Water Solutions,livestockwatersolutions.com.au,Frome Street,Moree,NSW,2400,High,Moree pastoral IoT engineering hub
+Hunter Hydrogen Tech,hunterhydrogentech.com.au,Wharf Road,Newcastle,NSW,2300,High,Newcastle harbour energy transition lab
+Hypersense Software,hypersensesoftware.com.au,Scott Street,Newcastle,NSW,2300,High,Newcastle rail and automotive software studio
+Central West Solar IoT,centralwestsolar.com.au,William Street,Bathurst,NSW,2795,High,Bathurst clean energy instrumentation lab
+Murray Irrigation Tech,murrayirrigation.com.au,Warmatta Street,Finley,NSW,2713,High,Finley irrigation infrastructure telemetry center
+Ballina Cloud Systems,ballinacloud.com.au,River Street,Ballina,NSW,2478,High,Ballina digital health and cloud office
+Fologram,fologram.com,Flinders Street,Melbourne,VIC,3000,High,Melbourne mixed reality studio
+FormFlow,formflow.com.au,Fremantle Drive,North Shore,VIC,3214,High,North Shore Geelong modular cleantech facility
+Keech 3D Advanced Manufacturing,keech3d.com.au,Prospect Street,Bendigo,VIC,3550,High,Bendigo advanced additive manufacturing lab
+Bendigo Telco Tech,bendigotelco.com.au,High Street,Bendigo,VIC,3550,High,Bendigo regional telco and data center
+Cogent,cogent.co,Swan Street,Richmond,VIC,3121,High,Richmond digital product consultancy hub
+Moula Money,moula.com.au,Bourke Street,Melbourne,VIC,3000,High,Melbourne SME fintech engineering center
+Pepperstone,pepperstone.com,Collins Street,Melbourne,VIC,3000,High,Melbourne algorithmic trading headquarters
+Sportsbet Tech,sportsbet.com.au,Collins Street,Melbourne,VIC,3000,High,Melbourne high-scale sports technology campus
+Openpay Tech,openpay.com.au,St Kilda Road,Melbourne,VIC,3004,High,St Kilda Road payments engineering lab
+TradeSquare,tradesquare.com.au,William Street,Melbourne,VIC,3000,High,Melbourne wholesale e-commerce platform
+Versent,versent.com.au,Bourke Street,Melbourne,VIC,3000,High,Melbourne enterprise cloud tech hub
+Austeng Tech,austeng.net.au,Tucker Street,Breakwater,VIC,3219,High,Breakwater Geelong industrial engineering facility
+Imagine Intelligent Materials,imgmaterials.com,Nicol Drive,Waurn Ponds,VIC,3216,High,Deakin ManuFutures Geelong graphene lab
+Boomaroo Tech,boomaroo.com,Geelong-Bacchus Marsh Road,Lara,VIC,3212,High,Lara smart horticulture robotics facility
+Federation Tech Park,fedunitechpark.com.au,University Drive,Mount Helen,VIC,3350,High,Mount Helen Ballarat technology park
+Ballarat Cloud Solutions,ballaratcloud.com.au,Lydiard Street,Ballarat,VIC,3350,High,Ballarat historic business tech precinct
+Eaglehawk Software,eaglehawksoftware.com.au,Victoria Street,Eaglehawk,VIC,3556,High,Eaglehawk municipal software lab
+Central Victorian Solar IoT,centralvicsolar.com.au,Pall Mall,Bendigo,VIC,3550,High,Bendigo clean energy electronics facility
+Gippsland Water Digital,gippswater.com.au,Hazelwood Road,Traralgon,VIC,3844,High,Traralgon regional water utility tech center
+Star of the South Telemetry,starofthesouth.com.au,Church Street,Traralgon,VIC,3844,High,Gippsland offshore clean energy office
+Latrobe Valley Engineering Tech,latrobevalleynetwork.com.au,Commercial Road,Morwell,VIC,3840,High,Morwell industrial digital transformation office
+Kagome Digital Ag,kagome.com.au,Broom Street,Echuca,VIC,3564,High,Echuca agricultural processing automation lab
+Goulburn Valley Telemetry,gvtelemetry.com.au,Wyndham Street,Shepparton,VIC,3630,High,Shepparton precision horticultural center
+SuniTAFE Smart Farm,sunitafe.edu.au,Benetook Avenue,Mildura,VIC,3500,High,Mildura horticultural education smart farm
+Mildura Fruit Tech,mildurafruittech.com.au,Eighth Street,Mildura,VIC,3500,High,Mildura agricultural packhouse automation hub
+Sunraysia Solar Telemetry,sunraysiasolar.com.au,Deakin Avenue,Mildura,VIC,3500,High,Mildura solar engineering workshop
+Deakin Marine Tech Warrnambool,deakinmarinetech.com.au,Princes Highway,Warrnambool,VIC,3280,High,Deakin Warrnambool marine research campus
+Midfield Automation,midfield.com.au,Scott Street,Warrnambool,VIC,3280,High,Warrnambool food automation facility
+South West IoT,southwestiot.com.au,Liebig Street,Warrnambool,VIC,3280,High,Warrnambool dairy telemetry development office
+Albury Wodonga Digital Health,awdigitalhealth.com.au,High Street,Wodonga,VIC,3690,High,Wodonga cross-border health tech office
+North East Telco,northeasttelco.com.au,Faithfull Street,Wangaratta,VIC,3677,High,Wangaratta wireless network engineering lab
+Goulburn River Glass Tech,goulburnglass.com.au,Emily Street,Seymour,VIC,3660,High,Seymour advanced materials manufacturing hub
+Yarra Valley Cloud Systems,yarravalleycloud.com.au,Main Street,Lilydale,VIC,3140,High,Lilydale wine technology development lab
+Dandenong Robotics Centre,dandenongrobotics.com.au,Cheltenham Road,Dandenong,VIC,3175,High,Dandenong manufacturing robotics plant
+Frankston Healthtech Lab,frankstonhealthtech.com.au,Nepean Highway,Frankston,VIC,3199,High,Frankston medical device innovation lab
+Mornington Peninsula Cleantech,mpcleantech.com.au,Barkly Street,Mornington,VIC,3931,High,Mornington Peninsula cleantech facility
+Bairnsdale Marine Sensors,bairnsdalemarine.com.au,Main Street,Bairnsdale,VIC,3875,High,Bairnsdale maritime sensor facility
+Castlemaine Engineering Tech,castlemaineengineering.com.au,Barker Street,Castlemaine,VIC,3450,High,Castlemaine electric mobility engineering workshop
+Ballarat Solar Tech,ballaratsolar.com.au,Sturt Street,Ballarat,VIC,3350,High,Ballarat solar power electronics office
+Geelong Aerospace Sensors,geelongaerospace.com.au,Station Street,North Shore,VIC,3214,High,Geelong aerospace test facility
+Opmantek Software,opmantek.com,Surfers Paradise Boulevard,Surfers Paradise,QLD,4217,High,Gold Coast telecom network software centre
+Russell Mineral Equipment Tech,rmeglobal.com,Industrial Avenue,Toowoomba,QLD,4350,High,Toowoomba specialized robotics engineering facility
+ENVIROFIBRE Tech,envirofibre.com.au,Enterprise Street,Kunda Park,QLD,4556,High,Kunda Park cleantech recycling plant
+Coastr Technology,coastr.com,Marine Parade,Southport,QLD,4215,High,Gold Coast mobility SaaS lab
+Cityzen Tech,cityzen.com.au,Bundall Road,Bundall,QLD,4217,High,Bundall smart city analytics studio
+AgTech Central,agtechcentral.com.au,Ruthven Street,Toowoomba,QLD,4350,High,Toowoomba grain agtech lab
+Wellcamp Aerospace Tech,wellcampaerospace.com.au,Wellcamp Station Road,Wellcamp,QLD,4350,High,Wellcamp airport aerospace precinct
+Cairns Aviation Tech,cairnsaviation.com.au,Tom McDonald Drive,Cairns Airport,QLD,4870,High,Cairns airport aviation engineering center
+Wet Tropics BioSensors,wettropicsbiosensors.com.au,Abbott Street,Cairns,QLD,4870,High,Cairns environmental sensor lab
+Far North Telemetry,farnorthtelemetry.com.au,Grafton Street,Cairns,QLD,4870,High,Cairns remote telemetry engineering hub
+JCU Marine Deeptech,jcumaredeptech.com.au,Angus Smith Drive,Douglas,QLD,4814,High,James Cook University Douglas marine science campus
+Townsville Port Telemetry,townsvilleporttech.com.au,Benwell Road,South Townsville,QLD,4810,High,Townsville maritime logistics telemetry lab
+CopperString Digital,copperstringdigital.com.au,Flinders Street,Townsville,QLD,4810,High,Townsville energy transmission center
+Mackay Autonomous Mining,mackayminingtech.com.au,Sydney Street,Mackay,QLD,4740,High,Mackay mining technology center
+CQUniversity Agtech,cquagtech.com.au,Bruce Highway,North Rockhampton,QLD,4702,High,CQUniversity Rockhampton precision pastoral lab
+Bundaberg Brew Tech,bundabergbrewtech.com.au,Bargara Road,Bundaberg,QLD,4670,High,Bundaberg beverage manufacturing automation center
+Gladstone Hydrogen Telemetry,gladstonehydrogen.com.au,Goondoon Street,Gladstone,QLD,4680,High,Gladstone clean industrial energy hub
+Bowen Basin Telematics,bowenbasin.com.au,Clermont Street,Emerald,QLD,4720,High,Emerald mining operational tech office
+Hervey Bay Marine Electronics,herveybaymarine.com.au,Boat Harbour Drive,Urangan,QLD,4655,High,Urangan marina technology lab
+Maroochydore Smart City IoT,maroochydoresmartcity.com.au,First Avenue,Maroochydore,QLD,4558,High,Maroochydore new city centre smart precinct
+Noosa Biosphere Tech,noosabiosphere.com.au,Thomas Street,Noosaville,QLD,4566,High,Noosaville ecological telemetry lab
+Gold Coast Robotics Hub,gcroboticshub.com.au,Nerang Street,Southport,QLD,4215,High,Southport robotics innovation precinct
+Varsity Lakes Cloud Lab,varsitylakescloud.com.au,Varsity Parade,Varsity Lakes,QLD,4227,High,Varsity Lakes software technology park
+Robina Healthtech Solutions,robinahealthtech.com.au,Robina Town Centre Drive,Robina,QLD,4226,High,Robina health technology precinct
+Ipswich Defense Robotics,ipswichdefenserobotics.com.au,Brisbane Street,Ipswich,QLD,4305,High,Ipswich defense industrial automation center
+Logan Cleantech Energy,logancleantech.com.au,Wembley Road,Logan Central,QLD,4114,High,Logan circular economy cleantech facility
+Redland Marine BioSensors,redlandmarine.com.au,Middle Street,Cleveland,QLD,4163,High,Cleveland marine environmental office
+Caboolture Ag Systems,cabooltureagsystems.com.au,King Street,Caboolture,QLD,4510,High,Caboolture greenhouse automation facility
+Gympie Timber Tech,gympietimbertech.com.au,Mary Street,Gympie,QLD,4570,High,Gympie forestry technology office
+Maryborough Rail Robotics,maryboroughrail.com.au,Bazaar Street,Maryborough,QLD,4650,High,Maryborough rail engineering center
+Chinchilla Gas Telemetry,chinchillagas.com.au,Heeney Street,Chinchilla,QLD,4413,High,Chinchilla energy telemetry office
+Roma Pastoral Tech,romapastoral.com.au,McDowall Street,Roma,QLD,4455,High,Roma saleyards digital automation lab
+Mount Isa Mineral Sensors,mountisaminerals.com.au,Marian Street,Mount Isa,QLD,4825,High,Mount Isa mining deeptech facility
+Atherton Tablelands Agtech,athertonagtech.com.au,Main Street,Atherton,QLD,4883,High,Atherton horticultural sensor lab
+Weipa Maritime Logistics,weipamaritime.com.au,Commercial Avenue,Weipa,QLD,4874,High,Weipa cape york shipping tech hub
+Innisfail Sugar Automation,innisfailsugar.com.au,Rankin Street,Innisfail,QLD,4860,High,Innisfail sugar technology office
+Stanthorpe Apple Tech,stanthorpeappletech.com.au,Maryland Street,Stanthorpe,QLD,4380,High,Stanthorpe agricultural climate office
+Spookfish Geospatial,spookfish.com,St Georges Terrace,Perth,WA,6000,High,Perth geospatial computer vision centre
+Pointerra,pointerra.com,Adelaide Terrace,East Perth,WA,6004,High,East Perth 3D geospatial cloud analytics
+Family Zone Tech,familyzone.com,Kings Park Road,West Perth,WA,6005,High,West Perth cyber safety software hub
+CVCheck Tech,cvcheck.com,Hasler Road,Osborne Park,WA,6017,High,Osborne Park verification fintech center
+SEQTA Software,seqta.com.au,Grand Boulevard,Joondalup,WA,6027,High,Joondalup school education software campus
+Scene Group Tech,scenegroup.com.au,Pakenham Street,Fremantle,WA,6160,High,Fremantle creative animation software lab
+Bankwest Digital,bankwest.com.au,"Bankwest Place, 300 Murray Street",Perth,WA,6000,High,Perth CBD digital retail banking headquarters
+Pilbara Autonomous Mining,pilbaraminingtech.com.au,Sharpe Avenue,Karratha,WA,6714,High,Karratha iron ore operational tech center
+South West Agtech Bunbury,southwestagtech.com.au,Victoria Street,Bunbury,WA,6230,High,Bunbury regional agricultural technology center
+Kalgoorlie Mine Automation,kalgoorliemining.com.au,Hannan Street,Kalgoorlie,WA,6430,High,Kalgoorlie gold mining engineering center
+Ningaloo Marine Telemetry,ningaloomarine.com.au,Murat Road,Exmouth,WA,6707,High,Exmouth coastal marine research facility
+Albany Wave Energy Tech,albanywaveenergy.com.au,York Street,Albany,WA,6330,High,Albany marine renewable energy lab
+Geraldton Wind Robotics,geraldtonwind.com.au,Marine Terrace,Geraldton,WA,6530,High,Geraldton clean energy robotics lab
+Busselton Viticulture Sensors,busseltonviti.com.au,Queen Street,Busselton,WA,6280,High,Busselton viticultural tech office
+Fremantle Subsea Robotics,fremantlesubsea.com.au,Cliff Street,Fremantle,WA,6160,High,Fremantle subsea maritime robotics lab
+Broome Pearl BioSensors,broomepearl.com.au,"Chinatown, Carnarvon Street",Broome,WA,6725,High,Broome marine aquaculture sensor center
+Esperance Grain Logistics,esperancegrain.com.au,Dempster Street,Esperance,WA,6450,High,Esperance grain logistics technology office
+Port Hedland Maritime Radar,porthedlandmaritime.com.au,The Esplanade,Port Hedland,WA,6721,High,Port Hedland world's largest export port tech center
+Kwinana Industrial Digital Twin,kwinanadigitaltwin.com.au,Mason Road,Kwinana Beach,WA,6167,High,Kwinana industrial battery materials chemical lab
+Henderson Marine Defence,hendersondefence.com.au,Cockburn Road,Henderson,WA,6166,High,Henderson Australian Marine Complex shipyard lab
+Subiaco Cloud Technologies,subiacocloud.com.au,Rokeby Road,Subiaco,WA,6008,High,Subiaco enterprise cloud software hub
+Joondalup Cyber Academy Tech,joondalupcyber.com.au,Kendrew Crescent,Joondalup,WA,6027,High,Joondalup ECU cyber security research center
+Midland Rail Automation,midlandrail.com.au,Railway Road,Midland,WA,6056,High,Midland rail transport technology center
+Mandurah Environmental IoT,mandurahenviro.com.au,Mandurah Terrace,Mandurah,WA,6210,High,Mandurah waterway environmental tech office
+Northam Broadacre Tech,northambroadacre.com.au,Fitzgerald Street,Northam,WA,6401,High,Northam central agricultural region office
+Newman Mining Telemetry,newmanmining.com.au,Iron Ore Parade,Newman,WA,6753,High,Newman mining operations tech base
+Silentium Defence,silentiumdefence.com.au,Mawson Lakes Boulevard,Mawson Lakes,SA,5095,High,Mawson Lakes defence and sensor tech precinct
+Acacia Systems,acaciasystems.com.au,Milham Place,Oaklands Park,SA,5046,High,Oaklands Park naval acoustic signal processing lab
+Dspace Australia,dspace.com,MAB Circuit,Tonsley,SA,5042,High,Tonsley innovation district automotive HIL lab
+CogBI Analytics,cogbi.com.au,North Terrace,Adelaide,SA,5000,High,Adelaide BioMed City clinical analytics lab
+BAE Systems Digital SA,baesystems.com,West Avenue,Edinburgh,SA,5111,High,Edinburgh defence aerospace and naval technology precinct
+Saab Australia Digital,saab.com,Third Avenue,Mawson Lakes,SA,5095,High,Mawson Lakes combat management systems campus
+Tonsley Clean Energy Tech,tonsleycleanenergy.com.au,Tonsley Boulevard,Tonsley,SA,5042,High,Tonsley innovation district clean energy hub
+Whyalla Green Steel Tech,whyallagreensteel.com.au,Iron Knob Road,Whyalla,SA,5600,High,Whyalla steelworks digital transformation office
+Port Augusta Solar Thermal,portaugustasolar.com.au,Highway One,Port Augusta,SA,5700,High,Port Augusta renewable energy engineering office
+Forestry South East Telemetry,forestryse.com.au,Commercial Street,Mount Gambier,SA,5290,High,Mount Gambier forestry technology lab
+Barossa Wine Digital,barossawinedigital.com.au,Murray Street,Tanunda,SA,5352,High,Tanunda wine technology development office
+Port Lincoln Marine Tech,portlincolnmarine.com.au,Tasman Terrace,Port Lincoln,SA,5606,High,Port Lincoln aquaculture technology facility
+Riverland Irrigation IoT,riverlandirrigation.com.au,Ral Ral Avenue,Renmark,SA,5341,High,Renmark riverland agricultural telemetry office
+Clare Valley Viticulture Tech,clarevalleytech.com.au,Main North Road,Clare,SA,5453,High,Clare Valley agricultural software lab
+Roxby Downs Remote Mining,roxbydownstech.com.au,Richardson Place,Roxby Downs,SA,5725,High,Roxby Downs Olympic Dam technology base
+Victor Harbor Coastal Sensors,victorharborsensors.com.au,Ocean Street,Victor Harbor,SA,5211,High,Victor Harbor coastal environmental lab
+Ceduna Satellite Earth Station,cedunasatellite.com.au,Eyre Highway,Ceduna,SA,5690,High,Ceduna deep space ground station facility
+Savage Interactive,procreate.com,Elizabeth Street,North Hobart,TAS,7000,High,North Hobart creative software headquarters
+Bell Bay Clean Hydrogen Digital,bellbayhydrogen.com.au,Bell Bay Road,Bell Bay,TAS,7253,High,Bell Bay industrial port clean hydrogen office
+Devonport Agricultural Automation,devonportagtech.com.au,Rooke Street,Devonport,TAS,7310,High,Devonport agricultural technology center
+Burnie Advanced Composites,burniecomposites.com.au,Mount Street,Burnie,TAS,7320,High,Burnie industrial engineering office
+Charles Darwin University Deeptech,cdu.edu.au,Ellengowan Drive,Casuarina,NT,0810,High,CDU Casuarina university deeptech campus
+NT Fleet Telematics,ntfleet.com.au,Stuart Highway,Winnellie,NT,0820,High,Winnellie Darwin fleet technology center
+Arnhem Space Tech,arnhemspace.com.au,Chesterfield Circuit,Nhulunbuy,NT,0880,High,Nhulunbuy Arnhem space operations office
+Alice Springs Solar Desert Tech,alicespringssolar.com.au,Todd Mall,Alice Springs,NT,0870,High,Alice Springs arid zone solar research office
+Employment Innovations,employmentinnovations.com,Kent Street,Sydney,NSW,2000,High,Sydney CBD HR and payroll compliance software
+Uber Carshare,ubercarshare.com,Harris Street,Ultimo,NSW,2007,High,Ultimo connected vehicle mobility lab
+Sonder,sonder.io,Elizabeth Street,Sydney,NSW,2000,High,Sydney safety and wellbeing software headquarters
+GigaComm,gigacomm.net.au,Castlereagh Street,Sydney,NSW,2000,High,Sydney next-gen telecommunications office
+Willow Technology,willowinc.com,Bond Street,Sydney,NSW,2000,High,Sydney smart building digital twin campus
+Who Gives A Crap,whogivesacrap.org,Smith Street,Collingwood,VIC,3066,High,Collingwood direct-to-consumer technology office
+Good Pair Days,goodpairdays.com,Dunning Avenue,Rosebery,NSW,2018,High,Rosebery consumer personalization tech office
+Zero Latency VR,zerolatencyvr.com,North Melbourne,North Melbourne,VIC,3051,High,North Melbourne spatial VR computing lab
+VAPAR,vapar.co,George Street,Sydney,NSW,2000,High,Sydney civil infrastructure computer vision hub
+CIM Tech,cim.io,O'Connell Street,Sydney,NSW,2000,High,Sydney commercial building cleantech software
+InDebted,indebted.co,Spring Street,Sydney,NSW,2000,High,Sydney fintech consumer engagement headquarters
+Koba Insurance,koba.com.au,Chapel Street,South Yarra,VIC,3141,High,South Yarra connected vehicle insurtech lab
+OpenSolar,opensolar.com,Young Street,Sydney,NSW,2000,High,Sydney solar software global headquarters
+GivEngineering,givengineering.com,Argyle Street,Fitzroy,VIC,3065,High,Fitzroy connected hardware design workshop
+Lumachain,lumachain.com,Bridge Street,Sydney,NSW,2000,High,Sydney food tech computer vision headquarters
+Great Wrap,greatwrap.co,Tullamarine,Tullamarine,VIC,3043,High,Tullamarine advanced biopolymer manufacturing facility
+Endua,endua.com,Kerry Road,Archerfield,QLD,4108,High,Archerfield hydrogen energy storage facility
+Splend Tech,splend.com.au,Bourke Street,Alexandria,NSW,2015,High,Alexandria mobility fleet management center
+SmartSat CRC,smartsatcrc.com,Frome Road,Adelaide,SA,5000,High,Lot Fourteen space technology research center
+Australian Institute for Machine Learning,aiml.adelaide.edu.au,North Terrace,Adelaide,SA,5000,High,Lot Fourteen AI research institute
+Monash MedTech,monash.edu,Wellington Road,Clayton,VIC,3800,High,Monash University Clayton biomedical engineering precinct
+CSL Limited,csl.com,Poplar Road,Parkville,VIC,3052,High,Parkville biomedical and vaccines innovation campus
+Nanosonics,nanosonics.com.au,Monro Avenue,Lane Cove,NSW,2066,High,Lane Cove infection control medical technology lab
+Pro Medicus,promedicus.com.au,Swan Street,Richmond,VIC,3121,High,Richmond clinical radiology software global headquarters
+SomnoMed,somnomed.com.au,Kent Street,Sydney,NSW,2000,High,Sydney digital sleep medicine headquarters
+Cyclopharm,cyclopharm.com.au,Commercial Road,Kingsgrove,NSW,2208,High,Kingsgrove nuclear medicine pulmonary technology facility
+Polynovo,polynovo.com,Plummer Street,Port Melbourne,VIC,3207,High,Port Melbourne tissue engineering facility
+Clinuvel Pharmaceuticals,clinuvel.com,Swanston Street,Melbourne,VIC,3000,High,Melbourne biopharmaceutical research office
+Opthea,opthea.com,Toorak Road,South Yarra,VIC,3141,High,South Yarra ophthalmology biotechnology lab
+Mayne Pharma Tech,maynepharma.com,Main North Road,Salisbury,SA,5108,High,Salisbury pharmaceutical manufacturing and analytical lab
+Starpharma,starpharma.com,Victoria Street,Abbotsford,VIC,3067,High,Abbotsford nanomedicine polymer technology campus
+Mesoblast,mesoblast.com,Collins Street,Melbourne,VIC,3000,High,Melbourne regenerative medicine global headquarters
+Genetic Signatures,geneticsignatures.com,Castlereagh Street,Sydney,NSW,2000,High,Sydney molecular diagnostic instruments facility
+Bionomics,bionomics.com.au,Dalgleish Street,Thebarton,SA,5031,High,Thebarton neuroscience drug discovery lab
+Anatara Lifesciences,anataralifesciences.com,Collins Street,Melbourne,VIC,3000,High,Melbourne gut microbiome biotechnology lab
+Dimerix,dimerix.com,Johnston Street,Fitzroy,VIC,3065,High,Fitzroy clinical biopharmaceutical office
+Invetech Group,invetechgroup.com,Ricketts Road,Mount Waverley,VIC,3149,High,Mount Waverley medical instrument engineering facility
+Planet Innovation,planetinnovation.com.au,Nelson Road,Box Hill,VIC,3128,High,Box Hill medical device commercialisation campus
+Grey Innovation,greyinnovation.com,Cremorne Street,Cremorne,VIC,3121,High,Cremorne medical technology design studio
+Hydrix Group,hydrix.com,Springvale Road,Mulgrave,VIC,3170,High,Mulgrave medical engineering and embedded software lab
+Compumedics,compumedics.com.au,Victoria Street,Abbotsford,VIC,3067,High,Abbotsford neuro-diagnostic technology campus
+CardieX,cardiex.com,Bridge Street,Sydney,NSW,2000,High,Sydney cardiovascular medical telemetry office
