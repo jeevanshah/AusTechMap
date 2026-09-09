@@ -32,6 +32,7 @@ from typing import cast
 from uuid import UUID
 
 import psycopg
+from psycopg.types.json import Jsonb
 
 from austechmap_ingestion.employers.geocoding import (
     GeocodeResult,
@@ -63,6 +64,7 @@ class AddressCandidate:
     postcode: str
     source_confidence: str
     source_note: str
+    source_url: str | None = None
 
 
 def load_address_fixture(path: Path = DEFAULT_FIXTURE_PATH) -> list[AddressCandidate]:
@@ -77,6 +79,7 @@ def load_address_fixture(path: Path = DEFAULT_FIXTURE_PATH) -> list[AddressCandi
                 postcode=row["postcode"].strip(),
                 source_confidence=row["source_confidence"].strip(),
                 source_note=row["source_note"].strip(),
+                source_url=row.get("source_url", "").strip() or None,
             )
             for row in reader
         ]
@@ -181,6 +184,48 @@ def _resolve_location(
     raise last_error if last_error is not None else GeocodingError("no variants to try")
 
 
+def _record_location_source_evidence(
+    connection: psycopg.Connection[tuple[object, ...]],
+    *,
+    company_id: UUID,
+    source_id: UUID,
+    candidate: AddressCandidate,
+    query_text: str,
+) -> None:
+    """Persist a fixture's public address proof once, alongside its map link."""
+    if candidate.source_url is None:
+        return
+    connection.execute(
+        """
+        INSERT INTO evidence (
+          entity_type, entity_id, claim_type, claim_value, source_id, confidence, observed_at
+        )
+        SELECT 'company', %s, 'location_source', %s, %s, 1.00, now()
+        WHERE NOT EXISTS (
+          SELECT 1 FROM evidence
+          WHERE entity_type = 'company'
+            AND entity_id = %s
+            AND claim_type = 'location_source'
+            AND claim_value->>'source_url' = %s
+            AND status = 'active'
+        )
+        """,
+        (
+            str(company_id),
+            Jsonb(
+                {
+                    "source_url": candidate.source_url,
+                    "source_note": candidate.source_note,
+                    "address_query": query_text,
+                }
+            ),
+            source_id,
+            str(company_id),
+            candidate.source_url,
+        ),
+    )
+
+
 def run_location_seed_import(
     database_url: str,
     mapbox_token: str,
@@ -240,6 +285,13 @@ def run_location_seed_import(
                     """,
                     (company_id, resolved_location_id, query_text, source_id),
                 )
+            _record_location_source_evidence(
+                connection,
+                company_id=company_id,
+                source_id=source_id,
+                candidate=candidate,
+                query_text=query_text,
+            )
 
     return LocationSeedStats(
         resolved=resolved,
