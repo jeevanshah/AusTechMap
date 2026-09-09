@@ -6,14 +6,14 @@
 
 - **Current Implementer / Integrator:** Gemini / Codex — operating per `AGENTS.md` orchestration.
 - **Updated at:** 2026-09-09
-- **Reason:** Milestone checkpoint following the completion and verification of Phase 5 (Hiring Momentum Derivation & Live Hiring Filters) and admin account security cleanup.
-- **Task / issue:** Complete Phase 5 delivery; prepare for Phase 8 tech employer cohort expansion towards 1,000 companies.
-- **Acceptance criteria:** All automated test suites green (contracts vitest 46/46, web vitest 170/170, ingestion pytest 244/244), zero lint errors, zero typecheck errors, Next.js Turbopack production build verified, live database verified on Neon.
+- **Reason:** Milestone checkpoint following Phase 8 tech employer cohort expansion (133 → 183 companies) and ATS source expansion (26 → 39 verified employers, 1,293 live jobs).
+- **Task / issue:** Deliver Phase 8 employer scaling and live hiring data enrichment.
+- **Acceptance criteria:** All automated test suites green (contracts vitest 46/46, web vitest 170/170, ingestion pytest 244/244), zero lint errors, zero typecheck errors, live database verified on Neon.
 
 ## Checkpoint
 
 - **Implementation branch:** `main`
-- **Implementation checkpoint commit:** `8594c01` (`feat(hiring): implement hiring momentum derivation and live map hiring filters`)
+- **Implementation checkpoint commit:** `28a025d` (`feat(hiring): register 13 new verified ATS sources and scale active jobs to 1,293`)
 - **Handoff commit:** Current commit on `main`; verify with `git rev-parse HEAD`.
 - **Working-tree status at checkpoint:** Clean.
 - **Remote:** `origin/main` synchronized.
@@ -190,6 +190,29 @@ Everything since the 2026-09-04 handoff:
   - Verified only `jeevanrajshah@gmail.com` remains active admin (`role = 'admin'`, `status = 'active'`).
 - Updated ingestion test suites: `test_ats_source_seed.py` (26 verified seeds), `test_migrations.py` (range 1..21), and `test_hiring_signals.py` (2/2 DB integration tests pass).
 - Monorepo quality gates: **216 tests passing** across contracts (46) and web (170), 0 lint errors, 0 type errors, clean Next.js build.
+
+**Phase 8 / Phase 5 ATS Source Expansion & Live Job Ingestion completed 9 September 2026**:
+- Expanded verified ATS employer sources from 26 to **39 registered tech employers** (added 13 verified public candidate boards across Lever, Ashby, and Greenhouse):
+  - **DroneShield** (`greenhouse:droneshield`, 29 jobs) — ASX-listed AI defence robotics, Sydney.
+  - **UpGuard** (`ashby:upguard`, 25 jobs) — Cybersecurity risk SaaS, Sydney.
+  - **Kogan.com** (`lever:kogan`, 22 jobs) — E-commerce & retail tech scaleup, Melbourne.
+  - **Shift** (`ashby:shift`, 18 jobs) — SME credit underwriting fintech, Sydney.
+  - **Bugcrowd** (`greenhouse:bugcrowd`, 14 jobs) — Crowdsourced cybersecurity platform, Sydney.
+  - **Buildkite** (`greenhouse:buildkite`, 10 jobs) — CI/CD automation software, Melbourne.
+  - **Q-CTRL** (`lever:q-ctrl`, 9 jobs) — Quantum infrastructure & sensing deeptech, Sydney.
+  - **PEXA** (`lever:pexa`, 6 jobs) — Digital property settlements SaaS, Melbourne.
+  - **Amber Electric** (`lever:amberelectric`, 5 jobs) — Smart energy automation, Melbourne.
+  - **Athena Home Loans** (`greenhouse:athena`, 4 jobs) — Cloud mortgage fintech, Sydney.
+  - **Secure Code Warrior** (`lever:securecodewarrior`, 3 jobs) — Developer security learning platform, Sydney.
+  - **Brighte** (`lever:brighte`, 2 jobs) — Clean energy consumer financing, Sydney.
+  - **Timely** (`ashby:timely`, 2 jobs) — Cloud booking and appointment SaaS, Melbourne.
+- Registered in `workers/ingestion/src/austechmap_ingestion/hiring/fixtures/ats_source_seed_20260905.csv` and seeded into Neon `company_ats_sources` (`{"created": 13, "reused": 26}`).
+- Crawled all 39 sources via `crawl-jobs --all`: expanded live jobs from 1,139 to **1,293 active unexpired jobs across 38 hiring companies** on Neon PostgreSQL.
+- Ingestion testing: `test_ats_source_seed.py` updated and passing for 39 sources; full pytest suite passing (244/244).
+- Derivation pipelines:
+  - `derive-hiring-signals`: derived 24 new role signals (78 total) and 38 new skill signals (145 total) across all 38 hiring companies.
+  - `run-retention-pipeline.mjs`: derived 199 new longitudinal change events (149 jobs, 50 locations) in `events`.
+- Monorepo quality gates: **460 automated tests passing** across contracts (46), web (170), and ingestion pytest (244). Live Next.js `/api/map/companies?hiring=true` verified with emerald active role indicators.
 
 ## Work remaining
 
