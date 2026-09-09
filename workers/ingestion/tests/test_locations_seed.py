@@ -124,6 +124,17 @@ def test_default_fixture_exists_and_matches_employer_fixture_domains() -> None:
     assert address_domains <= seeded_domains
 
 
+def test_address_fixture_preserves_an_optional_source_url(tmp_path: Path) -> None:
+    fixture = tmp_path / "addresses.csv"
+    fixture.write_text(
+        "domain,street_address,suburb,state,postcode,source_confidence,source_note,source_url\n"
+        "example.com,341 George Street,Sydney,NSW,2000,High,test,https://example.com/contact\n",
+        encoding="utf-8",
+    )
+    candidates = load_address_fixture(fixture)
+    assert candidates[0].source_url == "https://example.com/contact"
+
+
 @pytest.mark.integration
 def test_run_location_seed_import_resolves_and_links(tmp_path: Path) -> None:
     database_url = _database_url()
@@ -165,6 +176,42 @@ def test_run_location_seed_import_resolves_and_links(tmp_path: Path) -> None:
             (company_id,),
         ).fetchone()
     assert location == ("head_office", 151.2093, -33.8688, "external_geocoder", "accepted")
+
+
+@pytest.mark.integration
+def test_run_location_seed_import_records_source_url_evidence(tmp_path: Path) -> None:
+    database_url = _database_url()
+    suffix = uuid.uuid4().hex
+    domain = f"evidence-geocode-{suffix}.example.com"
+    fixture_path = tmp_path / "addresses.csv"
+    fixture_path.write_text(
+        "domain,street_address,suburb,state,postcode,source_confidence,source_note,source_url\n"
+        f"{domain},341 George Street,Sydney,NSW,2000,High,test,https://{domain}/contact\n",
+        encoding="utf-8",
+    )
+    with psycopg.connect(database_url, autocommit=True) as connection:
+        connection.execute(
+            "INSERT INTO companies (slug, display_name, domain) VALUES (%s, %s, %s)",
+            (f"evidence-geocode-{suffix}", f"Evidence Geocode {suffix}", domain),
+        )
+
+    _, geocode = _fake_geocoder(151.2093, -33.8688)
+    run_location_seed_import(database_url, "fake-token", fixture_path, geocode_fn=geocode)
+    run_location_seed_import(database_url, "fake-token", fixture_path, geocode_fn=geocode)
+
+    with psycopg.connect(database_url) as connection:
+        evidence = connection.execute(
+            """
+            SELECT claim_value->>'source_url', count(*)
+            FROM evidence
+            WHERE entity_type = 'company'
+              AND entity_id = (SELECT id::text FROM companies WHERE domain = %s)
+              AND claim_type = 'location_source'
+            GROUP BY claim_value->>'source_url'
+            """,
+            (domain,),
+        ).fetchone()
+    assert evidence == (f"https://{domain}/contact", 1)
 
 
 @pytest.mark.integration
