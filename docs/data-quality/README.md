@@ -7,3 +7,5 @@ Candidates may move into a seed fixture only after a public first-party source U
 `unreachable_needs_manual_review` is deliberately not a rejection: provider outages, bot controls, and TLS errors can all produce that result. It blocks automatic seeding until an authoritative company source is found.
 
 `wave1-seed-preflight-20260909.csv` is the bulk preflight derived from the homepage-evidence manifest. Its entries meet the fixture's syntactic source-evidence contract, but it is **not** an import instruction: applying it to Neon remains a production write requiring explicit user approval.
+
+`wave1-location-candidates-20260909.csv` is a bulk, first-party page sweep. Its address text is discovery-only: every candidate still needs its exact supporting page URL and a strict address-fixture validation before geocoding.

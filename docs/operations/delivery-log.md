@@ -23,3 +23,11 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Result: `seed-employers` completed with 67 matched existing companies, 0 created companies, 0 review items, 0 errors, and 0 low-confidence skips.
 - Verification: strict fixture evidence validation passed immediately before the import; the importer's returned result is recorded above.
 - Residual risk: this adds homepage-backed seed evidence to existing company records only. It does not verify or create a street-level location, and it does not make a company eligible for automatic geocoding.
+
+## 2026-09-09 — Wave 1 official-source location discovery
+
+- Commit: `data: record Wave 1 official-source location discovery` (this commit)
+- Scope: scanned the 67 evidence-backed companies' official home, contact, contact-us, and locations pages without using Google Maps or changing Neon.
+- Result: one address candidate (InDebted); 66 companies had no reliable street-address text found by the bounded page sweep.
+- Verification: candidate-only result; no location fixture was produced, validated, geocoded, or imported.
+- Residual risk: company websites can render contact details client-side or keep them on untested paths. The one candidate remains unverified until its exact first-party evidence URL is captured.
