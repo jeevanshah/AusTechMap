@@ -144,6 +144,14 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: all six fixture domains were read back with an accepted location and their exact active first-party source-evidence URL. One address used the importer's documented query fallback before successful geocoding; this is preserved in the company-location raw address and remains paired with the same cited source. Live totals after import: 506 companies with an accepted location, 388 with an ambiguous linked location, and nine pending review items.
 - Residual risk: five reviewed companies remain deliberately quarantined. They need a human or a new authoritative source to distinguish a correct office without guessing.
 
+## 2026-09-10 — residual ambiguous-location cleanup inventory
+
+- Commit: `data: inventory residual ambiguous locations` (this commit)
+- Scope: read-only Neon audit of every ambiguous company-location link after the approved repair imports.
+- Result: 388 ambiguous links remain. Seventy-six are superseded by an accepted location for the same company; 312 have no active first-party location evidence and remain a research queue.
+- Verification: direct read-only database query; no location, evidence, or company record changed.
+- Residual risk: unlinking superseded ambiguous records is a production mutation and must be separately approved and audited. The 312 evidence-free records cannot be safely auto-resolved.
+
 ## 2026-09-10 — ambiguous-location canonical-host recovery
 
 - Commit: `data: recover ambiguous-location address evidence` (this commit)

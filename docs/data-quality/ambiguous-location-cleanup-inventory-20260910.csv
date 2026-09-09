@@ -1,0 +1,389 @@
+domain,name,ambiguous_input_text,has_accepted_location,has_active_location_evidence,cleanup_disposition
+academyxi.com,Academy Xi,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+accesspay.com.au,AccessPay,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+aeeris.com,Aeeris,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+aerobotics.com,Aerobotics,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+aerologix.com,Aerologix,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+agdna.com,AgDNA,"Macquarie Street, Dubbo NSW 2830, Australia",false,false,no_active_location_evidence
+agiledigital.com.au,Agile Digital,"University Avenue, Canberra ACT 2601, Australia",false,false,no_active_location_evidence
+agora.io,Agora,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+agridigital.io,Agridigital,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+agrifutures.com.au,AgriFutures Australia Tech,"Boorooma Street, Wagga Wagga NSW 2650, Australia",true,true,superseded_by_accepted_location
+agtechcentral.com.au,AgTech Central,"Ruthven Street, Toowoomba QLD 4350, Australia",false,false,no_active_location_evidence
+aiml.adelaide.edu.au,Australian Institute for Machine Learning,"North Terrace, Adelaide SA 5000, Australia",false,false,no_active_location_evidence
+aiven.io,Aiven AU,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+albanywaveenergy.com.au,Albany Wave Energy Tech,"York Street, Albany WA 6330, Australia",false,false,no_active_location_evidence
+alembic.com.au,Alembic Strategy,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+alicespringssolar.com.au,Alice Springs Solar Desert Tech,"Todd Mall, Alice Springs NT 0870, Australia",true,false,superseded_by_accepted_location
+amidatech.com.au,Amida Technology,"St Georges Terrace, Perth WA 6000, Australia",false,false,no_active_location_evidence
+ampere.energy,Ampere Energy,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+anataralifesciences.com,Anatara Lifesciences,"Collins Street, Melbourne VIC 3000, Australia",true,true,superseded_by_accepted_location
+archerx.com.au,Archer Materials,"Frome Road, Adelaide SA 5000, Australia",true,true,superseded_by_accepted_location
+arcoplatform.com,Arco Platform,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+arloid.com,Arloid Automation,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+arnhemspace.com.au,Arnhem Space Tech,"Chesterfield Circuit, Nhulunbuy NT 0880, Australia",false,false,no_active_location_evidence
+assemblypayments.com,Assembly Payments,"Collins Street, Melbourne VIC 3000, Australia",true,true,superseded_by_accepted_location
+astutepayroll.com,Astute Payroll,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+athertonagtech.com.au,Atherton Tablelands Agtech,"Main Street, Atherton QLD 4883, Australia",false,false,no_active_location_evidence
+austeng.net.au,Austeng Tech,"Tucker Street, Breakwater VIC 3219, Australia",false,false,no_active_location_evidence
+autoguru.com.au,AutoGuru,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+awdigitalhealth.com.au,Albury Wodonga Digital Health,"High Street, Wodonga VIC 3690, Australia",false,false,no_active_location_evidence
+azured.com.au,Azured,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+baesystems.com,BAE Systems Digital SA,"West Avenue, Edinburgh SA 5111, Australia",false,false,no_active_location_evidence
+bairnsdalemarine.com.au,Bairnsdale Marine Sensors,"Main Street, Bairnsdale VIC 3875, Australia",false,false,no_active_location_evidence
+ballaratcloud.com.au,Ballarat Cloud Solutions,"Lydiard Street, Ballarat VIC 3350, Australia",false,false,no_active_location_evidence
+ballaratsolar.com.au,Ballarat Solar Tech,"Sturt Street, Ballarat VIC 3350, Australia",false,false,no_active_location_evidence
+ballinacloud.com.au,Ballina Cloud Systems,"River Street, Ballina NSW 2478, Australia",false,false,no_active_location_evidence
+barossawinedigital.com.au,Barossa Wine Digital,"Murray Street, Tanunda SA 5352, Australia",false,false,no_active_location_evidence
+bartondeakin.com,Barton Deakin,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+beamery.com,Beamery,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+beefledger.io,BeefLedger,"Peel Street, Tamworth NSW 2340, Australia",false,false,no_active_location_evidence
+behavox.com,Behavox AU,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+bellbayhydrogen.com.au,Bell Bay Clean Hydrogen Digital,"Bell Bay Road, Bell Bay TAS 7253, Australia",false,false,no_active_location_evidence
+bendigotelco.com.au,Bendigo Telco Tech,"High Street, Bendigo VIC 3550, Australia",false,false,no_active_location_evidence
+bionomics.com.au,Bionomics,"Dalgleish Street, Thebarton SA 5031, Australia",false,false,no_active_location_evidence
+boomaroo.com,Boomaroo Tech,"Geelong-Bacchus Marsh Road, Lara VIC 3212, Australia",true,true,superseded_by_accepted_location
+bowenbasin.com.au,Bowen Basin Telematics,"Clermont Street, Emerald QLD 4720, Australia",false,false,no_active_location_evidence
+braiins.com,Braiins,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+broomepearl.com.au,Broome Pearl BioSensors,"Chinatown, Carnarvon Street, Broome WA 6725, Australia",false,false,no_active_location_evidence
+buildpass.com.au,Buildpass,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+bundabergbrewtech.com.au,Bundaberg Brew Tech,"Bargara Road, Bundaberg QLD 4670, Australia",false,false,no_active_location_evidence
+burniecomposites.com.au,Burnie Advanced Composites,"Mount Street, Burnie TAS 7320, Australia",false,false,no_active_location_evidence
+busseltonviti.com.au,Busselton Viticulture Sensors,"Queen Street, Busselton WA 6280, Australia",false,false,no_active_location_evidence
+butn.com.au,Butn,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+cabooltureagsystems.com.au,Caboolture Ag Systems,"King Street, Caboolture QLD 4510, Australia",false,false,no_active_location_evidence
+canstar.com.au,Canstar,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+caradvice.com.au,Caradvice,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+carbonlink.com.au,CarbonLink,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+cardiex.com,CardieX,"Bridge Street, Sydney NSW 2000, Australia",true,false,superseded_by_accepted_location
+castlemaineengineering.com.au,Castlemaine Engineering Tech,"Barker Street, Castlemaine VIC 3450, Australia",false,false,no_active_location_evidence
+cea.com.au,CEA Technologies,"Gladstone Street, Fyshwick ACT 2609, Australia",false,false,no_active_location_evidence
+cedunasatellite.com.au,Ceduna Satellite Earth Station,"Eyre Highway, Ceduna SA 5690, Australia",false,false,no_active_location_evidence
+centralvicsolar.com.au,Central Victorian Solar IoT,"Pall Mall, Bendigo VIC 3550, Australia",false,false,no_active_location_evidence
+centralwestsolar.com.au,Central West Solar IoT,"William Street, Bathurst NSW 2795, Australia",false,false,no_active_location_evidence
+chinchillagas.com.au,Chinchilla Gas Telemetry,"Heeney Street, Chinchilla QLD 4413, Australia",false,false,no_active_location_evidence
+cim.io,CIM Tech,"O'Connell Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+cityzen.com.au,Cityzen Tech,"Bundall Road, Bundall QLD 4217, Australia",false,false,no_active_location_evidence
+civx.com.au,CivX,"King William Street, Adelaide SA 5000, Australia",false,false,no_active_location_evidence
+clarevalleytech.com.au,Clare Valley Viticulture Tech,"Main North Road, Clare SA 5453, Australia",false,false,no_active_location_evidence
+clevertar.com,Clevertar,"King William Street, Adelaide SA 5000, Australia",false,false,no_active_location_evidence
+clinuvel.com,Clinuvel Pharmaceuticals,"Swanston Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+clueylearning.com.au,Cluey Learning,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+coastr.com,Coastr Technology,"Marine Parade, Southport QLD 4215, Australia",false,false,no_active_location_evidence
+cogbi.com.au,CogBI Analytics,"North Terrace, Adelaide SA 5000, Australia",false,false,no_active_location_evidence
+cogent.co,Cogent,"Swan Street, Richmond VIC 3121, Australia",false,false,no_active_location_evidence
+cogitogroup.com.au,Cogito Group,"London Circuit, Canberra City ACT 2601, Australia",false,false,no_active_location_evidence
+compono.com,Compono,"Queen Street, Brisbane QLD 4000, Australia",true,true,superseded_by_accepted_location
+compumedics.com.au,Compumedics,"Victoria Street, Abbotsford VIC 3067, Australia",false,false,no_active_location_evidence
+copperstringdigital.com.au,CopperString Digital,"Flinders Street, Townsville QLD 4810, Australia",false,false,no_active_location_evidence
+corelogic.com.au,CoreLogic AU,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+coupa.com,Coupa Software AU,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+creditorwatch.com.au,Creditor Watch,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+csl.com,CSL Limited,"Poplar Road, Parkville VIC 3052, Australia",false,false,no_active_location_evidence
+curationcorp.com,Curation Corp,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+cvcheck.com,CVCheck Tech,"Hasler Road, Osborne Park WA 6017, Australia",false,false,no_active_location_evidence
+cyara.com,Cyara,"Collins Street, Melbourne VIC 3000, Australia",true,true,superseded_by_accepted_location
+cyban.com.au,Cyban,"St Georges Terrace, Perth WA 6000, Australia",false,false,no_active_location_evidence
+cyclopharm.com.au,Cyclopharm,"Commercial Road, Kingsgrove NSW 2208, Australia",false,false,no_active_location_evidence
+dandenongrobotics.com.au,Dandenong Robotics Centre,"Cheltenham Road, Dandenong VIC 3175, Australia",false,false,no_active_location_evidence
+datamesh.com.au,DataMesh,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+datanzo.com.au,Datanzo,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+deakinmarinetech.com.au,Deakin Marine Tech Warrnambool,"Princes Highway, Warrnambool VIC 3280, Australia",false,false,no_active_location_evidence
+devicie.com,Devicie,"Walker Street, North Sydney NSW 2060, Australia",true,true,superseded_by_accepted_location
+devonportagtech.com.au,Devonport Agricultural Automation,"Rooke Street, Devonport TAS 7310, Australia",false,false,no_active_location_evidence
+dextro.com.au,Dextro,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+dimerix.com,Dimerix,"Johnston Street, Fitzroy VIC 3065, Australia",true,true,superseded_by_accepted_location
+divipay.com.au,Divipay,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+dremio.com,Dremio (Australia Hub),"North Terrace, Adelaide SA 5000, Australia",false,false,no_active_location_evidence
+dspace.com,Dspace Australia,"MAB Circuit, Tonsley SA 5042, Australia",true,true,superseded_by_accepted_location
+eaglehawksoftware.com.au,Eaglehawk Software,"Victoria Street, Eaglehawk VIC 3556, Australia",false,false,no_active_location_evidence
+easygo.gg,Easygo Gaming,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+employmentinnovations.com,Employment Innovations,"Kent Street, Sydney NSW 2000, Australia",true,false,superseded_by_accepted_location
+endua.com,Endua,"Kerry Road, Archerfield QLD 4108, Australia",false,false,no_active_location_evidence
+entegy.com.au,Entegy,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+envirofibre.com.au,ENVIROFIBRE Tech,"Enterprise Street, Kunda Park QLD 4556, Australia",false,false,no_active_location_evidence
+esperancegrain.com.au,Esperance Grain Logistics,"Dempster Street, Esperance WA 6450, Australia",false,false,no_active_location_evidence
+euclideon.com,Euclideon,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+everty.com.au,Everty,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+ezypay.com,Ezypay,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+faethm.ai,Faethm AI,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+familyzone.com,Family Zone Tech,"Kings Park Road, West Perth WA 6005, Australia",false,false,no_active_location_evidence
+farmdeck.com,Farmdeck,"Summer Street, Orange NSW 2800, Australia",true,true,superseded_by_accepted_location
+farnorthtelemetry.com.au,Far North Telemetry,"Grafton Street, Cairns QLD 4870, Australia",false,false,no_active_location_evidence
+fedunitechpark.com.au,Federation Tech Park,"University Drive, Mount Helen VIC 3350, Australia",false,false,no_active_location_evidence
+ferocia.com.au,Ferocia,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+ferronova.com.au,Ferronova,"King William Street, Adelaide SA 5000, Australia",false,false,no_active_location_evidence
+fincast.io,Fincast,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+finpo.com.au,Finpo,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+fletch.ai,Fletch AI,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+flexigroup.com.au,FlexiGroup,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+fluidly.com,Fluidly AU,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+fologram.com,Fologram,"Flinders Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+forestryse.com.au,Forestry South East Telemetry,"Commercial Street, Mount Gambier SA 5290, Australia",false,false,no_active_location_evidence
+forter.com,Forter Australia,"Martin Place, Sydney NSW 2000, Australia",true,false,superseded_by_accepted_location
+frankly.com.au,Frankly,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+frankstonhealthtech.com.au,Frankston Healthtech Lab,"Nepean Highway, Frankston VIC 3199, Australia",false,false,no_active_location_evidence
+fremantlesubsea.com.au,Fremantle Subsea Robotics,"Cliff Street, Fremantle WA 6160, Australia",false,false,no_active_location_evidence
+gcroboticshub.com.au,Gold Coast Robotics Hub,"Nerang Street, Southport QLD 4215, Australia",false,false,no_active_location_evidence
+geelongaerospace.com.au,Geelong Aerospace Sensors,"Station Street, North Shore VIC 3214, Australia",false,false,no_active_location_evidence
+geneticsignatures.com,Genetic Signatures,"Castlereagh Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+geographe.com.au,Geographe,"Queen Street, Busselton WA 6280, Australia",false,false,no_active_location_evidence
+geolyse.com,Geolyse Tech,"Kite Street, Orange NSW 2800, Australia",false,false,no_active_location_evidence
+geraldtonwind.com.au,Geraldton Wind Robotics,"Marine Terrace, Geraldton WA 6530, Australia",false,false,no_active_location_evidence
+getconga.com,Conga AU,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+gigacomm.net.au,GigaComm,"Castlereagh Street, Sydney NSW 2000, Australia",true,false,superseded_by_accepted_location
+gippswater.com.au,Gippsland Water Digital,"Hazelwood Road, Traralgon VIC 3844, Australia",false,false,no_active_location_evidence
+givengineering.com,GivEngineering,"Argyle Street, Fitzroy VIC 3065, Australia",false,false,no_active_location_evidence
+gladstonehydrogen.com.au,Gladstone Hydrogen Telemetry,"Goondoon Street, Gladstone QLD 4680, Australia",false,false,no_active_location_evidence
+goanna.ag,Goanna Ag,"Margaret Street, Toowoomba QLD 4350, Australia",false,false,no_active_location_evidence
+goodpairdays.com,Good Pair Days,"Dunning Avenue, Rosebery NSW 2018, Australia",false,false,no_active_location_evidence
+goulburnglass.com.au,Goulburn River Glass Tech,"Emily Street, Seymour VIC 3660, Australia",false,false,no_active_location_evidence
+greatwrap.co,Great Wrap,"Tullamarine, Tullamarine VIC 3043, Australia",false,false,no_active_location_evidence
+greener.com.au,Greener,"Queen Street, Brisbane QLD 4000, Australia",true,true,superseded_by_accepted_location
+greenpowerenergy.com.au,GreenPower Energy,"St Georges Terrace, Perth WA 6000, Australia",false,false,no_active_location_evidence
+greensync.com.au,GreenSync,"Collins Street, Melbourne VIC 3000, Australia",true,true,superseded_by_accepted_location
+gretel.ai,Gretel.ai,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+greyinnovation.com,Grey Innovation,"Cremorne Street, Cremorne VIC 3121, Australia",false,false,no_active_location_evidence
+groundbreaker.co,Groundbreaker,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+gvtelemetry.com.au,Goulburn Valley Telemetry,"Wyndham Street, Shepparton VIC 3630, Australia",false,false,no_active_location_evidence
+gympietimbertech.com.au,Gympie Timber Tech,"Mary Street, Gympie QLD 4570, Australia",false,false,no_active_location_evidence
+haikudeck.com,Haiku Deck AU,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+halaxy.com,Halaxy,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+harvestroad.com.au,Harvest Road,"High Street, Fremantle WA 6160, Australia",false,false,no_active_location_evidence
+hatch.team,Hatch,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+haventec.com,Haventec,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+hendersondefence.com.au,Henderson Marine Defence,"Cockburn Road, Henderson WA 6166, Australia",false,false,no_active_location_evidence
+herveybaymarine.com.au,Hervey Bay Marine Electronics,"Boat Harbour Drive, Urangan QLD 4655, Australia",false,false,no_active_location_evidence
+hivery.com,Hivery,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+hiveuav.com,HiveUAV,"Hunter Street, Newcastle NSW 2300, Australia",false,false,no_active_location_evidence
+honeyflow.com.au,Flow Hive Tech,"Centennial Circuit, Byron Bay NSW 2481, Australia",false,false,no_active_location_evidence
+humanitix.com,Humanitix,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+hunterhydrogentech.com.au,Hunter Hydrogen Tech,"Wharf Road, Newcastle NSW 2300, Australia",false,false,no_active_location_evidence
+hydrix.com,Hydrix Group,"Springvale Road, Mulgrave VIC 3170, Australia",false,false,no_active_location_evidence
+hydronautics.com.au,Hydronautics,"High Street, Fremantle WA 6160, Australia",false,false,no_active_location_evidence
+hylo.com,Hylo,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+hyperanna.com,Hyper Anna,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+hyperdigital.com.au,Hyper Digital,"St Georges Terrace, Perth WA 6000, Australia",false,false,no_active_location_evidence
+hypersensesoftware.com.au,Hypersense Software,"Scott Street, Newcastle NSW 2300, Australia",false,false,no_active_location_evidence
+hypertune.com,Hypertune,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+imgmaterials.com,Imagine Intelligent Materials,"Nicol Drive, Waurn Ponds VIC 3216, Australia",true,false,superseded_by_accepted_location
+inauro.com.au,Inauro,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+indebted.co,InDebted,"Spring Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+infotrack.com.au,InfoTrack,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+inovor.com.au,Inovor Technologies,"North Terrace, Adelaide SA 5000, Australia",false,false,no_active_location_evidence
+insentra.com,Insentra,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+instantscripts.com.au,InstantScripts,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+intelledox.com,Intelledox,"London Circuit, Canberra City ACT 2601, Australia",false,false,no_active_location_evidence
+intellicheck.com.au,Intellicheck,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+intellihr.com,IntelliHR,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+intergraph.com.au,Intergraph AU,"St Georges Terrace, Perth WA 6000, Australia",false,false,no_active_location_evidence
+interlate.com,Interlate,"Queen Street, Brisbane QLD 4000, Australia",true,true,superseded_by_accepted_location
+intersective.com,Intersective,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+intopia.digital,Intopia,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+invetechgroup.com,Invetech Group,"Ricketts Road, Mount Waverley VIC 3149, Australia",false,false,no_active_location_evidence
+ipswichdefenserobotics.com.au,Ipswich Defense Robotics,"Brisbane Street, Ipswich QLD 4305, Australia",false,false,no_active_location_evidence
+jaxsta.com,Jaxsta,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+jcumaredeptech.com.au,JCU Marine Deeptech,"Angus Smith Drive, Douglas QLD 4814, Australia",false,false,no_active_location_evidence
+jemena.com.au,Jemena,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+joii.com.au,Joii,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+joondalupcyber.com.au,Joondalup Cyber Academy Tech,"Kendrew Crescent, Joondalup WA 6027, Australia",false,false,no_active_location_evidence
+joust.com.au,Joust,"King William Street, Adelaide SA 5000, Australia",false,false,no_active_location_evidence
+kablamo.com.au,Kablamo,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+kalgoorliemining.com.au,Kalgoorlie Mine Automation,"Hannan Street, Kalgoorlie WA 6430, Australia",false,false,no_active_location_evidence
+kinexus.com.au,Kinexus,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+kiralearning.com,Kira Learning,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+klayo.com,Klayo,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+koala.com,Koala Tech,"Bourke Road, Alexandria NSW 2015, Australia",false,false,no_active_location_evidence
+koba.com.au,Koba Insurance,"Chapel Street, South Yarra VIC 3141, Australia",false,false,no_active_location_evidence
+kurrajong.com.au,Kurrajong Tech,"Chaston Street, Wagga Wagga NSW 2650, Australia",false,false,no_active_location_evidence
+kwinanadigitaltwin.com.au,Kwinana Industrial Digital Twin,"Mason Road, Kwinana Beach WA 6167, Australia",false,false,no_active_location_evidence
+laingorourke.com,Laing O Rourke Digital,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+latrobevalleynetwork.com.au,Latrobe Valley Engineering Tech,"Commercial Road, Morwell VIC 3840, Australia",true,false,superseded_by_accepted_location
+legalvision.com.au,Legalvision,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+limeade.com,Limeade AU,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+liminalbiosciences.com,Liminal BioSciences AU,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+livestockwatersolutions.com.au,Livestock Water Solutions,"Frome Street, Moree NSW 2400, Australia",false,false,no_active_location_evidence
+livetiles.nyc,LiveTiles,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+localsearch.com.au,Localsearch,"Cavill Avenue, Surfers Paradise QLD 4217, Australia",true,true,superseded_by_accepted_location
+locqus.com,Locqus,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+logancleantech.com.au,Logan Cleantech Energy,"Wembley Road, Logan Central QLD 4114, Australia",false,false,no_active_location_evidence
+longbowadvantage.com,Longbow Advantage,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+lumachain.com,Lumachain,"Bridge Street, Sydney NSW 2000, Australia",true,false,superseded_by_accepted_location
+lumafinancialtech.com,Luma Financial Technologies,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+lumilighting.com.au,Lumi,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+luminary.com.au,Luminary,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+mackayminingtech.com.au,Mackay Autonomous Mining,"Sydney Street, Mackay QLD 4740, Australia",false,false,no_active_location_evidence
+macquarietelecom.com,Macquarie Telecom Cloud,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+mandurahenviro.com.au,Mandurah Environmental IoT,"Mandurah Terrace, Mandurah WA 6210, Australia",false,false,no_active_location_evidence
+marketplacer.com,Marketplacer,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+maroochydoresmartcity.com.au,Maroochydore Smart City IoT,"First Avenue, Maroochydore QLD 4558, Australia",false,false,no_active_location_evidence
+maryboroughrail.com.au,Maryborough Rail Robotics,"Bazaar Street, Maryborough QLD 4650, Australia",false,false,no_active_location_evidence
+maynepharma.com,Mayne Pharma Tech,"Main North Road, Salisbury SA 5108, Australia",false,false,no_active_location_evidence
+me3d.com.au,Me3D,"Squires Way, North Wollongong NSW 2500, Australia",false,false,no_active_location_evidence
+mealpal.com.au,Mealpal,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+mesoblast.com,Mesoblast,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+midfield.com.au,Midfield Automation,"Scott Street, Warrnambool VIC 3280, Australia",false,false,no_active_location_evidence
+midlandrail.com.au,Midland Rail Automation,"Railway Road, Midland WA 6056, Australia",false,false,no_active_location_evidence
+mildurafruittech.com.au,Mildura Fruit Tech,"Eighth Street, Mildura VIC 3500, Australia",false,false,no_active_location_evidence
+minfos.com.au,Minfos,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+mobisolutions.com.au,Mobi Solutions,"Smith Street, Darwin NT 0800, Australia",false,false,no_active_location_evidence
+monash.edu,Monash MedTech,"Wellington Road, Clayton VIC 3800, Australia",false,false,no_active_location_evidence
+monashivf.com,Monash IVF,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+montu.com.au,Montu,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+mosh.com.au,Mosh,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+moula.com.au,Moula Money,"Bourke Street, Melbourne VIC 3000, Australia",true,true,superseded_by_accepted_location
+mountisaminerals.com.au,Mount Isa Mineral Sensors,"Marian Street, Mount Isa QLD 4825, Australia",true,true,superseded_by_accepted_location
+mpcleantech.com.au,Mornington Peninsula Cleantech,"Barkly Street, Mornington VIC 3931, Australia",false,false,no_active_location_evidence
+murrayirrigation.com.au,Murray Irrigation Tech,"Warmatta Street, Finley NSW 2713, Australia",true,true,superseded_by_accepted_location
+mynd.ai,Mynd.ai,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+myriota.com,Myriota,"North Terrace, Adelaide SA 5000, Australia",false,false,no_active_location_evidence
+ncs.com.au,NCS Group,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+neighbourlytics.com,Neighbourlytics,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+netapp.com,NetApp AU,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+neumannspace.com,Neumann Space,"Frome Road, Adelaide SA 5000, Australia",false,false,no_active_location_evidence
+newmanmining.com.au,Newman Mining Telemetry,"Iron Ore Parade, Newman WA 6753, Australia",false,false,no_active_location_evidence
+nexgen.net.au,Nexgen,"Flinders Street, Townsville QLD 4810, Australia",false,false,no_active_location_evidence
+ningaloomarine.com.au,Ningaloo Marine Telemetry,"Murat Road, Exmouth WA 6707, Australia",false,false,no_active_location_evidence
+noeticgroup.com,Noetic Group Tech,"National Circuit, Barton ACT 2600, Australia",false,false,no_active_location_evidence
+noosabiosphere.com.au,Noosa Biosphere Tech,"Thomas Street, Noosaville QLD 4566, Australia",false,false,no_active_location_evidence
+northambroadacre.com.au,Northam Broadacre Tech,"Fitzgerald Street, Northam WA 6401, Australia",false,false,no_active_location_evidence
+northeasttelco.com.au,North East Telco,"Faithfull Street, Wangaratta VIC 3677, Australia",false,false,no_active_location_evidence
+notiv.com,Notiv,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+ntfleet.com.au,NT Fleet Telematics,"Stuart Highway, Winnellie NT 0820, Australia",false,false,no_active_location_evidence
+nura.com,Nura,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+octaneai.com,Octane AI,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+octet.com.au,Octet,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+openpay.com.au,Openpay Tech,"St Kilda Road, Melbourne VIC 3004, Australia",false,false,no_active_location_evidence
+opensolar.com,OpenSolar,"Young Street, Sydney NSW 2000, Australia",true,false,superseded_by_accepted_location
+opmantek.com,Opmantek Software,"Surfers Paradise Boulevard, Surfers Paradise QLD 4217, Australia",true,true,superseded_by_accepted_location
+opthea.com,Opthea,"Toorak Road, South Yarra VIC 3141, Australia",true,true,superseded_by_accepted_location
+outpostcentral.com,Outpost Central,"Bolton Street, Newcastle NSW 2300, Australia",true,true,superseded_by_accepted_location
+pairtree.com.au,Pairtree,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+partly.com,Partly,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+pathzero.com,Pathzero,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+pavefinance.com.au,Pave Finance,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+paxon.com.au,Paxon Group,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+paydock.com,Paydock,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+pepperstone.com,Pepperstone,"Collins Street, Melbourne VIC 3000, Australia",true,true,superseded_by_accepted_location
+personifycare.com,Personify Care,"North Terrace, Adelaide SA 5000, Australia",false,false,no_active_location_evidence
+picturewealth.com.au,PictureWealth,"Queen Street, Brisbane QLD 4000, Australia",true,true,superseded_by_accepted_location
+pilbaraminingtech.com.au,Pilbara Autonomous Mining,"Sharpe Avenue, Karratha WA 6714, Australia",false,false,no_active_location_evidence
+planetinnovation.com.au,Planet Innovation,"Nelson Road, Box Hill VIC 3128, Australia",true,true,superseded_by_accepted_location
+pnyx.com.au,Pnyx,"London Circuit, Canberra City ACT 2601, Australia",true,true,superseded_by_accepted_location
+pocketed.com.au,Pocketed,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+pointerra.com,Pointerra,"Adelaide Terrace, East Perth WA 6004, Australia",false,false,no_active_location_evidence
+polynovo.com,Polynovo,"Plummer Street, Port Melbourne VIC 3207, Australia",false,false,no_active_location_evidence
+portaugustasolar.com.au,Port Augusta Solar Thermal,"Highway One, Port Augusta SA 5700, Australia",false,false,no_active_location_evidence
+porthedlandmaritime.com.au,Port Hedland Maritime Radar,"The Esplanade, Port Hedland WA 6721, Australia",false,false,no_active_location_evidence
+portlincolnmarine.com.au,Port Lincoln Marine Tech,"Tasman Terrace, Port Lincoln SA 5606, Australia",false,false,no_active_location_evidence
+pozi.com,Pozi,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+precisionagriculture.com.au,Precision Agriculture Australia,"Peisley Street, Orange NSW 2800, Australia",false,false,no_active_location_evidence
+precisionpastures.com.au,Precision Pastures,"Beardy Street, Armidale NSW 2350, Australia",true,true,superseded_by_accepted_location
+preezie.com,Preezie,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+prezzee.com,Prezzee,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+procreate.com,Savage Interactive,"Elizabeth Street, North Hobart TAS 7000, Australia",false,false,no_active_location_evidence
+procurious.com,Procurious,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+promedicus.com.au,Pro Medicus,"Swan Street, Richmond VIC 3121, Australia",false,false,no_active_location_evidence
+pronavigator.ai,ProNavigator,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+proptrack.com.au,PropTrack,"Collins Street, Melbourne VIC 3000, Australia",true,true,superseded_by_accepted_location
+proqual.com.au,Proqual,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+quantium.com.au,Quantium,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+quantxlabs.com,QuantX Labs,"North Terrace, Adelaide SA 5000, Australia",false,false,no_active_location_evidence
+radiumcapital.com.au,Radium Capital,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+rayner.com.au,Rayner,"Elizabeth Street, Hobart TAS 7000, Australia",true,true,superseded_by_accepted_location
+realtimenetworks.com.au,RealTime Networks,"St Georges Terrace, Perth WA 6000, Australia",false,false,no_active_location_evidence
+redlandmarine.com.au,Redland Marine BioSensors,"Middle Street, Cleveland QLD 4163, Australia",false,false,no_active_location_evidence
+resmed.com,ResMed Digital,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+rezdy.com,Rezdy,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+rezeco.com.au,Rezeco,"King William Street, Adelaide SA 5000, Australia",false,false,no_active_location_evidence
+rezola.com.au,Rezola,"King William Street, Adelaide SA 5000, Australia",false,false,no_active_location_evidence
+riverlandirrigation.com.au,Riverland Irrigation IoT,"Ral Ral Avenue, Renmark SA 5341, Australia",false,false,no_active_location_evidence
+rmeglobal.com,Russell Mineral Equipment Tech,"Industrial Avenue, Toowoomba QLD 4350, Australia",false,false,no_active_location_evidence
+robinahealthtech.com.au,Robina Healthtech Solutions,"Robina Town Centre Drive, Robina QLD 4226, Australia",false,false,no_active_location_evidence
+romapastoral.com.au,Roma Pastoral Tech,"McDowall Street, Roma QLD 4455, Australia",false,false,no_active_location_evidence
+rosterfy.com,Rosterfy,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+roxbydownstech.com.au,Roxby Downs Remote Mining,"Richardson Place, Roxby Downs SA 5725, Australia",false,false,no_active_location_evidence
+saab.com,Saab Australia Digital,"Third Avenue, Mawson Lakes SA 5095, Australia",false,false,no_active_location_evidence
+samsara.com,Samsara Networks AU,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+scalapay.com,Scalapay,"Squires Way, North Wollongong NSW 2500, Australia",false,false,no_active_location_evidence
+scancam.com.au,Scancam,"Queen Street, Brisbane QLD 4000, Australia",true,true,superseded_by_accepted_location
+scenegroup.com.au,Scene Group Tech,"Pakenham Street, Fremantle WA 6160, Australia",false,false,no_active_location_evidence
+sealite.com.au,Sealite,"Mann Street, Gosford NSW 2250, Australia",false,false,no_active_location_evidence
+seerdata.com.au,Seer Data,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+seqta.com.au,SEQTA Software,"Grand Boulevard, Joondalup WA 6027, Australia",false,false,no_active_location_evidence
+sherlok.com.au,Sherlok,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+sievertlarsen.com,Sievert Larsen,"St Georges Terrace, Perth WA 6000, Australia",false,false,no_active_location_evidence
+silentiumdefence.com.au,Silentium Defence,"Mawson Lakes Boulevard, Mawson Lakes SA 5095, Australia",false,false,no_active_location_evidence
+skoolbag.com.au,Skoolbag,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+skyfii.com,Skyfii,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+smartcitiesiot.com.au,Smart Cities IoT Australia,"Crown Street, Wollongong NSW 2500, Australia",false,false,no_active_location_evidence
+smartfarmune.com.au,SMART Farm UNE,"Madgwick Drive, Armidale NSW 2350, Australia",false,false,no_active_location_evidence
+smartsatcrc.com,SmartSat CRC,"Frome Road, Adelaide SA 5000, Australia",false,false,no_active_location_evidence
+snapsend.com.au,SnapSend,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+sol-secure.com.au,Sol-Secure,"Clarence Street, Port Macquarie NSW 2444, Australia",false,false,no_active_location_evidence
+somnomed.com.au,SomnoMed,"Kent Street, Sydney NSW 2000, Australia",true,false,superseded_by_accepted_location
+sonder.io,Sonder,"Elizabeth Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+southerncrosscomputing.com.au,Southern Cross Computing,"Brisbane Street, Launceston TAS 7250, Australia",false,false,no_active_location_evidence
+southernriverinaiot.com.au,Southern Riverina IoT,"Cressy Street, Deniliquin NSW 2710, Australia",false,false,no_active_location_evidence
+southwestagtech.com.au,South West Agtech Bunbury,"Victoria Street, Bunbury WA 6230, Australia",false,false,no_active_location_evidence
+southwestiot.com.au,South West IoT,"Liebig Street, Warrnambool VIC 3280, Australia",false,false,no_active_location_evidence
+spendless.com.au,Spendless,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+splend.com.au,Splend Tech,"Bourke Street, Alexandria NSW 2015, Australia",false,false,no_active_location_evidence
+spookfish.com,Spookfish Geospatial,"St Georges Terrace, Perth WA 6000, Australia",false,false,no_active_location_evidence
+sportsbet.com.au,Sportsbet Tech,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+spriggy.com.au,Spriggy,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+springday.com.au,Springday,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+sproutx.com.au,SproutX Regional Tech,"Dean Street, Albury NSW 2640, Australia",true,true,superseded_by_accepted_location
+stanthorpeappletech.com.au,Stanthorpe Apple Tech,"Maryland Street, Stanthorpe QLD 4380, Australia",false,false,no_active_location_evidence
+starofthesouth.com.au,Star of the South Telemetry,"Church Street, Traralgon VIC 3844, Australia",false,false,no_active_location_evidence
+starpharma.com,Starpharma,"Victoria Street, Abbotsford VIC 3067, Australia",false,false,no_active_location_evidence
+stax.io,Stax,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+steller.com.au,Steller,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+stileeducation.com,Stile Education,"Collins Street, Melbourne VIC 3000, Australia",true,true,superseded_by_accepted_location
+strikingly.com,Strikingly,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+subiacocloud.com.au,Subiaco Cloud Technologies,"Rokeby Road, Subiaco WA 6008, Australia",false,false,no_active_location_evidence
+subzerorobotics.com.au,Subzero Robotics,"Harbour Drive, Coffs Harbour NSW 2450, Australia",false,false,no_active_location_evidence
+sunitafe.edu.au,SuniTAFE Smart Farm,"Benetook Avenue, Mildura VIC 3500, Australia",true,true,superseded_by_accepted_location
+sunraysiasolar.com.au,Sunraysia Solar Telemetry,"Deakin Avenue, Mildura VIC 3500, Australia",false,false,no_active_location_evidence
+taggle.com.au,Taggle Systems,"King William Street, Adelaide SA 5000, Australia",true,true,superseded_by_accepted_location
+telnyx.com,Telnyx,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+tether.io,Tether,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+thindata.com.au,Thindata,"King William Street, Adelaide SA 5000, Australia",false,false,no_active_location_evidence
+tideways.com.au,Tideways,"Smith Street, Darwin NT 0800, Australia",false,false,no_active_location_evidence
+tillpoint.com,Tillpoint,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+tillr.io,Tillr,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+timelio.com.au,Timelio,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+tonsleycleanenergy.com.au,Tonsley Clean Energy Tech,"Tonsley Boulevard, Tonsley SA 5042, Australia",false,false,no_active_location_evidence
+townsvilleporttech.com.au,Townsville Port Telemetry,"Benwell Road, South Townsville QLD 4810, Australia",false,false,no_active_location_evidence
+trace.io,Trace Together AU,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+tractorventures.com,Tractor Ventures,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+tradesquare.com.au,TradeSquare,"William Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+ubercarshare.com,Uber Carshare,"Harris Street, Ultimo NSW 2007, Australia",false,false,no_active_location_evidence
+updraft.com.au,Updraft,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+vantage-dc.com,Vantage Data Centres,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+vapar.co,VAPAR,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+varsitylakescloud.com.au,Varsity Lakes Cloud Lab,"Varsity Parade, Varsity Lakes QLD 4227, Australia",false,false,no_active_location_evidence
+venly.io,Venly,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+venngroup.com,Venn Group AU,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+verida.io,Verida,"Queen Street, Brisbane QLD 4000, Australia",false,false,no_active_location_evidence
+veridapt.com,Veridapt,"St Georges Terrace, Perth WA 6000, Australia",true,true,superseded_by_accepted_location
+versarien.com,Versarien AU,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+versent.com.au,Versent,"Bourke Street, Melbourne VIC 3000, Australia",true,true,superseded_by_accepted_location
+verto.com.au,Verto,"Elizabeth Street, Hobart TAS 7000, Australia",true,true,superseded_by_accepted_location
+victorharborsensors.com.au,Victor Harbor Coastal Sensors,"Ocean Street, Victor Harbor SA 5211, Australia",false,false,no_active_location_evidence
+violetx.com.au,VioletX,"St Georges Terrace, Perth WA 6000, Australia",false,false,no_active_location_evidence
+vixtechnology.com,Vix Technology,"Collins Street, Melbourne VIC 3000, Australia",true,true,superseded_by_accepted_location
+vocus.com.au,Vocus Group,"Collins Street, Melbourne VIC 3000, Australia",false,false,no_active_location_evidence
+weel.com.au,Weel,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
+weipamaritime.com.au,Weipa Maritime Logistics,"Commercial Avenue, Weipa QLD 4874, Australia",false,false,no_active_location_evidence
+wettropicsbiosensors.com.au,Wet Tropics BioSensors,"Abbott Street, Cairns QLD 4870, Australia",false,false,no_active_location_evidence
+whogivesacrap.org,Who Gives A Crap,"Smith Street, Collingwood VIC 3066, Australia",false,false,no_active_location_evidence
+whyallagreensteel.com.au,Whyalla Green Steel Tech,"Iron Knob Road, Whyalla SA 5600, Australia",false,false,no_active_location_evidence
+willowinc.com,Willow Technology,"Bond Street, Sydney NSW 2000, Australia",true,false,superseded_by_accepted_location
+xplicit.com.au,Xplicit,"Flinders Street, Townsville QLD 4810, Australia",false,false,no_active_location_evidence
+xref.com,Xref,"George Street, Sydney NSW 2000, Australia",true,true,superseded_by_accepted_location
+yarno.com.au,Yarno,"Collins Street, Melbourne VIC 3000, Australia",true,true,superseded_by_accepted_location
+yarravalleycloud.com.au,Yarra Valley Cloud Systems,"Main Street, Lilydale VIC 3140, Australia",false,false,no_active_location_evidence
+zeroco.com.au,Zero Co,"Hastings Street, Noosa Heads QLD 4567, Australia",false,false,no_active_location_evidence
+zerolatencyvr.com,Zero Latency VR,"North Melbourne, North Melbourne VIC 3051, Australia",false,false,no_active_location_evidence
+zutec.com,Zutec AU,"George Street, Sydney NSW 2000, Australia",false,false,no_active_location_evidence
