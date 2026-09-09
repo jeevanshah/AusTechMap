@@ -229,8 +229,22 @@ def test_resolve_review_item_approved_with_match_enriches_existing_company() -> 
         status = connection.execute(
             "SELECT status FROM review_queue_items WHERE id = %s", (review_id,)
         ).fetchone()
+        audit = connection.execute(
+            """
+            SELECT action, target_type, before_state, after_state, metadata
+            FROM audit_records WHERE target_id = %s
+            """,
+            (str(review_id),),
+        ).fetchone()
     assert company == (abn, "candidate.example.com")
     assert status == ("approved",)
+    assert audit == (
+        "review_item_resolved",
+        "review_queue_item",
+        {"kind": "candidate_match", "status": "pending"},
+        {"matched_company_id": str(existing), "status": "approved"},
+        {"outcome": "matched", "outcome_company_id": str(existing)},
+    )
 
 
 @pytest.mark.integration
