@@ -1,0 +1,201 @@
+name,domain,city,reachability_status,http_status,final_url,diagnostic,next_action
+HiveUAV,hiveuav.com,Newcastle,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Devicie,devicie.com,Sydney,reachable_needs_primary_evidence,200,https://devicie.com,,"Record first-party company, technology, and street-address evidence."
+Precision Agriculture Australia,precisionagriculture.com.au,Orange,reachable_needs_primary_evidence,200,https://precisionag.earth/,,"Record first-party company, technology, and street-address evidence."
+Farmdeck,farmdeck.com,Orange,reachable_needs_primary_evidence,200,https://www.farmdeck.com:443/,,"Record first-party company, technology, and street-address evidence."
+AgDNA,agdna.com,Dubbo,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Kurrajong Tech,kurrajong.com.au,Wagga Wagga,reachable_needs_primary_evidence,200,https://www.kurrajong.com.au/,,"Record first-party company, technology, and street-address evidence."
+AgriFutures Australia Tech,agrifutures.com.au,Wagga Wagga,reachable_needs_primary_evidence,200,https://agrifutures.com.au,,"Record first-party company, technology, and street-address evidence."
+Flow Hive Tech,honeyflow.com.au,Byron Bay,reachable_needs_primary_evidence,200,https://www.honeyflow.com.au/,,"Record first-party company, technology, and street-address evidence."
+SMART Farm UNE,smartfarmune.com.au,Armidale,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Precision Pastures,precisionpastures.com.au,Armidale,reachable_needs_primary_evidence,200,https://www.precisionpastures.com.au/,,"Record first-party company, technology, and street-address evidence."
+BeefLedger,beefledger.io,Tamworth,reachable_needs_primary_evidence,200,https://beefledger.io,,"Record first-party company, technology, and street-address evidence."
+Agile Digital,agiledigital.com.au,Canberra,reachable_needs_primary_evidence,200,https://agiledigital.com.au,,"Record first-party company, technology, and street-address evidence."
+Noetic Group Tech,noeticgroup.com,Canberra,reachable_needs_primary_evidence,200,https://atturra.com/au-en/solutions/advisory-consulting/,,"Record first-party company, technology, and street-address evidence."
+CEA Technologies,cea.com.au,Canberra,reachable_needs_primary_evidence,200,https://www.cea.com.au/,,"Record first-party company, technology, and street-address evidence."
+Koala Tech,koala.com,Sydney,reachable_needs_primary_evidence,200,https://au.koala.com/,,"Record first-party company, technology, and street-address evidence."
+Forter Australia,forter.com,Sydney,reachable_needs_primary_evidence,200,https://www.forter.com/,,"Record first-party company, technology, and street-address evidence."
+Smart Cities IoT Australia,smartcitiesiot.com.au,Wollongong,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Me3D,me3d.com.au,Wollongong,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Outpost Central,outpostcentral.com,Newcastle,reachable_needs_primary_evidence,200,https://outpostcentral.com,,"Record first-party company, technology, and street-address evidence."
+Geolyse Tech,geolyse.com,Orange,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+SproutX Regional Tech,sproutx.com.au,Albury,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Southern Riverina IoT,southernriverinaiot.com.au,Deniliquin,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Subzero Robotics,subzerorobotics.com.au,Coffs Harbour,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Sol-Secure,sol-secure.com.au,Port Macquarie,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Livestock Water Solutions,livestockwatersolutions.com.au,Moree,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Hunter Hydrogen Tech,hunterhydrogentech.com.au,Newcastle,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Hypersense Software,hypersensesoftware.com.au,Newcastle,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Central West Solar IoT,centralwestsolar.com.au,Bathurst,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Murray Irrigation Tech,murrayirrigation.com.au,Finley,reachable_needs_primary_evidence,200,https://www.murrayirrigation.com.au/,,"Record first-party company, technology, and street-address evidence."
+Ballina Cloud Systems,ballinacloud.com.au,Ballina,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Fologram,fologram.com,Melbourne,reachable_needs_primary_evidence,200,https://fologram.com,,"Record first-party company, technology, and street-address evidence."
+FormFlow,formflow.com.au,Geelong,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Keech 3D Advanced Manufacturing,keech3d.com.au,Bendigo,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Bendigo Telco Tech,bendigotelco.com.au,Bendigo,reachable_needs_primary_evidence,200,https://bendigotelco.com.au,,"Record first-party company, technology, and street-address evidence."
+Cogent,cogent.co,Melbourne,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Moula Money,moula.com.au,Melbourne,reachable_needs_primary_evidence,200,https://moula.com.au,,"Record first-party company, technology, and street-address evidence."
+Pepperstone,pepperstone.com,Melbourne,reachable_needs_primary_evidence,200,https://pepperstone.com/en-au,,"Record first-party company, technology, and street-address evidence."
+Sportsbet Tech,sportsbet.com.au,Melbourne,reachable_needs_primary_evidence,200,https://www.sportsbet.com.au/,,"Record first-party company, technology, and street-address evidence."
+Openpay Tech,openpay.com.au,Melbourne,reachable_needs_primary_evidence,200,https://pay.com.au/,,"Record first-party company, technology, and street-address evidence."
+TradeSquare,tradesquare.com.au,Melbourne,reachable_needs_primary_evidence,200,https://www.tradesquare.com.au/,,"Record first-party company, technology, and street-address evidence."
+Versent,versent.com.au,Melbourne,reachable_needs_primary_evidence,200,https://versent.com.au,,"Record first-party company, technology, and street-address evidence."
+Austeng Tech,austeng.net.au,Geelong,reachable_needs_primary_evidence,200,https://austeng.net.au,,"Record first-party company, technology, and street-address evidence."
+Imagine Intelligent Materials,imgmaterials.com,Geelong,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Boomaroo Tech,boomaroo.com,Lara,reachable_needs_primary_evidence,200,https://boomaroo.com,,"Record first-party company, technology, and street-address evidence."
+Federation Tech Park,fedunitechpark.com.au,Ballarat,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Ballarat Cloud Solutions,ballaratcloud.com.au,Ballarat,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Eaglehawk Software,eaglehawksoftware.com.au,Bendigo,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Central Victorian Solar IoT,centralvicsolar.com.au,Bendigo,reachable_needs_primary_evidence,200,https://centralvicsolar.com.au,,"Record first-party company, technology, and street-address evidence."
+Gippsland Water Digital,gippswater.com.au,Traralgon,reachable_needs_primary_evidence,200,https://www.gippswater.com.au/,,"Record first-party company, technology, and street-address evidence."
+Star of the South Telemetry,starofthesouth.com.au,Traralgon,reachable_needs_primary_evidence,200,https://southerlyten.com.au/project/star-of-the-south/,,"Record first-party company, technology, and street-address evidence."
+Latrobe Valley Engineering Tech,latrobevalleynetwork.com.au,Morwell,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Kagome Digital Ag,kagome.com.au,Echuca,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Goulburn Valley Telemetry,gvtelemetry.com.au,Shepparton,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+SuniTAFE Smart Farm,sunitafe.edu.au,Mildura,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Mildura Fruit Tech,mildurafruittech.com.au,Mildura,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Sunraysia Solar Telemetry,sunraysiasolar.com.au,Mildura,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Deakin Marine Tech Warrnambool,deakinmarinetech.com.au,Warrnambool,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Midfield Automation,midfield.com.au,Warrnambool,reachable_needs_primary_evidence,200,https://midfield.com.au,,"Record first-party company, technology, and street-address evidence."
+South West IoT,southwestiot.com.au,Warrnambool,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Albury Wodonga Digital Health,awdigitalhealth.com.au,Wodonga,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+North East Telco,northeasttelco.com.au,Wangaratta,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Goulburn River Glass Tech,goulburnglass.com.au,Seymour,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Yarra Valley Cloud Systems,yarravalleycloud.com.au,Lilydale,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Dandenong Robotics Centre,dandenongrobotics.com.au,Dandenong,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Frankston Healthtech Lab,frankstonhealthtech.com.au,Frankston,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Mornington Peninsula Cleantech,mpcleantech.com.au,Mornington,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Bairnsdale Marine Sensors,bairnsdalemarine.com.au,Bairnsdale,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Castlemaine Engineering Tech,castlemaineengineering.com.au,Castlemaine,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Ballarat Solar Tech,ballaratsolar.com.au,Ballarat,unreachable_needs_manual_review,,,TimeoutError,Check the claimed domain against an authoritative company source before seeding.
+Geelong Aerospace Sensors,geelongaerospace.com.au,Geelong,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Opmantek Software,opmantek.com,Gold Coast,reachable_needs_primary_evidence,200,https://firstwave.com/,,"Record first-party company, technology, and street-address evidence."
+Russell Mineral Equipment Tech,rmeglobal.com,Toowoomba,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+ENVIROFIBRE Tech,envirofibre.com.au,Sunshine Coast,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Coastr Technology,coastr.com,Gold Coast,reachable_needs_primary_evidence,200,https://www.coastr.com/,,"Record first-party company, technology, and street-address evidence."
+Cityzen Tech,cityzen.com.au,Gold Coast,reachable_needs_primary_evidence,200,https://cityzen.com.au,,"Record first-party company, technology, and street-address evidence."
+AgTech Central,agtechcentral.com.au,Toowoomba,unreachable_needs_manual_review,,,TimeoutError,Check the claimed domain against an authoritative company source before seeding.
+Wellcamp Aerospace Tech,wellcampaerospace.com.au,Toowoomba,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Cairns Aviation Tech,cairnsaviation.com.au,Cairns,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Wet Tropics BioSensors,wettropicsbiosensors.com.au,Cairns,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Far North Telemetry,farnorthtelemetry.com.au,Cairns,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+JCU Marine Deeptech,jcumaredeptech.com.au,Townsville,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Townsville Port Telemetry,townsvilleporttech.com.au,Townsville,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+CopperString Digital,copperstringdigital.com.au,Townsville,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Mackay Autonomous Mining,mackayminingtech.com.au,Mackay,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+CQUniversity Agtech,cquagtech.com.au,Rockhampton,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Bundaberg Brew Tech,bundabergbrewtech.com.au,Bundaberg,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Gladstone Hydrogen Telemetry,gladstonehydrogen.com.au,Gladstone,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Bowen Basin Telematics,bowenbasin.com.au,Emerald,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Hervey Bay Marine Electronics,herveybaymarine.com.au,Hervey Bay,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Maroochydore Smart City IoT,maroochydoresmartcity.com.au,Sunshine Coast,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Noosa Biosphere Tech,noosabiosphere.com.au,Noosa,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Gold Coast Robotics Hub,gcroboticshub.com.au,Gold Coast,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Varsity Lakes Cloud Lab,varsitylakescloud.com.au,Gold Coast,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Robina Healthtech Solutions,robinahealthtech.com.au,Gold Coast,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Ipswich Defense Robotics,ipswichdefenserobotics.com.au,Ipswich,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Logan Cleantech Energy,logancleantech.com.au,Logan,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Redland Marine BioSensors,redlandmarine.com.au,Cleveland,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Caboolture Ag Systems,cabooltureagsystems.com.au,Caboolture,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Gympie Timber Tech,gympietimbertech.com.au,Gympie,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Maryborough Rail Robotics,maryboroughrail.com.au,Maryborough,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Chinchilla Gas Telemetry,chinchillagas.com.au,Chinchilla,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Roma Pastoral Tech,romapastoral.com.au,Roma,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Mount Isa Mineral Sensors,mountisaminerals.com.au,Mount Isa,reachable_needs_primary_evidence,200,https://www.mountisaminerals.com.au/,,"Record first-party company, technology, and street-address evidence."
+Atherton Tablelands Agtech,athertonagtech.com.au,Atherton,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Weipa Maritime Logistics,weipamaritime.com.au,Weipa,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Innisfail Sugar Automation,innisfailsugar.com.au,Innisfail,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Stanthorpe Apple Tech,stanthorpeappletech.com.au,Stanthorpe,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Spookfish Geospatial,spookfish.com,Perth,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Pointerra,pointerra.com,Perth,reachable_needs_primary_evidence,200,https://www.pointerra.com/,,"Record first-party company, technology, and street-address evidence."
+Family Zone Tech,familyzone.com,Perth,reachable_needs_primary_evidence,200,https://www.qustodio.com:443/en/familyzone/,,"Record first-party company, technology, and street-address evidence."
+CVCheck Tech,cvcheck.com,Perth,reachable_needs_primary_evidence,200,https://cvcheck.com,,"Record first-party company, technology, and street-address evidence."
+SEQTA Software,seqta.com.au,Perth,reachable_needs_primary_evidence,200,https://www.tes.com/en-au/for-schools/seqta,,"Record first-party company, technology, and street-address evidence."
+Scene Group Tech,scenegroup.com.au,Perth,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Bankwest Digital,bankwest.com.au,Perth,reachable_needs_primary_evidence,200,https://www.bankwest.com.au/,,"Record first-party company, technology, and street-address evidence."
+Pilbara Autonomous Mining,pilbaraminingtech.com.au,Karratha,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+South West Agtech Bunbury,southwestagtech.com.au,Bunbury,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Kalgoorlie Mine Automation,kalgoorliemining.com.au,Kalgoorlie,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Ningaloo Marine Telemetry,ningaloomarine.com.au,Exmouth,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Albany Wave Energy Tech,albanywaveenergy.com.au,Albany,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Geraldton Wind Robotics,geraldtonwind.com.au,Geraldton,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Busselton Viticulture Sensors,busseltonviti.com.au,Busselton,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Fremantle Subsea Robotics,fremantlesubsea.com.au,Fremantle,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Broome Pearl BioSensors,broomepearl.com.au,Broome,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Esperance Grain Logistics,esperancegrain.com.au,Esperance,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Port Hedland Maritime Radar,porthedlandmaritime.com.au,Port Hedland,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Kwinana Industrial Digital Twin,kwinanadigitaltwin.com.au,Kwinana,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Henderson Marine Defence,hendersondefence.com.au,Henderson,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Subiaco Cloud Technologies,subiacocloud.com.au,Perth,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Joondalup Cyber Academy Tech,joondalupcyber.com.au,Joondalup,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Midland Rail Automation,midlandrail.com.au,Midland,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Mandurah Environmental IoT,mandurahenviro.com.au,Mandurah,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Northam Broadacre Tech,northambroadacre.com.au,Northam,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Newman Mining Telemetry,newmanmining.com.au,Newman,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Silentium Defence,silentiumdefence.com.au,Adelaide,reachable_needs_primary_evidence,200,https://www.silentiumdefence.com.au/,,"Record first-party company, technology, and street-address evidence."
+Acacia Systems,acaciasystems.com.au,Adelaide,reachable_needs_primary_evidence,200,https://www.acaciasystems.com.au/,,"Record first-party company, technology, and street-address evidence."
+Dspace Australia,dspace.com,Adelaide,reachable_needs_primary_evidence,200,https://www.dspace.com/en/pub/home.cfm,,"Record first-party company, technology, and street-address evidence."
+CogBI Analytics,cogbi.com.au,Adelaide,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+BAE Systems Digital SA,baesystems.com,Adelaide,reachable_needs_primary_evidence,200,https://www.baesystems.com/,,"Record first-party company, technology, and street-address evidence."
+Saab Australia Digital,saab.com,Adelaide,reachable_needs_primary_evidence,200,https://www.saab.com/,,"Record first-party company, technology, and street-address evidence."
+Tonsley Clean Energy Tech,tonsleycleanenergy.com.au,Adelaide,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Whyalla Green Steel Tech,whyallagreensteel.com.au,Whyalla,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Port Augusta Solar Thermal,portaugustasolar.com.au,Port Augusta,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Forestry South East Telemetry,forestryse.com.au,Mount Gambier,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Barossa Wine Digital,barossawinedigital.com.au,Tanunda,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Port Lincoln Marine Tech,portlincolnmarine.com.au,Port Lincoln,reachable_needs_primary_evidence,200,https://www.portlincolnmarine.com.au/,,"Record first-party company, technology, and street-address evidence."
+Riverland Irrigation IoT,riverlandirrigation.com.au,Renmark,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Clare Valley Viticulture Tech,clarevalleytech.com.au,Clare,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Roxby Downs Remote Mining,roxbydownstech.com.au,Roxby Downs,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Victor Harbor Coastal Sensors,victorharborsensors.com.au,Victor Harbor,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Ceduna Satellite Earth Station,cedunasatellite.com.au,Ceduna,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Savage Interactive,procreate.com,Hobart,reachable_needs_primary_evidence,200,https://procreate.com,,"Record first-party company, technology, and street-address evidence."
+Bell Bay Clean Hydrogen Digital,bellbayhydrogen.com.au,George Town,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Devonport Agricultural Automation,devonportagtech.com.au,Devonport,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Burnie Advanced Composites,burniecomposites.com.au,Burnie,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Charles Darwin University Deeptech,cdu.edu.au,Darwin,reachable_needs_primary_evidence,200,https://www.cdu.edu.au/,,"Record first-party company, technology, and street-address evidence."
+NT Fleet Telematics,ntfleet.com.au,Darwin,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Arnhem Space Tech,arnhemspace.com.au,Nhulunbuy,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Alice Springs Solar Desert Tech,alicespringssolar.com.au,Alice Springs,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Employment Innovations,employmentinnovations.com,Sydney,reachable_needs_primary_evidence,200,https://www.employmentinnovations.com/,,"Record first-party company, technology, and street-address evidence."
+Uber Carshare,ubercarshare.com,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Sonder,sonder.io,Sydney,reachable_needs_primary_evidence,200,https://sonder.io,,"Record first-party company, technology, and street-address evidence."
+GigaComm,gigacomm.net.au,Sydney,reachable_needs_primary_evidence,200,https://www.gigacomm.net.au/,,"Record first-party company, technology, and street-address evidence."
+Willow Technology,willowinc.com,Sydney,reachable_needs_primary_evidence,200,https://willowinc.com,,"Record first-party company, technology, and street-address evidence."
+Who Gives A Crap,whogivesacrap.org,Melbourne,reachable_needs_primary_evidence,200,https://au.whogivesacrap.org/,,"Record first-party company, technology, and street-address evidence."
+Good Pair Days,goodpairdays.com,Sydney,reachable_needs_primary_evidence,200,https://www.goodpairdays.com/au/,,"Record first-party company, technology, and street-address evidence."
+Zero Latency VR,zerolatencyvr.com,Melbourne,reachable_needs_primary_evidence,200,https://zerolatencyvr.com,,"Record first-party company, technology, and street-address evidence."
+VAPAR,vapar.co,Sydney,reachable_needs_primary_evidence,200,https://www.vapar.co/,,"Record first-party company, technology, and street-address evidence."
+CIM Tech,cim.io,Sydney,reachable_needs_primary_evidence,200,https://www.cim.io/,,"Record first-party company, technology, and street-address evidence."
+InDebted,indebted.co,Sydney,reachable_needs_primary_evidence,200,https://www.indebted.co/,,"Record first-party company, technology, and street-address evidence."
+Koba Insurance,koba.com.au,Melbourne,reachable_needs_primary_evidence,200,http://instantfwding.com/?dn=koba.com.au&pid=7PO2UM885,,"Record first-party company, technology, and street-address evidence."
+OpenSolar,opensolar.com,Sydney,reachable_needs_primary_evidence,200,https://www.opensolar.com/,,"Record first-party company, technology, and street-address evidence."
+GivEngineering,givengineering.com,Melbourne,reachable_needs_primary_evidence,200,https://givengineering.com,,"Record first-party company, technology, and street-address evidence."
+Lumachain,lumachain.com,Sydney,reachable_needs_primary_evidence,200,https://lumachain.com,,"Record first-party company, technology, and street-address evidence."
+Great Wrap,greatwrap.co,Melbourne,reachable_needs_primary_evidence,200,https://greatwrap.co,,"Record first-party company, technology, and street-address evidence."
+Endua,endua.com,Brisbane,reachable_needs_primary_evidence,200,https://www.endua.com/,,"Record first-party company, technology, and street-address evidence."
+Splend Tech,splend.com.au,Sydney,reachable_needs_primary_evidence,200,https://www.splend.com/,,"Record first-party company, technology, and street-address evidence."
+SmartSat CRC,smartsatcrc.com,Adelaide,reachable_needs_primary_evidence,200,https://smartsatcrc.com,,"Record first-party company, technology, and street-address evidence."
+Australian Institute for Machine Learning,aiml.adelaide.edu.au,Adelaide,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Monash MedTech,monash.edu,Melbourne,reachable_needs_primary_evidence,403,https://monash.edu,HTTP 403,"Record first-party company, technology, and street-address evidence."
+CSL Limited,csl.com,Melbourne,reachable_needs_primary_evidence,429,https://csl.com,HTTP 429,"Record first-party company, technology, and street-address evidence."
+Nanosonics,nanosonics.com.au,Sydney,reachable_needs_primary_evidence,200,https://www.nanosonics.com.au/,,"Record first-party company, technology, and street-address evidence."
+Pro Medicus,promedicus.com.au,Melbourne,reachable_needs_primary_evidence,200,https://www.promed.com.au/,,"Record first-party company, technology, and street-address evidence."
+SomnoMed,somnomed.com.au,Sydney,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Cyclopharm,cyclopharm.com.au,Sydney,reachable_needs_primary_evidence,200,https://www.cyclomedica.com/,,"Record first-party company, technology, and street-address evidence."
+Polynovo,polynovo.com,Melbourne,reachable_needs_primary_evidence,200,https://polynovo.com,,"Record first-party company, technology, and street-address evidence."
+Clinuvel Pharmaceuticals,clinuvel.com,Melbourne,reachable_needs_primary_evidence,200,https://www.clinuvel.com/,,"Record first-party company, technology, and street-address evidence."
+Opthea,opthea.com,Melbourne,reachable_needs_primary_evidence,200,https://ceryvyn.com/,,"Record first-party company, technology, and street-address evidence."
+Mayne Pharma Tech,maynepharma.com,Adelaide,reachable_needs_primary_evidence,200,https://www.maynepharma.com/,,"Record first-party company, technology, and street-address evidence."
+Starpharma,starpharma.com,Melbourne,reachable_needs_primary_evidence,429,https://starpharma.com,HTTP 429,"Record first-party company, technology, and street-address evidence."
+Mesoblast,mesoblast.com,Melbourne,reachable_needs_primary_evidence,403,https://mesoblast.com,HTTP 403,"Record first-party company, technology, and street-address evidence."
+Genetic Signatures,geneticsignatures.com,Sydney,reachable_needs_primary_evidence,200,https://geneticsignatures.com/au/,,"Record first-party company, technology, and street-address evidence."
+Bionomics,bionomics.com.au,Adelaide,unreachable_needs_manual_review,,,URLError,Check the claimed domain against an authoritative company source before seeding.
+Anatara Lifesciences,anataralifesciences.com,Melbourne,reachable_needs_primary_evidence,200,https://anataralifesciences.com,,"Record first-party company, technology, and street-address evidence."
+Dimerix,dimerix.com,Melbourne,reachable_needs_primary_evidence,200,https://dimerix.com,,"Record first-party company, technology, and street-address evidence."
+Invetech Group,invetechgroup.com,Melbourne,reachable_needs_primary_evidence,200,https://www.invetechgroup.com/,,"Record first-party company, technology, and street-address evidence."
+Planet Innovation,planetinnovation.com.au,Melbourne,reachable_needs_primary_evidence,200,https://planetinnovation.com/,,"Record first-party company, technology, and street-address evidence."
+Grey Innovation,greyinnovation.com,Melbourne,reachable_needs_primary_evidence,200,https://www.greyinnovation.com/,,"Record first-party company, technology, and street-address evidence."
+Hydrix Group,hydrix.com,Melbourne,reachable_needs_primary_evidence,200,https://www.hydrix.com/,,"Record first-party company, technology, and street-address evidence."
+Compumedics,compumedics.com.au,Melbourne,reachable_needs_primary_evidence,200,https://www.compumedics.com.au/en/,,"Record first-party company, technology, and street-address evidence."
+CardieX,cardiex.com,Sydney,reachable_needs_primary_evidence,200,https://conneqthealth.com/,,"Record first-party company, technology, and street-address evidence."

@@ -15,6 +15,11 @@ from austechmap_ingestion.employers.address_validation import (
 )
 from austechmap_ingestion.employers.category_apply import apply_company_categories
 from austechmap_ingestion.employers.category_seed import seed_categories
+from austechmap_ingestion.employers.cohort_triage import (
+    load_cohort_fixture,
+    triage_cohort,
+    write_triage_manifest,
+)
 from austechmap_ingestion.employers.geocoding import (
     GeocodingError,
     geocode_address,
@@ -151,6 +156,14 @@ def build_parser() -> argparse.ArgumentParser:
         default=1,
         help="fail when more than this many domains share a normalised address (default: 1)",
     )
+    triage_parser = subparsers.add_parser(
+        "triage-employer-cohort",
+        help="bulk-check candidate domains and write a non-mutating review manifest",
+    )
+    triage_parser.add_argument("--fixture", type=Path, required=True)
+    triage_parser.add_argument("--output", type=Path, required=True)
+    triage_parser.add_argument("--timeout-seconds", type=float, default=12.0)
+    triage_parser.add_argument("--workers", type=int, default=20)
     taxonomy_parser = subparsers.add_parser(
         "seed-taxonomy", help="seed the v1 role-family and skills taxonomies"
     )
@@ -476,6 +489,32 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
         )
         return 0 if validation.valid else 1
+
+    if args.command == "triage-employer-cohort":
+        try:
+            rows = triage_cohort(
+                load_cohort_fixture(args.fixture),
+                timeout_seconds=args.timeout_seconds,
+                workers=args.workers,
+            )
+            write_triage_manifest(args.output, rows)
+        except (OSError, ValueError) as error:
+            print(f"Cohort triage failed: {error}")
+            return 1
+        reachable = sum(row.reachability.reachable for row in rows)
+        print(
+            json.dumps(
+                {
+                    "manifest": str(args.output),
+                    "reachable": reachable,
+                    "total": len(rows),
+                    "unreachable": len(rows) - reachable,
+                },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
 
     if args.command == "seed-taxonomy":
         if not args.database_url:
