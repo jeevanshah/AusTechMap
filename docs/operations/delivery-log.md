@@ -113,3 +113,11 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Result: 191 domains were reachable; 190 homepages were captured; 29 domains produced AU-street candidate text. The 19 single or locality-matching complete candidates in `ambiguous-location-repair-preflight-20260910.csv` pass `validate-address-fixture`. Ten candidate-bearing domains remain in explicit review because they have multiple complete offices or incomplete addresses; 328 domains have no safe selection from this bounded pass.
 - Verification: bounded first-party fetches only, strict address-fixture validation (19 rows, no errors or duplicate addresses), and `git diff --check`.
 - Residual risk: no candidate has been geocoded or imported, and no Neon write occurred. Production geocoding/import remains an explicit approval gate; non-selected domains remain quarantined rather than inferred.
+
+## 2026-09-10 — ambiguous-location linked-page follow-up
+
+- Commit: `data: expand ambiguous-location repair preflight` (this commit)
+- Scope: a second bounded, read-only first-party pass followed location-shaped links from the 161 reachable domains with no candidate in the standard path sweep.
+- Result: six additional domains produced address text. Five safe selections were added to the preflight (four single complete candidates and one exact locality match), bringing it to 24 validated rows; the sixth remains multi-office review.
+- Verification: strict address-fixture validation (24 rows, no errors or duplicate addresses) and `git diff --check`.
+- Residual risk: no candidate has been geocoded or imported. Production geocoding/import remains an explicit approval gate.
