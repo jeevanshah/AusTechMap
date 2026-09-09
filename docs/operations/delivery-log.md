@@ -69,6 +69,11 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Result: 2 locations resolved, 0 reused, 0 errors, and 0 unmatched domains.
 - Verification: importer completed successfully against the validated fixture.
 
+## 2026-09-09 — live cohort reconciliation
+
+- Commit: `docs: record live cohort reconciliation` (this commit)
+- Scope: read-only Neon inventory for the current company, accepted-location, ambiguous-location, and pending-review counts.
+
 ## 2026-09-09 — Wave 2 / Wave 3 triage, homepage evidence, seed preflight
 
 - Commit: `data: prepare Wave 2/3 cohort evidence preflight` (`d9f282d`)
