@@ -15,3 +15,11 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Scope: adds a non-mutating preflight generator and a 67-row candidate fixture derived from captured first-party homepage metadata.
 - Verification: Ruff, Ruff formatting, mypy strict, 5 targeted tests, strict seed-fixture evidence validation, and `git diff --check`.
 - Residual risk: homepage metadata is only an initial source signal. The fixture is not imported; a bulk Neon seed operation still needs explicit user approval.
+
+## 2026-09-09 — Wave 1 production seed evidence import
+
+- Approval: user explicitly approved the 67-row Wave 1 seed preflight for production Neon in this session.
+- Input: `docs/data-quality/wave1-seed-preflight-20260909.csv` from commit `9720b6a`.
+- Result: `seed-employers` completed with 67 matched existing companies, 0 created companies, 0 review items, 0 errors, and 0 low-confidence skips.
+- Verification: strict fixture evidence validation passed immediately before the import; the importer's returned result is recorded above.
+- Residual risk: this adds homepage-backed seed evidence to existing company records only. It does not verify or create a street-level location, and it does not make a company eligible for automatic geocoding.
