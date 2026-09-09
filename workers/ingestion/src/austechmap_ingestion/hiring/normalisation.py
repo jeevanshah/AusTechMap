@@ -134,6 +134,8 @@ _WORK_STYLE_MAPS: dict[AtsProvider, dict[str, str]] = {
     "lever": _LEVER_WORK_STYLE_MAP,
     "ashby": _ASHBY_WORK_STYLE_MAP,
     "greenhouse": {},
+    "smartrecruiters": {"remote": "remote", "hybrid": "hybrid", "onsite": "onsite"},
+    "workable": {"remote": "remote", "hybrid": "hybrid", "onsite": "onsite"},
 }
 
 _TITLE_MATCH_CONFIDENCE = 0.7

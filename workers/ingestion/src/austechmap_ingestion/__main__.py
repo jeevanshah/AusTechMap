@@ -153,7 +153,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     source_status_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
     source_status_parser.add_argument(
-        "--ats-provider", choices=["lever", "ashby", "greenhouse"], required=True
+        "--ats-provider", choices=["lever", "ashby", "greenhouse", "smartrecruiters", "workable"], required=True
     )
     source_status_parser.add_argument("--ats-identifier", required=True)
     source_status_parser.add_argument(

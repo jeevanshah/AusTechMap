@@ -15,11 +15,19 @@ from austechmap_ingestion.hiring.greenhouse import (
     parse_greenhouse_postings,
 )
 from austechmap_ingestion.hiring.lever import LeverParseError, parse_lever_postings
+from austechmap_ingestion.hiring.smartrecruiters import (
+    SmartRecruitersParseError,
+    parse_smartrecruiters_postings,
+)
+from austechmap_ingestion.hiring.workable import (
+    WorkableParseError,
+    parse_workable_postings,
+)
 from austechmap_ingestion.hiring.normalisation import SkillDef, normalise_job
 from austechmap_ingestion.hiring.types import RawJobPosting
 from austechmap_ingestion.storage import SnapshotStore
 
-_PROVIDERS = frozenset({"lever", "ashby", "greenhouse"})
+_PROVIDERS = frozenset({"lever", "ashby", "greenhouse", "smartrecruiters", "workable"})
 
 
 class AtsReplayError(RuntimeError):
@@ -116,6 +124,18 @@ def _parse(provider: AtsProvider, payload: bytes) -> list[RawJobPosting]:
             return parse_lever_postings(payload)
         if provider == "ashby":
             return parse_ashby_postings(payload)
-        return parse_greenhouse_postings(payload)
-    except (AshbyParseError, GreenhouseParseError, LeverParseError) as error:
+        if provider == "greenhouse":
+            return parse_greenhouse_postings(payload)
+        if provider == "smartrecruiters":
+            return parse_smartrecruiters_postings(payload)
+        if provider == "workable":
+            return parse_workable_postings(payload)
+        raise ValueError(f"unsupported provider: {provider}")
+    except (
+        AshbyParseError,
+        GreenhouseParseError,
+        LeverParseError,
+        SmartRecruitersParseError,
+        WorkableParseError,
+    ) as error:
         raise AtsReplayError(f"{provider} snapshot no longer parses: {error}") from error

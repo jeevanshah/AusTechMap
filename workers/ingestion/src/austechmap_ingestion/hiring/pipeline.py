@@ -24,6 +24,8 @@ from austechmap_ingestion.hiring.company_sources import (
 )
 from austechmap_ingestion.hiring.greenhouse import fetch_greenhouse_postings
 from austechmap_ingestion.hiring.lever import fetch_lever_postings
+from austechmap_ingestion.hiring.smartrecruiters import fetch_smartrecruiters_postings
+from austechmap_ingestion.hiring.workable import fetch_workable_postings
 from austechmap_ingestion.hiring.normalisation import SkillDef, normalise_job
 from austechmap_ingestion.hiring.persistence import mark_expired_jobs, persist_job_posting
 from austechmap_ingestion.jobs import JobRepository, RunStatus, SnapshotRecord
@@ -99,6 +101,10 @@ def run_ats_crawl(
             raw_bytes, postings = fetch_ashby_postings(identifier, fetch_fn=fetch_fn)
         elif provider == "greenhouse":
             raw_bytes, postings = fetch_greenhouse_postings(identifier, fetch_fn=fetch_fn)
+        elif provider == "smartrecruiters":
+            raw_bytes, postings = fetch_smartrecruiters_postings(identifier, fetch_fn=fetch_fn)
+        elif provider == "workable":
+            raw_bytes, postings = fetch_workable_postings(identifier, fetch_fn=fetch_fn)
         else:
             raise ValueError(f"unsupported ats_provider: {provider!r}")
 
