@@ -1,0 +1,12 @@
+domain,name,outcome,reason,source_url
+agridigital.io,Agridigital,selected,official registered office includes full postcode,https://www.agridigital.io/contact
+assemblypayments.com,Assembly Payments,selected,official Australia office includes full postcode,https://www.hellozai.com/contact-us
+bartondeakin.com,Barton Deakin,selected,official NSW office includes full postcode and matches current Sydney locality,https://bartondeakin.com/contact/
+geneticsignatures.com,Genetic Signatures,selected,official headquarters metadata includes full postcode,https://geneticsignatures.com/au/contact/
+geographe.com.au,Geographe,quarantined,multiple official offices and none matches the current Busselton locality,https://geographe.com.au/contact
+inauro.com.au,Inauro,selected,official contact configuration includes full postcode,https://www.inauro.com.au/contact-us
+legalvision.com.au,Legalvision,quarantined,multiple official offices and no exact current-locality match,https://legalvision.com.au/contact-us/
+scancam.com.au,Scancam,selected,official Brisbane office includes full postcode and matches current Brisbane locality,https://sensen.ai/company/contact/
+seqta.com.au,SEQTA Software,quarantined,multiple official offices and none matches the current Joondalup locality,https://www.tes.com/en-au/contact
+splend.com.au,Splend Tech,quarantined,multiple official offices and none matches the current Alexandria locality,https://www.splend.com/contact-us/
+vantage-dc.com,Vantage Data Centres,quarantined,only extracted office is in Washington USA and is not an Australian location,https://vantage-dc.com/company/contact-us/

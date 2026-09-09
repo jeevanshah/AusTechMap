@@ -1,0 +1,7 @@
+name,domain,street_address,suburb,state,postcode,source_confidence,source_note,source_url
+Agridigital,agridigital.io,167 Brisbane Street,Dubbo,NSW,2830,High,complete first-party registered-office address,https://www.agridigital.io/contact
+Assembly Payments,assemblypayments.com,121 Castlereagh Street,Sydney,NSW,2000,High,complete first-party Australia office address,https://www.hellozai.com/contact-us
+Barton Deakin,bartondeakin.com,1 Shelley Street,Barangaroo,NSW,2000,High,complete first-party NSW office matching existing ambiguous locality,https://bartondeakin.com/contact/
+Genetic Signatures,geneticsignatures.com,7 Eliza Street,Newtown,NSW,2042,High,complete first-party headquarters address,https://geneticsignatures.com/au/contact/
+Inauro,inauro.com.au,644 Chapel Street,South Yarra,VIC,3141,High,complete first-party office address,https://www.inauro.com.au/contact-us
+Scancam,scancam.com.au,315 Brunswick St,Fortitude Valley,QLD,4006,High,complete first-party Brisbane office matching existing ambiguous locality,https://sensen.ai/company/contact/

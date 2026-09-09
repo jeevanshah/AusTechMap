@@ -129,6 +129,14 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: all 28 fixture rows were read back as an accepted company location paired with their exact active first-party source-evidence URL. Live totals after import: 908 companies, 501 companies with an accepted location, 388 with an ambiguous linked location, and nine pending review items.
 - Residual risk: 11 candidate-bearing companies remain quarantined because their evidence is incomplete or represents multiple offices; the remaining queue has no safe first-party selection from the bounded automated passes.
 
+## 2026-09-10 — ambiguous-location review-case resolution preflight
+
+- Commit: `data: resolve ambiguous-location review cases` (this commit)
+- Scope: re-examined the 11 review cases against raw first-party source context, without Google Maps or a Neon write.
+- Result: six formerly incomplete or locality-matched cases now have complete first-party address evidence and pass strict fixture validation. Five remain deliberately quarantined: three lack a location match among multiple offices, one has multiple offices without an exact match, and one has only a US office in the source.
+- Verification: 31 bounded source-context captures and `validate-address-fixture` (six rows, no errors or duplicate addresses).
+- Residual risk: the six-row preflight has not been geocoded or imported; production promotion remains an explicit approval gate.
+
 ## 2026-09-10 — ambiguous-location canonical-host recovery
 
 - Commit: `data: recover ambiguous-location address evidence` (this commit)
