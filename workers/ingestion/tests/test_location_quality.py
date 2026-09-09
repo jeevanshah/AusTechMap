@@ -11,6 +11,7 @@ from austechmap_ingestion.db.migrations import apply_migrations
 from austechmap_ingestion.employers.geocoding import GeocodeResult
 from austechmap_ingestion.employers.location_quality import (
     LocationQualityError,
+    low_specificity_candidates,
     quarantine_low_specificity_locations,
     street_address_lacks_number,
     validate_low_specificity_candidates,
@@ -53,6 +54,20 @@ def test_validation_refuses_a_mixed_specificity_fixture() -> None:
     ]
     with pytest.raises(LocationQualityError, match="mixed-specificity"):
         validate_low_specificity_candidates(candidates)
+
+
+def test_mixed_fixture_can_explicitly_select_only_low_specificity_addresses() -> None:
+    generic = AddressCandidate(
+        "generic.example", "George Street", "Sydney", "NSW", "2000", "High", "x"
+    )
+    specific = AddressCandidate(
+        "specific.example", "341 George Street", "Sydney", "NSW", "2000", "High", "x"
+    )
+    selected, skipped = low_specificity_candidates(
+        [generic, specific], include_only_low_specificity=True
+    )
+    assert selected == [generic]
+    assert skipped == ("specific.example",)
 
 
 @pytest.mark.integration

@@ -5,9 +5,10 @@ fixture can therefore make one unsupported city-centre point appear on many
 company profiles.  This module contains such a fixture without deleting the
 company, source, or raw-address evidence needed to research a correction.
 
-It is intentionally opt-in and defaults to a dry run.  The caller must supply
-a fixture made entirely of addresses without a street number; mixing a valid
-street address into the fixture is rejected rather than risking its removal.
+It is intentionally opt-in and defaults to a dry run.  By default, the caller
+must supply a fixture made entirely of addresses without a street number;
+mixed fixtures are rejected rather than risking a valid address's removal.
+The explicit mixed-fixture mode targets only the rows without a number.
 """
 
 from __future__ import annotations
@@ -39,6 +40,7 @@ class LocationQuarantineStats:
     fixture_candidates: int
     matched_fixture_domains: int
     unmatched_fixture_domains: tuple[str, ...]
+    skipped_specific_fixture_domains: tuple[str, ...]
     affected_locations: int
     affected_companies: int
     applied: bool
@@ -59,20 +61,42 @@ def street_address_lacks_number(street_address: str) -> bool:
     return _DIGIT_RE.search(street_address) is None
 
 
-def validate_low_specificity_candidates(candidates: list[AddressCandidate]) -> None:
-    """Require an all-low-specificity fixture before any containment can run."""
-    numbered = sorted(
-        candidate.domain
+def low_specificity_candidates(
+    candidates: list[AddressCandidate], *, include_only_low_specificity: bool = False
+) -> tuple[list[AddressCandidate], tuple[str, ...]]:
+    """Select unsupported addresses, rejecting mixed fixtures by default.
+
+    ``include_only_low_specificity`` is intentionally explicit.  It is for a
+    mostly-unsafe fixture where a small, known subset has real street numbers;
+    those specific rows must remain outside the containment target.
+    """
+    low_specificity = [
+        candidate
         for candidate in candidates
-        if not street_address_lacks_number(candidate.street_address)
+        if street_address_lacks_number(candidate.street_address)
+    ]
+    numbered = tuple(
+        sorted(
+            candidate.domain
+            for candidate in candidates
+            if not street_address_lacks_number(candidate.street_address)
+        )
     )
-    if numbered:
+    if numbered and not include_only_low_specificity:
         preview = ", ".join(numbered[:5])
         suffix = "..." if len(numbered) > 5 else ""
         raise LocationQualityError(
             "refusing to quarantine a mixed-specificity fixture; numbered street addresses "
             f"found for: {preview}{suffix}"
         )
+    if not low_specificity:
+        raise LocationQualityError("fixture contains no low-specificity addresses to quarantine")
+    return low_specificity, numbered
+
+
+def validate_low_specificity_candidates(candidates: list[AddressCandidate]) -> None:
+    """Require an all-low-specificity fixture before any containment can run."""
+    low_specificity_candidates(candidates)
 
 
 def _target_locations(
@@ -142,6 +166,7 @@ def quarantine_low_specificity_locations(
     actor_id: str,
     reason: str,
     apply: bool = False,
+    include_only_low_specificity: bool = False,
 ) -> LocationQuarantineStats:
     """Preview or quarantine external-geocoder rows linked by a bad fixture.
 
@@ -154,11 +179,13 @@ def quarantine_low_specificity_locations(
     if not reason.strip():
         raise LocationQualityError("a non-empty cleanup reason is required")
     candidates = load_address_fixture(fixture_path)
-    validate_low_specificity_candidates(candidates)
+    low_specificity, skipped_specific_domains = low_specificity_candidates(
+        candidates, include_only_low_specificity=include_only_low_specificity
+    )
 
     with psycopg.connect(database_url) as connection:
         targets, unmatched_domains, matched_fixture_domains = _target_locations(
-            connection, candidates=candidates
+            connection, candidates=low_specificity
         )
         affected_companies = len(
             {company_id for target in targets for company_id in target.company_ids}
@@ -226,6 +253,7 @@ def quarantine_low_specificity_locations(
         fixture_candidates=len(candidates),
         matched_fixture_domains=matched_fixture_domains,
         unmatched_fixture_domains=unmatched_domains,
+        skipped_specific_fixture_domains=skipped_specific_domains,
         affected_locations=len(targets),
         affected_companies=affected_companies,
         applied=apply,

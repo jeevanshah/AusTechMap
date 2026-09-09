@@ -126,6 +126,11 @@ def build_parser() -> argparse.ArgumentParser:
     quarantine_parser.add_argument("--actor-id", default="cohort-location-cleanup")
     quarantine_parser.add_argument("--reason", required=True)
     quarantine_parser.add_argument(
+        "--only-low-specificity",
+        action="store_true",
+        help="for a mixed fixture, quarantine only rows without a street number",
+    )
+    quarantine_parser.add_argument(
         "--apply",
         action="store_true",
         help="perform the audited quarantine (without this flag, only report the target set)",
@@ -385,6 +390,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 actor_id=args.actor_id,
                 reason=args.reason,
                 apply=args.apply,
+                include_only_low_specificity=args.only_low_specificity,
             )
         except (LocationQualityError, OSError, psycopg.Error) as error:
             print(f"Location cleanup failed: {error}")
@@ -397,6 +403,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "applied": cleanup_stats.applied,
                     "fixtureCandidates": cleanup_stats.fixture_candidates,
                     "matchedFixtureDomains": cleanup_stats.matched_fixture_domains,
+                    "skippedSpecificFixtureDomains": list(
+                        cleanup_stats.skipped_specific_fixture_domains
+                    ),
                     "unmatchedFixtureDomains": list(cleanup_stats.unmatched_fixture_domains),
                 },
                 separators=(",", ":"),
