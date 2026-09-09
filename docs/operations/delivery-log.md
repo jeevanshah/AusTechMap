@@ -152,6 +152,14 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: direct read-only database query; no location, evidence, or company record changed.
 - Residual risk: unlinking superseded ambiguous records is a production mutation and must be separately approved and audited. The 312 evidence-free records cannot be safely auto-resolved.
 
+## 2026-09-10 — superseded ambiguous-link production cleanup
+
+- Approval: user explicitly approved unlinking the 76 superseded ambiguous company-location records in production Neon in this session.
+- Scope: deleted only an ambiguous `company_locations` link where the same company already had an accepted location. The shared `resolved_locations` records and all evidence were retained.
+- Result: 76 links were unlinked and 76 append-only audit records were written. A pre-delete foreign-key check confirmed zero job references.
+- Verification: post-write read-back reports 312 ambiguous links/companies, zero remaining superseded ambiguous links, and 76 cleanup audit records.
+- Residual risk: the remaining 312 links have no active first-party location evidence; they remain a research queue and were not inferred or altered.
+
 ## 2026-09-10 — ambiguous-location canonical-host recovery
 
 - Commit: `data: recover ambiguous-location address evidence` (this commit)
