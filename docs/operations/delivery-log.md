@@ -137,6 +137,13 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: 31 bounded source-context captures and `validate-address-fixture` (six rows, no errors or duplicate addresses).
 - Residual risk: the six-row preflight has not been geocoded or imported; production promotion remains an explicit approval gate.
 
+## 2026-09-10 — ambiguous-location review repair production import
+
+- Approval: user explicitly approved geocoding and importing the six-row `ambiguous-location-review-repair-preflight-20260910.csv` fixture to production Neon in this session.
+- Result: `seed-locations` completed with six newly resolved locations, zero reused locations, zero errors, and zero unmatched domains.
+- Verification: all six fixture domains were read back with an accepted location and their exact active first-party source-evidence URL. One address used the importer's documented query fallback before successful geocoding; this is preserved in the company-location raw address and remains paired with the same cited source. Live totals after import: 506 companies with an accepted location, 388 with an ambiguous linked location, and nine pending review items.
+- Residual risk: five reviewed companies remain deliberately quarantined. They need a human or a new authoritative source to distinguish a correct office without guessing.
+
 ## 2026-09-10 — ambiguous-location canonical-host recovery
 
 - Commit: `data: recover ambiguous-location address evidence` (this commit)
