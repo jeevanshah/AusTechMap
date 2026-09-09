@@ -24,7 +24,7 @@ MIGRATIONS_DIRECTORY = REPOSITORY_ROOT / "db" / "migrations"
 def test_repository_migrations_are_contiguous_and_cover_foundation_contracts() -> None:
     migrations = discover_migrations(MIGRATIONS_DIRECTORY)
 
-    assert [migration.version for migration in migrations] == list(range(1, 17))
+    assert [migration.version for migration in migrations] == list(range(1, 21))
     combined_sql = "\n".join(migration.sql for migration in migrations)
     assert "CREATE EXTENSION IF NOT EXISTS postgis" in combined_sql
     assert "CREATE TABLE users" in combined_sql

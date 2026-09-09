@@ -172,6 +172,17 @@ Everything since the 2026-09-04 handoff:
   - Organic 100-point algorithm, ranking order, and score components remain 100% mathematically unpolluted.
 - Total test coverage: **210 automated tests passing** across contracts (45) and web (165), 0 lint errors, 0 type errors, clean Next.js Turbopack build across 37 routes.
 
+**Phase 5 Hiring & Phase 6A Sponsorship Expansion completed 9 September 2026**:
+- Expanded verified ATS employer sources from 12 to **26 registered employers** across Lever, Ashby, and Greenhouse (Airwallex, Zip Co, Eucalyptus, Fleet Space Technologies, SiteMinder, Neara, Culture Amp, Catapult Sports, Zeller, Sitemate, Deputy, Morse Micro, Objective Corporation, Immutable, Prospa, Dovetail, Dremio, Octopus Deploy, Envato, Up/Ferocia, Hysata, Kasada, Lumary, Vow, and Easy Agile).
+- Registered in `workers/ingestion/src/austechmap_ingestion/hiring/fixtures/ats_source_seed_20260905.csv` and seeded into Neon `company_ats_sources` (`{"created": 16, "reused": 10}`).
+- Executed `crawl-jobs --all` against production: successfully crawled all 26 sources, expanding live job postings from 92 across 9 companies to **1,139 live job postings across 25 active employers**.
+- Content-addressed raw snapshots stored; deterministic taxonomy classification and skill extraction applied to all 1,139 postings without destructive overwrites.
+- Executed `derive-sponsorship-evidence`: derived the platform's first organic `job_sponsorship_mention` evidence hit from a real job posting (Neara: "Senior Software Engineer - Australia", 0.70 confidence), automatically activating Neara's verified sponsorship badge and `?sponsorship=true` map filter.
+- Executed `run-retention-pipeline.mjs`: derived 1,056 new longitudinal `job.first_seen` change events in `events` table with zero errors.
+- Verified `/opportunities` (Opportunity Match), `/api/map/companies` (127ms response time), `/companies/[slug]` (Neara, Airwallex, Eucalyptus, Zip Co, etc.), and map sponsorship filters.
+- Updated ingestion test suites: `test_ats_source_seed.py` (26 verified seeds) and `test_migrations.py` (range 1..21).
+- Monorepo quality gates: **210 tests passing** across contracts (45) and web (165), 0 lint errors, 0 type errors.
+
 ## Work remaining
 
 Per `IMPLEMENTATION_PLAN.md`'s own phase checklists:
