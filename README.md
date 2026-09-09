@@ -12,7 +12,7 @@ opportunity, all traceable to a source.
 - **[ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md)** — authoritative technology and
   operational decisions. v3.10
 - **[AGENTS.md](./AGENTS.md)** — Codex/Claude/Gemini roles, orchestration, workflow rules, and quality
-  gates. v1.8
+  gates. v1.9
 - **[docs/golden-queries.md](./docs/golden-queries.md)** — relevance fixtures and measurable search
   acceptance gates. v1.0
 - **[docs/deployment.md](./docs/deployment.md)** — staging promotion and web/worker deployment. v1.0
@@ -21,8 +21,8 @@ opportunity, all traceable to a source.
 
 As of 9 September 2026, Phases 0–8 foundation work is live against Neon, with private-alpha
 discovery (map/search/profiles), Opportunity Match, retention/alerts, and launch hardening in place.
-The employer cohort sits near **400+** researched companies with **57** registered ATS sources and
-**~2,065** active observed jobs (see `HANDOFF.md` for the latest live counts).
+The employer cohort has **908** companies and **506** companies with an accepted, evidence-backed
+location (see `HANDOFF.md` for the latest live counts).
 
 **Cohort data-quality (Waves 1–3), 9 September 2026:** low-specificity city-centre pins were
 quarantined earlier. Evidence-backed homepage seed preflights are committed under
@@ -32,6 +32,8 @@ street-address candidates — discovery-only; no geocode or `seed-locations` unt
 verified source URL and passes `validate-address-fixture`. Pipeline notes:
 [`docs/data-quality/README.md`](./docs/data-quality/README.md),
 [`docs/operations/delivery-log.md`](./docs/operations/delivery-log.md).
+
+**Current location status, 10 September 2026:** 34 first-party-backed repair locations have now been user-approved and imported to Neon. The 76 ambiguous links superseded by accepted locations were audited and unlinked; **312** ambiguous links remain research-only because they have no active first-party location evidence. This paragraph supersedes the earlier discovery-only wording above.
 
 Cloudflare R2 for the account-deletion ledger remains deliberately deferred until real users are
 admitted. Current priorities: verify street-level locations for map-eligible companies, expand ATS

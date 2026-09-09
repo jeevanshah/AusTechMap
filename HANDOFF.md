@@ -5,9 +5,9 @@
 ## Switch
 
 - **Current Implementer / Integrator:** Codex (Cursor Auto covering after Codex usage limit) — operating per `AGENTS.md` orchestration / bulk autonomous delivery lane.
-- **Updated at:** 2026-09-09
-- **Reason:** Checkpoint after Wave 2/3 homepage-evidence seeding and first-party location discovery; README status brought current.
-- **Task / issue:** Continue street-level location verification for discovery candidates; do not geocode until each address has a first-party source URL and passes `validate-address-fixture`.
+- **Updated at:** 2026-09-10
+- **Reason:** Post-import geographic evidence and cleanup checkpoint.
+- **Task / issue:** Continue only with first-party-backed location research for the 312 evidence-free ambiguous links, or resume normal product/ATS work. Do not infer locations.
 - **Acceptance criteria (this checkpoint):** Wave 2/3 triage → evidence → seed preflight → Neon `seed-employers` → location-candidate manifests committed on `main`; no location geocode/import performed.
 
 ## Checkpoint
@@ -17,6 +17,17 @@
 - **Handoff commit:** `548df4e` on `main`.
 - **Working-tree status at checkpoint:** Clean after this docs commit.
 - **Remote:** `origin/main` synchronized after push.
+
+## Geographic evidence and cleanup — 10 September 2026
+
+- **Checkpoint:** `2ded9c5` is the completed production-cleanup checkpoint; this handoff commit records its durable state.
+- **Working tree:** Do **not** stage the unrelated uncommitted Cursor draft in `workers/ingestion/src/austechmap_ingestion/__main__.py` and `workers/ingestion/src/austechmap_ingestion/employers/location_promotion.py`; it was tested but is not applicable to the new repair fixtures. `workers/ingestion/.pytest-codex-20260910/` is a disposable local test directory.
+- **Approved imports:** The user explicitly approved two production `seed-locations` operations: the 28-row repair fixture (24 resolved / 4 reused) and the six-row review repair fixture (6 resolved / 0 reused).
+- **Verification:** Every one of the 34 fixture domains has an accepted location paired with its exact active first-party `location_source` evidence URL. The Barton Deakin import used the importer's documented query fallback but retained the cited evidence.
+- **Approved cleanup:** The user approved unlinking 76 ambiguous company-location links only where the same company already had an accepted location. The operation wrote 76 immutable audit records, deleted no shared `resolved_locations` or evidence, and had zero job foreign-key references.
+- **Live post-cleanup state:** 908 companies; 506 companies with an accepted location; **312 ambiguous links/companies**; zero remaining superseded ambiguous links; nine pending review items.
+- **Next safe work:** Continue only with first-party-backed location research for the 312 evidence-free ambiguous links, or resume normal product/ATS work. Do not infer locations. Five difficult review cases remain quarantined; see `docs/data-quality/ambiguous-location-review-resolution-20260910.csv`.
+- **Relevant commits:** `1f9825e`, `ed5eb98`, `05544f5`, `27134bb`, `056a536`, `3bb1dac`, `4abba39`, `3760670`, `2ded9c5`.
 
 ## Data-quality cleanup — 9 September 2026
 
