@@ -8,15 +8,41 @@ after first-party company and technology evidence has been recorded separately.
 from __future__ import annotations
 
 import csv
+import re
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.error import HTTPError, URLError
+from urllib.parse import urljoin, urlparse
 from urllib.request import Request, urlopen
 
 _USER_AGENT = "AusTechMap cohort validation/1.0"
+_LOCATION_PATHS = ("", "contact", "contact-us", "locations", "support")
+_SCRIPT_STYLE_RE = re.compile(
+    r"<(script|style|noscript)\b[^>]*>.*?</\1>",
+    re.IGNORECASE | re.DOTALL,
+)
+_TAG_RE = re.compile(r"<[^>]+>")
+_WHITESPACE_RE = re.compile(r"\s+")
+_STREET_TYPES = (
+    r"(?:Street|St|Road|Rd|Avenue|Ave|Drive|Dr|Lane|Ln|Boulevard|Blvd|"
+    r"Parade|Pde|Place|Pl|Court|Ct|Crescent|Cres|Way|Highway|Hwy|"
+    r"Terrace|Tce|Circuit|Cct|Close|Cl)"
+)
+_STATE = r"(?:NSW|VIC|QLD|WA|SA|TAS|ACT|NT)"
+_AU_ADDRESS_RE = re.compile(
+    rf"\b("
+    rf"\d{{1,5}}[A-Za-z]?(?:/\d{{1,5}}[A-Za-z]?)?"
+    rf"\s+[A-Za-z][A-Za-z0-9'’.\-]*(?:\s+[A-Za-z][A-Za-z0-9'’.\-]*){{0,4}}"
+    rf"\s+{_STREET_TYPES}"
+    rf"(?:\s*,?\s+[A-Za-z][A-Za-z'’\-]*(?:\s+[A-Za-z][A-Za-z'’\-]*){{0,3}})?"
+    rf"(?:\s*,?\s+{_STATE})?"
+    rf"(?:\s+\d{{4}})?"
+    rf")\b",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -84,6 +110,33 @@ class SeedPreflightRow:
     original_reason: str
     source_url: str
     technology_rationale: str
+
+
+@dataclass(frozen=True)
+class LocationPageFetch:
+    url: str
+    final_url: str | None
+    text: str | None
+    detail: str | None
+
+
+@dataclass(frozen=True)
+class LocationDiscoveryRow:
+    candidate: CohortCandidate
+    pages_checked: tuple[str, ...]
+    address_candidates: tuple[str, ...]
+
+    @property
+    def status(self) -> str:
+        return (
+            "address_candidate_needs_verification"
+            if self.address_candidates
+            else "no_candidate_found"
+        )
+
+    @property
+    def next_action(self) -> str:
+        return "Verify candidate text on the cited first-party page before geocoding."
 
 
 class _MetadataParser(HTMLParser):
@@ -453,5 +506,178 @@ def write_seed_preflight(path: Path, rows: tuple[SeedPreflightRow, ...]) -> None
                     "confidence": "Medium - first-party homepage metadata captured",
                     "source_url": row.source_url,
                     "technology_rationale": row.technology_rationale,
+                }
+            )
+
+
+def load_seed_preflight(path: Path) -> tuple[SeedPreflightRow, ...]:
+    with path.open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        if reader.fieldnames is None:
+            raise ValueError("missing seed preflight header")
+        required = {
+            "name",
+            "domain",
+            "careers_url",
+            "city",
+            "reason",
+            "source_url",
+            "technology_rationale",
+        }
+        missing = sorted(required - set(reader.fieldnames))
+        if missing:
+            raise ValueError(f"missing seed preflight columns: {', '.join(missing)}")
+        rows = tuple(
+            SeedPreflightRow(
+                candidate=CohortCandidate(
+                    name=row["name"].strip(),
+                    domain=row["domain"].strip().lower(),
+                    city=row["city"].strip(),
+                ),
+                careers_url=row["careers_url"].strip(),
+                original_reason=row["reason"].strip(),
+                source_url=row["source_url"].strip(),
+                technology_rationale=row["technology_rationale"].strip(),
+            )
+            for row in reader
+        )
+    if not rows:
+        raise ValueError("seed preflight contains no rows")
+    return rows
+
+
+def html_to_visible_text(html: str) -> str:
+    without_blocks = _SCRIPT_STYLE_RE.sub(" ", html)
+    text = _TAG_RE.sub(" ", without_blocks)
+    return _WHITESPACE_RE.sub(" ", text).strip()
+
+
+def extract_au_street_addresses(text: str) -> tuple[str, ...]:
+    found: list[str] = []
+    seen: set[str] = set()
+    for match in _AU_ADDRESS_RE.finditer(text):
+        candidate = _WHITESPACE_RE.sub(" ", match.group(1)).strip(" ,")
+        key = candidate.casefold()
+        if key in seen:
+            continue
+        # Discovery-only: keep Australian-looking street addresses with a number
+        # and a state code so marketing copy and foreign offices stay out.
+        if not re.search(r"\d", candidate):
+            continue
+        if not re.search(rf"\b{_STATE}\b", candidate, re.IGNORECASE):
+            continue
+        seen.add(key)
+        found.append(candidate)
+    return tuple(found)
+
+
+def candidate_location_urls(source_url: str) -> tuple[str, ...]:
+    parsed = urlparse(source_url)
+    if not parsed.scheme or not parsed.netloc:
+        raise ValueError(f"source_url must be an absolute URL: {source_url}")
+    base = f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
+    if not base.endswith("/"):
+        base = f"{base}/"
+    urls: list[str] = []
+    seen: set[str] = set()
+    for suffix in _LOCATION_PATHS:
+        url = base if not suffix else urljoin(base, suffix)
+        if url not in seen:
+            seen.add(url)
+            urls.append(url)
+    return tuple(urls)
+
+
+def fetch_location_page(url: str, *, timeout_seconds: float) -> LocationPageFetch:
+    request = Request(url, headers={"User-Agent": _USER_AGENT})
+    try:
+        with urlopen(request, timeout=timeout_seconds) as response:  # noqa: S310 - reviewed preflight URL
+            content_type = response.headers.get_content_type()
+            if content_type not in {"text/html", "application/xhtml+xml"}:
+                return LocationPageFetch(
+                    url=url,
+                    final_url=response.url,
+                    text=None,
+                    detail=f"unsupported content type: {content_type}",
+                )
+            charset = response.headers.get_content_charset() or "utf-8"
+            html = response.read(196_608).decode(charset, errors="replace")
+            return LocationPageFetch(
+                url=url,
+                final_url=response.url,
+                text=html_to_visible_text(html),
+                detail=None,
+            )
+    except HTTPError as error:
+        return LocationPageFetch(url, error.url, None, f"HTTP {error.code}")
+    except (TimeoutError, URLError, OSError) as error:
+        return LocationPageFetch(url, None, None, type(error).__name__)
+
+
+def discover_location_candidates(
+    preflight_rows: tuple[SeedPreflightRow, ...],
+    *,
+    timeout_seconds: float = 12.0,
+    workers: int = 8,
+    fetch_page: Callable[[str], LocationPageFetch] | None = None,
+) -> tuple[LocationDiscoveryRow, ...]:
+    if workers < 1:
+        raise ValueError("workers must be at least 1")
+    get = fetch_page or (lambda url: fetch_location_page(url, timeout_seconds=timeout_seconds))
+
+    def discover_one(row: SeedPreflightRow) -> LocationDiscoveryRow:
+        try:
+            urls = candidate_location_urls(row.source_url)
+        except ValueError:
+            return LocationDiscoveryRow(row.candidate, (), ())
+        pages: list[str] = []
+        addresses: list[str] = []
+        seen_addresses: set[str] = set()
+        for url in urls:
+            page = get(url)
+            checked = page.final_url or url
+            if checked not in pages:
+                pages.append(checked)
+            if not page.text:
+                continue
+            for address in extract_au_street_addresses(page.text):
+                key = address.casefold()
+                if key in seen_addresses:
+                    continue
+                seen_addresses.add(key)
+                addresses.append(address)
+        return LocationDiscoveryRow(row.candidate, tuple(pages), tuple(addresses))
+
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        return tuple(executor.map(discover_one, preflight_rows))
+
+
+def write_location_candidates(path: Path, rows: tuple[LocationDiscoveryRow, ...]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=(
+                "name",
+                "domain",
+                "city",
+                "status",
+                "pages_checked",
+                "address_candidates",
+                "next_action",
+            ),
+            lineterminator="\n",
+        )
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(
+                {
+                    "name": row.candidate.name,
+                    "domain": row.candidate.domain,
+                    "city": row.candidate.city,
+                    "status": row.status,
+                    "pages_checked": " | ".join(row.pages_checked),
+                    "address_candidates": " | ".join(row.address_candidates),
+                    "next_action": row.next_action,
                 }
             )

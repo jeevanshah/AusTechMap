@@ -17,11 +17,14 @@ from austechmap_ingestion.employers.category_apply import apply_company_categori
 from austechmap_ingestion.employers.category_seed import seed_categories
 from austechmap_ingestion.employers.cohort_triage import (
     build_seed_preflight,
+    discover_location_candidates,
     harvest_homepage_evidence,
     load_cohort_fixture,
+    load_seed_preflight,
     load_triage_manifest,
     triage_cohort,
     write_evidence_harvest,
+    write_location_candidates,
     write_seed_preflight,
     write_triage_manifest,
 )
@@ -184,6 +187,14 @@ def build_parser() -> argparse.ArgumentParser:
     preflight_parser.add_argument("--cohort-fixture", type=Path, required=True)
     preflight_parser.add_argument("--evidence-harvest", type=Path, required=True)
     preflight_parser.add_argument("--output", type=Path, required=True)
+    location_parser = subparsers.add_parser(
+        "harvest-cohort-location-candidates",
+        help="bulk first-party page sweep for street-address candidates without geocoding",
+    )
+    location_parser.add_argument("--seed-preflight", type=Path, required=True)
+    location_parser.add_argument("--output", type=Path, required=True)
+    location_parser.add_argument("--timeout-seconds", type=float, default=12.0)
+    location_parser.add_argument("--workers", type=int, default=8)
     taxonomy_parser = subparsers.add_parser(
         "seed-taxonomy", help="seed the v1 role-family and skills taxonomies"
     )
@@ -576,6 +587,32 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(
             json.dumps(
                 {"candidates": len(preflight_rows), "preflight": str(args.output)},
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "harvest-cohort-location-candidates":
+        try:
+            location_rows = discover_location_candidates(
+                load_seed_preflight(args.seed_preflight),
+                timeout_seconds=args.timeout_seconds,
+                workers=args.workers,
+            )
+            write_location_candidates(args.output, location_rows)
+        except (OSError, ValueError) as error:
+            print(f"Cohort location discovery failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "candidatesWithAddress": sum(
+                        1 for row in location_rows if row.address_candidates
+                    ),
+                    "manifest": str(args.output),
+                    "total": len(location_rows),
+                },
                 separators=(",", ":"),
                 sort_keys=True,
             )

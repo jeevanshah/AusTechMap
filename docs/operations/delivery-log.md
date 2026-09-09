@@ -48,3 +48,11 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
   - Wave 3: `seed-employers` → 0 matched, 113 created, 1 review, 0 errors, 0 low-confidence skips.
 - Verification: strict fixture evidence validation passed immediately before each import; importer JSON results recorded above.
 - Residual risk: adds homepage-backed seed evidence (and Wave 3 new company rows) only. Does not verify or create street-level locations, and does not make companies eligible for automatic geocoding. Five domains were queued for review rather than auto-accepted.
+
+## 2026-09-09 — Wave 2 / Wave 3 official-source location discovery
+
+- Commit: `feat: harvest Wave 2/3 first-party location candidates` (this commit)
+- Scope: adds reusable `harvest-cohort-location-candidates` CLI; sweeps official home/contact/contact-us/locations/support pages for Waves 2 and 3 without Google Maps or Neon writes.
+- Result: Wave 2 **39**/135 companies with AU-state street candidates; Wave 3 **32**/114. Remaining rows are `no_candidate_found`.
+- Verification: 7 cohort triage tests, ruff, mypy strict on changed module, `git diff --check`.
+- Residual risk: candidates are regex-extracted discovery text and may include multi-office or noisy matches. No address fixture, validation, geocode, or Neon location import was performed.

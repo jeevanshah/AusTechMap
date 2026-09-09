@@ -8,13 +8,18 @@ import pytest
 from austechmap_ingestion.employers.cohort_triage import (
     CohortCandidate,
     HomepageEvidence,
+    LocationPageFetch,
     ReachabilityResult,
+    SeedPreflightRow,
     build_seed_preflight,
+    discover_location_candidates,
+    extract_au_street_addresses,
     harvest_homepage_evidence,
     load_cohort_fixture,
     load_triage_manifest,
     triage_cohort,
     write_evidence_harvest,
+    write_location_candidates,
     write_seed_preflight,
     write_triage_manifest,
 )
@@ -124,3 +129,94 @@ def test_seed_preflight_only_includes_evidence_backed_candidates(tmp_path: Path)
     with output.open(encoding="utf-8", newline="") as handle:
         manifest = list(csv.DictReader(handle))
     assert manifest[0]["confidence"] == "Medium - first-party homepage metadata captured"
+
+
+def test_extract_au_street_addresses_requires_street_number() -> None:
+    text = (
+        "Visit us at 300 Barangaroo Avenue Barangaroo NSW 2000. "
+        "Ignore Avenue of the Arts and Level Office Tower."
+    )
+    assert extract_au_street_addresses(text) == ("300 Barangaroo Avenue Barangaroo NSW 2000",)
+
+
+def test_location_discovery_records_candidate_and_checked_pages(tmp_path: Path) -> None:
+    preflight = (
+        SeedPreflightRow(
+            candidate=CohortCandidate("InDebted", "indebted.co", "Sydney"),
+            careers_url="https://indebted.co/careers",
+            original_reason="Collections SaaS",
+            source_url="https://www.indebted.co/",
+            technology_rationale="Debt recovery platform for lenders",
+        ),
+        SeedPreflightRow(
+            candidate=CohortCandidate("Empty", "empty.example", "Perth"),
+            careers_url="https://empty.example/careers",
+            original_reason="Example",
+            source_url="https://empty.example/",
+            technology_rationale="Example software company homepage text",
+        ),
+    )
+    pages = {
+        "https://www.indebted.co/": LocationPageFetch(
+            "https://www.indebted.co/",
+            "https://www.indebted.co/",
+            "HQ 300 Barangaroo Avenue Barangaroo NSW 2000",
+            None,
+        ),
+        "https://www.indebted.co/contact": LocationPageFetch(
+            "https://www.indebted.co/contact",
+            "https://www.indebted.co/contact",
+            None,
+            "HTTP 404",
+        ),
+        "https://www.indebted.co/contact-us": LocationPageFetch(
+            "https://www.indebted.co/contact-us",
+            "https://www.indebted.co/contact-us",
+            None,
+            "HTTP 404",
+        ),
+        "https://www.indebted.co/locations": LocationPageFetch(
+            "https://www.indebted.co/locations",
+            "https://www.indebted.co/locations",
+            None,
+            "HTTP 404",
+        ),
+        "https://www.indebted.co/support": LocationPageFetch(
+            "https://www.indebted.co/support",
+            "https://www.indebted.co/support",
+            None,
+            "HTTP 404",
+        ),
+        "https://empty.example/": LocationPageFetch(
+            "https://empty.example/", "https://empty.example/", "No street here", None
+        ),
+        "https://empty.example/contact": LocationPageFetch(
+            "https://empty.example/contact", "https://empty.example/contact", "No street", None
+        ),
+        "https://empty.example/contact-us": LocationPageFetch(
+            "https://empty.example/contact-us",
+            "https://empty.example/contact-us",
+            "No street",
+            None,
+        ),
+        "https://empty.example/locations": LocationPageFetch(
+            "https://empty.example/locations", "https://empty.example/locations", "No street", None
+        ),
+        "https://empty.example/support": LocationPageFetch(
+            "https://empty.example/support", "https://empty.example/support", "No street", None
+        ),
+    }
+
+    rows = discover_location_candidates(preflight, fetch_page=pages.__getitem__)
+    output = tmp_path / "locations.csv"
+    write_location_candidates(output, rows)
+
+    assert [row.status for row in rows] == [
+        "address_candidate_needs_verification",
+        "no_candidate_found",
+    ]
+    assert rows[0].address_candidates == ("300 Barangaroo Avenue Barangaroo NSW 2000",)
+    with output.open(encoding="utf-8", newline="") as handle:
+        manifest = list(csv.DictReader(handle))
+    assert manifest[0]["address_candidates"].startswith("300 Barangaroo Avenue")
+    assert "https://www.indebted.co/" in manifest[0]["pages_checked"]
