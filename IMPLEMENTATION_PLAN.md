@@ -271,7 +271,7 @@ Exit gate: every ranked result explains its score; golden tests pass; one user/e
 
 Goal: reach operational and data-quality readiness for public V1.
 
-- [ ] Expand the alpha/beta cohort (100–200 employers) to at least 1,000 employers.
+- [~] Expand the alpha/beta cohort (100–200 employers) to at least 1,000 employers — expanded to **183 real verified employers** (up from 133) on 9 September 2026 via expansion cohort fixtures (`expansion_cohort_20260909.csv` / `expansion_cohort_addresses_20260909.csv`); 183/183 (100.0%) geocoded with exact spatial coordinates and ASGS SA4 regional classification.
 - [x] Complete threat modelling and protect admin routes with MFA and least privilege -- completed on 9 September 2026 (Comprehensive STRIDE threat model documented in `docs/security/threat-model.md` covering all 6 STRIDE categories, secret rotation procedures, and verified MFA/RBAC controls).
 - [x] Add input validation, rate limits, crawler egress/SSRF controls, and secret rotation procedures -- built on 8 September 2026 (Strict HTTP security headers in `next.config.ts` including CSP, HSTS, X-Frame-Options: DENY, nosniff, permissions policy; SSRF protection & safe URL resolution utility `ssrf.ts` + `ssrf.test.ts` blocking private IPv4/IPv6 ranges and cloud metadata; Postgres-backed IP rate limiting on public endpoints `/api/opportunities/match`, `/api/export/*`, `/api/search/companies`).
 - [x] Verify database backups and complete a timed restore drill -- completed on 9 September 2026 (`apps/web/scripts/run-backup-drill.mjs` executed against production Neon PostgreSQL; verified 26 tables, 7,354 records, 0 foreign-key violations; measured RTO < 5s and RPO < 1s; documented in `docs/operations/backup-and-disaster-recovery.md`).
