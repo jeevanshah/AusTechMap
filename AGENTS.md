@@ -1,7 +1,7 @@
 # Agent Workflow
 
 > Coding-agent roles, quality gates, and repository conventions for Australia Tech Map — anticipated in [PRODUCT_SPEC.md](./PRODUCT_SPEC.md) Appendix B.1. Read this before making any change in this repository.
-> Version 1.8 · 8 September 2026
+> Version 1.9 · 9 September 2026
 
 > [!IMPORTANT]
 > **Current status (7 September 2026):** Codex resumes as active implementer and final integrator, per the user's explicit instruction — the default, steady-state assignment in the Roles table below is back in effect. Claude was active implementer from 4–7 September (Codex was on quota, then the user simply asked for Codex back); see `HANDOFF.md` for the full state of what was built in the interim (Phases 2–6A backend work, a full visual redesign, and the complete authentication/authorization system from §4.1) before touching anything.
@@ -93,13 +93,33 @@ There's no meaningful codebase to graph yet — don't add it now. Reassess at Ph
 3. **The independent reviewer reviews completed diffs without simultaneously editing them.** When Claude is reviewing, its edit lane is limited to the docs above — never application code, never while the active implementer has a branch in flight. When Codex is reviewing instead (Claude activated as backup implementer), the same separation applies in reverse.
 4. **The fix-loop runs through the active implementer, not the reviewer.** If a review finds an issue, the active implementer applies the fix — never the reviewer, regardless of which agent is in which seat. A reviewer who fixes things quietly becomes a second editor, which defeats the point of rule 5.
 5. **Only one agent edits migrations, shared contracts, or architecture files at a time.** This is the load-bearing rule; everything else is negotiable, this one isn't.
-6. **Every change passes automated tests and one independent AI review** before merging. If the named
-   reviewer is unavailable because of provider or account-access limits, only the user may waive that
-   review for a specifically named change set. The waiver must be recorded under `docs/reviews/` with
-   its reason, affected commits/PRs, verification evidence, and residual risks. A waiver is not an
-   independent approval and does not silently relax this rule for later work.
+6. **Every change passes automated tests and one independent AI review** before merging, except work
+   eligible for the bulk autonomous delivery lane below. If the named reviewer is unavailable because
+   of provider or account-access limits, only the user may waive that review for a specifically named
+   change set. The waiver must be recorded under `docs/reviews/` with its reason, affected commits/PRs,
+   verification evidence, and residual risks. A waiver is not an independent approval and does not
+   silently relax this rule for later work.
 7. **Implementation-time deviations from `ARCHITECTURE_DECISIONS.md` get written back into it**, not left as undocumented differences between what the docs say and what the code does. The active implementer notes the deviation (PR description is fine); the independent reviewer folds it into the ADR, whichever agent that is at the time. The docs are the only state genuinely shared across all three tools — none of them see each other's conversation history — so they have to stay current, not just accurate at the last phase gate.
 8. **Commit at every phase gate**, per [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) §12 (Governance and reporting).
+
+### Bulk autonomous delivery lane
+
+The user authorised this lane on 9 September 2026 to remove the per-PR messenger bottleneck. Codex may
+commit and push directly to `main` without a PR or independent-AI review when all of the following hold:
+
+- The change is non-production bulk research, a review manifest, documentation, test coverage, or
+  development-only validation/tooling.
+- It makes no database, external-service, account, deployment, or cost-incurring change, other than the
+  Git commit itself.
+- Relevant automated checks, static checks, and `git diff --check` pass.
+- Codex records the commit, verification, scope, and residual risk in
+  [`docs/operations/delivery-log.md`](./docs/operations/delivery-log.md).
+
+The lane never covers migrations; production database writes; seeding, disabling, quarantining, or
+geocoding company/location data; authentication, security, permissions, or privacy changes; deployment
+or paid-service changes; destructive commands; or architecture/contract changes. Those still require the
+existing review and/or explicit user approval. Review happens at a completed cohort or phase checkpoint,
+not for every eligible intermediate commit.
 
 ## Bootstrapping
 
