@@ -40,6 +40,14 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: bounded first-party page fetches only; all output remains discovery evidence.
 - Residual risk: candidates can represent multiple offices or a city different from the cohort's claimed city. Selection and strict fixture validation remain required before any map action.
 
+## 2026-09-09 — Wave 2/3 location selection preflight
+
+- Commit: `data: prepare Wave 2/3 location selection preflight` (this commit)
+- Scope: selected only complete first-party address candidates that were unique per company or uniquely matched the cohort city.
+- Result: 51 rows passed `validate-address-fixture`; four shared-address companies were excluded rather than guessed.
+- Verification: no duplicate domains, no shared selected addresses, street numbers, public source URLs, and strict fixture validation all passed.
+- Residual risk: this is a production-impacting geocode candidate set. No Neon location write has occurred; an explicit approval is required before `seed-locations` runs.
+
 ## 2026-09-09 — Wave 2 / Wave 3 triage, homepage evidence, seed preflight
 
 - Commit: `data: prepare Wave 2/3 cohort evidence preflight` (`d9f282d`)

@@ -1,0 +1,52 @@
+name,domain,street_address,suburb,state,postcode,source_confidence,source_note,source_url
+1spatial AU,1spatial.com,44,Market Street Sydney,NSW,2000,High,unique complete candidate matching claimed city,https://1spatial.com/contact-us
+Aeeris,aeeris.com,210 George St,Sydney,NSW,2000,High,single complete first-party address candidate,https://www.aeeris.com/contact-us
+Aiven AU,aiven.io,40 King Street,Sydney,NSW,2000,High,single complete first-party address candidate,https://aiven.io/contact
+Beforepay,beforepay.com.au,77 Castlereagh Street,Sydney,NSW,2000,High,single complete first-party address candidate,https://www.beforepay.com.au:443/
+BlueRock,bluerock.com.au,2/525 Collins St,Melbourne,VIC,3000,High,single complete first-party address candidate,https://www.bluerock.com.au/contact/
+Butn,butn.com.au,23,William St Balaclava,VIC,3183,High,single complete first-party address candidate,https://www.butn.co/contact
+CancerAid,canceraid.com,4 Cornwallis St,Eveleigh,NSW,2015,High,single complete first-party address candidate,https://osarahealth.com/contact
+CEVO,cevo.com.au,440,Collins St Melbourne,VIC,3000,High,unique complete candidate matching claimed city,https://cevo.com.au/contact-us/
+Cluey Learning,clueylearning.com.au,117 Clarence St,Sydney,NSW,2000,High,single complete first-party address candidate,https://clueylearning.com.au/support/
+Coder Academy,coderacademy.edu.au,119 Charlotte Street,Brisbane City,QLD,4000,High,unique complete candidate matching claimed city,https://coderacademy.edu.au/#openConnect
+Compono,compono.com,757,Ann St Fortitude Valley,QLD,4006,High,single complete first-party address candidate,https://www.compono.com/contact-us
+Credabl,credabl.com.au,151 Castlereagh St,Sydney,NSW,2000,High,unique complete candidate matching claimed city,https://www.credabl.com.au/contact
+Cyara,cyara.com,1,Railway Crescent Croydon,VIC,3136,High,single complete first-party address candidate,https://cyara.com/lp/contact-us/
+Elmo Software,elmosoftware.com.au,580,George Street Sydney,NSW,2000,High,unique complete candidate matching claimed city,https://elmosoftware.com.au/contact
+Everty,everty.com.au,200,George Street Sydney,NSW,2000,High,single complete first-party address candidate,https://everty.com.au/support/
+Ezypay,ezypay.com,1/477 Pitt Street,Sydney,NSW,2000,High,single complete first-party address candidate,https://www.ezypay.com/contact
+Fluent Commerce,fluentcommerce.com,68,Harrington Street The Rocks,NSW,2000,High,single complete first-party address candidate,https://fluentcommerce.com/contact/
+Frankly,frankly.com.au,181 St Kilda Road,St Kilda,VIC,3182,High,single complete first-party address candidate,https://www.frankly.com.au/
+Get Capital,getcapital.com.au,177,Pacific Hwy North Sydney,NSW,2060,High,single complete first-party address candidate,https://www.shift.com.au/contact-us
+Greener,greener.com.au,180 George St,Sydney,NSW,2000,High,single complete first-party address candidate,https://www.greener.com.au/about#contact
+GreenSync,greensync.com.au,477 Collins St,Melbourne,VIC,3000,High,single complete first-party address candidate,https://greensync.com/contact/
+Haventec,haventec.com,55,Market Street Sydney,NSW,2000,High,single complete first-party address candidate,https://www.haventec.com/contact
+Hivery,hivery.com,2,Park Street Sydney,NSW,2000,High,single complete first-party address candidate,https://www.hivery.com/contact-us/
+InDebted,indebted.com,300,Barangaroo Avenue Barangaroo,NSW,2000,High,single complete first-party address candidate,https://www.indebted.co/support
+Insentra,insentra.com,35 Ventnor Avenue,West Perth,WA,6005,High,single complete first-party address candidate,https://www.insentragroup.com/au/contact/
+Interlate,interlate.com,1/143,Coronation Drive Milton,QLD,4064,High,single complete first-party address candidate,https://www.interlate.com/contact/
+Localsearch,localsearch.com.au,138 Robina Town Centre Drive,Robina,QLD,4226,High,single complete first-party address candidate,https://www.localsearch.com.au:443/
+Minfos,minfos.com.au,737,Bourke Street Docklands,VIC,3008,High,single complete first-party address candidate,https://www.minfos.com.au/contact
+Neto,netohq.com,1/30 Chancellor Village Boulevard,Sippy Downs,QLD,4556,High,single complete first-party address candidate,https://netohq.com/contact
+Parbery,parbery.com.au,9/65,Tennant Street Fyshwick,ACT,2609,High,single complete first-party address candidate,https://www.parbery.com.au/contact
+Pearler,pearler.com,56 Clarence Street,Sydney,NSW,2000,High,single complete first-party address candidate,https://pearler.com/contact-us
+PictureWealth,picturewealth.com.au,556 Wellington Street,Perth,WA,6000,High,single complete first-party address candidate,https://www.picturewealth.com/contact-us
+Planit Testing,planittesting.com,140 William Street,Melbourne,VIC,3000,High,unique complete candidate matching claimed city,https://www.planit.com/contact-us/
+Pnyx,pnyx.com.au,95b Station St,Penrith,NSW,2750,High,single complete first-party address candidate,https://www.pnyx.com.au/contact
+Powow,powow.com.au,201 Coward Street,Mascot,NSW,2020,High,single complete first-party address candidate,https://powow.com.au/
+PropTrack,proptrack.com.au,511 Church Street,Richmond,VIC,3121,High,single complete first-party address candidate,https://www.proptrack.com.au/contact-us/
+Quantaco,quantaco.co,300 Flinders Street,Melbourne,VIC,3000,High,single complete first-party address candidate,https://www.quantaco.co/contact/
+Radium Capital,radiumcapital.com.au,388 George Street,Sydney,NSW,2000,High,unique complete candidate matching claimed city,https://radiumcapital.com.au/contact/
+RocketBoots,rocketboots.com,189 Kent Street,Sydney,NSW,2000,High,single complete first-party address candidate,https://www.rocketboots.com/contact
+Skilio,skilio.com.au,470 St Kilda Road,Ground Floor Melbourne,VIC,3004,High,single complete first-party address candidate,https://skilio.com.au/contact
+Skodel,skodel.com,456 Health Ave,Melbourne,VIC,3000,High,single complete first-party address candidate,https://skodel.com/contact-us
+Sonder,sonder.com.au,2/9 Chester St,Newstead,QLD,4006,High,single complete first-party address candidate,https://sonder.com.au/contact
+Spriggy,spriggy.com.au,80 Clarence St,Sydney,NSW,2000,High,single complete first-party address candidate,https://spriggy.com.au/
+Springday,springday.com.au,13/201 Miller St,North Sydney,NSW,2060,High,single complete first-party address candidate,https://myspringday.com.au/contact/
+Taggle Systems,taggle.com.au,14,Junction Street Marrickville,NSW,2204,High,single complete first-party address candidate,https://taggle.com/contact/
+Thinkmill,thinkmill.com.au,191 Clarence St,Sydney,NSW,2000,High,unique complete candidate matching claimed city,https://www.thinkmill.com.au/contact
+Tiimely,tiimely.com,121 King William Street,Adelaide,SA,5000,High,unique complete candidate matching claimed city,https://tiimely.com/contact-us
+Unison,unison.com.au,8,Horsfall Street Templestowe Lower,VIC,3107,High,single complete first-party address candidate,https://www.unison.au/
+Uno Home Loans,uno.com.au,123 Pitt Street,Sydney,NSW,2000,High,single complete first-party address candidate,https://www.unohomeloans.com.au/contact-us
+Valiant Finance,valiantfinance.com.au,15 Foster Street,Surry Hills,NSW,2010,High,single complete first-party address candidate,https://www.valiantfinance.com/contact
+Veridapt,veridapt.com,1/231 Balcatta Rd,Balcatta,WA,6021,High,single complete first-party address candidate,https://www.veridapt.com/locations

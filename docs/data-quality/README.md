@@ -20,3 +20,5 @@ Wave 2 / Wave 3 follow the same non-mutating pipeline (`triage` → `homepage-ev
 `wave2-seed-preflight-20260909.csv` / `wave3-seed-preflight-20260909.csv` and the matching `*-location-candidates-20260909.csv` files are review artifacts. Wave 2/3 Neon `seed-employers` was user-approved on 9 September 2026 (see `docs/operations/delivery-log.md`). Location text remains discovery-only: every candidate still needs its exact supporting page URL and `validate-address-fixture` before geocoding. Neon `seed-locations` / geocoding still need explicit user approval.
 
 `wave23-location-candidate-sources-20260909.csv` attaches exact first-party page URLs to the Wave 2/3 discovery candidates. It is still not an address fixture: a company may have multiple offices, and each candidate requires selection and address-field validation before any map action.
+
+`wave23-location-selection-preflight-20260909.csv` contains the 51 unambiguous, complete address candidates selected from that source-linked set. It passed `validate-address-fixture`; it is ready for a single, explicitly approved production geocode/import only.
