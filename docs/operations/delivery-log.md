@@ -121,3 +121,11 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Result: six additional domains produced address text. Five safe selections were added to the preflight (four single complete candidates and one exact locality match), bringing it to 24 validated rows; the sixth remains multi-office review.
 - Verification: strict address-fixture validation (24 rows, no errors or duplicate addresses) and `git diff --check`.
 - Residual risk: no candidate has been geocoded or imported. Production geocoding/import remains an explicit approval gate.
+
+## 2026-09-10 — ambiguous-location canonical-host recovery
+
+- Commit: `data: recover ambiguous-location address evidence` (this commit)
+- Scope: a bounded, read-only retry on `www` and HTTP canonical-host variants for the 166 initially unreachable domains, followed by the same standard first-party location-path sweep on recovered domains.
+- Result: 36 domains were recovered; four produced single complete first-party address candidates. The repair preflight now has 28 rows, all passing strict validation; no additional multi-office case was selected.
+- Verification: bounded first-party fetches only, strict address-fixture validation (28 rows, no errors or duplicate addresses), and `git diff --check`.
+- Residual risk: no candidate has been geocoded or imported. Production geocoding/import remains an explicit approval gate.
