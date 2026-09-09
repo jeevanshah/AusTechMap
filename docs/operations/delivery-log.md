@@ -56,6 +56,13 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: Neon read-back after the timeout confirmed 48 accepted company locations from the fixture; retry returned 48 reused, 0 new resolves, and the three exceptions above.
 - Residual risk: no retry should run until the three exceptions have corrected evidence/domain handling. No unsupported map point was created for them.
 
+## 2026-09-09 — Wave 2/3 canonical-domain location repair preflight
+
+- Commit: `data: prepare Wave 2/3 location repair preflight` (this commit)
+- Scope: prepares InDebted (`indebted.co`) and Sonder (`sonder.io`) with corrected canonical domains and official Australian street-address URLs.
+- Verification: two rows pass `validate-address-fixture`; Skilio remains excluded because its official source lacks a complete address.
+- Residual risk: no Neon write has occurred. This repair fixture needs explicit approval before geocoding/import.
+
 ## 2026-09-09 — Wave 2 / Wave 3 triage, homepage evidence, seed preflight
 
 - Commit: `data: prepare Wave 2/3 cohort evidence preflight` (`d9f282d`)

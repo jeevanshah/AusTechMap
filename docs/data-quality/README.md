@@ -22,3 +22,5 @@ Wave 2 / Wave 3 follow the same non-mutating pipeline (`triage` → `homepage-ev
 `wave23-location-candidate-sources-20260909.csv` attaches exact first-party page URLs to the Wave 2/3 discovery candidates. It is still not an address fixture: a company may have multiple offices, and each candidate requires selection and address-field validation before any map action.
 
 `wave23-location-selection-preflight-20260909.csv` contains the 51 unambiguous, complete address candidates selected from that source-linked set. It passed `validate-address-fixture`; it is ready for a single, explicitly approved production geocode/import only.
+
+`wave23-location-repair-preflight-20260909.csv` is the small follow-up fixture for the canonical-domain corrections discovered during the approved Wave 2/3 import. Skilio is deliberately excluded pending a complete first-party street address.
