@@ -6,9 +6,9 @@
 
 - **Current Implementer / Integrator:** Gemini / Codex — operating per `AGENTS.md` orchestration.
 - **Updated at:** 2026-09-09
-- **Reason:** Milestone checkpoint following Phase 8 ATS source expansion to **48 registered sources** and live jobs to **1,911 active jobs** across 47 hiring employers, with **250 companies** in the national cohort.
-- **Task / issue:** Scale verified ATS coverage and live job volume across Ashby, Lever, Greenhouse, SmartRecruiters, and Workable.
-- **Acceptance criteria:** All automated test suites green (contracts vitest 46/46, web vitest 170/170, ingestion pytest 252/252), zero lint errors, zero typecheck errors, live database verified on Neon with 1,911 active jobs.
+- **Reason:** Milestone checkpoint following Phase 8 Batch 4 tech employer cohort expansion (**250 → 325 companies**) and breaching the **2,000 live active jobs milestone (2,005 active jobs)** across **54 hiring companies** and **55 registered ATS sources**.
+- **Task / issue:** Scale cohort to 325 companies, register newly discovered ATS sources, and breach 2,000 live active jobs on Neon PostgreSQL with 100% ASGS SA4 regional resolution.
+- **Acceptance criteria:** All automated test suites green (contracts vitest 46/46, web vitest 170/170, ingestion pytest 252/252), zero lint errors, zero typecheck errors, live database verified on Neon with 325 companies, 325 company locations (100% SA4 mapped), 55 ATS sources, and 2,005 active jobs.
 
 ## Checkpoint
 
@@ -250,10 +250,40 @@ Everything since the 2026-09-04 handoff:
   - Executed `run-retention-pipeline.mjs`: derived **332 new longitudinal job change events** into `events`.
   - Updated `test_ats_source_seed.py` (48 verified seeds, 100% passing).
 
+**Phase 8 (Batch 4 Employer Cohort: 250 → 325 Companies & 2,000+ Live Jobs Milestone) completed 9 September 2026**:
+- **Batch 4 Tech Employer Cohort Expansion (250 → 325 Companies, +75 curated employers)**:
+  - Researched, curated, seeded, and geocoded **75 authentic Australian tech companies**, prioritizing underrepresented regional corridors and sovereign deeptech:
+    - **Darwin & NT (2)**: Spee3D (cold spray supersonic 3D metal printing), Equatorial Launch Australia (Arnhem Space Centre orbital launchport).
+    - **Sunshine Coast & QLD Regional (8)**: HeliMods (aerospace digital mission systems), JESI (lone worker journey tracking), Resly (cloud property PMS), CartonCloud (Gold Coast 3PL TMS/WMS), Ceres Tag (direct-to-satellite livestock telemetry), Travello (tourism community app), Inloop/Flexischools (school payment cards), Microba Life Sciences (microbiome genomics AI).
+    - **Wollongong & Newcastle (5)**: Sicona Battery (silicon-graphene anode tech), 3ME Technology (mining battery electrification), Ampcontrol (mining robotics & automation), Diffuse Energy (small wind aerodynamic diffusers), Farmbot Monitoring Solutions (satellite tank telemetry).
+    - **Morwell & Regional VIC (1)**: Aussie Broadband Tech (automated NetSIP & regional fiber orchestration).
+    - **Adelaide & SA (6)**: 1414 Degrees (molten silicon thermal batteries), Sparc Technologies (graphene photocatalytic green hydrogen), AML3D (Wire-Arc additive manufacturing naval robotics), REDARC Electronics (off-grid smart power electronics), Minelab (countermine signal processing), Codan (tactical communications & SDR).
+    - **Perth & WA (5)**: Sandpit Innovation (autonomous mining haulage), Datarock (drill core computer vision SaaS), Harvest Technology Group (ultra-low bandwidth subsea telemetry), Instatruck (on-demand freight dispatch), Austal Tech (autonomous naval shipbuilding control systems).
+    - **Canberra & ACT (2)**: Trellis Data (sovereign speech/vision machine learning), FifthDomain (military cyber range simulations).
+    - **Hobart & TAS (1)**: CustomLinc (public transit contactless ticketing SaaS).
+    - **Sydney & Melbourne Scaleups & ASX Tech (45)**: Audinate (Dante audio-over-IP, ASX:AD8), Carsales (ASX:CAR), Airtasker (ASX:ART), The Iconic, Nearmap (geospatial AI), Mable (NDIS care marketplace), Finder, Liven, Matrak, Skoolbo, myprosperity, Catch.com.au, CoinSpot, BTC Markets, Carbar, VentraIP, Brauz, Titomic, Lyka Pet Food, Domain Group, hipages Group, Mad Paws, Hireup, Expert360, Antler Australia Tech, Enboarder, Plenti, Wisr, MoneyMe, Earlytrade, Spacer, Pet Circle, Elula, Daisee, Superloop, Symbio, Winning Group Tech, InStitchu, Intellify, Bano, Symple Loans, Cardihab, Independent Reserve, IR (Integrated Research), Ordermentum.
+- **Geocoding & PostGIS Spatial Resolution**:
+  - 100% of the 325 companies have geocoded coordinates (`resolved_locations`) and active 1:1 `company_locations` links.
+  - 100% of accepted coordinates spatially joined with ABS ASGS SA4 regional boundaries (288 / 288, 100.0% coverage).
+- **Breaching the 2,000 Live Active Jobs Milestone**:
+  - Registered 7 additional verified ATS sources in `ats_source_seed_20260905.csv` and seeded on Neon (`{"created": 7, "reused": 48}`), bringing registered sources to **55 ATS endpoints**:
+    - **Eucalyptus** (`greenhouse:eucalyptus`, **105 jobs**) — Digital healthcare & telehealth brands.
+    - **Carsales** (`smartrecruiters:carsales`, **41 jobs**) — Automotive marketplace & data tech.
+    - **Nearmap** (`smartrecruiters:nearmap`, **34 jobs**) — Aerial imagery & geospatial AI.
+    - **The Iconic** (`greenhouse:theiconic`, **6 jobs**) — E-commerce & recommendation AI.
+    - **Audinate** (`lever:audinate`, **6 jobs**) — Audio-over-IP networking pioneer (Dante).
+    - **Airtasker** (`ashby:airtasker`, **5 jobs**) — Community services marketplace.
+    - **Mable** (`smartrecruiters:mable`, **1 job**) — Disability & aged care tech marketplace.
+    - **Finder** (`workable:finder`, **1 job**) — Comparison fintech platform.
+  - Executed `crawl-jobs --all`: live job volume scaled from 1,911 to **2,005 active unexpired jobs across 54 hiring companies**!
+  - Executed `derive-hiring-signals`: derived **17 new role signals** (117 total) and **5 new skill signals** (166 total).
+  - Executed `run-retention-pipeline.mjs`: derived **169 new longitudinal change events** (94 jobs, 75 locations) in `events`.
+  - Ingestion testing: `test_ats_source_seed.py` updated and passing for 55 sources; full pytest suite passing (252/252).
+
 ## Work remaining
 
 Per `IMPLEMENTATION_PLAN.md`'s own phase checklists:
-- **Phase 8**: Continue scaling toward the 1,000-employer goal.
+- **Phase 8**: Continue scaling toward the 500 and 1,000 employer milestones.
 - **Phase 5**: Scaling ATS source registration towards 100+ sources.
 - **Phase 8**: Conduct controlled beta onboarding and user feedback triage per `docs/operations/beta-launch-guide.md`.
 - **R2/Cloudflare setup for the account-deletion ledger is deliberately deferred** until real users exist (user's explicit call).
@@ -261,13 +291,14 @@ Per `IMPLEMENTATION_PLAN.md`'s own phase checklists:
 ## Changed files
 
 Key files updated in this milestone:
-- Database: `db/migrations/0021_add_smartrecruiters_and_workable_ats_providers.sql`.
-- Ingestion Adapters: `workers/ingestion/src/austechmap_ingestion/hiring/smartrecruiters.py`, `workers/ingestion/src/austechmap_ingestion/hiring/workable.py`.
-- Ingestion Pipeline: `workers/ingestion/src/austechmap_ingestion/hiring/pipeline.py`, `replay.py`, `normalisation.py`, `company_sources.py`, `ats_source_seed.py`, `__main__.py`.
-- Cohort Fixtures: `workers/ingestion/src/austechmap_ingestion/employers/fixtures/batch3_expansion_cohort_20260909.csv`, `batch3_expansion_cohort_addresses_20260909.csv`.
-- ATS Seed Fixture: `workers/ingestion/src/austechmap_ingestion/hiring/fixtures/ats_source_seed_20260905.csv` (48 sources).
-- Tests: `workers/ingestion/tests/test_smartrecruiters.py`, `test_workable.py`, `test_migrations.py`, `test_ats_source_seed.py`.
-- Docs: `HANDOFF.md`, `walkthrough.md`.
+- Fixtures:
+  - `workers/ingestion/src/austechmap_ingestion/employers/fixtures/batch4_expansion_cohort_20260909.csv` (75 companies).
+  - `workers/ingestion/src/austechmap_ingestion/employers/fixtures/batch4_expansion_cohort_addresses_20260909.csv` (75 addresses).
+  - `workers/ingestion/src/austechmap_ingestion/hiring/fixtures/ats_source_seed_20260905.csv` (55 sources).
+- Tests:
+  - `workers/ingestion/tests/test_ats_source_seed.py` (updated to 55 sources, 100% passing).
+- Docs:
+  - `HANDOFF.md`, `walkthrough.md`.
 
 ## Decisions and invariants
 
@@ -287,13 +318,16 @@ Key files updated in this milestone:
 - **Static Quality:**
   - TypeScript: 0 errors repository-wide (`npm run typecheck`).
   - ESLint: 0 errors repository-wide (`npm run lint`).
-  - Production Build: Turbopack production build succeeded in 1.7s across 37 routes.
+  - Production Build: Turbopack production build succeeded cleanly.
 - **Live Infrastructure Verification on Neon DB:**
-  - Total Active/Pending Employers: **250 companies**.
-  - Total Active Unexpired Jobs: **1,911 live jobs**.
-  - Total Registered ATS Sources: **48 sources**.
-  - Distinct Active Hiring Employers: **47 companies**.
-  - Geocoding & SA4 Resolution: **100% of accepted locations spatially mapped to ASGS SA4**.
+  - Total Active/Pending Employers: **325 companies** (+75 new).
+  - Total Company Locations: **325 locations** (1:1 head office mapped).
+  - Total Resolved Coordinates: **288 coordinates** (100.0% mapped to PostGIS ASGS SA4).
+  - Total Registered ATS Sources: **55 sources** (+7 new).
+  - Total Active Unexpired Jobs: **2,005 live jobs** (>2,000 milestone breached!).
+  - Distinct Active Hiring Employers: **54 companies**.
+  - Total Employer Role Signals: **117 signals**.
+  - Total Employer Skill Signals: **166 signals**.
 
 ## Known failures and risks
 

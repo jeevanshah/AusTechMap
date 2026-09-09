@@ -33,10 +33,18 @@ def test_default_fixture_exists_and_parses() -> None:
     assert DEFAULT_FIXTURE_PATH.exists()
     seeds = load_ats_source_seed_fixture()
     assert seeds == ATS_SOURCE_SEED
-    assert len(seeds) == 48
+    assert len(seeds) == 55
     by_domain = {seed.company_domain: seed for seed in seeds}
     assert by_domain["kasada.io"].ats_provider == "lever"
     assert by_domain["kasada.io"].ats_identifier == "kasada"
+    assert by_domain["audinate.com"].ats_provider == "lever"
+    assert by_domain["audinate.com"].ats_identifier == "audinate"
+    assert by_domain["nearmap.com"].ats_provider == "smartrecruiters"
+    assert by_domain["nearmap.com"].ats_identifier == "nearmap"
+    assert by_domain["airtasker.com"].ats_provider == "ashby"
+    assert by_domain["airtasker.com"].ats_identifier == "airtasker"
+    assert by_domain["finder.com.au"].ats_provider == "workable"
+    assert by_domain["finder.com.au"].ats_identifier == "finder"
     assert by_domain["vowfood.com"].ats_provider == "ashby"
     assert by_domain["vowfood.com"].ats_identifier == "vow"
     assert by_domain["cultureamp.com"].ats_provider == "greenhouse"
