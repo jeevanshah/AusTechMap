@@ -1,0 +1,31 @@
+name,domain,street_address,suburb,state,postcode,source_confidence,source_note,source_url
+"Aeeris",aeeris.com,"210 George St","Sydney",NSW,2000,High,existing first-party location evidence,https://www.aeeris.com/contact-us
+"Aiven AU",aiven.io,"40 King Street","Sydney",NSW,2000,High,existing first-party location evidence,https://aiven.io/contact
+"Butn",butn.com.au,"23","William St Balaclava",VIC,3183,High,existing first-party location evidence,https://www.butn.co/contact
+"Cluey Learning",clueylearning.com.au,"117 Clarence St","Sydney",NSW,2000,High,existing first-party location evidence,https://clueylearning.com.au/support/
+"Compono",compono.com,"757","Ann St Fortitude Valley",QLD,4006,High,existing first-party location evidence,https://www.compono.com/contact-us
+"Cyara",cyara.com,"1","Railway Crescent Croydon",VIC,3136,High,existing first-party location evidence,https://cyara.com/lp/contact-us/
+"Devicie",devicie.com,"85 Castlereagh Street","Sydney",NSW,2000,High,existing first-party location evidence,https://devicie.com/privacy-policy
+"Everty",everty.com.au,"200","George Street Sydney",NSW,2000,High,existing first-party location evidence,https://everty.com.au/support/
+"Ezypay",ezypay.com,"1/477 Pitt Street","Sydney",NSW,2000,High,existing first-party location evidence,https://www.ezypay.com/contact
+"Farmdeck",farmdeck.com,"32 Delhi Road","North Ryde",NSW,2113,High,existing first-party location evidence,https://www.farmdeck.com/contact-us/
+"Frankly",frankly.com.au,"181 St Kilda Road","St Kilda",VIC,3182,High,existing first-party location evidence,https://www.frankly.com.au/
+"Greener",greener.com.au,"180 George St","Sydney",NSW,2000,High,existing first-party location evidence,https://www.greener.com.au/about#contact
+"GreenSync",greensync.com.au,"477 Collins St","Melbourne",VIC,3000,High,existing first-party location evidence,https://greensync.com/contact/
+"Haventec",haventec.com,"55","Market Street Sydney",NSW,2000,High,existing first-party location evidence,https://www.haventec.com/contact
+"Hivery",hivery.com,"2","Park Street Sydney",NSW,2000,High,existing first-party location evidence,https://www.hivery.com/contact-us/
+"InDebted",indebted.co,"300 Barangaroo Avenue","Barangaroo",NSW,2000,High,existing first-party location evidence,https://www.indebted.co/regions/australia
+"Insentra",insentra.com,"35 Ventnor Avenue","West Perth",WA,6005,High,existing first-party location evidence,https://www.insentragroup.com/au/contact/
+"Interlate",interlate.com,"1/143","Coronation Drive Milton",QLD,4064,High,existing first-party location evidence,https://www.interlate.com/contact/
+"Localsearch",localsearch.com.au,"138 Robina Town Centre Drive","Robina",QLD,4226,High,existing first-party location evidence,https://www.localsearch.com.au:443/
+"Minfos",minfos.com.au,"737","Bourke Street Docklands",VIC,3008,High,existing first-party location evidence,https://www.minfos.com.au/contact
+"PictureWealth",picturewealth.com.au,"556 Wellington Street","Perth",WA,6000,High,existing first-party location evidence,https://www.picturewealth.com/contact-us
+"Pnyx",pnyx.com.au,"95b Station St","Penrith",NSW,2750,High,existing first-party location evidence,https://www.pnyx.com.au/contact
+"Precision Pastures",precisionpastures.com.au,"128 Dangar Street","Armidale",NSW,2350,High,existing first-party location evidence,https://www.precisionpastures.com.au/contact/
+"PropTrack",proptrack.com.au,"511 Church Street","Richmond",VIC,3121,High,existing first-party location evidence,https://www.proptrack.com.au/contact-us/
+"Radium Capital",radiumcapital.com.au,"388 George Street","Sydney",NSW,2000,High,existing first-party location evidence,https://radiumcapital.com.au/contact/
+"Sonder",sonder.io,"834 Elizabeth Street","Waterloo",NSW,2017,High,existing first-party location evidence,https://sonder.io/
+"Spriggy",spriggy.com.au,"80 Clarence St","Sydney",NSW,2000,High,existing first-party location evidence,https://spriggy.com.au/
+"Springday",springday.com.au,"13/201 Miller St","North Sydney",NSW,2060,High,existing first-party location evidence,https://myspringday.com.au/contact/
+"Taggle Systems",taggle.com.au,"14","Junction Street Marrickville",NSW,2204,High,existing first-party location evidence,https://taggle.com/contact/
+"Veridapt",veridapt.com,"1/231 Balcatta Rd","Balcatta",WA,6021,High,existing first-party location evidence,https://www.veridapt.com/locations
