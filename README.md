@@ -19,25 +19,26 @@ opportunity, all traceable to a source.
 
 ## Status
 
-As of 8 September 2026, Phases 0–3 are closed against real infrastructure and data. The private-alpha
-core is live with 133 researched employers, mapped geography and regional classification, three ATS
-adapters, 92 observed jobs across 9 companies, employer search/profiles, and sponsorship filtering.
+As of 9 September 2026, Phases 0–8 foundation work is live against Neon, with private-alpha
+discovery (map/search/profiles), Opportunity Match, retention/alerts, and launch hardening in place.
+The employer cohort sits near **400+** researched companies with **57** registered ATS sources and
+**~2,065** active observed jobs (see `HANDOFF.md` for the latest live counts).
 
-Phase 6A's sponsorship-evidence slice is deployed: Home Affairs labour-agreement evidence and
-job-derived claims are source-linked, confidence-scored, lifecycle-managed, and reviewable. Production
-migrations run through `0015`; health, homepage, and company search were verified after deployment.
-Authentication, database sessions, staff TOTP MFA, role-gated admin routes, and account-deletion code
-are built. Cloudflare R2 configuration for the deletion suppression ledger remains deliberately
-deferred until real users are admitted.
+**Cohort data-quality (Waves 1–3), 9 September 2026:** low-specificity city-centre pins were
+quarantined earlier. Evidence-backed homepage seed preflights are committed under
+`docs/data-quality/`. Wave 2/3 Neon `seed-employers` imported homepage evidence (**131** matched /
+**113** created). First-party location discovery found **39** (Wave 2) and **32** (Wave 3) AU-state
+street-address candidates — discovery-only; no geocode or `seed-locations` until each address has a
+verified source URL and passes `validate-address-fixture`. Pipeline notes:
+[`docs/data-quality/README.md`](./docs/data-quality/README.md),
+[`docs/operations/delivery-log.md`](./docs/operations/delivery-log.md).
 
-Phase 5 now includes checksum-verified snapshot replay, adaptive due-time scheduling, automatic source
-quarantine, and audited operator kill switches. The current priority is expanding verified source
-coverage and proving the refresh cadence in production, followed by private-alpha feedback. Phase 7
-matching, saved-state, and alerts remain gated on that feedback checkpoint.
+Cloudflare R2 for the account-deletion ledger remains deliberately deferred until real users are
+admitted. Current priorities: verify street-level locations for map-eligible companies, expand ATS
+coverage, and run controlled beta onboarding per `docs/operations/beta-launch-guide.md`.
 
 ## Delivery approach
 
-Ship and validate a private alpha first — 100–200 curated employers, three ATS integrations,
-map/search/profiles, and sponsorship evidence — before building Opportunity Match, alerts, or scaling
-to the 1,000-employer V1 target. See [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) for the
-authoritative sequence.
+Ship and validate a private alpha first — curated employers, ATS integrations, map/search/profiles,
+and sponsorship evidence — before scaling to the 1,000-employer V1 target. See
+[IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) for the authoritative sequence.

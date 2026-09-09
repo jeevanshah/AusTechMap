@@ -17,4 +17,4 @@ Wave 2 / Wave 3 follow the same non-mutating pipeline (`triage` → `homepage-ev
 | 2 | 152 | 140 | 135 | 39 |
 | 3 | 141 | 121 | 114 | 32 |
 
-`wave2-seed-preflight-20260909.csv` / `wave3-seed-preflight-20260909.csv` and the matching `*-location-candidates-20260909.csv` files are review artifacts. Location text is discovery-only: every candidate still needs its exact supporting page URL and `validate-address-fixture` before geocoding. Neon `seed-locations` / geocoding still need explicit user approval.
+`wave2-seed-preflight-20260909.csv` / `wave3-seed-preflight-20260909.csv` and the matching `*-location-candidates-20260909.csv` files are review artifacts. Wave 2/3 Neon `seed-employers` was user-approved on 9 September 2026 (see `docs/operations/delivery-log.md`). Location text remains discovery-only: every candidate still needs its exact supporting page URL and `validate-address-fixture` before geocoding. Neon `seed-locations` / geocoding still need explicit user approval.

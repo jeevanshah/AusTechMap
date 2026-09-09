@@ -4,28 +4,27 @@
 
 ## Switch
 
-- **Current Implementer / Integrator:** Gemini / Codex — operating per `AGENTS.md` orchestration.
+- **Current Implementer / Integrator:** Codex (Cursor Auto covering after Codex usage limit) — operating per `AGENTS.md` orchestration / bulk autonomous delivery lane.
 - **Updated at:** 2026-09-09
-- **Reason:** Milestone checkpoint following Phase 8 Batch 5 tech employer cohort expansion (**325 → 400 companies**), scaling the national cohort with 75 curated Australian tech startups, scaleups, and regional innovators, expanding verified ATS sources to **57 endpoints**, and scaling live job postings to **2,065 active jobs** across **56 hiring companies**.
-- **Task / issue:** Scale cohort to 400 companies, register newly discovered ATS sources, and maintain 100% PostGIS ASGS SA4 regional resolution and 100% test pass rates across all packages.
-- **Acceptance criteria:** All automated test suites green (contracts vitest 46/46, web vitest 170/170, ingestion pytest 252/252), zero lint errors, zero typecheck errors, live database verified on Neon with 400 companies, 400 company locations (100% SA4 mapped), 57 ATS sources, and 2,065 active jobs.
+- **Reason:** Checkpoint after Wave 2/3 homepage-evidence seeding and first-party location discovery; README status brought current.
+- **Task / issue:** Continue street-level location verification for discovery candidates; do not geocode until each address has a first-party source URL and passes `validate-address-fixture`.
+- **Acceptance criteria (this checkpoint):** Wave 2/3 triage → evidence → seed preflight → Neon `seed-employers` → location-candidate manifests committed on `main`; no location geocode/import performed.
 
 ## Checkpoint
 
 - **Implementation branch:** `main`
-- **Implementation checkpoint commit:** Pending commit on `main`; verify with `git rev-parse HEAD`.
-- **Handoff commit:** Current commit on `main`; verify with `git rev-parse HEAD`.
-- **Working-tree status at checkpoint:** Clean.
-- **Remote:** `origin/main` synchronized.
+- **Implementation checkpoint commit:** `f7f2eb5` (`feat: harvest Wave 2/3 first-party location candidates`); verify with `git rev-parse HEAD`.
+- **Handoff commit:** this commit on `main` after docs update.
+- **Working-tree status at checkpoint:** Clean after this docs commit.
+- **Remote:** `origin/main` synchronized after push.
 
 ## Data-quality cleanup — 9 September 2026
 
 This section supersedes the geographic-completeness claims below for the two
-unreviewed Antigravity cohort waves. The CSV research files were discovered
-untracked in the working tree; they were not committed or imported by Codex.
+unreviewed Antigravity cohort waves.
 
 - **Branch / commits:** `fix/cohort-location-quality` at `1daac35` and
-  `7b763e1`; pending the required independent review before merge.
+  `7b763e1`; waiver recorded under `docs/reviews/2026-09-09-cohort-location-cleanup-waiver.md`.
 - **Wave 2:** 200 address rows had no street numbers and collapsed to generic
   city-centre locations. The audited Neon cleanup quarantined 16 accepted
   `resolved_locations`, affecting 199 linked company profiles. Five candidate
@@ -41,15 +40,26 @@ untracked in the working tree; they were not committed or imported by Codex.
   Quarantined rows are `ambiguous` with their map point and regional
   assignments cleared, so accepted-only map/profile/search queries no longer
   expose unsupported coordinates.
-- **Verification:** the cleanup command's post-apply dry run returned zero
-  remaining accepted targets for each wave. New targeted tests: 3 passed,
-  1 live-PostGIS test skipped locally; ruff and mypy pass for the changed
-  ingestion code. The full Python suite earlier passed 254 tests with 97 live
-  infrastructure tests skipped; unrelated pre-existing ruff failures remain
-  in Antigravity's hiring-signal files.
-- **Do not import Wave 3 or re-geocode either wave** until every map-eligible
-  address has a source URL and a street-level identifier. The untracked Wave
-  1/2/3 fixture files are preserved for investigation, not trusted as input.
+- **Do not re-geocode Wave 1/2/3 or run `seed-locations` from discovery CSVs**
+  until every map-eligible address has a source URL and a street-level
+  identifier and passes `validate-address-fixture`.
+
+## Wave 2 / Wave 3 evidence + location discovery — 9 September 2026
+
+Committed under the bulk autonomous delivery lane (`docs/operations/delivery-log.md`):
+
+| Step | Wave 2 | Wave 3 | Neon |
+| --- | ---: | ---: | --- |
+| Triage reachable | 152 / 200 | 141 / 196 | none |
+| Homepage metadata captured | 140 | 121 | none |
+| Seed preflight rows | 135 | 114 | none |
+| `seed-employers` | 131 matched, 4 review | 113 created, 1 review | **applied** (user-approved) |
+| Location candidates (AU state) | **39** / 135 | **32** / 114 | none |
+
+- **Commits:** `d9f282d` (preflight manifests), `1dc5ca4` (seed import log), `f7f2eb5` (location CLI + candidate CSVs).
+- **CLI added:** `harvest-cohort-location-candidates` in `workers/ingestion`.
+- **Artifacts:** `docs/data-quality/wave{2,3}-*-20260909.csv` (see `docs/data-quality/README.md`).
+- **Next:** human-verify location candidates → build address fixtures with exact page URLs → `validate-address-fixture` → only then consider `seed-locations` / geocode with explicit approval.
 
 ## Work completed
 
@@ -338,22 +348,23 @@ Everything since the 2026-09-04 handoff:
 ## Work remaining
 
 Per `IMPLEMENTATION_PLAN.md`'s own phase checklists:
-- **Phase 8**: Continue scaling toward the 500 and 1,000 employer milestones.
-- **Phase 5**: Scaling ATS source registration towards 100+ sources.
-- **Phase 8**: Conduct controlled beta onboarding and user feedback triage per `docs/operations/beta-launch-guide.md`.
+- **Data quality:** Verify Wave 2/3 location candidates (39 + 32) with exact first-party page URLs; build address fixtures; `validate-address-fixture`; only then geocode / `seed-locations` with explicit approval.
+- **Phase 8:** Continue scaling toward the 500 and 1,000 employer milestones.
+- **Phase 5:** Scaling ATS source registration towards 100+ sources.
+- **Phase 8:** Conduct controlled beta onboarding and user feedback triage per `docs/operations/beta-launch-guide.md`.
 - **R2/Cloudflare setup for the account-deletion ledger is deliberately deferred** until real users exist (user's explicit call).
 
 ## Changed files
 
 Key files updated in this milestone:
-- Fixtures:
-  - `workers/ingestion/src/austechmap_ingestion/employers/fixtures/batch5_expansion_cohort_20260909.csv` (75 companies).
-  - `workers/ingestion/src/austechmap_ingestion/employers/fixtures/batch5_expansion_cohort_addresses_20260909.csv` (75 addresses).
+- Fixtures / manifests:
+  - `docs/data-quality/wave{2,3}-*-20260909.csv` (triage, homepage evidence, seed preflight, location candidates).
+  - `workers/ingestion/src/austechmap_ingestion/employers/fixtures/wave{1,2,3}_cohort*.csv`.
   - `workers/ingestion/src/austechmap_ingestion/hiring/fixtures/ats_source_seed_20260905.csv` (57 sources).
-- Tests:
-  - `workers/ingestion/tests/test_ats_source_seed.py` (updated to 57 sources, 100% passing).
+- Code:
+  - `harvest-cohort-location-candidates` in `workers/ingestion` (`cohort_triage.py`, `__main__.py`, tests).
 - Docs:
-  - `HANDOFF.md`, `walkthrough.md`.
+  - `README.md`, `HANDOFF.md`, `docs/data-quality/README.md`, `docs/operations/delivery-log.md`.
 
 ## Decisions and invariants
 
@@ -387,10 +398,12 @@ Key files updated in this milestone:
 ## Known failures and risks
 
 - **R2/Cloudflare is not configured for the account-deletion feature, by deliberate user choice** (deferred until user volume warrants).
+- **Location candidates are discovery-only** — regex/page-sweep text may include multi-office or noisy matches; never treat `*-location-candidates-*.csv` as a geocode fixture.
 - **Antigravity Browser Subagent Environment Limitation**: Driver download 404 from upstream Playwright CDN (`playwright-1.57.0-win32_x64.zip`) prevents automated browser screenshot generation; local HTTP API endpoints (`/api/health`, `/api/map/companies`) and Next.js dev server verify 100% runtime correctness.
 
 ## Next actions
 
-1. Continue scaling the employer cohort towards the 500 / 1,000 employer milestones.
-2. Probe additional ATS boards (e.g. Pinpoint, Breezy, Recruitee, Taleo, SuccessFactors) for other major Australian employers.
-3. Advance Phase 9 commercial features (sponsored opportunities, workforce analytics exports).
+1. Verify Wave 2/3 location candidates (39 + 32) with exact first-party page URLs; build address fixtures; validate; geocode only with explicit approval.
+2. Continue scaling the employer cohort towards the 500 / 1,000 employer milestones.
+3. Probe additional ATS boards (e.g. Pinpoint, Breezy, Recruitee, Taleo, SuccessFactors) for other major Australian employers.
+4. Advance Phase 9 commercial features (sponsored opportunities, workforce analytics exports).

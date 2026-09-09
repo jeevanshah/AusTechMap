@@ -56,3 +56,10 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Result: Wave 2 **39**/135 companies with AU-state street candidates; Wave 3 **32**/114. Remaining rows are `no_candidate_found`.
 - Verification: 7 cohort triage tests, ruff, mypy strict on changed module, `git diff --check`.
 - Residual risk: candidates are regex-extracted discovery text and may include multi-office or noisy matches. No address fixture, validation, geocode, or Neon location import was performed.
+
+## 2026-09-09 — docs status sync (README + HANDOFF)
+
+- Commit: `docs: sync README and HANDOFF for Wave 2/3 progress` (this commit)
+- Scope: brings root `README.md` status and `HANDOFF.md` current with Wave 2/3 seed + location-discovery outcomes; clarifies next gate is verified address fixtures only.
+- Verification: documentation-only; `git diff --check`.
+- Residual risk: live Neon employer/job totals in older HANDOFF verification bullets may lag post-seed creates until the next live inventory query.
