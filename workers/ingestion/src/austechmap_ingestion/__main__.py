@@ -9,6 +9,10 @@ from pathlib import Path
 import psycopg
 
 from austechmap_ingestion.db.migrations import MigrationError, apply_migrations
+from austechmap_ingestion.employers.address_validation import (
+    AddressFixtureValidationError,
+    validate_address_fixture,
+)
 from austechmap_ingestion.employers.category_apply import apply_company_categories
 from austechmap_ingestion.employers.category_seed import seed_categories
 from austechmap_ingestion.employers.geocoding import (
@@ -134,6 +138,17 @@ def build_parser() -> argparse.ArgumentParser:
         "--apply",
         action="store_true",
         help="perform the audited quarantine (without this flag, only report the target set)",
+    )
+    validate_address_parser = subparsers.add_parser(
+        "validate-address-fixture",
+        help="validate street-level source evidence before a new cohort is geocoded",
+    )
+    validate_address_parser.add_argument("--fixture", type=Path, required=True)
+    validate_address_parser.add_argument(
+        "--max-domains-per-address",
+        type=int,
+        default=1,
+        help="fail when more than this many domains share a normalised address (default: 1)",
     )
     taxonomy_parser = subparsers.add_parser(
         "seed-taxonomy", help="seed the v1 role-family and skills taxonomies"
@@ -350,6 +365,21 @@ def main(argv: Sequence[str] | None = None) -> int:
         if not args.database_url:
             print("DATABASE_URL or --database-url is required")
             return 2
+        if args.fixture != DEFAULT_ADDRESS_FIXTURE_PATH:
+            try:
+                validation = validate_address_fixture(args.fixture)
+            except (AddressFixtureValidationError, OSError, ValueError) as error:
+                print(f"Address fixture validation failed: {error}")
+                return 1
+            if not validation.valid:
+                print(
+                    json.dumps(
+                        {"errors": list(validation.errors), "valid": False},
+                        separators=(",", ":"),
+                        sort_keys=True,
+                    )
+                )
+                return 1
         if args.provider == "mapbox" and not args.mapbox_token:
             print("MAPBOX_TOKEN or --mapbox-token is required for --provider mapbox")
             return 2
@@ -413,6 +443,31 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
         )
         return 0
+
+    if args.command == "validate-address-fixture":
+        try:
+            validation = validate_address_fixture(
+                args.fixture, max_domains_per_address=args.max_domains_per_address
+            )
+        except (AddressFixtureValidationError, OSError, ValueError) as error:
+            print(f"Address fixture validation failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "duplicateAddresses": [
+                        {"address": address, "domains": list(domains)}
+                        for address, domains in validation.duplicate_addresses
+                    ],
+                    "errors": list(validation.errors),
+                    "rows": validation.rows,
+                    "valid": validation.valid,
+                },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0 if validation.valid else 1
 
     if args.command == "seed-taxonomy":
         if not args.database_url:
