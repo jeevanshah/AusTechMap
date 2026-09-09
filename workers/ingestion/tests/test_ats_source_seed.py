@@ -33,7 +33,7 @@ def test_default_fixture_exists_and_parses() -> None:
     assert DEFAULT_FIXTURE_PATH.exists()
     seeds = load_ats_source_seed_fixture()
     assert seeds == ATS_SOURCE_SEED
-    assert len(seeds) == 26
+    assert len(seeds) == 39
     by_domain = {seed.company_domain: seed for seed in seeds}
     assert by_domain["kasada.io"].ats_provider == "lever"
     assert by_domain["kasada.io"].ats_identifier == "kasada"
@@ -45,6 +45,16 @@ def test_default_fixture_exists_and_parses() -> None:
     assert by_domain["airwallex.com"].ats_identifier == "airwallex"
     assert by_domain["eucalyptus.vc"].ats_provider == "greenhouse"
     assert by_domain["eucalyptus.vc"].ats_identifier == "eucalyptus"
+    assert by_domain["droneshield.com"].ats_provider == "greenhouse"
+    assert by_domain["droneshield.com"].ats_identifier == "droneshield"
+    assert by_domain["buildkite.com"].ats_provider == "greenhouse"
+    assert by_domain["buildkite.com"].ats_identifier == "buildkite"
+    assert by_domain["upguard.com"].ats_provider == "ashby"
+    assert by_domain["upguard.com"].ats_identifier == "upguard"
+    assert by_domain["shift.com.au"].ats_provider == "ashby"
+    assert by_domain["shift.com.au"].ats_identifier == "shift"
+    assert by_domain["q-ctrl.com"].ats_provider == "lever"
+    assert by_domain["q-ctrl.com"].ats_identifier == "q-ctrl"
     assert all(seed.discovered_method == "manual_verified" for seed in seeds)
 
 
