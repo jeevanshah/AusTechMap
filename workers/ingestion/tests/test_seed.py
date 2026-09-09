@@ -14,7 +14,20 @@ from austechmap_ingestion.employers.seed import (
     _parse_confidence,
     load_seed_fixture,
     run_seed_import,
+    validate_seed_fixture_evidence,
 )
+
+
+def test_new_cohort_requires_public_source_and_technology_rationale(tmp_path: Path) -> None:
+    fixture = tmp_path / "cohort.csv"
+    fixture.write_text(
+        "name,domain,careers_url,city,reason,confidence,source_url,technology_rationale\n"
+        "Example,example.com,https://example.com/careers,Sydney,test,High,"
+        "https://example.com,Builds a verified enterprise software platform.\n",
+        encoding="utf-8",
+    )
+    assert validate_seed_fixture_evidence(fixture) == ()
+
 
 REPOSITORY_ROOT = Path(__file__).parents[3]
 MIGRATIONS_DIRECTORY = REPOSITORY_ROOT / "db" / "migrations"

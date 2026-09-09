@@ -28,6 +28,7 @@ import csv
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
+from urllib.parse import urlparse
 from uuid import UUID
 
 import psycopg
@@ -60,6 +61,8 @@ class SeedCandidate:
     reason: str
     confidence_tier: ConfidenceTier
     confidence_note: str | None
+    source_url: str | None = None
+    technology_rationale: str | None = None
 
 
 def _parse_confidence(raw: str) -> tuple[ConfidenceTier, str | None]:
@@ -82,12 +85,37 @@ def load_seed_fixture(path: Path = DEFAULT_FIXTURE_PATH) -> list[SeedCandidate]:
                 reason=row["reason"].strip(),
                 confidence_tier=(parsed := _parse_confidence(row["confidence"]))[0],
                 confidence_note=parsed[1],
+                source_url=row.get("source_url", "").strip() or None,
+                technology_rationale=row.get("technology_rationale", "").strip() or None,
             )
             for row in reader
         ]
     if not candidates:
         raise SeedImportError(f"no candidates found in {path}")
     return candidates
+
+
+def validate_seed_fixture_evidence(path: Path) -> tuple[str, ...]:
+    """Return strict evidence-contract failures for a new employer cohort."""
+    with path.open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        if reader.fieldnames is None:
+            return ("missing CSV header",)
+        required = {"source_url", "technology_rationale"}
+        missing = sorted(required - set(reader.fieldnames))
+        if missing:
+            return (f"missing required columns: {', '.join(missing)}",)
+        rows = list(reader)
+    errors: list[str] = []
+    for row_number, row in enumerate(rows, start=2):
+        name = row.get("name", "unknown").strip() or "unknown"
+        source_url = row["source_url"].strip()
+        parsed = urlparse(source_url)
+        if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+            errors.append(f"row {row_number} ({name}): source_url must be public http(s)")
+        if len(row["technology_rationale"].strip()) < 20:
+            errors.append(f"row {row_number} ({name}): technology_rationale is too short")
+    return tuple(errors)
 
 
 @dataclass(frozen=True)
@@ -173,6 +201,8 @@ def _record_seed_evidence(
                         "reason": candidate.reason,
                         "confidence_tier": candidate.confidence_tier,
                         "confidence_note": candidate.confidence_note,
+                        "source_url": candidate.source_url,
+                        "technology_rationale": candidate.technology_rationale,
                     }
                 ),
                 source_id,

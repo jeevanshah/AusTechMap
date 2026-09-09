@@ -40,6 +40,7 @@ from austechmap_ingestion.employers.seed import (
     DEFAULT_FIXTURE_PATH,
     SeedImportError,
     run_seed_import,
+    validate_seed_fixture_evidence,
 )
 from austechmap_ingestion.employers.sponsorship_evidence import (
     derive_sponsorship_evidence_from_jobs,
@@ -339,6 +340,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         if not args.database_url:
             print("DATABASE_URL or --database-url is required")
             return 2
+        if args.fixture != DEFAULT_FIXTURE_PATH:
+            validation_errors = validate_seed_fixture_evidence(args.fixture)
+            if validation_errors:
+                print(
+                    json.dumps({"errors": list(validation_errors), "valid": False}, sort_keys=True)
+                )
+                return 1
         try:
             stats = run_seed_import(args.database_url, args.fixture)
         except (SeedImportError, psycopg.Error) as error:
