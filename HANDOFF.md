@@ -18,6 +18,39 @@
 - **Working-tree status at checkpoint:** Clean.
 - **Remote:** `origin/main` synchronized.
 
+## Data-quality cleanup — 9 September 2026
+
+This section supersedes the geographic-completeness claims below for the two
+unreviewed Antigravity cohort waves. The CSV research files were discovered
+untracked in the working tree; they were not committed or imported by Codex.
+
+- **Branch / commits:** `fix/cohort-location-quality` at `1daac35` and
+  `7b763e1`; pending the required independent review before merge.
+- **Wave 2:** 200 address rows had no street numbers and collapsed to generic
+  city-centre locations. The audited Neon cleanup quarantined 16 accepted
+  `resolved_locations`, affecting 199 linked company profiles. Five candidate
+  domains remain in the review queue as aliases/duplicates:
+  `edrolo.com`, `indebted.com`, `judo.bank`, `propelleraero.com`, and
+  `sonder.com.au`.
+- **Wave 1:** 198 of 200 rows had no street numbers. The cleanup quarantined
+  173 accepted locations affecting 188 profiles, while retaining the two
+  numbered-address records for `agrifutures.com.au` and `bankwest.com.au`.
+- **Integrity:** no company, company-location link, raw address, or source
+  evidence was deleted. Each changed location has an append-only
+  `audit_records` entry with action `location_quarantined_low_specificity`.
+  Quarantined rows are `ambiguous` with their map point and regional
+  assignments cleared, so accepted-only map/profile/search queries no longer
+  expose unsupported coordinates.
+- **Verification:** the cleanup command's post-apply dry run returned zero
+  remaining accepted targets for each wave. New targeted tests: 3 passed,
+  1 live-PostGIS test skipped locally; ruff and mypy pass for the changed
+  ingestion code. The full Python suite earlier passed 254 tests with 97 live
+  infrastructure tests skipped; unrelated pre-existing ruff failures remain
+  in Antigravity's hiring-signal files.
+- **Do not import Wave 3 or re-geocode either wave** until every map-eligible
+  address has a source URL and a street-level identifier. The untracked Wave
+  1/2/3 fixture files are preserved for investigation, not trusted as input.
+
 ## Work completed
 
 Everything since the 2026-09-04 handoff:
