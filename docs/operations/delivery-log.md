@@ -32,6 +32,14 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: candidate-only result; no location fixture was produced, validated, geocoded, or imported.
 - Residual risk: company websites can render contact details client-side or keep them on untested paths. The one candidate remains unverified until its exact first-party evidence URL is captured.
 
+## 2026-09-09 — Wave 2/3 exact location-source attribution
+
+- Commit: `data: attach exact first-party location sources` (this commit)
+- Scope: rechecked only the 71 existing Wave 2/3 location-discovery candidates and attached the exact official page URL to every extracted address candidate.
+- Result: 147 candidate address/source pairs; no fixture, geocode, or Neon write was produced.
+- Verification: bounded first-party page fetches only; all output remains discovery evidence.
+- Residual risk: candidates can represent multiple offices or a city different from the cohort's claimed city. Selection and strict fixture validation remain required before any map action.
+
 ## 2026-09-09 — Wave 2 / Wave 3 triage, homepage evidence, seed preflight
 
 - Commit: `data: prepare Wave 2/3 cohort evidence preflight` (`d9f282d`)
