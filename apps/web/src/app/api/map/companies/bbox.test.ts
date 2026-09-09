@@ -141,4 +141,28 @@ describe("parseBboxParams", () => {
       expect(result.params.category).toBeNull();
     }
   });
+
+  it("parses hiring, role_family, and work_style params", () => {
+    const result = parseBboxParams(
+      params("bbox=150,-34,152,-33&hiring=true&role_family=engineering&work_style=remote"),
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.params.hiring).toBe(true);
+      expect(result.params.roleFamily).toBe("engineering");
+      expect(result.params.workStyle).toBe("remote");
+    }
+  });
+
+  it("handles empty or invalid work_style gracefully", () => {
+    const result = parseBboxParams(
+      params("bbox=150,-34,152,-33&hiring=false&work_style=invalid"),
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.params.hiring).toBe(false);
+      expect(result.params.workStyle).toBeNull();
+    }
+  });
 });
+

@@ -46,6 +46,7 @@ from austechmap_ingestion.hiring.company_sources import (
 from austechmap_ingestion.hiring.normalisation import SkillDef
 from austechmap_ingestion.hiring.pipeline import run_ats_crawl
 from austechmap_ingestion.hiring.replay import AtsReplayError, replay_ats_snapshot
+from austechmap_ingestion.hiring.signals import derive_employer_hiring_signals
 from austechmap_ingestion.hiring.taxonomy_seed import SKILLS, seed_taxonomy
 from austechmap_ingestion.jobs import JobError, JobRepository
 from austechmap_ingestion.observability import (
@@ -178,6 +179,12 @@ def build_parser() -> argparse.ArgumentParser:
     sponsorship_derive_parser.add_argument(
         "--database-url", default=os.environ.get("DATABASE_URL")
     )
+    hiring_signals_parser = subparsers.add_parser(
+        "derive-hiring-signals",
+        help="derive employer role demand and skill signals from real job postings",
+    )
+    hiring_signals_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    hiring_signals_parser.add_argument("--period-days", type=int, default=30)
     labour_agreement_parser = subparsers.add_parser(
         "match-labour-agreements",
         help="match the Home Affairs current-labour-agreements list against real companies",
@@ -580,6 +587,32 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "companiesConsidered": sponsorship_stats.companies_considered,
                     "currentEvidenceCreated": sponsorship_stats.current_evidence_created,
                     "historicalEvidenceCreated": sponsorship_stats.historical_evidence_created,
+                },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "derive-hiring-signals":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        try:
+            signals_stats = derive_employer_hiring_signals(
+                args.database_url, period_days=args.period_days
+            )
+        except psycopg.Error as error:
+            print(f"Hiring signals derivation failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "companiesConsidered": signals_stats.companies_considered,
+                    "roleSignalsCreated": signals_stats.role_signals_created,
+                    "roleSignalsUpdated": signals_stats.role_signals_updated,
+                    "skillSignalsCreated": signals_stats.skill_signals_created,
+                    "skillSignalsUpdated": signals_stats.skill_signals_updated,
                 },
                 separators=(",", ":"),
                 sort_keys=True,

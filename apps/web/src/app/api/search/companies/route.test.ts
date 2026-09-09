@@ -196,6 +196,51 @@ describe("GET /api/search/companies", () => {
     );
   });
 
+  it("forwards hiring, role_family, and work_style filters to the query", async () => {
+    const pool = fakePool([]);
+    vi.mocked(getPool).mockReturnValue(pool);
+
+    await GET(request("q=acme&hiring=true&role_family=engineering&work_style=remote"));
+
+    expect(pool.query).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.arrayContaining(["acme", true, "engineering", "remote"]),
+    );
+  });
+
+  it("returns hiring signals when present on company", async () => {
+    vi.mocked(getPool).mockReturnValue(
+      fakePool([
+        {
+          slug: "acme",
+          name: "Acme",
+          domain: "acme.example.com",
+          name_score: 0.9,
+          alias_score: null,
+          matched_alias: null,
+          city: "Sydney",
+          primary_category: "Fintech",
+          has_sponsorship_evidence: true,
+          is_regional: false,
+          active_jobs_count: 5,
+          top_role_families: ["Engineering", "Product"],
+          work_styles: ["remote", "hybrid"],
+        },
+      ]),
+    );
+
+    const response = await GET(request("q=acme"));
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.results[0]).toMatchObject({
+      slug: "acme",
+      activeJobsCount: 5,
+      topRoleFamilies: ["Engineering", "Product"],
+      workStyles: ["remote", "hybrid"],
+    });
+  });
+
   it("returns 400 for a missing query", async () => {
     const response = await GET(request(""));
     expect(response.status).toBe(400);

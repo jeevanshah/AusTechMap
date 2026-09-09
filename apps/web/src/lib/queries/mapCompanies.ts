@@ -14,6 +14,9 @@ export interface MapCompaniesQuery {
   category: string | null;
   sponsorship: boolean;
   regional: boolean;
+  hiring?: boolean;
+  roleFamily?: string | null;
+  workStyle?: "remote" | "hybrid" | "onsite" | null;
 }
 
 const SPONSORSHIP_CLAIM_TYPES = [
@@ -33,6 +36,23 @@ interface MapCompanyRow {
   primary_category: string | null;
   has_sponsorship_evidence: boolean;
   is_regional: boolean;
+  active_jobs_count: number;
+  top_role_families: string[] | null;
+  work_styles: unknown;
+}
+
+function parseWorkStyles(val: unknown): ("remote" | "hybrid" | "onsite")[] | undefined {
+  if (!val) return undefined;
+  let arr: string[] = [];
+  if (Array.isArray(val)) {
+    arr = val;
+  } else if (typeof val === "string") {
+    arr = val.replace(/[{}"']/g, "").split(",").map((s) => s.trim()).filter(Boolean);
+  }
+  const valid = arr.filter((s): s is "remote" | "hybrid" | "onsite" =>
+    s === "remote" || s === "hybrid" || s === "onsite",
+  );
+  return valid.length > 0 ? valid : undefined;
 }
 
 const MAX_ROWS = 500;
@@ -59,7 +79,10 @@ export async function fetchMapCompanies(
                 AND e2.claim_type = ANY($7::text[])
                 AND e2.status = 'active'
             ) AS has_sponsorship_evidence,
-            rl.migration_category IS NOT NULL AS is_regional
+            rl.migration_category IS NOT NULL AS is_regional,
+            COALESCE(hiring.active_jobs_count, 0) AS active_jobs_count,
+            hiring.top_role_families,
+            hiring.work_styles
      FROM company_locations cl
      JOIN companies c ON c.id = cl.company_id
      JOIN resolved_locations rl ON rl.id = cl.resolved_location_id
@@ -79,6 +102,14 @@ export async function fetchMapCompanies(
        ORDER BY cg.label
        LIMIT 1
      ) cat ON true
+     LEFT JOIN LATERAL (
+       SELECT count(*)::int AS active_jobs_count,
+              array_remove(array_agg(DISTINCT rf.label), NULL) AS top_role_families,
+              array_remove(array_agg(DISTINCT j.remote_type::text), 'unknown') AS work_styles
+       FROM jobs j
+       LEFT JOIN role_families rf ON rf.id = j.role_family_id
+       WHERE j.company_id = c.id AND j.expired_at IS NULL
+     ) hiring ON true
      WHERE c.status NOT IN ('merged', 'disabled')
        AND rl.status = 'accepted'
        AND rl.point IS NOT NULL
@@ -95,6 +126,16 @@ export async function fetchMapCompanies(
                AND e.status = 'active'
            ))
        AND (NOT $8::boolean OR rl.migration_category IS NOT NULL)
+       AND (NOT $10::boolean OR COALESCE(hiring.active_jobs_count, 0) > 0)
+       AND ($11::text IS NULL OR EXISTS (
+             SELECT 1 FROM jobs j2
+             JOIN role_families rf2 ON rf2.id = j2.role_family_id
+             WHERE j2.company_id = c.id AND j2.expired_at IS NULL AND rf2.key = $11
+           ))
+       AND ($12::text IS NULL OR EXISTS (
+             SELECT 1 FROM jobs j3
+             WHERE j3.company_id = c.id AND j3.expired_at IS NULL AND j3.remote_type = $12::work_style
+           ))
      ORDER BY c.display_name
      LIMIT $9`,
     [
@@ -102,11 +143,14 @@ export async function fetchMapCompanies(
       query.bbox.south,
       query.bbox.east,
       query.bbox.north,
-      query.category,
-      query.sponsorship,
+      query.category ?? null,
+      Boolean(query.sponsorship),
       SPONSORSHIP_CLAIM_TYPES,
-      query.regional,
+      Boolean(query.regional),
       MAX_ROWS + 1,
+      Boolean(query.hiring),
+      query.roleFamily ?? null,
+      query.workStyle ?? null,
     ],
   );
 
@@ -122,6 +166,9 @@ export async function fetchMapCompanies(
     primaryCategory: row.primary_category,
     hasSponsorshipEvidence: row.has_sponsorship_evidence,
     isRegional: row.is_regional,
+    activeJobsCount: row.active_jobs_count > 0 ? row.active_jobs_count : undefined,
+    topRoleFamilies: row.top_role_families && row.top_role_families.length > 0 ? row.top_role_families : undefined,
+    workStyles: parseWorkStyles(row.work_styles),
   }));
 
   return { points, truncated };

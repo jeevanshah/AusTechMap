@@ -16,6 +16,9 @@ export const HealthResponseSchema = z.object({
 
 export type HealthResponse = z.infer<typeof HealthResponseSchema>;
 
+export const WorkStyleSchema = z.enum(["remote", "hybrid", "onsite", "unknown"]);
+export type WorkStyle = z.infer<typeof WorkStyleSchema>;
+
 export const MapCompanyPointSchema = z.object({
   slug: z.string().min(1),
   name: z.string().min(1),
@@ -27,6 +30,9 @@ export const MapCompanyPointSchema = z.object({
   primaryCategory: z.string().nullable(),
   hasSponsorshipEvidence: z.boolean(),
   isRegional: z.boolean(),
+  activeJobsCount: z.number().int().nonnegative().optional(),
+  topRoleFamilies: z.array(z.string()).optional(),
+  workStyles: z.array(WorkStyleSchema).optional(),
 });
 
 export type MapCompanyPoint = z.infer<typeof MapCompanyPointSchema>;
@@ -56,6 +62,9 @@ export const CompanySearchResultSchema = z.object({
   primaryCategory: z.string().nullable(),
   hasSponsorshipEvidence: z.boolean(),
   isRegional: z.boolean(),
+  activeJobsCount: z.number().int().nonnegative().optional(),
+  topRoleFamilies: z.array(z.string()).optional(),
+  workStyles: z.array(WorkStyleSchema).optional(),
 });
 
 export type CompanySearchResult = z.infer<typeof CompanySearchResultSchema>;

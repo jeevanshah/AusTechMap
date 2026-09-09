@@ -32,6 +32,36 @@ describe("MapCompaniesResponseSchema", () => {
     });
   });
 
+  it("accepts points with hiring intelligence fields", () => {
+    expect(
+      MapCompaniesResponseSchema.parse({
+        version: 1,
+        bbox: { west: 150, south: -34, east: 152, north: -33 },
+        points: [
+          {
+            ...validPoint,
+            activeJobsCount: 14,
+            topRoleFamilies: ["Software Engineering", "Product / Delivery"],
+            workStyles: ["remote", "hybrid"],
+          },
+        ],
+        truncated: false,
+      }),
+    ).toEqual({
+      version: 1,
+      bbox: { west: 150, south: -34, east: 152, north: -33 },
+      points: [
+        {
+          ...validPoint,
+          activeJobsCount: 14,
+          topRoleFamilies: ["Software Engineering", "Product / Delivery"],
+          workStyles: ["remote", "hybrid"],
+        },
+      ],
+      truncated: false,
+    });
+  });
+
   it("rejects a point outside Australia's latitude/longitude bounds", () => {
     expect(() =>
       MapCompaniesResponseSchema.parse({

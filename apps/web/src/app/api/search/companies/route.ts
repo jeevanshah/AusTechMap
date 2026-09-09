@@ -19,6 +19,18 @@ export async function GET(request: Request): Promise<Response> {
   const category = categoryRaw && categoryRaw !== "" ? categoryRaw : null;
   const sponsorship = searchParams.get("sponsorship") === "true";
   const regional = searchParams.get("regional") === "true";
+  const hiring = searchParams.get("hiring") === "true";
+  const roleFamilyRaw =
+    searchParams.get("role_family")?.trim() ||
+    searchParams.get("roleFamily")?.trim();
+  const roleFamily = roleFamilyRaw && roleFamilyRaw !== "" ? roleFamilyRaw : null;
+  const workStyleRaw =
+    searchParams.get("work_style")?.trim() ||
+    searchParams.get("workStyle")?.trim();
+  const workStyle =
+    workStyleRaw === "remote" || workStyleRaw === "hybrid" || workStyleRaw === "onsite"
+      ? workStyleRaw
+      : null;
 
   try {
     const pool = getPool();
@@ -36,6 +48,9 @@ export async function GET(request: Request): Promise<Response> {
       category,
       sponsorship,
       regional,
+      hiring,
+      roleFamily,
+      workStyle,
     );
     const body = CompanySearchResponseSchema.parse({
       version: 1,

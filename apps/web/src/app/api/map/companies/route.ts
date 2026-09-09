@@ -18,6 +18,9 @@ export async function GET(request: Request): Promise<Response> {
       category: parsed.params.category,
       sponsorship: parsed.params.sponsorship,
       regional: parsed.params.regional,
+      hiring: parsed.params.hiring,
+      roleFamily: parsed.params.roleFamily,
+      workStyle: parsed.params.workStyle,
     });
     const body = MapCompaniesResponseSchema.parse({
       version: 1,
@@ -31,6 +34,7 @@ export async function GET(request: Request): Promise<Response> {
       },
     });
   } catch (caught) {
+    console.error("GET /api/map/companies error:", caught);
     if (caught instanceof DatabaseNotConfiguredError) {
       return Response.json(
         { version: 1, error: "database_not_configured" },

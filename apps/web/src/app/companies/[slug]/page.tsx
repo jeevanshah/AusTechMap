@@ -12,6 +12,7 @@ import {
   Globe,
   Share2,
   ShieldCheck,
+  Zap,
 } from "lucide-react";
 
 import type { MapCompanyPoint } from "@austechmap/contracts";
@@ -69,6 +70,20 @@ interface OpenJobEntry {
   postedAt: string | null;
 }
 
+interface RoleSignalEntry {
+  roleFamily: string;
+  activeJobs: number;
+  newJobs: number;
+  momentum: number | null;
+  sufficient: boolean;
+}
+
+interface SkillSignalEntry {
+  skillName: string;
+  evidenceCount: number;
+  confidence: number;
+}
+
 interface CompanyProfileRow {
   id: string;
   slug: string;
@@ -88,6 +103,8 @@ interface CompanyProfileRow {
   research_source_name: string | null;
   sponsorship_evidence: SponsorshipEvidenceEntry[];
   open_jobs: OpenJobEntry[];
+  role_signals: RoleSignalEntry[];
+  skill_signals: SkillSignalEntry[];
   is_claimed?: boolean;
   claimed_at?: string | null;
 }
@@ -142,7 +159,9 @@ async function loadCompany(slug: string): Promise<CompanyProfileRow | null> {
        research.observed_at AS research_observed_at,
        research.source_name AS research_source_name,
        COALESCE(sponsorship.items, '[]'::json) AS sponsorship_evidence,
-       COALESCE(jobs_data.items, '[]'::json) AS open_jobs
+       COALESCE(jobs_data.items, '[]'::json) AS open_jobs,
+       COALESCE(role_signals_data.items, '[]'::json) AS role_signals,
+       COALESCE(skill_signals_data.items, '[]'::json) AS skill_signals
      FROM companies c
      LEFT JOIN companies m ON m.id = c.merged_into_company_id
      LEFT JOIN LATERAL (
@@ -207,6 +226,32 @@ async function loadCompany(slug: string): Promise<CompanyProfileRow | null> {
        LEFT JOIN role_families rf ON rf.id = j.role_family_id
        WHERE j.company_id = c.id AND j.expired_at IS NULL
      ) jobs_data ON true
+     LEFT JOIN LATERAL (
+       SELECT json_agg(
+                json_build_object(
+                  'roleFamily', rf.label,
+                  'activeJobs', ers.active_jobs,
+                  'newJobs', ers.new_jobs,
+                  'momentum', ers.momentum,
+                  'sufficient', ers.sufficient
+                ) ORDER BY ers.active_jobs DESC
+              ) AS items
+       FROM employer_role_signals ers
+       JOIN role_families rf ON rf.id = ers.role_family_id
+       WHERE ers.company_id = c.id
+     ) role_signals_data ON true
+     LEFT JOIN LATERAL (
+       SELECT json_agg(
+                json_build_object(
+                  'skillName', s.label,
+                  'evidenceCount', ess.evidence_count,
+                  'confidence', ess.confidence
+                ) ORDER BY ess.evidence_count DESC
+              ) AS items
+       FROM employer_skill_signals ess
+       JOIN skills s ON s.id = ess.skill_id
+       WHERE ess.company_id = c.id
+     ) skill_signals_data ON true
      WHERE c.slug = $1`,
     [slug],
   );
@@ -607,6 +652,94 @@ export default async function CompanyProfilePage({
           Affairs guidance.
         </p>
       </section>
+
+      {(company.role_signals.length > 0 || company.skill_signals.length > 0) && (
+        <section className="rounded-xl border border-surface-border bg-slate-50/70 p-5 shadow-2xs">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-100 text-emerald-800">
+              <Zap className="h-4 w-4 fill-emerald-700 text-emerald-700" />
+            </span>
+            <div>
+              <h2 className="font-heading text-lg font-semibold text-navy-900">
+                Hiring Demand &amp; Skills Landscape
+              </h2>
+              <p className="text-xs text-slate-500">
+                Signals derived from active job vacancies and observed recruitment velocity.
+              </p>
+            </div>
+          </div>
+
+          {/* Role Families Grid */}
+          {company.role_signals.length > 0 && (
+            <div className="mb-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-2">
+                In-Demand Role Disciplines
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                {company.role_signals.map((signal) => (
+                  <div
+                    key={signal.roleFamily}
+                    className="flex items-center justify-between rounded-lg border border-surface-border bg-white px-3 py-2 text-xs shadow-2xs"
+                  >
+                    <div>
+                      <span className="font-semibold text-navy-900 block">
+                        {signal.roleFamily}
+                      </span>
+                      <span className="text-[11px] text-slate-500 font-mono">
+                        {signal.activeJobs} live {signal.activeJobs === 1 ? "role" : "roles"}
+                      </span>
+                    </div>
+                    <div>
+                      {signal.sufficient && signal.momentum !== null ? (
+                        <span
+                          className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-bold ${
+                            signal.momentum > 0
+                              ? "bg-emerald-100 text-emerald-800"
+                              : signal.momentum < 0
+                                ? "bg-amber-100 text-amber-800"
+                                : "bg-slate-200 text-slate-700"
+                          }`}
+                        >
+                          {signal.momentum > 0 ? `+${Math.round(signal.momentum * 100)}%` : `${Math.round(signal.momentum * 100)}%`}
+                        </span>
+                      ) : (
+                        <span
+                          className="rounded-full bg-slate-100 border border-slate-200 px-2 py-0.5 font-mono text-[10px] text-slate-600"
+                          title="Baseline index period (momentum requires >= 14 days observation)"
+                        >
+                          Baseline
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Top In-Demand Skills */}
+          {company.skill_signals.length > 0 && (
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-2">
+                Top Detected Technologies &amp; Capabilities
+              </h3>
+              <div className="flex flex-wrap gap-1.5">
+                {company.skill_signals.slice(0, 15).map((skill) => (
+                  <span
+                    key={skill.skillName}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-800 shadow-2xs"
+                  >
+                    <span>{skill.skillName}</span>
+                    <span className="rounded bg-slate-100 px-1.5 py-0.2 font-mono text-[10px] text-slate-500 font-semibold">
+                      {skill.evidenceCount}
+                    </span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
 
       <section>
         <div className="mb-4 flex items-center justify-between">

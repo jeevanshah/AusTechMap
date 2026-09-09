@@ -110,6 +110,22 @@ describe("GET /api/map/companies", () => {
     );
   });
 
+  it("forwards hiring, role_family, and work_style filters to the query", async () => {
+    const pool = fakePool([]);
+    vi.mocked(getPool).mockReturnValue(pool);
+
+    await GET(
+      request(
+        "bbox=150,-34,152,-33&hiring=true&role_family=engineering&work_style=remote",
+      ),
+    );
+
+    expect(pool.query).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.arrayContaining([true, "engineering", "remote"]),
+    );
+  });
+
   it("returns 400 for a malformed bbox without touching the database", async () => {
     const response = await GET(request("bbox=not-a-bbox"));
 

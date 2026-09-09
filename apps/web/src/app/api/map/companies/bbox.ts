@@ -6,6 +6,9 @@ export interface ParsedBboxParams {
   category: string | null;
   sponsorship: boolean;
   regional: boolean;
+  hiring: boolean;
+  roleFamily: string | null;
+  workStyle: "remote" | "hybrid" | "onsite" | null;
 }
 
 export type BboxParseResult =
@@ -81,6 +84,18 @@ export function parseBboxParams(
   const category = categoryRaw && categoryRaw !== "" ? categoryRaw : null;
   const sponsorship = searchParams.get("sponsorship") === "true";
   const regional = searchParams.get("regional") === "true";
+  const hiring = searchParams.get("hiring") === "true";
+  const roleFamilyRaw =
+    searchParams.get("role_family")?.trim() ||
+    searchParams.get("roleFamily")?.trim();
+  const roleFamily = roleFamilyRaw && roleFamilyRaw !== "" ? roleFamilyRaw : null;
+  const workStyleRaw =
+    searchParams.get("work_style")?.trim() ||
+    searchParams.get("workStyle")?.trim();
+  const workStyle =
+    workStyleRaw === "remote" || workStyleRaw === "hybrid" || workStyleRaw === "onsite"
+      ? workStyleRaw
+      : null;
 
   return {
     ok: true,
@@ -90,6 +105,9 @@ export function parseBboxParams(
       category,
       sponsorship,
       regional,
+      hiring,
+      roleFamily,
+      workStyle,
     },
   };
 }

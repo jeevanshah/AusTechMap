@@ -41,6 +41,7 @@ import type {
   MapCompanyPoint,
   RegionalHub,
   SavedSearchFilter,
+  WorkStyle,
 } from "@austechmap/contracts";
 
 import { saveSearchAction } from "../actions/retentionActions";
@@ -71,6 +72,9 @@ interface ListEntry {
   primaryCategory: string | null;
   hasSponsorshipEvidence: boolean;
   isRegional: boolean;
+  activeJobsCount?: number;
+  topRoleFamilies?: string[];
+  workStyles?: WorkStyle[];
 }
 
 interface HubMeta {
@@ -490,6 +494,9 @@ function pointsToListEntries(points: MapCompanyPoint[]): ListEntry[] {
     primaryCategory: point.primaryCategory,
     hasSponsorshipEvidence: point.hasSponsorshipEvidence,
     isRegional: point.isRegional,
+    activeJobsCount: point.activeJobsCount,
+    topRoleFamilies: point.topRoleFamilies,
+    workStyles: point.workStyles,
   }));
 }
 
@@ -505,6 +512,9 @@ function searchResultsToListEntries(
     primaryCategory: result.primaryCategory,
     hasSponsorshipEvidence: result.hasSponsorshipEvidence,
     isRegional: result.isRegional,
+    activeJobsCount: result.activeJobsCount,
+    topRoleFamilies: result.topRoleFamilies,
+    workStyles: result.workStyles,
   }));
 }
 
@@ -602,6 +612,21 @@ export function HomeMapShell({
     if (typeof window === "undefined") return false;
     return Boolean(new URLSearchParams(window.location.search).get("regional"));
   });
+  const [hiringOnly, setHiringOnly] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return Boolean(new URLSearchParams(window.location.search).get("hiring"));
+  });
+  const [selectedRoleFamily, setSelectedRoleFamily] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return new URLSearchParams(window.location.search).get("role_family") ?? "";
+  });
+  const [selectedWorkStyle, setSelectedWorkStyle] = useState<
+    "remote" | "hybrid" | "onsite" | ""
+  >(() => {
+    if (typeof window === "undefined") return "";
+    const ws = new URLSearchParams(window.location.search).get("work_style");
+    return ws === "remote" || ws === "hybrid" || ws === "onsite" ? ws : "";
+  });
   const [activeHubCity, setActiveHubCity] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
     const hub = new URLSearchParams(window.location.search).get("hub");
@@ -638,10 +663,31 @@ export function HomeMapShell({
       parts.push(catObj ? catObj.label : selectedCategory);
     }
     if (sponsorshipOnly) parts.push("482 Sponsors");
+    if (hiringOnly) parts.push("Actively Hiring");
+    if (selectedRoleFamily) parts.push(selectedRoleFamily);
+    if (selectedWorkStyle) {
+      parts.push(
+        selectedWorkStyle === "remote"
+          ? "Remote"
+          : selectedWorkStyle === "hybrid"
+            ? "Hybrid"
+            : "On-site",
+      );
+    }
     if (regionalOnly && !activeHubCity) parts.push("Regional Hubs");
     if (query) parts.push(`"${query}"`);
     return parts.length > 0 ? parts.join(" · ") : "Australia Tech Ecosystem";
-  }, [activeHubCity, categories, query, regionalOnly, selectedCategory, sponsorshipOnly]);
+  }, [
+    activeHubCity,
+    categories,
+    hiringOnly,
+    query,
+    regionalOnly,
+    selectedCategory,
+    selectedRoleFamily,
+    selectedWorkStyle,
+    sponsorshipOnly,
+  ]);
 
   const handleSaveSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -657,6 +703,9 @@ export function HomeMapShell({
     const filters: SavedSearchFilter = {
       query: query || undefined,
       category: selectedCategory || undefined,
+      roleFamily: selectedRoleFamily || undefined,
+      hiring: hiringOnly || undefined,
+      remote: selectedWorkStyle || undefined,
       sponsorship: sponsorshipOnly ? "current" : undefined,
       regional: regionalOnly || undefined,
       hubCity: activeHubCity || undefined,
@@ -766,8 +815,15 @@ export function HomeMapShell({
         : "";
       const sponsorshipParam = sponsorshipOnly ? "&sponsorship=true" : "";
       const regionalParam = regionalOnly ? "&regional=true" : "";
+      const hiringParam = hiringOnly ? "&hiring=true" : "";
+      const roleFamilyParam = selectedRoleFamily
+        ? `&role_family=${encodeURIComponent(selectedRoleFamily)}`
+        : "";
+      const workStyleParam = selectedWorkStyle
+        ? `&work_style=${encodeURIComponent(selectedWorkStyle)}`
+        : "";
       fetch(
-        `/api/search/companies?q=${encodeURIComponent(trimmed)}${categoryParam}${sponsorshipParam}${regionalParam}`,
+        `/api/search/companies?q=${encodeURIComponent(trimmed)}${categoryParam}${sponsorshipParam}${regionalParam}${hiringParam}${roleFamilyParam}${workStyleParam}`,
       )
         .then((response) => response.json())
         .then((body: { results?: CompanySearchResult[] }) => {
@@ -782,7 +838,15 @@ export function HomeMapShell({
     return () => {
       if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     };
-  }, [query, selectedCategory, sponsorshipOnly, regionalOnly]);
+  }, [
+    query,
+    selectedCategory,
+    sponsorshipOnly,
+    regionalOnly,
+    hiringOnly,
+    selectedRoleFamily,
+    selectedWorkStyle,
+  ]);
 
   const handleMoveEnd = useCallback((bbox: Bbox, zoom: number) => {
     if (moveTimeoutRef.current) clearTimeout(moveTimeoutRef.current);
@@ -806,8 +870,15 @@ export function HomeMapShell({
       sponsorshipOnly || activeDirectoryTab === "sponsors";
     const sponsorshipParam = isSponsorshipActive ? "&sponsorship=true" : "";
     const regionalParam = regionalOnly ? "&regional=true" : "";
+    const hiringParam = hiringOnly ? "&hiring=true" : "";
+    const roleFamilyParam = selectedRoleFamily
+      ? `&role_family=${encodeURIComponent(selectedRoleFamily)}`
+      : "";
+    const workStyleParam = selectedWorkStyle
+      ? `&work_style=${encodeURIComponent(selectedWorkStyle)}`
+      : "";
     fetch(
-      `/api/map/companies?bbox=${bboxParam}${zoomParam}${categoryParam}${sponsorshipParam}${regionalParam}`,
+      `/api/map/companies?bbox=${bboxParam}${zoomParam}${categoryParam}${sponsorshipParam}${regionalParam}${hiringParam}${roleFamilyParam}${workStyleParam}`,
     )
       .then((response) => response.json())
       .then((body: { points?: MapCompanyPoint[] }) =>
@@ -823,6 +894,9 @@ export function HomeMapShell({
     sponsorshipOnly,
     activeDirectoryTab,
     regionalOnly,
+    hiringOnly,
+    selectedRoleFamily,
+    selectedWorkStyle,
   ]);
 
   const handlePointClick = useCallback((slug: string) => {
@@ -845,11 +919,55 @@ export function HomeMapShell({
     ? searchResultsToListEntries(searchResults ?? [])
     : pointsToListEntries(points);
 
-  // Apply regional-only filter on the list view
+  const availableRoleFamilies = useMemo(() => {
+    const set = new Set<string>();
+    for (const entry of rawListEntries) {
+      if (entry.topRoleFamilies) {
+        for (const rf of entry.topRoleFamilies) {
+          set.add(rf);
+        }
+      }
+    }
+    return Array.from(set).sort();
+  }, [rawListEntries]);
+
+  const hiringCount = useMemo(
+    () => rawListEntries.filter((e) => (e.activeJobsCount ?? 0) > 0).length,
+    [rawListEntries],
+  );
+
+  // Apply regional, hiring, role family, and work style filters on the list view
   const listEntries = useMemo(() => {
-    if (!regionalOnly) return rawListEntries;
-    return rawListEntries.filter((entry) => entry.isRegional);
-  }, [rawListEntries, regionalOnly]);
+    let entries = rawListEntries;
+    if (regionalOnly) {
+      entries = entries.filter((entry) => entry.isRegional);
+    }
+    if (hiringOnly) {
+      entries = entries.filter((entry) => (entry.activeJobsCount ?? 0) > 0);
+    }
+    if (selectedRoleFamily) {
+      entries = entries.filter(
+        (entry) =>
+          entry.topRoleFamilies &&
+          entry.topRoleFamilies.some(
+            (rf) => rf.toLowerCase() === selectedRoleFamily.toLowerCase(),
+          ),
+      );
+    }
+    if (selectedWorkStyle) {
+      entries = entries.filter(
+        (entry) =>
+          entry.workStyles && entry.workStyles.includes(selectedWorkStyle),
+      );
+    }
+    return entries;
+  }, [
+    rawListEntries,
+    regionalOnly,
+    hiringOnly,
+    selectedRoleFamily,
+    selectedWorkStyle,
+  ]);
 
   // Verified sponsorship count across currently loaded records
   const sponsoredCount = useMemo(
@@ -865,17 +983,42 @@ export function HomeMapShell({
     return listEntries;
   }, [listEntries, activeDirectoryTab]);
 
-  // Apply regional-only and visa-sponsor filter to map points as well
+  // Apply regional-only, hiring, role family, work style, and visa-sponsor filter to map points as well
   const displayedPoints = useMemo(() => {
     let pts = points;
     if (regionalOnly) {
       pts = pts.filter((point) => point.isRegional);
     }
+    if (hiringOnly) {
+      pts = pts.filter((point) => (point.activeJobsCount ?? 0) > 0);
+    }
+    if (selectedRoleFamily) {
+      pts = pts.filter(
+        (point) =>
+          point.topRoleFamilies &&
+          point.topRoleFamilies.some(
+            (rf) => rf.toLowerCase() === selectedRoleFamily.toLowerCase(),
+          ),
+      );
+    }
+    if (selectedWorkStyle) {
+      pts = pts.filter(
+        (point) =>
+          point.workStyles && point.workStyles.includes(selectedWorkStyle),
+      );
+    }
     if (activeDirectoryTab === "sponsors") {
       pts = pts.filter((point) => point.hasSponsorshipEvidence);
     }
     return pts;
-  }, [points, regionalOnly, activeDirectoryTab]);
+  }, [
+    points,
+    regionalOnly,
+    hiringOnly,
+    selectedRoleFamily,
+    selectedWorkStyle,
+    activeDirectoryTab,
+  ]);
 
   const selectedEntry =
     listEntries.find((entry) => entry.slug === selectedSlug) ??
@@ -888,6 +1031,9 @@ export function HomeMapShell({
     setSelectedCategory("");
     setSponsorshipOnly(false);
     setRegionalOnly(false);
+    setHiringOnly(false);
+    setSelectedRoleFamily("");
+    setSelectedWorkStyle("");
     setActiveHubCity(null);
     setSelectedSlug(null);
     setCameraTarget({
@@ -932,6 +1078,9 @@ export function HomeMapShell({
     selectedCategory !== "" ||
     sponsorshipOnly ||
     regionalOnly ||
+    hiringOnly ||
+    selectedRoleFamily !== "" ||
+    selectedWorkStyle !== "" ||
     activeHubCity !== null;
 
   return (
@@ -1037,8 +1186,74 @@ export function HomeMapShell({
             </select>
           </div>
 
+          {/* Work Style Dropdown */}
+          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200/90 bg-slate-50/80 px-3 py-1.5">
+            <Building2 className="h-4 w-4 text-slate-400 shrink-0" />
+            <select
+              value={selectedWorkStyle}
+              onChange={(e) =>
+                setSelectedWorkStyle(
+                  e.target.value as "remote" | "hybrid" | "onsite" | "",
+                )
+              }
+              className="text-xs font-semibold text-navy-900 bg-transparent focus:outline-none cursor-pointer py-1"
+            >
+              <option value="">All work styles</option>
+              <option value="remote">Remote (AU-wide)</option>
+              <option value="hybrid">Hybrid</option>
+              <option value="onsite">On-site</option>
+            </select>
+          </div>
+
           {/* Filter Pills */}
           <div className="flex items-center gap-2 overflow-x-auto py-1">
+            <button
+              type="button"
+              onClick={() => setHiringOnly(!hiringOnly)}
+              aria-pressed={hiringOnly}
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
+                hiringOnly
+                  ? "border border-emerald-700 bg-emerald-700 text-white shadow-xs"
+                  : "border border-slate-200/90 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+              }`}
+            >
+              <Zap
+                className={`h-3.5 w-3.5 ${
+                  hiringOnly ? "text-white" : "text-emerald-600"
+                }`}
+              />
+              <span>Actively hiring</span>
+              {hiringCount > 0 && (
+                <span
+                  className={`rounded-full px-1.5 py-0.2 font-mono text-[10px] font-bold ${
+                    hiringOnly
+                      ? "bg-white/20 text-white"
+                      : "bg-emerald-100 text-emerald-800"
+                  }`}
+                >
+                  {hiringCount}
+                </span>
+              )}
+            </button>
+
+            {availableRoleFamilies.length > 0 && (
+              <div className="flex items-center gap-1 rounded-xl border border-slate-200/90 bg-white px-2.5 py-1 text-xs">
+                <Cpu className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                <select
+                  value={selectedRoleFamily}
+                  onChange={(e) => setSelectedRoleFamily(e.target.value)}
+                  className="text-xs font-semibold text-navy-900 bg-transparent focus:outline-none cursor-pointer py-1"
+                >
+                  <option value="">All roles</option>
+                  {availableRoleFamilies.map((rf) => (
+                    <option key={rf} value={rf}>
+                      {rf}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <button
               type="button"
               onClick={() => setSponsorshipOnly(!sponsorshipOnly)}
@@ -1261,11 +1476,33 @@ export function HomeMapShell({
                         Regional
                       </span>
                     )}
-                    {!query && !activeHubCity && !selectedCategory && !sponsorshipOnly && !regionalOnly && (
-                      <span className="text-[11px] text-slate-500 italic">
-                        All verified technology employers in Australia
+                    {hiringOnly && (
+                      <span className="rounded bg-emerald-50 text-emerald-800 px-2 py-0.5 text-[10px] font-medium border border-emerald-200">
+                        Actively Hiring
                       </span>
                     )}
+                    {selectedRoleFamily && (
+                      <span className="rounded bg-white px-2 py-0.5 text-[10px] font-medium text-slate-700 border border-slate-200">
+                        Role: {selectedRoleFamily}
+                      </span>
+                    )}
+                    {selectedWorkStyle && (
+                      <span className="rounded bg-white px-2 py-0.5 text-[10px] font-medium text-slate-700 border border-slate-200">
+                        Work style: {selectedWorkStyle}
+                      </span>
+                    )}
+                    {!query &&
+                      !activeHubCity &&
+                      !selectedCategory &&
+                      !sponsorshipOnly &&
+                      !regionalOnly &&
+                      !hiringOnly &&
+                      !selectedRoleFamily &&
+                      !selectedWorkStyle && (
+                        <span className="text-[11px] text-slate-500 italic">
+                          All verified technology employers in Australia
+                        </span>
+                      )}
                   </div>
                 </div>
 
@@ -1339,6 +1576,12 @@ export function HomeMapShell({
                             Standard Employer
                           </span>
                         )}
+                        {selectedEntry.activeJobsCount && selectedEntry.activeJobsCount > 0 && (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 shadow-2xs">
+                            <Zap className="h-3 w-3 text-emerald-600 fill-emerald-600 shrink-0" />
+                            {selectedEntry.activeJobsCount} Live {selectedEntry.activeJobsCount === 1 ? "Role" : "Roles"}
+                          </span>
+                        )}
                         {selectedEntry.primaryCategory && (
                           <CategoryBadge
                             category={selectedEntry.primaryCategory}
@@ -1392,8 +1635,8 @@ export function HomeMapShell({
                   </button>
                 </div>
 
-                {/* 3-Part Auditable Registry Checklist Grid */}
-                <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                {/* 4-Part Auditable Registry Checklist Grid */}
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
                   {/* Card 1: ASIC & ABN Registration */}
                   <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-slate-50 p-3 transition-colors hover:border-slate-300 shadow-2xs">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
@@ -1450,6 +1693,39 @@ export function HomeMapShell({
                       </span>
                     </div>
                   </div>
+
+                  {/* Card 4: Live Hiring Demand */}
+                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-slate-50 p-3 transition-colors hover:border-slate-300 shadow-2xs">
+                    <div
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border shadow-2xs ${
+                        selectedEntry.activeJobsCount && selectedEntry.activeJobsCount > 0
+                          ? "bg-emerald-600 text-white border-emerald-600"
+                          : "bg-white text-slate-400 border-slate-200/90"
+                      }`}
+                    >
+                      <Zap
+                        className={`h-4 w-4 ${
+                          selectedEntry.activeJobsCount && selectedEntry.activeJobsCount > 0
+                            ? "fill-white text-white"
+                            : "text-slate-400"
+                        }`}
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="block font-heading text-xs font-bold text-navy-900">
+                        {selectedEntry.activeJobsCount && selectedEntry.activeJobsCount > 0
+                          ? `${selectedEntry.activeJobsCount} Live ${selectedEntry.activeJobsCount === 1 ? "Vacancy" : "Vacancies"}`
+                          : "Hiring Status"}
+                      </span>
+                      <span className="block text-[11px] text-slate-500 font-medium truncate">
+                        {selectedEntry.topRoleFamilies && selectedEntry.topRoleFamilies.length > 0
+                          ? selectedEntry.topRoleFamilies.join(", ")
+                          : selectedEntry.activeJobsCount && selectedEntry.activeJobsCount > 0
+                            ? "Actively Recruiting"
+                            : "No Live Vacancies"}
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Actions Row */}
@@ -1484,7 +1760,11 @@ export function HomeMapShell({
                       }
                       className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl border border-slate-200/90 bg-white px-3.5 py-2 text-xs font-semibold text-navy-900 hover:bg-slate-50 transition-colors shadow-2xs"
                     >
-                      Careers portal
+                      <span>
+                        {selectedEntry.activeJobsCount && selectedEntry.activeJobsCount > 0
+                          ? `View ${selectedEntry.activeJobsCount} open ${selectedEntry.activeJobsCount === 1 ? "role" : "roles"}`
+                          : "Careers portal"}
+                      </span>
                       <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
                     </a>
                   )}
@@ -1794,10 +2074,17 @@ export function HomeMapShell({
                               {entry.name}
                             </span>
                             <div className="flex items-center gap-1.5 shrink-0">
-                              <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-800 shadow-2xs">
-                                <CheckCircle2 className="h-2.5 w-2.5 text-emerald-600 shrink-0" />
-                                Verified
-                              </span>
+                              {entry.activeJobsCount && entry.activeJobsCount > 0 ? (
+                                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-800 shadow-2xs">
+                                  <Zap className="h-2.5 w-2.5 text-emerald-600 fill-emerald-600 shrink-0" />
+                                  {entry.activeJobsCount} live {entry.activeJobsCount === 1 ? "role" : "roles"}
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-800 shadow-2xs">
+                                  <CheckCircle2 className="h-2.5 w-2.5 text-emerald-600 shrink-0" />
+                                  Verified
+                                </span>
+                              )}
                               <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-0.5 group-hover:text-navy-900 transition-all" />
                             </div>
                           </div>
@@ -1820,8 +2107,27 @@ export function HomeMapShell({
                             )}
                           </div>
 
+                          {/* Role Families & Work Style Tags */}
+                          {entry.topRoleFamilies && entry.topRoleFamilies.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-1 mt-1.5">
+                              {entry.topRoleFamilies.slice(0, 3).map((rf) => (
+                                <span
+                                  key={rf}
+                                  className="rounded bg-slate-100/90 px-1.5 py-0.5 font-mono text-[10px] font-medium text-slate-600"
+                                >
+                                  {rf}
+                                </span>
+                              ))}
+                              {entry.workStyles && entry.workStyles.includes("remote") && (
+                                <span className="rounded bg-sky-50 text-sky-700 border border-sky-200/70 px-1.5 py-0.5 font-mono text-[10px] font-semibold">
+                                  Remote
+                                </span>
+                              )}
+                            </div>
+                          )}
+
                           {entry.hasSponsorshipEvidence && (
-                            <div className="flex items-center gap-1.5 mt-2">
+                            <div className="flex items-center gap-1.5 mt-1.5">
                               <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-slate-50 px-2.5 py-0.5 font-mono text-[10px] font-semibold text-slate-800 shadow-2xs">
                                 <Award className="h-2.5 w-2.5 text-slate-600 shrink-0" />
                                 Subclass 482 Sponsor

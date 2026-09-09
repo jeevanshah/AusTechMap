@@ -13,6 +13,9 @@ interface TrigramRow {
   primary_category: string | null;
   has_sponsorship_evidence: boolean;
   is_regional: boolean;
+  active_jobs_count: number;
+  top_role_families: string[] | null;
+  work_styles: unknown;
 }
 
 interface LocationRow {
@@ -24,6 +27,23 @@ interface LocationRow {
   primary_category: string | null;
   has_sponsorship_evidence: boolean;
   is_regional: boolean;
+  active_jobs_count: number;
+  top_role_families: string[] | null;
+  work_styles: unknown;
+}
+
+function parseWorkStyles(val: unknown): ("remote" | "hybrid" | "onsite")[] | undefined {
+  if (!val) return undefined;
+  let arr: string[] = [];
+  if (Array.isArray(val)) {
+    arr = val;
+  } else if (typeof val === "string") {
+    arr = val.replace(/[{}"']/g, "").split(",").map((s) => s.trim()).filter(Boolean);
+  }
+  const valid = arr.filter((s): s is "remote" | "hybrid" | "onsite" =>
+    s === "remote" || s === "hybrid" || s === "onsite",
+  );
+  return valid.length > 0 ? valid : undefined;
 }
 
 const SIGNAL_COLUMNS_SQL = `research.claim_value ->> 'city' AS city,
@@ -38,7 +58,10 @@ const SIGNAL_COLUMNS_SQL = `research.claim_value ->> 'city' AS city,
               SELECT 1 FROM company_locations cl2
               JOIN resolved_locations rl2 ON rl2.id = cl2.resolved_location_id
               WHERE cl2.company_id = c.id AND rl2.migration_category IS NOT NULL
-            ) AS is_regional`;
+            ) AS is_regional,
+            COALESCE(hiring.active_jobs_count, 0) AS active_jobs_count,
+            hiring.top_role_families,
+            hiring.work_styles`;
 
 const SIGNAL_JOINS_SQL = `LEFT JOIN LATERAL (
        SELECT e.claim_value
@@ -55,7 +78,15 @@ const SIGNAL_JOINS_SQL = `LEFT JOIN LATERAL (
        WHERE ccl2.company_id = c.id
        ORDER BY cg.label
        LIMIT 1
-     ) cat ON true`;
+     ) cat ON true
+     LEFT JOIN LATERAL (
+       SELECT count(*)::int AS active_jobs_count,
+              array_remove(array_agg(DISTINCT rf.label), NULL) AS top_role_families,
+              array_remove(array_agg(DISTINCT j.remote_type::text), 'unknown') AS work_styles
+       FROM jobs j
+       LEFT JOIN role_families rf ON rf.id = j.role_family_id
+       WHERE j.company_id = c.id AND j.expired_at IS NULL
+     ) hiring ON true`;
 
 const LOCATION_FALLBACK_SCORE = 0.5;
 
@@ -75,14 +106,27 @@ const CATEGORY_FILTER_SQL = `($2::text IS NULL OR EXISTS (
 const SPONSORSHIP_FILTER_SQL = `(NOT $3::boolean OR EXISTS (
              SELECT 1 FROM evidence e
              WHERE e.entity_type = 'company' AND e.entity_id = c.id::text
-               AND e.claim_type = ANY($4::text[])
-               AND e.status = 'active'
+                AND e.claim_type = ANY($4::text[])
+                AND e.status = 'active'
            ))`;
 
 const REGIONAL_FILTER_SQL = `(NOT $5::boolean OR EXISTS (
              SELECT 1 FROM company_locations cl2
              JOIN resolved_locations rl2 ON rl2.id = cl2.resolved_location_id
              WHERE cl2.company_id = c.id AND rl2.migration_category IS NOT NULL
+           ))`;
+
+const HIRING_FILTER_SQL = `(NOT $6::boolean OR COALESCE(hiring.active_jobs_count, 0) > 0)`;
+
+const ROLE_FAMILY_FILTER_SQL = `($7::text IS NULL OR EXISTS (
+             SELECT 1 FROM jobs j2
+             JOIN role_families rf2 ON rf2.id = j2.role_family_id
+             WHERE j2.company_id = c.id AND j2.expired_at IS NULL AND rf2.key = $7
+           ))`;
+
+const WORK_STYLE_FILTER_SQL = `($8::text IS NULL OR EXISTS (
+             SELECT 1 FROM jobs j3
+             WHERE j3.company_id = c.id AND j3.expired_at IS NULL AND j3.remote_type = $8::work_style
            ))`;
 
 const SPONSORSHIP_CLAIM_TYPES = [
@@ -97,12 +141,18 @@ export async function searchCompanies(
   category: string | null = null,
   sponsorship = false,
   regional = false,
+  hiring = false,
+  roleFamily: string | null = null,
+  workStyle: "remote" | "hybrid" | "onsite" | null = null,
 ): Promise<CompanySearchResult[]> {
   const filterParams = [
     category,
     sponsorship,
     SPONSORSHIP_CLAIM_TYPES,
     regional,
+    hiring,
+    roleFamily,
+    workStyle,
   ];
   const { rows } = await pool.query<TrigramRow>(
     `SELECT c.slug, c.display_name AS name, c.domain,
@@ -127,6 +177,9 @@ export async function searchCompanies(
        AND ${CATEGORY_FILTER_SQL}
        AND ${SPONSORSHIP_FILTER_SQL}
        AND ${REGIONAL_FILTER_SQL}
+       AND ${HIRING_FILTER_SQL}
+       AND ${ROLE_FAMILY_FILTER_SQL}
+       AND ${WORK_STYLE_FILTER_SQL}
      ORDER BY GREATEST(similarity(c.display_name, $1), COALESCE(alias_sim.best, 0)) DESC
      LIMIT 20`,
     [query, ...filterParams],
@@ -147,6 +200,9 @@ export async function searchCompanies(
           primaryCategory: row.primary_category,
           hasSponsorshipEvidence: row.has_sponsorship_evidence,
           isRegional: row.is_regional,
+          activeJobsCount: row.active_jobs_count > 0 ? row.active_jobs_count : undefined,
+          topRoleFamilies: row.top_role_families && row.top_role_families.length > 0 ? row.top_role_families : undefined,
+          workStyles: parseWorkStyles(row.work_styles),
         };
       }
       return {
@@ -160,6 +216,9 @@ export async function searchCompanies(
         primaryCategory: row.primary_category,
         hasSponsorshipEvidence: row.has_sponsorship_evidence,
         isRegional: row.is_regional,
+        activeJobsCount: row.active_jobs_count > 0 ? row.active_jobs_count : undefined,
+        topRoleFamilies: row.top_role_families && row.top_role_families.length > 0 ? row.top_role_families : undefined,
+        workStyles: parseWorkStyles(row.work_styles),
       };
     });
   }
@@ -176,6 +235,9 @@ export async function searchCompanies(
        AND ${CATEGORY_FILTER_SQL}
        AND ${SPONSORSHIP_FILTER_SQL}
        AND ${REGIONAL_FILTER_SQL}
+       AND ${HIRING_FILTER_SQL}
+       AND ${ROLE_FAMILY_FILTER_SQL}
+       AND ${WORK_STYLE_FILTER_SQL}
      ORDER BY c.id
      LIMIT 20`,
     [query, ...filterParams],
@@ -192,5 +254,8 @@ export async function searchCompanies(
     primaryCategory: row.primary_category,
     hasSponsorshipEvidence: row.has_sponsorship_evidence,
     isRegional: row.is_regional,
+    activeJobsCount: row.active_jobs_count > 0 ? row.active_jobs_count : undefined,
+    topRoleFamilies: row.top_role_families && row.top_role_families.length > 0 ? row.top_role_families : undefined,
+    workStyles: parseWorkStyles(row.work_styles),
   }));
 }

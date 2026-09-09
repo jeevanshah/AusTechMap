@@ -64,6 +64,8 @@ function pointsToGeoJson(points: MapCompanyPoint[]): FeatureCollection {
         name: point.name,
         hasSponsorshipEvidence: point.hasSponsorshipEvidence ? 1 : 0,
         isRegional: point.isRegional ? 1 : 0,
+        activeJobsCount: point.activeJobsCount ?? 0,
+        isHiring: (point.activeJobsCount ?? 0) > 0 ? 1 : 0,
       },
       geometry: { type: "Point", coordinates: [point.lng, point.lat] },
     })),
@@ -173,20 +175,29 @@ export function MapCanvas({
         paint: {
           "circle-color": [
             "case",
+            ["==", ["get", "isHiring"], 1],
+            "#059669",
             ["==", ["get", "hasSponsorshipEvidence"], 1],
             "#c2410c",
             "#0f172a",
           ],
-          "circle-radius": 11,
-          "circle-opacity": 0.12,
+          "circle-radius": [
+            "case",
+            ["==", ["get", "isHiring"], 1],
+            13,
+            11,
+          ],
+          "circle-opacity": 0.15,
           "circle-stroke-width": 1,
           "circle-stroke-color": [
             "case",
+            ["==", ["get", "isHiring"], 1],
+            "#059669",
             ["==", ["get", "hasSponsorshipEvidence"], 1],
             "#c2410c",
             "#0f172a",
           ],
-          "circle-stroke-opacity": 0.25,
+          "circle-stroke-opacity": 0.35,
         },
       });
       map.addLayer({
@@ -197,11 +208,18 @@ export function MapCanvas({
         paint: {
           "circle-color": [
             "case",
+            ["==", ["get", "isHiring"], 1],
+            "#059669",
             ["==", ["get", "hasSponsorshipEvidence"], 1],
             "#c2410c",
             "#0f172a",
           ],
-          "circle-radius": 6.5,
+          "circle-radius": [
+            "case",
+            ["==", ["get", "isHiring"], 1],
+            7,
+            6.5,
+          ],
           "circle-stroke-width": 2,
           "circle-stroke-color": "#ffffff",
         },
