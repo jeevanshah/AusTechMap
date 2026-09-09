@@ -13,8 +13,8 @@
 ## Checkpoint
 
 - **Implementation branch:** `main`
-- **Implementation checkpoint commit:** `f7f2eb5` (`feat: harvest Wave 2/3 first-party location candidates`); verify with `git rev-parse HEAD`.
-- **Handoff commit:** this commit on `main` after docs update.
+- **Implementation checkpoint commit:** `f7f2eb5` (location harvest); handoff docs sync `548df4e` — verify with `git rev-parse HEAD`.
+- **Handoff commit:** `548df4e` on `main`.
 - **Working-tree status at checkpoint:** Clean after this docs commit.
 - **Remote:** `origin/main` synchronized after push.
 
