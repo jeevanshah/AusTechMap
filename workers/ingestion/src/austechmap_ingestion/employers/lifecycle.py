@@ -192,6 +192,51 @@ class ReviewResolution:
     outcome: MatchOutcome | None
 
 
+def _audit_review_resolution(
+    connection: psycopg.Connection[tuple[object, ...]],
+    *,
+    actor_user_id: int,
+    review_item_id: uuid.UUID,
+    kind: str,
+    decision: Literal["approved", "rejected"],
+    matched_company_id: uuid.UUID | None,
+    outcome: MatchOutcome | None,
+    reason: str | None,
+) -> None:
+    """Record the staff decision independently of any company enrichment."""
+    connection.execute(
+        """
+        INSERT INTO audit_records (
+          actor_type, actor_id, action, target_type, target_id,
+          reason, before_state, after_state, metadata, request_id
+        )
+        VALUES ('user', %s, 'review_item_resolved', 'review_queue_item', %s,
+                %s, %s, %s, %s, %s)
+        """,
+        (
+            str(actor_user_id),
+            str(review_item_id),
+            reason,
+            Jsonb({"status": "pending", "kind": kind}),
+            Jsonb(
+                {
+                    "status": decision,
+                    "matched_company_id": str(matched_company_id)
+                    if matched_company_id
+                    else None,
+                }
+            ),
+            Jsonb(
+                {
+                    "outcome": outcome.decision if outcome is not None else None,
+                    "outcome_company_id": str(outcome.company_id) if outcome is not None else None,
+                }
+            ),
+            uuid.uuid4().hex,
+        ),
+    )
+
+
 def resolve_review_item(
     database_url: str,
     *,
@@ -199,6 +244,7 @@ def resolve_review_item(
     decision: Literal["approved", "rejected"],
     actor_user_id: int,
     matched_company_id: uuid.UUID | None = None,
+    reason: str | None = None,
 ) -> ReviewResolution:
     """Resolve one pending review_queue_items row.
 
@@ -212,12 +258,12 @@ def resolve_review_item(
     """
     with psycopg.connect(database_url) as connection:
         row = connection.execute(
-            "SELECT status, payload, source_id FROM review_queue_items WHERE id = %s",
+            "SELECT status, kind, payload, source_id FROM review_queue_items WHERE id = %s",
             (review_item_id,),
         ).fetchone()
         if row is None:
             raise EmployerIdentityError(f"review item not found: {review_item_id}")
-        status, payload, source_id = row
+        status, kind, payload, source_id = row
         if status != "pending":
             raise EmployerIdentityError(f"review item already resolved: {review_item_id}")
 
@@ -256,5 +302,15 @@ def resolve_review_item(
             WHERE id = %s
             """,
             (decision, actor_user_id, review_item_id),
+        )
+        _audit_review_resolution(
+            connection,
+            actor_user_id=actor_user_id,
+            review_item_id=review_item_id,
+            kind=cast(str, kind),
+            decision=decision,
+            matched_company_id=matched_company_id,
+            outcome=outcome,
+            reason=reason,
         )
         return ReviewResolution(outcome)
