@@ -21,6 +21,10 @@ from austechmap_ingestion.employers.labour_agreements import (
     load_labour_agreements_fixture,
     match_labour_agreements,
 )
+from austechmap_ingestion.employers.location_quality import (
+    LocationQualityError,
+    quarantine_low_specificity_locations,
+)
 from austechmap_ingestion.employers.locations_seed import (
     DEFAULT_FIXTURE_PATH as DEFAULT_ADDRESS_FIXTURE_PATH,
 )
@@ -113,6 +117,24 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_ADDRESS_FIXTURE_PATH,
         help="address CSV to geocode from (defaults to the alpha cohort address fixture)",
     )
+    quarantine_parser = subparsers.add_parser(
+        "quarantine-low-specificity-locations",
+        help="dry-run or quarantine accepted external points from an unsupported address fixture",
+    )
+    quarantine_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    quarantine_parser.add_argument("--fixture", type=Path, required=True)
+    quarantine_parser.add_argument("--actor-id", default="cohort-location-cleanup")
+    quarantine_parser.add_argument("--reason", required=True)
+    quarantine_parser.add_argument(
+        "--only-low-specificity",
+        action="store_true",
+        help="for a mixed fixture, quarantine only rows without a street number",
+    )
+    quarantine_parser.add_argument(
+        "--apply",
+        action="store_true",
+        help="perform the audited quarantine (without this flag, only report the target set)",
+    )
     taxonomy_parser = subparsers.add_parser(
         "seed-taxonomy", help="seed the v1 role-family and skills taxonomies"
     )
@@ -153,7 +175,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     source_status_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
     source_status_parser.add_argument(
-        "--ats-provider", choices=["lever", "ashby", "greenhouse", "smartrecruiters", "workable"], required=True
+        "--ats-provider",
+        choices=["lever", "ashby", "greenhouse", "smartrecruiters", "workable"],
+        required=True,
     )
     source_status_parser.add_argument("--ats-identifier", required=True)
     source_status_parser.add_argument(
@@ -348,6 +372,41 @@ def main(argv: Sequence[str] | None = None) -> int:
                         {"domain": domain, "error": message}
                         for domain, message in location_stats.errors
                     ],
+                },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "quarantine-low-specificity-locations":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        try:
+            cleanup_stats = quarantine_low_specificity_locations(
+                args.database_url,
+                fixture_path=args.fixture,
+                actor_id=args.actor_id,
+                reason=args.reason,
+                apply=args.apply,
+                include_only_low_specificity=args.only_low_specificity,
+            )
+        except (LocationQualityError, OSError, psycopg.Error) as error:
+            print(f"Location cleanup failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "affectedCompanies": cleanup_stats.affected_companies,
+                    "affectedLocations": cleanup_stats.affected_locations,
+                    "applied": cleanup_stats.applied,
+                    "fixtureCandidates": cleanup_stats.fixture_candidates,
+                    "matchedFixtureDomains": cleanup_stats.matched_fixture_domains,
+                    "skippedSpecificFixtureDomains": list(
+                        cleanup_stats.skipped_specific_fixture_domains
+                    ),
+                    "unmatchedFixtureDomains": list(cleanup_stats.unmatched_fixture_domains),
                 },
                 separators=(",", ":"),
                 sort_keys=True,
