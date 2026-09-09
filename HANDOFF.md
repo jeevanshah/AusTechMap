@@ -6,9 +6,9 @@
 
 - **Current Implementer / Integrator:** Gemini / Codex — operating per `AGENTS.md` orchestration.
 - **Updated at:** 2026-09-09
-- **Reason:** Milestone checkpoint following Phase 8 tech employer cohort expansion to **250 companies** and ATS adapter expansion (added SmartRecruiters & Workable, crawled Canva & Rokt to **1,579 active jobs**).
-- **Task / issue:** Deliver Phase 8 employer cohort depth (Perth, Adelaide, Brisbane, Canberra, Hobart, Newcastle, Wollongong, Byron Bay, Geelong, Bendigo, Shepparton) and 4th/5th ATS adapters.
-- **Acceptance criteria:** All automated test suites green (contracts vitest 46/46, web vitest 170/170, ingestion pytest 252/252), zero lint errors, zero typecheck errors, live database verified on Neon with 250 companies and 100% PostGIS SA4 geographic resolution.
+- **Reason:** Milestone checkpoint following Phase 8 ATS source expansion to **48 registered sources** and live jobs to **1,911 active jobs** across 47 hiring employers, with **250 companies** in the national cohort.
+- **Task / issue:** Scale verified ATS coverage and live job volume across Ashby, Lever, Greenhouse, SmartRecruiters, and Workable.
+- **Acceptance criteria:** All automated test suites green (contracts vitest 46/46, web vitest 170/170, ingestion pytest 252/252), zero lint errors, zero typecheck errors, live database verified on Neon with 1,911 active jobs.
 
 ## Checkpoint
 
@@ -236,6 +236,19 @@ Everything since the 2026-09-04 handoff:
   - 100% of company locations (230 accepted) geocoded and spatially resolved via PostGIS point-in-polygon joins into ABS ASGS SA4 regional boundaries.
   - Derived 67 new location change events into `events` via `run-retention-pipeline.mjs`.
   - Monorepo quality gates: **468 automated tests passing** across contracts (46), web (170), and ingestion pytest (252).
+- **Phase 8 (7 Additional ATS Sources Registered — Live Jobs Surpass 1,900) completed 9 September 2026**:
+  - Registered 7 newly discovered & verified Australian tech employers in `ats_source_seed_20260905.csv` and seeded into Neon PostgreSQL (`{"created": 7, "reused": 41}`):
+    - **Xplor Technologies** (`smartrecruiters:Xplor`, **248 jobs**) — Childcare & fitness cloud SaaS platform.
+    - **Netwealth** (`ashby:netwealth`, **25 jobs**) — Financial technology administration platform.
+    - **Sentient Vision Systems** (`greenhouse:aechelontechnology`, **20 jobs**) — Airborne computer vision & AI search deeptech.
+    - **Weploy** (`greenhouse:weploy`, **18 jobs**) — Algorithmic workforce dispatch SaaS.
+    - **Flare** (`smartrecruiters:flarehr`, **14 jobs**) — Digital employee onboarding & workplace fintech.
+    - **Ofload** (`workable:ofload`, **6 jobs**) — Digital freight logistics tech.
+    - **ActivePipe** (`smartrecruiters:activepipe`, **1 job**) — Real estate predictive marketing automation.
+  - Executed `crawl-jobs --all`: ingested **332 new live job postings**, scaling platform live volume to **1,911 active unexpired jobs across 47 hiring companies**!
+  - Executed `derive-hiring-signals`: derived **16 new role family signals** (100 total) and **8 new skill signals** (161 total).
+  - Executed `run-retention-pipeline.mjs`: derived **332 new longitudinal job change events** into `events`.
+  - Updated `test_ats_source_seed.py` (48 verified seeds, 100% passing).
 
 ## Work remaining
 
@@ -252,6 +265,7 @@ Key files updated in this milestone:
 - Ingestion Adapters: `workers/ingestion/src/austechmap_ingestion/hiring/smartrecruiters.py`, `workers/ingestion/src/austechmap_ingestion/hiring/workable.py`.
 - Ingestion Pipeline: `workers/ingestion/src/austechmap_ingestion/hiring/pipeline.py`, `replay.py`, `normalisation.py`, `company_sources.py`, `ats_source_seed.py`, `__main__.py`.
 - Cohort Fixtures: `workers/ingestion/src/austechmap_ingestion/employers/fixtures/batch3_expansion_cohort_20260909.csv`, `batch3_expansion_cohort_addresses_20260909.csv`.
+- ATS Seed Fixture: `workers/ingestion/src/austechmap_ingestion/hiring/fixtures/ats_source_seed_20260905.csv` (48 sources).
 - Tests: `workers/ingestion/tests/test_smartrecruiters.py`, `test_workable.py`, `test_migrations.py`, `test_ats_source_seed.py`.
 - Docs: `HANDOFF.md`, `walkthrough.md`.
 
@@ -276,8 +290,9 @@ Key files updated in this milestone:
   - Production Build: Turbopack production build succeeded in 1.7s across 37 routes.
 - **Live Infrastructure Verification on Neon DB:**
   - Total Active/Pending Employers: **250 companies**.
-  - Total Active Unexpired Jobs: **1,579 live jobs**.
-  - Total Registered ATS Sources: **41 sources**.
+  - Total Active Unexpired Jobs: **1,911 live jobs**.
+  - Total Registered ATS Sources: **48 sources**.
+  - Distinct Active Hiring Employers: **47 companies**.
   - Geocoding & SA4 Resolution: **100% of accepted locations spatially mapped to ASGS SA4**.
 
 ## Known failures and risks
