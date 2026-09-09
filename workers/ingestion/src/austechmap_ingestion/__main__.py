@@ -16,11 +16,13 @@ from austechmap_ingestion.employers.address_validation import (
 from austechmap_ingestion.employers.category_apply import apply_company_categories
 from austechmap_ingestion.employers.category_seed import seed_categories
 from austechmap_ingestion.employers.cohort_triage import (
+    build_seed_preflight,
     harvest_homepage_evidence,
     load_cohort_fixture,
     load_triage_manifest,
     triage_cohort,
     write_evidence_harvest,
+    write_seed_preflight,
     write_triage_manifest,
 )
 from austechmap_ingestion.employers.geocoding import (
@@ -175,6 +177,13 @@ def build_parser() -> argparse.ArgumentParser:
     harvest_parser.add_argument("--output", type=Path, required=True)
     harvest_parser.add_argument("--timeout-seconds", type=float, default=12.0)
     harvest_parser.add_argument("--workers", type=int, default=12)
+    preflight_parser = subparsers.add_parser(
+        "prepare-cohort-seed-preflight",
+        help="build a non-importable, evidence-backed bulk employer seed preflight CSV",
+    )
+    preflight_parser.add_argument("--cohort-fixture", type=Path, required=True)
+    preflight_parser.add_argument("--evidence-harvest", type=Path, required=True)
+    preflight_parser.add_argument("--output", type=Path, required=True)
     taxonomy_parser = subparsers.add_parser(
         "seed-taxonomy", help="seed the v1 role-family and skills taxonomies"
     )
@@ -551,6 +560,22 @@ def main(argv: Sequence[str] | None = None) -> int:
                         row.status == "skipped_unreachable" for row in evidence_rows
                     ),
                 },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "prepare-cohort-seed-preflight":
+        try:
+            preflight_rows = build_seed_preflight(args.cohort_fixture, args.evidence_harvest)
+            write_seed_preflight(args.output, preflight_rows)
+        except (OSError, ValueError, KeyError) as error:
+            print(f"Cohort seed preflight failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {"candidates": len(preflight_rows), "preflight": str(args.output)},
                 separators=(",", ":"),
                 sort_keys=True,
             )

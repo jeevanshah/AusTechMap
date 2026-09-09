@@ -9,11 +9,13 @@ from austechmap_ingestion.employers.cohort_triage import (
     CohortCandidate,
     HomepageEvidence,
     ReachabilityResult,
+    build_seed_preflight,
     harvest_homepage_evidence,
     load_cohort_fixture,
     load_triage_manifest,
     triage_cohort,
     write_evidence_harvest,
+    write_seed_preflight,
     write_triage_manifest,
 )
 
@@ -94,3 +96,31 @@ def test_load_triage_manifest_reads_written_manifest(tmp_path: Path) -> None:
     loaded = load_triage_manifest(manifest)
 
     assert loaded == triage_rows
+
+
+def test_seed_preflight_only_includes_evidence_backed_candidates(tmp_path: Path) -> None:
+    cohort = tmp_path / "cohort.csv"
+    cohort.write_text(
+        "name,domain,careers_url,city,reason,confidence\n"
+        "Live,live.example,https://live.example/careers,Sydney,Original claim,High\n"
+        "Down,down.example,https://down.example/careers,Perth,Original claim,High\n",
+        encoding="utf-8",
+    )
+    evidence = tmp_path / "evidence.csv"
+    evidence.write_text(
+        "name,domain,city,harvest_status,source_url,page_title,meta_description\n"
+        "Live,live.example,Sydney,metadata_captured_needs_human_assessment,"
+        "https://live.example,Live Software,Build secure software products\n"
+        "Down,down.example,Perth,skipped_unreachable,,,,\n",
+        encoding="utf-8",
+    )
+
+    rows = build_seed_preflight(cohort, evidence)
+    output = tmp_path / "preflight.csv"
+    write_seed_preflight(output, rows)
+
+    assert len(rows) == 1
+    assert rows[0].technology_rationale == "Live Software Build secure software products"
+    with output.open(encoding="utf-8", newline="") as handle:
+        manifest = list(csv.DictReader(handle))
+    assert manifest[0]["confidence"] == "Medium - first-party homepage metadata captured"

@@ -5,3 +5,5 @@ These files are bulk-review artifacts, not import fixtures. A reachable domain o
 Candidates may move into a seed fixture only after a public first-party source URL and a specific technology rationale are recorded. A location needs separate first-party, street-level address evidence and must pass `validate-address-fixture` before it can be geocoded.
 
 `unreachable_needs_manual_review` is deliberately not a rejection: provider outages, bot controls, and TLS errors can all produce that result. It blocks automatic seeding until an authoritative company source is found.
+
+`wave1-seed-preflight-20260909.csv` is the bulk preflight derived from the homepage-evidence manifest. Its entries meet the fixture's syntactic source-evidence contract, but it is **not** an import instruction: applying it to Neon remains a production write requiring explicit user approval.

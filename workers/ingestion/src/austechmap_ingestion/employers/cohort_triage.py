@@ -77,6 +77,15 @@ class EvidenceHarvestRow:
         return "reachable_but_metadata_unavailable"
 
 
+@dataclass(frozen=True)
+class SeedPreflightRow:
+    candidate: CohortCandidate
+    careers_url: str
+    original_reason: str
+    source_url: str
+    technology_rationale: str
+
+
 class _MetadataParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
@@ -224,6 +233,63 @@ def load_triage_manifest(path: Path) -> tuple[TriageRow, ...]:
     return rows
 
 
+def load_evidence_harvest(path: Path) -> tuple[dict[str, str], ...]:
+    with path.open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        if reader.fieldnames is None:
+            raise ValueError("missing evidence harvest header")
+        required = {
+            "name",
+            "domain",
+            "city",
+            "harvest_status",
+            "source_url",
+            "page_title",
+            "meta_description",
+        }
+        missing = sorted(required - set(reader.fieldnames))
+        if missing:
+            raise ValueError(f"missing evidence harvest columns: {', '.join(missing)}")
+        return tuple(reader)
+
+
+def build_seed_preflight(
+    cohort_fixture: Path, evidence_harvest: Path
+) -> tuple[SeedPreflightRow, ...]:
+    candidates = load_cohort_fixture(cohort_fixture)
+    with cohort_fixture.open(encoding="utf-8", newline="") as handle:
+        original_rows = {row["domain"].strip().lower(): row for row in csv.DictReader(handle)}
+    evidence_by_domain = {
+        row["domain"].strip().lower(): row for row in load_evidence_harvest(evidence_harvest)
+    }
+
+    preflight: list[SeedPreflightRow] = []
+    for candidate in candidates:
+        evidence = evidence_by_domain.get(candidate.domain)
+        original = original_rows[candidate.domain]
+        if (
+            evidence is None
+            or evidence["harvest_status"] != "metadata_captured_needs_human_assessment"
+        ):
+            continue
+        title = evidence["page_title"].strip()
+        description = evidence["meta_description"].strip()
+        rationale = " ".join(part for part in (title, description) if part)
+        source_url = evidence["source_url"].strip()
+        if not source_url or len(rationale) < 20:
+            continue
+        preflight.append(
+            SeedPreflightRow(
+                candidate=candidate,
+                careers_url=original["careers_url"].strip(),
+                original_reason=original["reason"].strip(),
+                source_url=source_url,
+                technology_rationale=rationale,
+            )
+        )
+    return tuple(preflight)
+
+
 def fetch_homepage_metadata(url: str, *, timeout_seconds: float) -> HomepageEvidence:
     request = Request(url, headers={"User-Agent": _USER_AGENT})
     try:
@@ -354,5 +420,38 @@ def write_evidence_harvest(path: Path, rows: tuple[EvidenceHarvestRow, ...]) -> 
                         if row.status == "metadata_captured_needs_human_assessment"
                         else "Find an authoritative company source before creating a seed fixture."
                     ),
+                }
+            )
+
+
+def write_seed_preflight(path: Path, rows: tuple[SeedPreflightRow, ...]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=(
+                "name",
+                "domain",
+                "careers_url",
+                "city",
+                "reason",
+                "confidence",
+                "source_url",
+                "technology_rationale",
+            ),
+            lineterminator="\n",
+        )
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(
+                {
+                    "name": row.candidate.name,
+                    "domain": row.candidate.domain,
+                    "careers_url": row.careers_url,
+                    "city": row.candidate.city,
+                    "reason": row.original_reason,
+                    "confidence": "Medium - first-party homepage metadata captured",
+                    "source_url": row.source_url,
+                    "technology_rationale": row.technology_rationale,
                 }
             )
