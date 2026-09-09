@@ -63,6 +63,12 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: two rows pass `validate-address-fixture`; Skilio remains excluded because its official source lacks a complete address.
 - Residual risk: no Neon write has occurred. This repair fixture needs explicit approval before geocoding/import.
 
+## 2026-09-09 — Wave 2/3 canonical-domain location repair import
+
+- Approval: user explicitly approved the two-row repair fixture for production Neon in this session.
+- Result: 2 locations resolved, 0 reused, 0 errors, and 0 unmatched domains.
+- Verification: importer completed successfully against the validated fixture.
+
 ## 2026-09-09 — Wave 2 / Wave 3 triage, homepage evidence, seed preflight
 
 - Commit: `data: prepare Wave 2/3 cohort evidence preflight` (`d9f282d`)
