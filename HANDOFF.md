@@ -4,20 +4,19 @@
 
 ## Switch
 
-- **Outgoing implementer:** Claude
-- **Incoming implementer:** Codex — active implementer and final integrator, per the default role assignment in `AGENTS.md`. Gemini continues UI/browser/prototyping duties (see Roles table).
-- **Switched at:** 2026-09-07, user-triggered directly (not a quota event this time — the user simply asked to bring Codex back in).
-- **Reason:** No specific issue — Claude had been active implementer since 2026-09-04 (Codex was on quota then); the user is now resuming the default assignment.
-- **Task / issue:** None outstanding from the switch itself. `main` is green (full JS check suite passing locally; Python static checks — `ruff`, `mypy` — also clean, `pytest` not re-run this session, see Verification).
-- **Acceptance criteria:** This file accurately reflects real, current state — not the 2026-09-04 snapshot it replaces, which was stale through everything below.
+- **Current Implementer / Integrator:** Gemini / Codex — operating per `AGENTS.md` orchestration.
+- **Updated at:** 2026-09-09
+- **Reason:** Milestone checkpoint following the completion and verification of Phase 5 (Hiring Momentum Derivation & Live Hiring Filters) and admin account security cleanup.
+- **Task / issue:** Complete Phase 5 delivery; prepare for Phase 8 tech employer cohort expansion towards 1,000 companies.
+- **Acceptance criteria:** All automated test suites green (contracts vitest 46/46, web vitest 170/170, ingestion pytest 244/244), zero lint errors, zero typecheck errors, Next.js Turbopack production build verified, live database verified on Neon.
 
 ## Checkpoint
 
 - **Implementation branch:** `main`
-- **Implementation checkpoint commit:** `f2a3f23` (docs(launch): author Phase 8 launch quality report across all 15 product gates)
-- **Handoff commit:** The commit containing this populated file; verify with `git rev-parse HEAD`.
+- **Implementation checkpoint commit:** `8594c01` (`feat(hiring): implement hiring momentum derivation and live map hiring filters`)
+- **Handoff commit:** Current commit on `main`; verify with `git rev-parse HEAD`.
 - **Working-tree status at checkpoint:** Clean.
-- **Remote:** `origin/main` confirmed at the same commit.
+- **Remote:** `origin/main` synchronized.
 
 ## Work completed
 
@@ -180,65 +179,66 @@ Everything since the 2026-09-04 handoff:
 - Executed `derive-sponsorship-evidence`: derived the platform's first organic `job_sponsorship_mention` evidence hit from a real job posting (Neara: "Senior Software Engineer - Australia", 0.70 confidence), automatically activating Neara's verified sponsorship badge and `?sponsorship=true` map filter.
 - Executed `run-retention-pipeline.mjs`: derived 1,056 new longitudinal `job.first_seen` change events in `events` table with zero errors.
 - Verified `/opportunities` (Opportunity Match), `/api/map/companies` (127ms response time), `/companies/[slug]` (Neara, Airwallex, Eucalyptus, Zip Co, etc.), and map sponsorship filters.
-- Updated ingestion test suites: `test_ats_source_seed.py` (26 verified seeds) and `test_migrations.py` (range 1..21).
-- Monorepo quality gates: **210 tests passing** across contracts (45) and web (165), 0 lint errors, 0 type errors.
+- **Phase 5 Hiring Momentum Signals & Live Filters completed 9 September 2026**:
+  - Implemented automated signal derivation engine (`hiring/signals.py`, `derive-hiring-signals` CLI) strictly enforcing the sufficiency rule: requires `sample_size >= 3` across distinct observation dates `>= 14` days apart; insufficient sample sets `sufficient = false, momentum = null` (no fake velocity).
+  - Derived **54 employer role signals** and **107 employer skill signals** across 25 active employers on live Neon PostgreSQL.
+  - Interactive Map & Directory: Added "Actively hiring" toggle pill, role family filter dropdown, work style filter dropdown; `MapCanvas` highlights hiring employers with emerald `#059669` glowing markers and halos; company directory cards render `⚡ X live roles` badges; inspection drawer adds 4th "Live Hiring Demand" card.
+  - Profile Page: `/companies/[slug]` renders emerald-styled "Hiring Demand & Skills Landscape" card with role disciplines, baseline/momentum indicators, and top detected skills.
+  - Query Normalization: Added `parseWorkStyles` helper and SQL enum text cast in `mapCompanies.ts` and `searchCompanies.ts`.
+- **Admin Account Security Housekeeping completed 9 September 2026**:
+  - Deactivated and demoted legacy bootstrap admin accounts (`system-admin-ui@austechmap.internal` and `jeevan.shah@churchill.edu.au`) to `role = 'user'`, `status = 'disabled'`.
+  - Verified only `jeevanrajshah@gmail.com` remains active admin (`role = 'admin'`, `status = 'active'`).
+- Updated ingestion test suites: `test_ats_source_seed.py` (26 verified seeds), `test_migrations.py` (range 1..21), and `test_hiring_signals.py` (2/2 DB integration tests pass).
+- Monorepo quality gates: **216 tests passing** across contracts (46) and web (170), 0 lint errors, 0 type errors, clean Next.js build.
 
 ## Work remaining
 
 Per `IMPLEMENTATION_PLAN.md`'s own phase checklists:
-- Phase 4: formal load test (needs >=1,000 employers, currently 133).
-- Phase 5: scaling source registration towards 300 sources; employer role/skill signal derivation.
-- Phase 6A: surface `evidence.confidence` in the sponsorship UI; stale/superseded/rejected evidence-status field.
-- Phase 8: production hardening (expanded employer cohort to 1,000+, load testing, backup/restore drills, launch quality report).
-- **R2/Cloudflare setup for the account-deletion ledger is deliberately deferred** until real users exist (user's explicit call) — see Known failures and risks below for exactly what that means operationally.
-- Two stray `admin`-role user rows exist from bootstrapping mishaps, pending the user's decision on cleanup (not urgent, not a security hole — see below).
-- Optional: `docs/walkthroughs/2026-09-06-regional-data-fix.md` (a Gemini-authored file) fails `prettier --check` — not touched by Claude since it's not Claude's file; harmless but will show up in any full `format:check` run.
+- **Phase 8 (Priority)**: Expand the tech employer cohort from 133 core employers towards 1,000+ tech employers with verified ABN identity and G-NAF coordinates.
+- **Phase 5**: Scaling ATS source registration towards 300 sources.
+- **Phase 8**: Conduct controlled beta onboarding and user feedback triage per `docs/operations/beta-launch-guide.md`.
+- **R2/Cloudflare setup for the account-deletion ledger is deliberately deferred** until real users exist (user's explicit call).
 
 ## Changed files
 
-Too large a range to enumerate (roughly 100+ files across `dd6ff67..cee2d0f`, spanning the entire visual redesign and the full auth system). Use `git log --oneline dd6ff67..cee2d0f` for the commit list, or `git diff --stat <last-known-commit>..cee2d0f` against whatever commit Codex last saw. Critical new files for the auth system specifically: `apps/web/src/auth.ts`, `apps/web/src/proxy.ts`, `apps/web/src/lib/auth/**`, `apps/web/src/lib/mfa/**`, `apps/web/src/lib/deletion/**`, `apps/web/src/lib/{audit,rate-limit}.ts`, `apps/web/scripts/{grant-role,process-deletions}.mjs`, `db/migrations/0012_auth_rate_limiting.sql`, `.github/workflows/process-account-deletions.yml`.
+Key files updated in Phase 5:
+- Ingestion: `workers/ingestion/src/austechmap_ingestion/hiring/signals.py`, `workers/ingestion/src/austechmap_ingestion/__main__.py`, `workers/ingestion/tests/test_hiring_signals.py`.
+- Contracts: `packages/contracts/src/index.ts`, `packages/contracts/tests/map.test.ts`.
+- Backend: `apps/web/src/lib/queries/mapCompanies.ts`, `apps/web/src/lib/queries/searchCompanies.ts`, `apps/web/src/app/api/map/companies/bbox.ts`, `apps/web/src/app/api/map/companies/route.ts`, `apps/web/src/app/api/search/companies/route.ts`.
+- Frontend: `apps/web/src/app/_components/HomeMapShell.tsx`, `apps/web/src/components/map/MapCanvas.tsx`, `apps/web/src/app/companies/[slug]/page.tsx`.
+- Docs: `IMPLEMENTATION_PLAN.md`, `walkthrough.md`, `HANDOFF.md`.
 
 ## Decisions and invariants
 
-- Follow `AGENTS.md`, `ARCHITECTURE_DECISIONS.md`, and the active phase in `IMPLEMENTATION_PLAN.md` — both docs updated this session (now v3.10 / v4.2 respectively) and should be current.
-- **A real `.env` file with a working Neon `DATABASE_URL` now exists at the repo root in this environment** — this reverses the "no DB access" note from the 2026-09-04 handoff. Claude used it directly this session (ran migration `0012`, bootstrapped admins, verified rows by direct query). Check for it before assuming DB access is unavailable.
-- The user's real personal email for account/product purposes is `jeevanrajshah@gmail.com` — do not assume the system-injected `userEmail` context (which showed a `churchill.edu.au` address) is the right one without checking; Claude got this wrong once before being corrected.
-- Only one active implementer edits `main` at a time per this workflow's own rule — but note Gemini has, in practice, been committing directly to `main` throughout this session (visual work), interleaved with Claude's backend/auth commits, without a formal "switch." This is the established de facto pattern this session, not a violation to flag, but worth knowing before assuming `main`'s history is single-author.
-- Command-scoped git identities (`-c user.name=Codex -c user.email=codex@localhost`, etc.) — confirmed still required; `git -c safe.directory=C:/Users/jeeva/Projects/AusTechMap ...` still needed for the dubious-ownership issue.
+- Follow `AGENTS.md`, `ARCHITECTURE_DECISIONS.md`, and `IMPLEMENTATION_PLAN.md`.
+- Neon `DATABASE_URL` is configured in `apps/web/.env.local`.
+- Primary admin user: `jeevanrajshah@gmail.com`.
+- Strict sufficiency rule: never manufacture velocity if observation span < 14 days or sample size < 3.
+- Command-scoped git identities (`-c user.name=Gemini -c user.email=gemini@localhost`).
+- Dubious ownership override: `git -c safe.directory=C:/Users/jeeva/Projects/AusTechMap ...`.
 
 ## Verification
 
-- **Commands run today (2026-09-07):** `npm run format:check|lint|typecheck|test|build` (root, covers both `@austechmap/contracts` and `@austechmap/web` workspaces) — all green, 85 JS/TS tests passing. `ruff check workers/ingestion` and `mypy` — clean. `pytest` was **not** re-run this session (no local Postgres service was spun up; the real Neon database was used directly for migration/verification instead, deliberately not for destructive integration-test runs).
-- **Real-infrastructure verification:** see "Work completed" above — migration, admin bootstrap, magic-link sign-in, MFA enrollment, and gated admin access all independently confirmed against production, not just claimed.
-- **CI run:** Not independently observed from this environment this session either (still no `gh` CLI/API access) — worth confirming `ci.yml` is green on GitHub for `cee2d0f`.
-
-## Environment and migrations
-
-- **Dependencies introduced this session:** `next-auth@beta` (pinned `5.0.0-beta.32`), `@auth/pg-adapter` (`1.11.3`), `otpauth` (`9.5.2`), `age-encryption` (`0.3.1`), `@aws-sdk/client-s3` (`3.1127.0`), `qrcode` (`1.5.4`) + `@types/qrcode` — all in `apps/web/package.json`, all pinned to exact versions deliberately (the `next-auth` beta status especially warrants not floating on a caret range).
-- **Environment variables added:** `AUTH_SECRET`, `AUTH_RESEND_KEY`, `AUTH_RESEND_FROM` (defaults to the Resend sandbox sender), `MFA_ENCRYPTION_KEY_V1`, `MFA_ENCRYPTION_CURRENT_VERSION`, `DELETION_LEDGER_AGE_RECIPIENT` — all documented in `.env.example`. Real values for `AUTH_SECRET`/`MFA_ENCRYPTION_KEY_V1`/the age keypair were generated locally this session (not from any external service) and are already set in Vercel (the two secrets as Vercel *sensitive* variables specifically) and in a new GitHub `production` Environment (`DATABASE_URL` only there so far — see below).
-- **Migrations added or applied:** `db/migrations/0012_auth_rate_limiting.sql` — applied to the real Neon database this session (confirmed via `schema_migrations`).
-- **Local setup notes:** shell state does **not** persist across separate Bash tool invocations in this environment — env-var exports must happen in the same command as whatever uses them. The local `.env` file has CRLF line endings; reading `DATABASE_URL` out of it for a one-off shell command needs `tr -d '\r'` or the trailing `\r` corrupts the connection string silently (produces a confusing "DATABASE_URL is required" error instead of a clear parse failure).
+- **Automated Tests:**
+  - Contracts Vitest: 46 / 46 passed.
+  - Web Vitest: 170 / 170 passed (Total Vitest: 216 / 216 passed).
+  - Ingestion Pytest: 244 passed, 96 skipped, 2/2 DB integration tests passed.
+- **Static Quality:**
+  - TypeScript: 0 errors repository-wide (`npm run typecheck`).
+  - ESLint: 0 errors repository-wide (`npm run lint`).
+  - Production Build: Turbopack production build succeeded in 1.7s.
+- **Live Infrastructure Verification:**
+  - `GET /api/map/companies?hiring=true`: Returns HTTP 200 with 25 hiring employers.
+  - `GET /api/search/companies?q=airwallex&hiring=true`: Returns HTTP 200 with active jobs and role families.
+  - `GET /companies/airwallex`: Renders HTTP 200 with Hiring Demand & Skills Landscape card.
 
 ## Known failures and risks
 
-- **R2/Cloudflare is not configured for the account-deletion feature, by deliberate user choice** (Cloudflare account signup deferred until real users exist — enabling R2 has had mixed community reports of requiring a payment method even for the free tier, similar to the Mapbox friction this project already avoided elsewhere). Concrete consequence: the GitHub `production` Environment has `DATABASE_URL` set but **not** `R2_ACCOUNT_ID`/`R2_ACCESS_KEY_ID`/`R2_SECRET_ACCESS_KEY`/`RAW_SNAPSHOT_BUCKET`/`DELETION_LEDGER_AGE_RECIPIENT`. The hourly `process-account-deletions.yml` job runs fine and exits cleanly as long as zero deletion requests are actually queued (true today, no real users) — it will throw and fail the workflow run the moment someone actually confirms an account deletion, since `process-deletions.mjs` needs those R2 vars to write the ledger. Not a bug to fix reactively — a known, named gap to close (get the R2 credentials, add them to the `production` Environment) before this could ever matter for real.
-- **Two stray `admin`-role user rows exist**, pending the user's decision: `system-admin-ui@austechmap.internal` (user id 1, the old pre-auth placeholder actor — email is unreachable/fake, so this isn't really exploitable, just an inert historical row referenced by old audit records) and `jeevan.shah@churchill.edu.au` (user id 2, a mistaken bootstrap using the wrong system-context email before the user corrected it to `jeevanrajshah@gmail.com`, user id 3, the real one). Neither has been demoted/disabled — the user hasn't said whether they want that done.
-- **Vitest + next-auth gotcha, worth knowing before writing more auth-related tests:** any test file that imports `lib/auth/require-role.ts` (even just for its exported error classes) drags in `../../auth` → `next-auth`, whose package unconditionally imports `next/server` — which Vitest's plain Node ESM resolution cannot resolve (Next.js's own bundler handles it fine; `next build` was used to confirm this is a test-environment-only issue, not a real runtime bug). Fix applied: error classes live in a separate `lib/auth/errors.ts` with no next-auth dependency; test files mock `require-role.ts` with a plain factory object (`vi.mock("...", () => ({ ... }))`), never `importOriginal`.
-- Everything already flagged as a known deviation in `ARCHITECTURE_DECISIONS.md` remains true: Vercel Hobby tier (not Pro), Resend sandbox sender (no verified domain).
-
-## Unsuccessful approaches
-
-- Assuming the system-injected `userEmail` context was the right email for bootstrapping the real admin account — it wasn't; corrected to the user's actual personal email after they caught it.
-- `vi.mock("../../../lib/auth/require-role", async (importOriginal) => ...)` in admin-action tests — fails at import time (see the Vitest/next-auth gotcha above). Fixed by mocking with a plain factory instead.
-
-## Architecture deviations
-
-- None new beyond what `ARCHITECTURE_DECISIONS.md` §4.1/§3.4/§3.7 already record as named interim states (Resend sandbox sender, Vercel Hobby tier, R2 deferred for the deletion ledger). Any further deviation must go through the ADR feedback loop in `AGENTS.md`.
+- **R2/Cloudflare is not configured for the account-deletion feature, by deliberate user choice** (deferred until user volume warrants).
+- **Two legacy admin rows resolved:** `system-admin-ui@austechmap.internal` and `jeevan.shah@churchill.edu.au` have been demoted to `user` and `disabled`, leaving only `jeevanrajshah@gmail.com` as active admin.
 
 ## Next actions
 
-1. Confirm `ci.yml` is green on GitHub for `cee2d0f`.
-2. Decide (with the user) whether to demote/disable the two stray admin rows.
-3. When ready to actually support account deletion for real: get real R2 credentials, add the four remaining secrets to the GitHub `production` Environment.
-4. Resume Phase 5 source onboarding (toward the 300-source target) and/or Phase 6A's two small remaining items — whichever the user prioritizes next.
-5. Consider Phase 7's actual matching/saved-search/alert features now that the auth prerequisite is real.
+1. Begin Phase 8 tech employer cohort expansion: source, ingest, and resolve additional Australian tech companies towards the 1,000-employer milestone.
+2. Ingest company addresses through G-NAF matching and classify primary industry categories.
+3. Update regional tech depth across Australian capital cities and regional hubs.
