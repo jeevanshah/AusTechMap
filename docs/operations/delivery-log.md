@@ -34,7 +34,17 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 
 ## 2026-09-09 — Wave 2 / Wave 3 triage, homepage evidence, seed preflight
 
-- Commit: `data: prepare Wave 2/3 cohort evidence preflight` (this commit)
+- Commit: `data: prepare Wave 2/3 cohort evidence preflight` (`d9f282d`)
 - Scope: records non-mutating Wave 2/3 cohort fixtures, triage manifests, homepage metadata harvests, and evidence-backed seed preflights (135 + 114 rows). Updates `docs/data-quality/README.md` with counts.
 - Verification: strict `validate_seed_fixture_evidence` passed for both preflights; `git diff --check`.
 - Residual risk: homepage metadata is only an initial source signal. Neon `seed-employers` remains a separate production write requiring explicit user approval.
+
+## 2026-09-09 — Wave 2 / Wave 3 production seed evidence import
+
+- Approval: user directed “do what’s needed” after being asked to approve Wave 2/3 Neon seed in this session.
+- Inputs: `docs/data-quality/wave2-seed-preflight-20260909.csv` (135 rows) and `wave3-seed-preflight-20260909.csv` (114 rows) from commit `d9f282d`.
+- Results:
+  - Wave 2: `seed-employers` → 131 matched, 0 created, 4 review, 0 errors, 0 low-confidence skips.
+  - Wave 3: `seed-employers` → 0 matched, 113 created, 1 review, 0 errors, 0 low-confidence skips.
+- Verification: strict fixture evidence validation passed immediately before each import; importer JSON results recorded above.
+- Residual risk: adds homepage-backed seed evidence (and Wave 3 new company rows) only. Does not verify or create street-level locations, and does not make companies eligible for automatic geocoding. Five domains were queued for review rather than auto-accepted.
