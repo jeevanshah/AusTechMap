@@ -16,8 +16,11 @@ from austechmap_ingestion.employers.address_validation import (
 from austechmap_ingestion.employers.category_apply import apply_company_categories
 from austechmap_ingestion.employers.category_seed import seed_categories
 from austechmap_ingestion.employers.cohort_triage import (
+    harvest_homepage_evidence,
     load_cohort_fixture,
+    load_triage_manifest,
     triage_cohort,
+    write_evidence_harvest,
     write_triage_manifest,
 )
 from austechmap_ingestion.employers.geocoding import (
@@ -164,6 +167,14 @@ def build_parser() -> argparse.ArgumentParser:
     triage_parser.add_argument("--output", type=Path, required=True)
     triage_parser.add_argument("--timeout-seconds", type=float, default=12.0)
     triage_parser.add_argument("--workers", type=int, default=20)
+    harvest_parser = subparsers.add_parser(
+        "harvest-cohort-homepage-evidence",
+        help="bulk-capture homepage metadata from a cohort triage manifest without seeding data",
+    )
+    harvest_parser.add_argument("--triage-manifest", type=Path, required=True)
+    harvest_parser.add_argument("--output", type=Path, required=True)
+    harvest_parser.add_argument("--timeout-seconds", type=float, default=12.0)
+    harvest_parser.add_argument("--workers", type=int, default=12)
     taxonomy_parser = subparsers.add_parser(
         "seed-taxonomy", help="seed the v1 role-family and skills taxonomies"
     )
@@ -509,6 +520,36 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "reachable": reachable,
                     "total": len(rows),
                     "unreachable": len(rows) - reachable,
+                },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "harvest-cohort-homepage-evidence":
+        try:
+            evidence_rows = harvest_homepage_evidence(
+                load_triage_manifest(args.triage_manifest),
+                timeout_seconds=args.timeout_seconds,
+                workers=args.workers,
+            )
+            write_evidence_harvest(args.output, evidence_rows)
+        except (OSError, ValueError) as error:
+            print(f"Cohort evidence harvest failed: {error}")
+            return 1
+        metadata_captured = sum(
+            row.status == "metadata_captured_needs_human_assessment" for row in evidence_rows
+        )
+        print(
+            json.dumps(
+                {
+                    "manifest": str(args.output),
+                    "metadataCaptured": metadata_captured,
+                    "total": len(evidence_rows),
+                    "unreachable": sum(
+                        row.status == "skipped_unreachable" for row in evidence_rows
+                    ),
                 },
                 separators=(",", ":"),
                 sort_keys=True,

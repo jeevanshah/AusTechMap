@@ -11,6 +11,7 @@ import csv
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
+from html.parser import HTMLParser
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -51,6 +52,64 @@ class TriageRow:
         if self.reachability.reachable:
             return "Record first-party company, technology, and street-address evidence."
         return "Check the claimed domain against an authoritative company source before seeding."
+
+
+@dataclass(frozen=True)
+class HomepageEvidence:
+    http_status: int | None
+    final_url: str | None
+    title: str | None
+    description: str | None
+    detail: str | None
+
+
+@dataclass(frozen=True)
+class EvidenceHarvestRow:
+    triage: TriageRow
+    evidence: HomepageEvidence | None
+
+    @property
+    def status(self) -> str:
+        if not self.triage.reachability.reachable:
+            return "skipped_unreachable"
+        if self.evidence is not None and (self.evidence.title or self.evidence.description):
+            return "metadata_captured_needs_human_assessment"
+        return "reachable_but_metadata_unavailable"
+
+
+class _MetadataParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self._in_title = False
+        self._title_parts: list[str] = []
+        self.description: str | None = None
+
+    @property
+    def title(self) -> str | None:
+        title = " ".join(self._title_parts).strip()
+        return title or None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag.lower() == "title":
+            self._in_title = True
+            return
+        if tag.lower() != "meta":
+            return
+        attributes = {key.lower(): (value or "") for key, value in attrs}
+        name = attributes.get("name", attributes.get("property", "")).lower()
+        if name not in {"description", "og:description", "twitter:description"}:
+            return
+        content = " ".join(attributes.get("content", "").split())
+        if content and self.description is None:
+            self.description = content[:500]
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag.lower() == "title":
+            self._in_title = False
+
+    def handle_data(self, data: str) -> None:
+        if self._in_title:
+            self._title_parts.append(data)
 
 
 def load_cohort_fixture(path: Path) -> tuple[CohortCandidate, ...]:
@@ -126,6 +185,99 @@ def triage_cohort(
     )
 
 
+def load_triage_manifest(path: Path) -> tuple[TriageRow, ...]:
+    with path.open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        if reader.fieldnames is None:
+            raise ValueError("missing triage manifest header")
+        required = {
+            "name",
+            "domain",
+            "city",
+            "reachability_status",
+            "http_status",
+            "final_url",
+            "diagnostic",
+        }
+        missing = sorted(required - set(reader.fieldnames))
+        if missing:
+            raise ValueError(f"missing triage manifest columns: {', '.join(missing)}")
+        rows = tuple(
+            TriageRow(
+                candidate=CohortCandidate(
+                    name=row["name"].strip(),
+                    domain=row["domain"].strip(),
+                    city=row["city"].strip(),
+                ),
+                reachability=ReachabilityResult(
+                    reachable=row["reachability_status"].strip()
+                    == "reachable_needs_primary_evidence",
+                    http_status=int(row["http_status"]) if row["http_status"].strip() else None,
+                    final_url=row["final_url"].strip() or None,
+                    detail=row["diagnostic"].strip() or None,
+                ),
+            )
+            for row in reader
+        )
+    if not rows:
+        raise ValueError("triage manifest contains no rows")
+    return rows
+
+
+def fetch_homepage_metadata(url: str, *, timeout_seconds: float) -> HomepageEvidence:
+    request = Request(url, headers={"User-Agent": _USER_AGENT})
+    try:
+        with urlopen(request, timeout=timeout_seconds) as response:  # noqa: S310 - reviewed manifest input
+            content_type = response.headers.get_content_type()
+            if content_type not in {"text/html", "application/xhtml+xml"}:
+                return HomepageEvidence(
+                    http_status=response.status,
+                    final_url=response.url,
+                    title=None,
+                    description=None,
+                    detail=f"unsupported content type: {content_type}",
+                )
+            charset = response.headers.get_content_charset() or "utf-8"
+            parser = _MetadataParser()
+            parser.feed(response.read(131_072).decode(charset, errors="replace"))
+            parser.close()
+            return HomepageEvidence(
+                http_status=response.status,
+                final_url=response.url,
+                title=parser.title,
+                description=parser.description,
+                detail=None,
+            )
+    except HTTPError as error:
+        return HomepageEvidence(error.code, error.url, None, None, f"HTTP {error.code}")
+    except (TimeoutError, URLError, OSError) as error:
+        return HomepageEvidence(None, None, None, None, type(error).__name__)
+
+
+def harvest_homepage_evidence(
+    triage_rows: tuple[TriageRow, ...],
+    *,
+    timeout_seconds: float = 12.0,
+    workers: int = 12,
+    fetch: Callable[[str], HomepageEvidence] | None = None,
+) -> tuple[EvidenceHarvestRow, ...]:
+    if workers < 1:
+        raise ValueError("workers must be at least 1")
+    get = fetch or (lambda url: fetch_homepage_metadata(url, timeout_seconds=timeout_seconds))
+    reachable_rows = tuple(
+        row for row in triage_rows if row.reachability.reachable and row.reachability.final_url
+    )
+    urls = tuple(row.reachability.final_url or "" for row in reachable_rows)
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        evidence = tuple(executor.map(get, urls))
+    evidence_by_domain = {
+        row.candidate.domain: result for row, result in zip(reachable_rows, evidence, strict=True)
+    }
+    return tuple(
+        EvidenceHarvestRow(row, evidence_by_domain.get(row.candidate.domain)) for row in triage_rows
+    )
+
+
 def write_triage_manifest(path: Path, rows: tuple[TriageRow, ...]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as handle:
@@ -155,5 +307,52 @@ def write_triage_manifest(path: Path, rows: tuple[TriageRow, ...]) -> None:
                     "final_url": row.reachability.final_url or "",
                     "diagnostic": row.reachability.detail or "",
                     "next_action": row.next_action,
+                }
+            )
+
+
+def write_evidence_harvest(path: Path, rows: tuple[EvidenceHarvestRow, ...]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=(
+                "name",
+                "domain",
+                "city",
+                "harvest_status",
+                "source_url",
+                "http_status",
+                "page_title",
+                "meta_description",
+                "diagnostic",
+                "next_action",
+            ),
+            lineterminator="\n",
+        )
+        writer.writeheader()
+        for row in rows:
+            evidence = row.evidence
+            source_url = evidence.final_url if evidence else ""
+            http_status = evidence.http_status if evidence else ""
+            page_title = evidence.title if evidence else ""
+            meta_description = evidence.description if evidence else ""
+            diagnostic = evidence.detail if evidence else ""
+            writer.writerow(
+                {
+                    "name": row.triage.candidate.name,
+                    "domain": row.triage.candidate.domain,
+                    "city": row.triage.candidate.city,
+                    "harvest_status": row.status,
+                    "source_url": source_url or "",
+                    "http_status": http_status or "",
+                    "page_title": page_title or "",
+                    "meta_description": meta_description or "",
+                    "diagnostic": diagnostic or "",
+                    "next_action": (
+                        "Assess this primary-source metadata before creating a seed fixture."
+                        if row.status == "metadata_captured_needs_human_assessment"
+                        else "Find an authoritative company source before creating a seed fixture."
+                    ),
                 }
             )
