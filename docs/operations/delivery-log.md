@@ -48,6 +48,14 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: no duplicate domains, no shared selected addresses, street numbers, public source URLs, and strict fixture validation all passed.
 - Residual risk: this is a production-impacting geocode candidate set. No Neon location write has occurred; an explicit approval is required before `seed-locations` runs.
 
+## 2026-09-09 — Wave 2/3 production location import
+
+- Approval: user explicitly approved the 51-row Wave 2/3 location-selection preflight for production Neon in this session.
+- Result: 48 accepted company locations applied. The command timed out after those writes, then an idempotent retry reused all 48 and reported the three unresolved rows.
+- Unresolved: `indebted.com` and `sonder.com.au` do not match existing company domains; `skilio.com.au` has no Nominatim match for its sourced address.
+- Verification: Neon read-back after the timeout confirmed 48 accepted company locations from the fixture; retry returned 48 reused, 0 new resolves, and the three exceptions above.
+- Residual risk: no retry should run until the three exceptions have corrected evidence/domain handling. No unsupported map point was created for them.
+
 ## 2026-09-09 — Wave 2 / Wave 3 triage, homepage evidence, seed preflight
 
 - Commit: `data: prepare Wave 2/3 cohort evidence preflight` (`d9f282d`)
