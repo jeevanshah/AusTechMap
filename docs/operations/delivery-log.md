@@ -205,6 +205,13 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: all six fixture domains were read back with an accepted location and exact active first-party source evidence. Live accepted-location coverage is now 514 companies.
 - Residual risk: the six imported companies' original ambiguous links are new superseded-link cleanup candidates. The other 304 records remain unresolved rather than inferred.
 
+## 2026-09-10 — deep-repair superseded-link production cleanup
+
+- Approval: user explicitly approved unlinking the six superseded ambiguous company-location records in production Neon in this session.
+- Result: six links were unlinked after a zero-job-reference check, with six append-only audit records written. No accepted locations, shared resolved locations, or evidence records were removed.
+- Verification: post-write read-back reports 304 ambiguous links, 514 companies with an accepted location, 84 total superseded-link cleanup audit records, and zero remaining superseded ambiguous links.
+- Residual risk: the remaining 304 links have no active first-party location evidence and remain a research queue.
+
 ## 2026-09-10 — ambiguous-location canonical-host recovery
 
 - Commit: `data: recover ambiguous-location address evidence` (this commit)
