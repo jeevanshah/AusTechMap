@@ -24,7 +24,7 @@ from typing import Literal, cast
 import psycopg
 
 from austechmap_ingestion.employers.normalisation import normalise_domain
-from austechmap_ingestion.hiring.company_sources import AtsProvider
+from austechmap_ingestion.hiring.company_sources import ATS_PROVIDERS, AtsProvider
 from austechmap_ingestion.hiring.static_careers import (
     InvalidCareersUrlError,
     validate_static_careers_url,
@@ -33,9 +33,7 @@ from austechmap_ingestion.jobs import JobRepository
 
 SOURCE_KEY = "ats-discovery"
 DEFAULT_FIXTURE_PATH = Path(__file__).parent / "fixtures" / "ats_source_seed_20260905.csv"
-_VALID_PROVIDERS = frozenset(
-    {"lever", "ashby", "greenhouse", "smartrecruiters", "workable", "breezy", "static_careers"}
-)
+_VALID_PROVIDERS = frozenset(ATS_PROVIDERS)
 
 
 class AtsSourceSeedError(Exception):

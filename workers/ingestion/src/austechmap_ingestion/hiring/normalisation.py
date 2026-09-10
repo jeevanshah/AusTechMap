@@ -138,6 +138,7 @@ _WORK_STYLE_MAPS: dict[AtsProvider, dict[str, str]] = {
     "workable": {"remote": "remote", "hybrid": "hybrid", "onsite": "onsite"},
     "breezy": {"remote": "remote", "onsite": "onsite"},
     "static_careers": {},
+    "pinpoint": {"remote": "remote", "hybrid": "hybrid", "onsite": "onsite"},
 }
 
 _TITLE_MATCH_CONFIDENCE = 0.7

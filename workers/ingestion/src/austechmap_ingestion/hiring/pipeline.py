@@ -28,6 +28,7 @@ from austechmap_ingestion.hiring.greenhouse import fetch_greenhouse_postings
 from austechmap_ingestion.hiring.lever import fetch_lever_postings
 from austechmap_ingestion.hiring.normalisation import SkillDef, normalise_job
 from austechmap_ingestion.hiring.persistence import mark_expired_jobs, persist_job_posting
+from austechmap_ingestion.hiring.pinpoint import fetch_pinpoint_payload, parse_pinpoint_postings
 from austechmap_ingestion.hiring.smartrecruiters import fetch_smartrecruiters_postings
 from austechmap_ingestion.hiring.static_careers import (
     StaticCareersDocument,
@@ -122,6 +123,8 @@ def run_ats_crawl(
             raw_bytes, postings = fetch_workable_postings(identifier, fetch_fn=fetch_fn)
         elif provider == "breezy":
             raw_bytes = fetch_breezy_payload(identifier, fetch_fn=fetch_fn)
+        elif provider == "pinpoint":
+            raw_bytes = fetch_pinpoint_payload(identifier, fetch_fn=fetch_fn)
         elif provider == "static_careers":
             static_document = fetch_static_careers_document(identifier, fetcher=fetch_fn)
             raw_bytes = static_document.content
@@ -138,6 +141,8 @@ def run_ats_crawl(
         )
         if provider == "breezy":
             postings = parse_breezy_postings(raw_bytes)
+        elif provider == "pinpoint":
+            postings = parse_pinpoint_postings(raw_bytes)
         elif provider == "static_careers":
             if static_document is None:
                 raise RuntimeError("static careers document was not fetched")

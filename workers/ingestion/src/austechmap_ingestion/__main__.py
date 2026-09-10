@@ -65,6 +65,7 @@ from austechmap_ingestion.employers.sponsorship_evidence import (
 from austechmap_ingestion.health import build_health
 from austechmap_ingestion.hiring.ats_source_seed import AtsSourceSeedError, seed_ats_sources
 from austechmap_ingestion.hiring.company_sources import (
+    ATS_PROVIDERS,
     AtsSourceOperationError,
     list_active_ats_sources,
     set_ats_source_status,
@@ -262,7 +263,7 @@ def build_parser() -> argparse.ArgumentParser:
     source_status_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
     source_status_parser.add_argument(
         "--ats-provider",
-        choices=["lever", "ashby", "greenhouse", "smartrecruiters", "workable"],
+        choices=ATS_PROVIDERS,
         required=True,
     )
     source_status_parser.add_argument("--ats-identifier", required=True)

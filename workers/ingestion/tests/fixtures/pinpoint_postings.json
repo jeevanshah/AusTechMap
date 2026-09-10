@@ -1,0 +1,23 @@
+{
+  "data": [
+    {
+      "id": "pinpoint-role-1",
+      "title": "Principal Platform Engineer",
+      "url": "https://careers.example.pinpointhq.com/en/postings/pinpoint-role-1",
+      "application_form_url": "https://careers.example.pinpointhq.com/apply/pinpoint-role-1",
+      "description": "<p>Build resilient systems.</p>",
+      "employment_type": "full_time",
+      "employment_type_text": "Full Time",
+      "workplace_type": "remote",
+      "location": {
+        "name": "Remote",
+        "city": "Sydney",
+        "province": "NSW",
+        "country": "Australia"
+      },
+      "job": {
+        "department": {"id": "engineering", "name": "Engineering"}
+      }
+    }
+  ]
+}

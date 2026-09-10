@@ -10,13 +10,14 @@ import psycopg
 
 from austechmap_ingestion.hiring.ashby import AshbyParseError, parse_ashby_postings
 from austechmap_ingestion.hiring.breezy import BreezyParseError, parse_breezy_postings
-from austechmap_ingestion.hiring.company_sources import AtsProvider
+from austechmap_ingestion.hiring.company_sources import ATS_PROVIDERS, AtsProvider
 from austechmap_ingestion.hiring.greenhouse import (
     GreenhouseParseError,
     parse_greenhouse_postings,
 )
 from austechmap_ingestion.hiring.lever import LeverParseError, parse_lever_postings
 from austechmap_ingestion.hiring.normalisation import SkillDef, normalise_job
+from austechmap_ingestion.hiring.pinpoint import PinpointParseError, parse_pinpoint_postings
 from austechmap_ingestion.hiring.smartrecruiters import (
     SmartRecruitersParseError,
     parse_smartrecruiters_postings,
@@ -34,9 +35,7 @@ from austechmap_ingestion.hiring.workable import (
 )
 from austechmap_ingestion.storage import SnapshotStore
 
-_PROVIDERS = frozenset(
-    {"lever", "ashby", "greenhouse", "smartrecruiters", "workable", "breezy", "static_careers"}
-)
+_PROVIDERS = frozenset(ATS_PROVIDERS)
 
 
 class AtsReplayError(RuntimeError):
@@ -98,7 +97,7 @@ def replay_ats_snapshot(
     identifier_value = payload.get("ats_identifier")
     if provider_value not in _PROVIDERS or not isinstance(identifier_value, str):
         raise AtsReplayError(f"run has invalid ATS replay metadata: {run_id}")
-    provider = cast(AtsProvider, provider_value)
+    provider = provider_value
     object_key = cast(str, row[2])
     snapshot_sha256 = cast(str, row[3])
     response_metadata = cast(dict[str, object], row[4])
@@ -149,6 +148,8 @@ def _parse(provider: AtsProvider, payload: bytes, *, identifier: str) -> list[Ra
             return parse_workable_postings(payload)
         if provider == "breezy":
             return parse_breezy_postings(payload)
+        if provider == "pinpoint":
+            return parse_pinpoint_postings(payload)
         if provider == "static_careers":
             return list(
                 parse_static_job_postings(
@@ -167,6 +168,7 @@ def _parse(provider: AtsProvider, payload: bytes, *, identifier: str) -> list[Ra
         BreezyParseError,
         GreenhouseParseError,
         LeverParseError,
+        PinpointParseError,
         SmartRecruitersParseError,
         StaticCareersParseError,
         WorkableParseError,

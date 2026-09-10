@@ -18,7 +18,19 @@ AtsProvider = Literal[
     "workable",
     "breezy",
     "static_careers",
+    "pinpoint",
 ]
+
+ATS_PROVIDERS: tuple[AtsProvider, ...] = (
+    "lever",
+    "ashby",
+    "greenhouse",
+    "smartrecruiters",
+    "workable",
+    "breezy",
+    "static_careers",
+    "pinpoint",
+)
 AtsSourceStatus = Literal["active", "paused", "quarantined", "disabled"]
 
 ACTIVE_BOARD_INTERVAL = timedelta(hours=24)
@@ -206,15 +218,7 @@ def set_ats_source_status(
     changed_at: datetime | None = None,
     request_id: str | None = None,
 ) -> AtsSourceOperationalState:
-    if ats_provider not in {
-        "lever",
-        "ashby",
-        "greenhouse",
-        "smartrecruiters",
-        "workable",
-        "breezy",
-        "static_careers",
-    }:
+    if ats_provider not in ATS_PROVIDERS:
         raise ValueError(f"invalid ATS provider: {ats_provider!r}")
     if status not in _VALID_STATUSES:
         raise ValueError(f"invalid ATS source status: {status!r}")

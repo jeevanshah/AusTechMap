@@ -149,6 +149,31 @@ def test_run_ats_crawl_persists_structured_static_careers_postings() -> None:
 
 
 @pytest.mark.integration
+def test_run_ats_crawl_persists_and_replays_pinpoint_postings() -> None:
+    database_url = _database_url()
+    suffix = uuid.uuid4().hex
+    company_ats_source = _setup_company_ats_source(database_url, suffix, "pinpoint", "workwithus")
+    repository = JobRepository(database_url)
+    store = FilesystemSnapshotStore(Path(tempfile.gettempdir()) / f"pipeline-pinpoint-{suffix}")
+
+    result = run_ats_crawl(
+        repository,
+        store,
+        database_url=database_url,
+        company_ats_source=company_ats_source,
+        skills=(),
+        fetch_fn=lambda *a, **kw: _fake_fetch("pinpoint_postings.json"),
+    )
+
+    assert result.created is True
+    assert result.fetched == 1
+    assert result.jobs_created == 1
+    replayed = replay_ats_snapshot(database_url, store, run_id=result.run_id, skills=())
+    assert replayed.ats_provider == "pinpoint"
+    assert [job.title for job in replayed.jobs] == ["Principal Platform Engineer"]
+
+
+@pytest.mark.integration
 def test_run_ats_crawl_persists_real_lever_postings() -> None:
     database_url = _database_url()
     suffix = uuid.uuid4().hex
