@@ -27,8 +27,11 @@ def test_seed_taxonomy_creates_all_role_families_and_skills() -> None:
 
     stats = seed_taxonomy(database_url)
 
-    assert stats.role_families_created == len(ROLE_FAMILIES)
-    assert stats.skills_created == len(SKILLS)
+    # The full integration suite uses one database and earlier tests may have
+    # already called seed_taxonomy(). Creation counts are therefore allowed to
+    # be zero, while the resulting canonical taxonomy remains the invariant.
+    assert 0 <= stats.role_families_created <= len(ROLE_FAMILIES)
+    assert 0 <= stats.skills_created <= len(SKILLS)
     with psycopg.connect(database_url) as connection:
         role_family_count = connection.execute("SELECT count(*) FROM role_families").fetchone()
         skill_keys = {

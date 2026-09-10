@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import os
 import uuid
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
+from typing import cast
 
 import psycopg
 import pytest
@@ -12,6 +13,7 @@ from austechmap_ingestion.db.migrations import apply_migrations
 from austechmap_ingestion.hiring.signals import (
     derive_employer_hiring_signals,
 )
+from austechmap_ingestion.hiring.taxonomy_seed import seed_taxonomy
 
 REPOSITORY_ROOT = Path(__file__).parents[3]
 MIGRATIONS_DIRECTORY = REPOSITORY_ROOT / "db" / "migrations"
@@ -25,11 +27,19 @@ def _database_url() -> str:
     return database_url
 
 
+def _database_today(database_url: str) -> date:
+    with psycopg.connect(database_url) as connection:
+        row = connection.execute("SELECT current_date").fetchone()
+    assert row is not None
+    return cast(date, row[0])
+
+
 @pytest.mark.integration
 def test_derive_employer_hiring_signals_insufficient_sample_size() -> None:
     database_url = _database_url()
     suffix = uuid.uuid4().hex
-    today = datetime.now(UTC).date()
+    today = _database_today(database_url)
+    seed_taxonomy(database_url)
 
     with psycopg.connect(database_url, autocommit=True) as conn:
         # Create company
@@ -41,7 +51,9 @@ def test_derive_employer_hiring_signals_insufficient_sample_size() -> None:
         company_id = company_row[0]
 
         # Get role family and data source
-        role_family_row = conn.execute("SELECT id FROM role_families LIMIT 1").fetchone()
+        role_family_row = conn.execute(
+            "SELECT id FROM role_families WHERE key = 'software-engineering'"
+        ).fetchone()
         source_row = conn.execute("SELECT id FROM data_sources LIMIT 1").fetchone()
         assert role_family_row is not None
         assert source_row is not None
@@ -99,9 +111,11 @@ def test_derive_employer_hiring_signals_insufficient_sample_size() -> None:
 def test_derive_employer_hiring_signals_sufficient_cadence() -> None:
     database_url = _database_url()
     suffix = uuid.uuid4().hex
-    today = datetime.now(UTC).date()
-    t_minus_20 = datetime.now(UTC) - timedelta(days=20)
-    t_minus_5 = datetime.now(UTC) - timedelta(days=5)
+    today = _database_today(database_url)
+    now = datetime.now(UTC)
+    t_minus_20 = now - timedelta(days=20)
+    t_minus_5 = now - timedelta(days=5)
+    seed_taxonomy(database_url)
 
     with psycopg.connect(database_url, autocommit=True) as conn:
         company_row = conn.execute(
@@ -111,7 +125,9 @@ def test_derive_employer_hiring_signals_sufficient_cadence() -> None:
         assert company_row is not None
         company_id = company_row[0]
 
-        role_family_row = conn.execute("SELECT id FROM role_families LIMIT 1").fetchone()
+        role_family_row = conn.execute(
+            "SELECT id FROM role_families WHERE key = 'software-engineering'"
+        ).fetchone()
         source_row = conn.execute("SELECT id FROM data_sources LIMIT 1").fetchone()
         assert role_family_row is not None
         assert source_row is not None
