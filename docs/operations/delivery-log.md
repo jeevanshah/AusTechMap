@@ -198,6 +198,13 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: bounded official-site fetches only; exact candidate/source manifest retained; `validate-address-fixture` passed for the six-row preflight.
 - Residual risk: no production write occurred. The six-row fixture needs explicit approval before geocoding/import; the remaining 304 locations have no safe automatic resolution.
 
+## 2026-09-10 — deep first-party repair production import
+
+- Approval: user explicitly approved geocoding and importing the six-row `deep-first-party-location-repair-preflight-20260910.csv` fixture to production Neon in this session.
+- Result: `seed-locations` completed with four newly resolved locations, two reused locations, zero errors, and zero unmatched domains.
+- Verification: all six fixture domains were read back with an accepted location and exact active first-party source evidence. Live accepted-location coverage is now 514 companies.
+- Residual risk: the six imported companies' original ambiguous links are new superseded-link cleanup candidates. The other 304 records remain unresolved rather than inferred.
+
 ## 2026-09-10 — ambiguous-location canonical-host recovery
 
 - Commit: `data: recover ambiguous-location address evidence` (this commit)
