@@ -10,8 +10,11 @@ from austechmap_ingestion.hiring.static_careers import (
     HostRateLimiter,
     RobotsDisallowedError,
     StaticCareersFetchError,
+    StaticCareersPage,
+    StaticCareersParseError,
     fetch_static_careers_page,
     parse_static_careers_page,
+    parse_static_job_postings,
 )
 
 _FIXTURES = Path(__file__).parent / "fixtures"
@@ -59,6 +62,42 @@ def test_parse_static_careers_page_ignores_invalid_json_ld() -> None:
     assert result.job_postings == ()
     assert result.role_links == ()
     assert result.requires_browser is False
+
+
+def test_parse_static_job_postings_uses_stable_job_urls_only() -> None:
+    content = (_FIXTURES / "static_careers_structured.html").read_bytes()
+    page = StaticCareersPage(
+        requested_url=_CAREERS_URL,
+        final_url=_CAREERS_URL,
+        content=content,
+        content_type="text/html",
+        parse_result=parse_static_careers_page(content, page_url=_CAREERS_URL),
+    )
+
+    postings = parse_static_job_postings(page)
+
+    assert len(postings) == 1
+    assert postings[0].title == "Senior Platform Engineer"
+    assert postings[0].source_url == "https://careers.example.test/jobs/platform-engineer"
+    assert postings[0].external_id == (
+        "e81a3f0a4f11447e42d18a7e30f3f9c537bdae2ed35f830634348b7ac5affe1f"
+    )
+    assert postings[0].posted_at is not None
+    assert postings[0].employment_type_raw == "FULL_TIME, PERMANENT"
+
+
+def test_parse_static_job_postings_rejects_link_only_page() -> None:
+    content = b'<a href="/jobs/123">Senior Engineer</a>'
+    page = StaticCareersPage(
+        requested_url=_CAREERS_URL,
+        final_url=_CAREERS_URL,
+        content=content,
+        content_type="text/html",
+        parse_result=parse_static_careers_page(content, page_url=_CAREERS_URL),
+    )
+
+    with pytest.raises(StaticCareersParseError, match="JSON-LD JobPosting"):
+        parse_static_job_postings(page)
 
 
 class _FakeFetcher:

@@ -25,12 +25,16 @@ import psycopg
 
 from austechmap_ingestion.employers.normalisation import normalise_domain
 from austechmap_ingestion.hiring.company_sources import AtsProvider
+from austechmap_ingestion.hiring.static_careers import (
+    InvalidCareersUrlError,
+    validate_static_careers_url,
+)
 from austechmap_ingestion.jobs import JobRepository
 
 SOURCE_KEY = "ats-discovery"
 DEFAULT_FIXTURE_PATH = Path(__file__).parent / "fixtures" / "ats_source_seed_20260905.csv"
 _VALID_PROVIDERS = frozenset(
-    {"lever", "ashby", "greenhouse", "smartrecruiters", "workable", "breezy"}
+    {"lever", "ashby", "greenhouse", "smartrecruiters", "workable", "breezy", "static_careers"}
 )
 
 
@@ -55,11 +59,19 @@ def load_ats_source_seed_fixture(path: Path = DEFAULT_FIXTURE_PATH) -> tuple[Ats
             provider = row["ats_provider"].strip()
             if provider not in _VALID_PROVIDERS:
                 raise AtsSourceSeedError(f"unrecognised ats_provider: {provider!r}")
+            identifier = row["ats_identifier"].strip()
+            if provider == "static_careers":
+                try:
+                    identifier = validate_static_careers_url(identifier)
+                except InvalidCareersUrlError as error:
+                    raise AtsSourceSeedError(
+                        f"invalid static careers URL: {identifier!r}"
+                    ) from error
             seeds.append(
                 AtsSourceSeed(
                     company_domain=row["company_domain"].strip(),
                     ats_provider=cast(AtsProvider, provider),
-                    ats_identifier=row["ats_identifier"].strip(),
+                    ats_identifier=identifier,
                 )
             )
     if not seeds:

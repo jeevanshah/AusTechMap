@@ -10,16 +10,19 @@ fallback; they are never guessed from script payloads.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import time
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
+from datetime import UTC, date, datetime
 from urllib.parse import urljoin, urlsplit, urlunsplit
 from urllib.robotparser import RobotFileParser
 
 from selectolax.lexbor import LexborHTMLParser
 
 from austechmap_ingestion.fetch_safety import SafeFetchResult, safe_fetch
+from austechmap_ingestion.hiring.types import RawJobPosting
 
 STATIC_CAREERS_USER_AGENT = "AusTechMapBot/1.0 (+https://github.com/jeevanshah/AusTechMap)"
 _HTML_CONTENT_TYPES = frozenset({"text/html", "application/xhtml+xml"})
@@ -44,6 +47,10 @@ class StaticCareersFetchError(StaticCareersError):
     """A careers or robots response cannot be used as a static HTML page."""
 
 
+class StaticCareersParseError(StaticCareersError):
+    """The static page has no sufficiently stable structured job records."""
+
+
 @dataclass(frozen=True)
 class JsonLdJobPosting:
     title: str
@@ -51,6 +58,7 @@ class JsonLdJobPosting:
     date_posted: str | None
     employment_types: tuple[str, ...]
     locations: tuple[str, ...]
+    description_html: str | None
 
 
 @dataclass(frozen=True)
@@ -67,9 +75,15 @@ class StaticCareersParseResult:
 
 
 @dataclass(frozen=True)
-class StaticCareersPage:
+class StaticCareersDocument:
     requested_url: str
     final_url: str
+    content: bytes
+    content_type: str
+
+
+@dataclass(frozen=True)
+class StaticCareersPage(StaticCareersDocument):
     parse_result: StaticCareersParseResult
 
 
@@ -127,6 +141,12 @@ def _hostname_for_url(url: str) -> str:
     if parts.username is not None or parts.password is not None:
         raise InvalidCareersUrlError("careers URL must not contain credentials")
     return parts.hostname.lower()
+
+
+def validate_static_careers_url(careers_url: str) -> str:
+    """Validate the registered URL without performing a network request."""
+    _hostname_for_url(careers_url)
+    return careers_url
 
 
 def _robots_url(careers_url: str) -> str:
@@ -228,6 +248,7 @@ def _extract_json_ld(tree: LexborHTMLParser) -> tuple[JsonLdJobPosting, ...]:
                 date_posted=_normalise_text(item.get("datePosted")),
                 employment_types=_normalise_strings(item.get("employmentType")),
                 locations=_location_names(item.get("jobLocation")),
+                description_html=_normalise_text(item.get("description")),
             )
             if posting not in seen:
                 seen.add(posting)
@@ -287,12 +308,12 @@ def parse_static_careers_page(html: bytes | str, *, page_url: str) -> StaticCare
     )
 
 
-def fetch_static_careers_page(
+def fetch_static_careers_document(
     careers_url: str,
     *,
     fetcher: SafeFetcher = safe_fetch,
     rate_limiter: HostRateLimiter | None = None,
-) -> StaticCareersPage:
+) -> StaticCareersDocument:
     """Fetch one registered careers page, respecting robots before parsing it."""
     hostname = _hostname_for_url(careers_url)
     allowed_hosts = frozenset({hostname})
@@ -321,8 +342,106 @@ def fetch_static_careers_page(
     content_type = page.content_type.split(";", 1)[0].lower().strip()
     if content_type not in _HTML_CONTENT_TYPES:
         raise StaticCareersFetchError(f"careers page was not HTML: {page.content_type!r}")
-    return StaticCareersPage(
+    return StaticCareersDocument(
         requested_url=careers_url,
         final_url=page.final_url,
-        parse_result=parse_static_careers_page(page.content, page_url=page.final_url),
+        content=page.content,
+        content_type=content_type,
     )
+
+
+def fetch_static_careers_page(
+    careers_url: str,
+    *,
+    fetcher: SafeFetcher = safe_fetch,
+    rate_limiter: HostRateLimiter | None = None,
+) -> StaticCareersPage:
+    """Fetch then parse one careers page for non-persistent discovery use."""
+    document = fetch_static_careers_document(
+        careers_url,
+        fetcher=fetcher,
+        rate_limiter=rate_limiter,
+    )
+    return StaticCareersPage(
+        requested_url=document.requested_url,
+        final_url=document.final_url,
+        content=document.content,
+        content_type=document.content_type,
+        parse_result=parse_static_careers_page(document.content, page_url=document.final_url),
+    )
+
+
+def _posting_url(page: StaticCareersPage, value: str | None) -> str | None:
+    if value is None:
+        return None
+    absolute = urljoin(page.final_url, value)
+    parts = urlsplit(absolute)
+    if (
+        parts.scheme not in {"http", "https"}
+        or not parts.hostname
+        or parts.username is not None
+        or parts.password is not None
+    ):
+        return None
+    return urlunsplit((parts.scheme, parts.netloc, parts.path, parts.query, ""))
+
+
+def _posted_at(value: str | None) -> datetime | None:
+    if value is None:
+        return None
+    try:
+        if "T" in value:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+            return parsed if parsed.tzinfo is not None else parsed.replace(tzinfo=UTC)
+        return datetime.combine(date.fromisoformat(value), datetime.min.time(), tzinfo=UTC)
+    except ValueError:
+        return None
+
+
+def parse_static_job_postings(page: StaticCareersPage) -> tuple[RawJobPosting, ...]:
+    """Convert only stable JSON-LD job records into persistable postings.
+
+    Candidate HTML links are deliberately discovery evidence, not jobs: their
+    title/link pairs lack a stable external identifier and can otherwise turn a
+    generic "Apply" control into a false job. A source with no usable JSON-LD
+    records must be reviewed or handled by the future browser/page-detail path.
+    """
+    postings: list[RawJobPosting] = []
+    seen_ids: set[str] = set()
+    for record in page.parse_result.job_postings:
+        source_url = _posting_url(page, record.url)
+        if source_url is None:
+            continue
+        external_id = hashlib.sha256(source_url.encode("utf-8")).hexdigest()
+        if external_id in seen_ids:
+            continue
+        seen_ids.add(external_id)
+        postings.append(
+            RawJobPosting(
+                external_id=external_id,
+                title=record.title,
+                department=None,
+                team=None,
+                location_text="; ".join(record.locations) or None,
+                employment_type_raw=", ".join(record.employment_types) or None,
+                remote_type_raw=None,
+                country=None,
+                posted_at=_posted_at(record.date_posted),
+                source_url=source_url,
+                apply_url=source_url,
+                description_html=record.description_html,
+                description_text=None,
+                raw={
+                    "datePosted": record.date_posted,
+                    "employmentType": list(record.employment_types),
+                    "jobLocation": list(record.locations),
+                    "sourceUrl": source_url,
+                    "title": record.title,
+                },
+            )
+        )
+    if not postings:
+        raise StaticCareersParseError(
+            "static careers page has no JSON-LD JobPosting record with a usable URL"
+        )
+    return tuple(postings)

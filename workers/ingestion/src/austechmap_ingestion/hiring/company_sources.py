@@ -10,7 +10,15 @@ from typing import Literal, cast
 import psycopg
 from psycopg.types.json import Jsonb
 
-AtsProvider = Literal["lever", "ashby", "greenhouse", "smartrecruiters", "workable", "breezy"]
+AtsProvider = Literal[
+    "lever",
+    "ashby",
+    "greenhouse",
+    "smartrecruiters",
+    "workable",
+    "breezy",
+    "static_careers",
+]
 AtsSourceStatus = Literal["active", "paused", "quarantined", "disabled"]
 
 ACTIVE_BOARD_INTERVAL = timedelta(hours=24)
@@ -205,6 +213,7 @@ def set_ats_source_status(
         "smartrecruiters",
         "workable",
         "breezy",
+        "static_careers",
     }:
         raise ValueError(f"invalid ATS provider: {ats_provider!r}")
     if status not in _VALID_STATUSES:
@@ -223,9 +232,7 @@ def set_ats_source_status(
             (ats_provider, ats_identifier),
         ).fetchone()
         if before is None:
-            raise AtsSourceOperationError(
-                f"ATS source not found: {ats_provider}/{ats_identifier}"
-            )
+            raise AtsSourceOperationError(f"ATS source not found: {ats_provider}/{ats_identifier}")
         source_id = cast(uuid.UUID, before[0])
         previous_status = cast(str, before[1])
         row = connection.execute(

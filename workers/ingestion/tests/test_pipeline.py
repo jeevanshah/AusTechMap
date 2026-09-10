@@ -34,7 +34,11 @@ def _database_url() -> str:
 def _setup_company_ats_source(
     database_url: str, suffix: str, ats_provider: str, ats_identifier: str
 ) -> CompanyAtsSource:
-    unique_identifier = f"{ats_identifier}-{suffix}"
+    unique_identifier = (
+        f"{ats_identifier.rstrip('/')}/{suffix}"
+        if ats_provider == "static_careers"
+        else f"{ats_identifier}-{suffix}"
+    )
     repository = JobRepository(database_url)
     source_id = repository.ensure_source(
         source_key=f"pipeline-test-discovery-{suffix}",
@@ -70,9 +74,78 @@ def _setup_company_ats_source(
 def _fake_fetch(fixture_name: str) -> SafeFetchResult:
     content = (FIXTURES_DIRECTORY / fixture_name).read_bytes()
     return SafeFetchResult(
-        final_url="https://example.test/fixture", status_code=200, content=content,
+        final_url="https://example.test/fixture",
+        status_code=200,
+        content=content,
         content_type="application/json",
     )
+
+
+def _fake_static_careers_fetch(url: str, **_: object) -> SafeFetchResult:
+    if url.endswith("/robots.txt"):
+        return SafeFetchResult(
+            final_url=url,
+            status_code=404,
+            content=b"not found",
+            content_type="text/plain",
+        )
+    content = (FIXTURES_DIRECTORY / "static_careers_structured.html").read_bytes()
+    return SafeFetchResult(
+        final_url=url,
+        status_code=200,
+        content=content,
+        content_type="text/html; charset=utf-8",
+    )
+
+
+@pytest.mark.integration
+def test_run_ats_crawl_persists_structured_static_careers_postings() -> None:
+    database_url = _database_url()
+    suffix = uuid.uuid4().hex
+    company_ats_source = _setup_company_ats_source(
+        database_url,
+        suffix,
+        "static_careers",
+        "https://careers.example.test/jobs",
+    )
+    repository = JobRepository(database_url)
+    store = FilesystemSnapshotStore(Path(tempfile.gettempdir()) / f"pipeline-static-{suffix}")
+
+    result = run_ats_crawl(
+        repository,
+        store,
+        database_url=database_url,
+        company_ats_source=company_ats_source,
+        skills=(),
+        fetch_fn=_fake_static_careers_fetch,
+    )
+
+    assert result.created is True
+    assert result.fetched == 1
+    assert result.jobs_created == 1
+    replayed = replay_ats_snapshot(
+        database_url,
+        store,
+        run_id=result.run_id,
+        skills=(),
+    )
+    with psycopg.connect(database_url) as connection:
+        job_row = connection.execute(
+            "SELECT source_system, title FROM jobs WHERE company_id = %s",
+            (company_ats_source.company_id,),
+        ).fetchone()
+        snapshot_content_type = connection.execute(
+            """
+            SELECT rs.content_type
+            FROM raw_snapshots rs
+            JOIN import_runs ir ON ir.id = rs.import_run_id
+            WHERE ir.id = %s
+            """,
+            (result.run_id,),
+        ).fetchone()
+    assert job_row == ("static_careers", "Senior Platform Engineer")
+    assert snapshot_content_type == ("text/html",)
+    assert [job.title for job in replayed.jobs] == ["Senior Platform Engineer"]
 
 
 @pytest.mark.integration
@@ -223,12 +296,20 @@ def test_run_ats_crawl_is_idempotent_at_the_run_level_on_the_same_day() -> None:
     fetch_fn = lambda *a, **kw: _fake_fetch("lever_immutable_postings.json")  # noqa: E731
 
     first = run_ats_crawl(
-        repository, store, database_url=database_url, company_ats_source=company_ats_source,
-        skills=(), fetch_fn=fetch_fn,
+        repository,
+        store,
+        database_url=database_url,
+        company_ats_source=company_ats_source,
+        skills=(),
+        fetch_fn=fetch_fn,
     )
     second = run_ats_crawl(
-        repository, store, database_url=database_url, company_ats_source=company_ats_source,
-        skills=(), fetch_fn=fetch_fn,
+        repository,
+        store,
+        database_url=database_url,
+        company_ats_source=company_ats_source,
+        skills=(),
+        fetch_fn=fetch_fn,
     )
 
     assert first.created is True
@@ -256,15 +337,24 @@ def test_run_ats_crawl_retries_a_same_day_retryable_failure() -> None:
 
     with pytest.raises(RuntimeError, match="simulated transient failure"):
         run_ats_crawl(
-            repository, store, database_url=database_url, company_ats_source=company_ats_source,
-            skills=(), fetch_fn=_failing_fetch, now=crawl_day,
+            repository,
+            store,
+            database_url=database_url,
+            company_ats_source=company_ats_source,
+            skills=(),
+            fetch_fn=_failing_fetch,
+            now=crawl_day,
         )
 
     # Retry a couple of minutes later the same day -- past the first
     # retry's 1-minute backoff window.
     result = run_ats_crawl(
-        repository, store, database_url=database_url, company_ats_source=company_ats_source,
-        skills=(), fetch_fn=lambda *a, **kw: _fake_fetch("lever_immutable_postings.json"),
+        repository,
+        store,
+        database_url=database_url,
+        company_ats_source=company_ats_source,
+        skills=(),
+        fetch_fn=lambda *a, **kw: _fake_fetch("lever_immutable_postings.json"),
         now=crawl_day + timedelta(minutes=2),
     )
 

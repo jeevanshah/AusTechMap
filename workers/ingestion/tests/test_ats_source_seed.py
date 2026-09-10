@@ -79,11 +79,39 @@ def test_load_ats_source_seed_fixture_rejects_an_unrecognised_provider(
 ) -> None:
     bad_fixture = tmp_path / "bad.csv"
     bad_fixture.write_text(
-        'company_domain,ats_provider,ats_identifier\nexample.com,workday,example\n',
+        "company_domain,ats_provider,ats_identifier\nexample.com,workday,example\n",
         encoding="utf-8",
     )
     with pytest.raises(AtsSourceSeedError, match="unrecognised ats_provider"):
         load_ats_source_seed_fixture(bad_fixture)
+
+
+def test_load_ats_source_seed_fixture_accepts_a_static_careers_url(tmp_path: Path) -> None:
+    fixture = tmp_path / "static-careers.csv"
+    fixture.write_text(
+        "company_domain,ats_provider,ats_identifier\n"
+        "example.com,static_careers,https://careers.example.com/jobs\n",
+        encoding="utf-8",
+    )
+
+    assert load_ats_source_seed_fixture(fixture) == (
+        AtsSourceSeed(
+            company_domain="example.com",
+            ats_provider="static_careers",
+            ats_identifier="https://careers.example.com/jobs",
+        ),
+    )
+
+
+def test_load_ats_source_seed_fixture_rejects_invalid_static_careers_url(tmp_path: Path) -> None:
+    fixture = tmp_path / "invalid-static-careers.csv"
+    fixture.write_text(
+        "company_domain,ats_provider,ats_identifier\nexample.com,static_careers,/careers\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(AtsSourceSeedError, match="invalid static careers URL"):
+        load_ats_source_seed_fixture(fixture)
 
 
 @pytest.mark.integration

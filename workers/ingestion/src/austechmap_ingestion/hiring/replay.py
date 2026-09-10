@@ -21,6 +21,12 @@ from austechmap_ingestion.hiring.smartrecruiters import (
     SmartRecruitersParseError,
     parse_smartrecruiters_postings,
 )
+from austechmap_ingestion.hiring.static_careers import (
+    StaticCareersPage,
+    StaticCareersParseError,
+    parse_static_careers_page,
+    parse_static_job_postings,
+)
 from austechmap_ingestion.hiring.types import RawJobPosting
 from austechmap_ingestion.hiring.workable import (
     WorkableParseError,
@@ -28,7 +34,9 @@ from austechmap_ingestion.hiring.workable import (
 )
 from austechmap_ingestion.storage import SnapshotStore
 
-_PROVIDERS = frozenset({"lever", "ashby", "greenhouse", "smartrecruiters", "workable", "breezy"})
+_PROVIDERS = frozenset(
+    {"lever", "ashby", "greenhouse", "smartrecruiters", "workable", "breezy", "static_careers"}
+)
 
 
 class AtsReplayError(RuntimeError):
@@ -71,7 +79,7 @@ def replay_ats_snapshot(
     with psycopg.connect(database_url) as connection:
         row = connection.execute(
             """
-            SELECT ir.run_type, ir.payload, rs.object_key, rs.sha256
+            SELECT ir.run_type, ir.payload, rs.object_key, rs.sha256, rs.response_metadata
             FROM import_runs ir
             JOIN raw_snapshots rs ON rs.import_run_id = ir.id
             WHERE ir.id = %s AND ir.status = 'succeeded'
@@ -93,8 +101,16 @@ def replay_ats_snapshot(
     provider = cast(AtsProvider, provider_value)
     object_key = cast(str, row[2])
     snapshot_sha256 = cast(str, row[3])
+    response_metadata = cast(dict[str, object], row[4])
+    final_url = response_metadata.get("final_url", identifier_value)
+    if not isinstance(final_url, str):
+        raise AtsReplayError(f"run has invalid static careers final URL metadata: {run_id}")
     raw_bytes = store.get(object_key=object_key, expected_sha256=snapshot_sha256)
-    postings = _parse(provider, raw_bytes)
+    postings = _parse(
+        provider,
+        raw_bytes,
+        identifier=final_url if provider == "static_careers" else identifier_value,
+    )
 
     replayed: list[ReplayedJob] = []
     for posting in postings:
@@ -119,7 +135,7 @@ def replay_ats_snapshot(
     )
 
 
-def _parse(provider: AtsProvider, payload: bytes) -> list[RawJobPosting]:
+def _parse(provider: AtsProvider, payload: bytes, *, identifier: str) -> list[RawJobPosting]:
     try:
         if provider == "lever":
             return parse_lever_postings(payload)
@@ -133,6 +149,18 @@ def _parse(provider: AtsProvider, payload: bytes) -> list[RawJobPosting]:
             return parse_workable_postings(payload)
         if provider == "breezy":
             return parse_breezy_postings(payload)
+        if provider == "static_careers":
+            return list(
+                parse_static_job_postings(
+                    StaticCareersPage(
+                        requested_url=identifier,
+                        final_url=identifier,
+                        content=payload,
+                        content_type="text/html",
+                        parse_result=parse_static_careers_page(payload, page_url=identifier),
+                    )
+                )
+            )
         raise ValueError(f"unsupported provider: {provider}")
     except (
         AshbyParseError,
@@ -140,6 +168,7 @@ def _parse(provider: AtsProvider, payload: bytes) -> list[RawJobPosting]:
         GreenhouseParseError,
         LeverParseError,
         SmartRecruitersParseError,
+        StaticCareersParseError,
         WorkableParseError,
     ) as error:
         raise AtsReplayError(f"{provider} snapshot no longer parses: {error}") from error

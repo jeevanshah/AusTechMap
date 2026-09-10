@@ -8,6 +8,7 @@ bytes are fetched.
 
 from __future__ import annotations
 
+import hashlib
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -28,6 +29,13 @@ from austechmap_ingestion.hiring.lever import fetch_lever_postings
 from austechmap_ingestion.hiring.normalisation import SkillDef, normalise_job
 from austechmap_ingestion.hiring.persistence import mark_expired_jobs, persist_job_posting
 from austechmap_ingestion.hiring.smartrecruiters import fetch_smartrecruiters_postings
+from austechmap_ingestion.hiring.static_careers import (
+    StaticCareersDocument,
+    StaticCareersPage,
+    fetch_static_careers_document,
+    parse_static_careers_page,
+    parse_static_job_postings,
+)
 from austechmap_ingestion.hiring.workable import fetch_workable_postings
 from austechmap_ingestion.jobs import JobRepository, RunStatus, SnapshotRecord
 from austechmap_ingestion.storage import SnapshotStore
@@ -62,7 +70,13 @@ def run_ats_crawl(
     # requires a lowercase slug, but the real ATS site/board identifier
     # (used for the actual fetch URL below) is legitimately case-sensitive
     # for some providers (e.g. Lever's "Zeller", "Lumary" 404 in lowercase).
-    source_key = f"ats-{provider}-{identifier}".lower()
+    source_key = (
+        f"ats-static-careers-{hashlib.sha256(identifier.encode('utf-8')).hexdigest()[:24]}"
+        if provider == "static_careers"
+        else f"ats-{provider}-{identifier}".lower()
+    )
+    snapshot_content_type = "application/json"
+    static_document: StaticCareersDocument | None = None
 
     # A distinct data_sources row from company_ats_source.source_id: that
     # one records provenance for the discovery ("how we know this company
@@ -108,6 +122,10 @@ def run_ats_crawl(
             raw_bytes, postings = fetch_workable_postings(identifier, fetch_fn=fetch_fn)
         elif provider == "breezy":
             raw_bytes = fetch_breezy_payload(identifier, fetch_fn=fetch_fn)
+        elif provider == "static_careers":
+            static_document = fetch_static_careers_document(identifier, fetcher=fetch_fn)
+            raw_bytes = static_document.content
+            snapshot_content_type = static_document.content_type
         else:
             raise ValueError(f"unsupported ats_provider: {provider!r}")
 
@@ -116,19 +134,30 @@ def run_ats_crawl(
         stored = store.put(
             source_key=source_key,
             content=raw_bytes,
-            content_type="application/json",
+            content_type=snapshot_content_type,
         )
         if provider == "breezy":
             postings = parse_breezy_postings(raw_bytes)
+        elif provider == "static_careers":
+            if static_document is None:
+                raise RuntimeError("static careers document was not fetched")
+            static_page = StaticCareersPage(
+                requested_url=static_document.requested_url,
+                final_url=static_document.final_url,
+                content=raw_bytes,
+                content_type=static_document.content_type,
+                parse_result=parse_static_careers_page(
+                    raw_bytes, page_url=static_document.final_url
+                ),
+            )
+            postings = list(parse_static_job_postings(static_page))
 
         created = updated = unchanged = 0
         seen_external_ids: set[str] = set()
         with psycopg.connect(database_url) as connection, connection.transaction():
             for posting in postings:
                 seen_external_ids.add(posting.external_id)
-                normalised, skill_matches = normalise_job(
-                    posting, provider=provider, skills=skills
-                )
+                normalised, skill_matches = normalise_job(posting, provider=provider, skills=skills)
                 result = persist_job_posting(
                     connection,
                     company_id=company_ats_source.company_id,
@@ -163,10 +192,18 @@ def run_ats_crawl(
                 source_id=crawl_source_id,
                 object_key=stored.object_key,
                 sha256=stored.sha256,
-                content_type="application/json",
+                content_type=snapshot_content_type,
                 byte_size=stored.byte_size,
                 retrieved_at=crawl_time,
-                response_metadata={"ats_provider": provider, "ats_identifier": identifier},
+                response_metadata={
+                    "ats_provider": provider,
+                    "ats_identifier": identifier,
+                    **(
+                        {"final_url": static_document.final_url}
+                        if provider == "static_careers" and static_document is not None
+                        else {}
+                    ),
+                },
             ),
             metrics={
                 "fetched": len(postings),
