@@ -1,0 +1,7 @@
+company_domain,ats_provider,ats_identifier,evidence_url,public_board_validation,current_open_roles,status
+creditorwatch.com.au,workable,creditorwatch,https://creditorwatch.com.au/company/careers,GET https://apply.workable.com/api/v1/widget/accounts/creditorwatch returned a parseable public board,10,ready_for_manual_source_registration_after_r2
+dug.com,breezy,dug,https://dug.com/careers-at-dug/,GET https://dug.breezy.hr/json returned a parseable public board,12,ready_for_manual_source_registration_after_r2
+legalvision.com.au,workable,legalvision,https://legalvision.com.au/careers/,GET https://apply.workable.com/api/v1/widget/accounts/legalvision returned a parseable public board,29,ready_for_manual_source_registration_after_r2
+lyka.com.au,workable,lyka,https://lyka.com.au/careers,GET https://apply.workable.com/api/v1/widget/accounts/lyka returned a parseable public board,17,ready_for_manual_source_registration_after_r2
+mable.com.au,lever,mable,https://mable.com.au/about-us/careers-at-mable/,GET https://api.lever.co/v0/postings/mable returned a parseable public board,22,ready_for_manual_source_registration_after_r2
+zutec.com,workable,zutec,https://zutec.com/about,GET https://apply.workable.com/api/v1/widget/accounts/zutec returned a parseable public board,3,ready_for_manual_source_registration_after_r2

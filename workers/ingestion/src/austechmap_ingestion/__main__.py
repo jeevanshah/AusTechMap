@@ -4,6 +4,7 @@ import os
 import uuid
 from collections.abc import Sequence
 from datetime import UTC, date, datetime
+from functools import partial
 from pathlib import Path
 
 import psycopg
@@ -62,6 +63,7 @@ from austechmap_ingestion.employers.seed import (
 from austechmap_ingestion.employers.sponsorship_evidence import (
     derive_sponsorship_evidence_from_jobs,
 )
+from austechmap_ingestion.fetch_safety import safe_fetch
 from austechmap_ingestion.health import build_health
 from austechmap_ingestion.hiring.ats_source_seed import AtsSourceSeedError, seed_ats_sources
 from austechmap_ingestion.hiring.company_sources import (
@@ -74,6 +76,11 @@ from austechmap_ingestion.hiring.normalisation import SkillDef
 from austechmap_ingestion.hiring.pipeline import run_ats_crawl
 from austechmap_ingestion.hiring.replay import AtsReplayError, replay_ats_snapshot
 from austechmap_ingestion.hiring.signals import derive_employer_hiring_signals
+from austechmap_ingestion.hiring.source_discovery import (
+    discover_ats_sources,
+    load_careers_fixture,
+    write_ats_discovery_preflight,
+)
 from austechmap_ingestion.hiring.taxonomy_seed import SKILLS, seed_taxonomy
 from austechmap_ingestion.jobs import JobError, JobRepository
 from austechmap_ingestion.observability import (
@@ -222,6 +229,20 @@ def build_parser() -> argparse.ArgumentParser:
     location_parser.add_argument("--output", type=Path, required=True)
     location_parser.add_argument("--timeout-seconds", type=float, default=12.0)
     location_parser.add_argument("--workers", type=int, default=8)
+    ats_discovery_parser = subparsers.add_parser(
+        "discover-ats-sources",
+        help="read-only scan of cohort careers pages for known public ATS board links",
+    )
+    ats_discovery_parser.add_argument(
+        "--fixture",
+        type=Path,
+        action="append",
+        required=True,
+        help="cohort CSV with domain and careers_url columns; may be supplied more than once",
+    )
+    ats_discovery_parser.add_argument("--output", type=Path, required=True)
+    ats_discovery_parser.add_argument("--workers", type=int, default=4)
+    ats_discovery_parser.add_argument("--timeout-seconds", type=float, default=6.0)
     taxonomy_parser = subparsers.add_parser(
         "seed-taxonomy", help="seed the v1 role-family and skills taxonomies"
     )
@@ -481,6 +502,34 @@ def main(argv: Sequence[str] | None = None) -> int:
                         {"domain": domain, "error": message}
                         for domain, message in location_stats.errors
                     ],
+                },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "discover-ats-sources":
+        try:
+            discovery_rows = tuple(
+                row for fixture in args.fixture for row in load_careers_fixture(fixture)
+            )
+            discovery = discover_ats_sources(
+                discovery_rows,
+                workers=args.workers,
+                fetcher=partial(safe_fetch, timeout_seconds=args.timeout_seconds),
+            )
+            write_ats_discovery_preflight(args.output, discovery)
+        except (OSError, ValueError) as error:
+            print(f"ATS source discovery failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "candidates": len(discovery.candidates),
+                    "checked": discovery.checked,
+                    "errors": len(discovery.errors),
+                    "output": str(args.output),
                 },
                 separators=(",", ":"),
                 sort_keys=True,
