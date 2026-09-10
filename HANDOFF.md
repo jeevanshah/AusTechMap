@@ -25,8 +25,8 @@
 - **Approved imports:** The user explicitly approved two production `seed-locations` operations: the 28-row repair fixture (24 resolved / 4 reused) and the six-row review repair fixture (6 resolved / 0 reused).
 - **Verification:** Every one of the 34 fixture domains has an accepted location paired with its exact active first-party `location_source` evidence URL. The Barton Deakin import used the importer's documented query fallback but retained the cited evidence.
 - **Approved cleanup:** The user approved unlinking 76 ambiguous company-location links only where the same company already had an accepted location. The operation wrote 76 immutable audit records, deleted no shared `resolved_locations` or evidence, and had zero job foreign-key references.
-- **Live post-cleanup state:** 908 companies; 506 companies with an accepted location; **312 ambiguous links/companies**; zero remaining superseded ambiguous links; nine pending review items.
-- **Next safe work:** Continue only with first-party-backed location research for the 312 evidence-free ambiguous links, or resume normal product/ATS work. Do not infer locations. Five difficult review cases remain quarantined; see `docs/data-quality/ambiguous-location-review-resolution-20260910.csv`.
+- **Live post-cleanup state:** 908 companies; 508 companies with an accepted location; **312 ambiguous links/companies**; two newly superseded ambiguous links from the final approved repair import; nine pending review items.
+- **Next safe work:** Clean up the two newly superseded links with explicit approval, then resume normal product/ATS work. The remaining 310 ambiguous links have no active first-party evidence; do not infer locations. Five difficult review cases remain quarantined; see `docs/data-quality/ambiguous-location-review-resolution-20260910.csv`.
 - **Relevant commits:** `1f9825e`, `ed5eb98`, `05544f5`, `27134bb`, `056a536`, `3bb1dac`, `4abba39`, `3760670`, `2ded9c5`.
 
 ## Data-quality cleanup — 9 September 2026
