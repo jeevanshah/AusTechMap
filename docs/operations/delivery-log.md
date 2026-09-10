@@ -146,6 +146,14 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: strict address-fixture validation (24 rows, no errors or duplicate addresses) and `git diff --check`.
 - Residual risk: no candidate has been geocoded or imported. Production geocoding/import remains an explicit approval gate.
 
+## 2026-09-10 — Pinpoint public ATS feed implementation
+
+- Branch / commit: `feat/pinpoint-public-feed` at `9823eff`; intentionally not merged to `main` pending the repository's independent-review or explicit-waiver gate.
+- Scope: added Pinpoint's documented unauthenticated public careers feed (`https://{company-subdomain}.pinpointhq.com/postings.json`) as a structured ATS provider. The worker snapshots bytes before parsing, supports read-only replay, validates safe subdomain identifiers, and preserves the existing source scheduling/kill-switch lifecycle.
+- Migration: new forward-only `0024_add_pinpoint_ats_provider.sql`; it is **not** applied to Neon.
+- Verification: 301 passed, 101 skipped locally; strict mypy and targeted Ruff passed. The live PostGIS integration coverage runs in CI once the branch is reviewed/merged.
+- Production state: no Pinpoint company source has been registered and no crawl has run. Cloudflare R2 remains deferred, so no new production snapshot-backed source should be activated.
+
 ## 2026-09-10 — Breezy HR adapter foundation
 
 - Commits: `e30a7e3` (`feat: add Breezy ATS adapter`) and `556f683` (`fix: harden Breezy ATS ingestion`).
