@@ -38,6 +38,10 @@ from austechmap_ingestion.employers.labour_agreements import (
     load_labour_agreements_fixture,
     match_labour_agreements,
 )
+from austechmap_ingestion.employers.location_promotion import (
+    LocationPromotionError,
+    promote_evidenced_locations,
+)
 from austechmap_ingestion.employers.location_quality import (
     LocationQualityError,
     quarantine_low_specificity_locations,
@@ -152,6 +156,28 @@ def build_parser() -> argparse.ArgumentParser:
         "--apply",
         action="store_true",
         help="perform the audited quarantine (without this flag, only report the target set)",
+    )
+    promote_parser = subparsers.add_parser(
+        "promote-evidenced-locations",
+        help=(
+            "dry-run or promote ambiguous locations that already have first-party "
+            "location_source evidence matching an address fixture"
+        ),
+    )
+    promote_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    promote_parser.add_argument("--fixture", type=Path, required=True)
+    promote_parser.add_argument("--actor-id", default="evidenced-location-promotion")
+    promote_parser.add_argument(
+        "--provider",
+        choices=["nominatim", "mapbox"],
+        default="nominatim",
+        help="geocoding provider used only when --apply is set (default: nominatim)",
+    )
+    promote_parser.add_argument("--mapbox-token", default=os.environ.get("MAPBOX_TOKEN"))
+    promote_parser.add_argument(
+        "--apply",
+        action="store_true",
+        help="perform audited promotion with fresh geocoding (default is dry-run)",
     )
     validate_address_parser = subparsers.add_parser(
         "validate-address-fixture",
@@ -489,6 +515,61 @@ def main(argv: Sequence[str] | None = None) -> int:
                         cleanup_stats.skipped_specific_fixture_domains
                     ),
                     "unmatchedFixtureDomains": list(cleanup_stats.unmatched_fixture_domains),
+                },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "promote-evidenced-locations":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        try:
+            validation = validate_address_fixture(args.fixture)
+        except (AddressFixtureValidationError, OSError, ValueError) as error:
+            print(f"Address fixture validation failed: {error}")
+            return 1
+        if not validation.valid:
+            print(
+                json.dumps(
+                    {"errors": list(validation.errors), "valid": False},
+                    separators=(",", ":"),
+                    sort_keys=True,
+                )
+            )
+            return 1
+        if args.apply and args.provider == "mapbox" and not args.mapbox_token:
+            print("MAPBOX_TOKEN or --mapbox-token is required for --provider mapbox")
+            return 2
+        geocode_fn = geocode_address if args.provider == "mapbox" else geocode_address_nominatim
+        credential = args.mapbox_token if args.provider == "mapbox" else ""
+        try:
+            promotion_stats = promote_evidenced_locations(
+                args.database_url,
+                fixture_path=args.fixture,
+                actor_id=args.actor_id,
+                apply=args.apply,
+                credential=credential or "",
+                geocode_fn=geocode_fn,
+            )
+        except (LocationPromotionError, OSError, psycopg.Error) as error:
+            print(f"Location promotion failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "applied": promotion_stats.applied,
+                    "auditRecords": promotion_stats.audit_records,
+                    "errors": [
+                        {"domain": domain, "error": message}
+                        for domain, message in promotion_stats.errors
+                    ],
+                    "fixtureCandidates": promotion_stats.fixture_candidates,
+                    "promoted": promotion_stats.promoted,
+                    "proposed": promotion_stats.proposed,
+                    "reused": promotion_stats.reused,
                 },
                 separators=(",", ":"),
                 sort_keys=True,

@@ -160,6 +160,14 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: post-write read-back reports 312 ambiguous links/companies, zero remaining superseded ambiguous links, and 76 cleanup audit records.
 - Residual risk: the remaining 312 links have no active first-party location evidence; they remain a research queue and were not inferred or altered.
 
+## 2026-09-10 — evidenced-location promotion workflow hardening
+
+- Commit: `feat: harden evidenced location promotion` (this commit)
+- Scope: completed the existing Cursor draft for the opt-in `promote-evidenced-locations` worker command.
+- Result: promotion remains dry-run by default and now clears stale G-NAF/candidate metadata when a fresh external geocode is accepted. A focused integration test covers dry-run behavior, audited promotion, and the resulting accepted state.
+- Verification: Ruff, mypy strict, and the ingestion suite (268 passed, 99 integration/environment skips locally). The new live-PostGIS integration test will run where `TEST_DATABASE_URL` is configured.
+- Residual risk: the command is intentionally narrow. It only promotes an already-linked ambiguous location with exact active first-party source evidence; it does not replace `seed-locations` for newly researched addresses.
+
 ## 2026-09-10 — ambiguous-location canonical-host recovery
 
 - Commit: `data: recover ambiguous-location address evidence` (this commit)
