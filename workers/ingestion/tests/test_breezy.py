@@ -97,9 +97,12 @@ def test_parse_breezy_postings_rejects_missing_required_fields() -> None:
 def test_fetch_breezy_postings_uses_company_public_json_feed() -> None:
     observed: dict[str, object] = {}
 
-    def fake_fetch(url: str, *, allowed_hosts: frozenset[str]) -> SafeFetchResult:
+    def fake_fetch(
+        url: str, *, allowed_hosts: frozenset[str], headers: dict[str, str]
+    ) -> SafeFetchResult:
         observed["url"] = url
         observed["allowed_hosts"] = allowed_hosts
+        observed["headers"] = headers
         return SafeFetchResult(
             final_url=url,
             status_code=200,
@@ -114,6 +117,10 @@ def test_fetch_breezy_postings_uses_company_public_json_feed() -> None:
     assert observed == {
         "url": "https://stake.breezy.hr/json",
         "allowed_hosts": frozenset({"stake.breezy.hr"}),
+        "headers": {
+            "Accept": "application/json",
+            "User-Agent": "AusTechMapBot/1.0 (+https://github.com/jeevanshah/AusTechMap)",
+        },
     }
 
 

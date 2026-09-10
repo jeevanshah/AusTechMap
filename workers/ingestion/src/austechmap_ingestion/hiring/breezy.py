@@ -25,6 +25,10 @@ class BreezyParseError(Exception):
 
 
 _COMPANY_IDENTIFIER_RE = re.compile(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?")
+_BREEZY_REQUEST_HEADERS = {
+    "Accept": "application/json",
+    "User-Agent": "AusTechMapBot/1.0 (+https://github.com/jeevanshah/AusTechMap)",
+}
 
 
 def _string_or_none(value: object) -> str | None:
@@ -110,7 +114,11 @@ def fetch_breezy_payload(
     if _COMPANY_IDENTIFIER_RE.fullmatch(company) is None:
         raise ValueError(f"invalid Breezy company identifier: {company!r}")
     host = f"{company}.breezy.hr"
-    result = fetch_fn(f"https://{host}/json", allowed_hosts=frozenset({host}))
+    result = fetch_fn(
+        f"https://{host}/json",
+        allowed_hosts=frozenset({host}),
+        headers=_BREEZY_REQUEST_HEADERS,
+    )
     return result.content
 
 
