@@ -1,5 +1,13 @@
 # Autonomous delivery log
 
+## 2026-09-10 - static careers source lifecycle
+
+- Commit: `931125e` (`feat: operationalize static careers sources`).
+- Scope: registers `static_careers` as a supported job-source provider through forward-only migration `0023`; reuses the existing scheduled source lifecycle; snapshots verified HTML before parsing; persists only schema.org JSON-LD `JobPosting` records with stable HTTP(S) URLs; retains candidate links as discovery-only; and replays snapshots using the recorded final redirect URL.
+- Verification: scoped Ruff and formatting checks, strict mypy across 56 source files, and the full ingestion suite passed (**292 passed**, **100 live-PostGIS integration tests skipped** locally). Migration discovery assertions now cover versions 1 through 23. The static pipeline/replay integration test is present and will run in CI's disposable PostGIS service.
+- Review: the usual isolated Codex reviewer was quota-blocked and the available Claude Code reviewer timed out without returning a verdict. The user explicitly waived independent AI review and approved direct merge; see `docs/reviews/2026-09-10-static-careers-lifecycle-waiver.md`.
+- Residual risk: migration 0023 is committed but not applied to Neon. No static source was registered and no production crawl occurred. A first source requires separate evidence-backed registration and a production-write approval.
+
 ## 2026-09-10 - static careers-page discovery foundation
 
 - Commit: `481af52` (`feat: add static careers page parser`).
