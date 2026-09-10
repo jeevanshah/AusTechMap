@@ -10,6 +10,7 @@
 - **Task / issue:** Resume employer-cohort and ATS-source expansion. The 304 evidence-free ambiguous locations are a research-only backlog; do not infer locations.
 - **Acceptance criteria (this checkpoint):** Add only evidence-backed employers and verified ATS sources; preserve the existing production approval and audit rules for every production write.
 - **Latest completed delivery:** Breezy HR support is implemented and independently reviewed on `main` (`e30a7e3`, `556f683`). Stake's public `https://stake.breezy.hr/json` board verified the response shape (16 active jobs at research time), but no ATS source was seeded and no production crawl ran. Registering it remains an explicit production-write approval.
+- **Database prerequisite:** migration `0022_add_breezy_ats_provider.sql` is independently reviewed and merged (`69d61a8`, `af391b9`), but has not been applied to Neon. Apply it before retrying the already-approved Stake registration and first crawl.
 
 ## Checkpoint
 

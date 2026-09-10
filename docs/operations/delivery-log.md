@@ -130,6 +130,13 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Review: an isolated read-only Codex review found and the follow-up commit fixed unknown work-style inference, parse-before-store ordering, and malformed UTF-8 handling. A final independent review approved the result.
 - Residual risk: no Breezy source has been registered in Neon and no Breezy production crawl has run. Stake source registration and ingestion remain explicit production-write approval gates.
 
+## 2026-09-10 — Breezy provider database prerequisite
+
+- Commits: `69d61a8` (`db: add Breezy ATS provider`) and `af391b9` (`test: update migration application expectation`).
+- Scope: added forward-only migration `0022_add_breezy_ats_provider.sql`, which adds `breezy` to Neon’s `ats_provider` enum. The clean-database migration integration assertion now expects all versions 1 through 22 rather than its stale 1-through-16 range.
+- Verification: migration-contract tests passed (3 passed; 8 live-PostGIS integration tests skipped locally) and an independent read-only review approved the migration and correction.
+- Production state: migration 0022 has not been applied to Neon. A Stake registration attempt was rejected by the current enum before any company ATS source or job was written.
+
 ## 2026-09-10 — ambiguous-location repair production import
 
 - Approval: user explicitly approved geocoding and importing the 28-row `ambiguous-location-repair-preflight-20260910.csv` fixture to production Neon in this session.
