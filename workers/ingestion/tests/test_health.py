@@ -25,7 +25,7 @@ def test_health_cli_emits_json(capsys: pytest.CaptureFixture[str]) -> None:
     assert json.loads(capsys.readouterr().out) == build_health("cli-run")
 
 
-@pytest.mark.parametrize("provider", ["breezy", "static_careers"])
+@pytest.mark.parametrize("provider", ["breezy", "static_careers", "pinpoint"])
 def test_set_ats_source_status_cli_accepts_every_operational_provider(provider: str) -> None:
     args = build_parser().parse_args(
         [
