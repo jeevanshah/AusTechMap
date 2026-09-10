@@ -9,8 +9,8 @@
 - **Reason:** Post-import geographic evidence and cleanup checkpoint.
 - **Task / issue:** Resume employer-cohort and ATS-source expansion. The 304 evidence-free ambiguous locations are a research-only backlog; do not infer locations.
 - **Acceptance criteria (this checkpoint):** Add only evidence-backed employers and verified ATS sources; preserve the existing production approval and audit rules for every production write.
-- **Latest completed delivery:** Breezy HR support is implemented and independently reviewed on `main` (`e30a7e3`, `556f683`). Stake's public `https://stake.breezy.hr/json` board verified the response shape (16 active jobs at research time), but no ATS source was seeded and no production crawl ran. Registering it remains an explicit production-write approval.
-- **Database prerequisite:** migration `0022_add_breezy_ats_provider.sql` is independently reviewed and merged (`69d61a8`, `af391b9`), but has not been applied to Neon. Apply it before retrying the already-approved Stake registration and first crawl.
+- **Latest completed delivery:** Breezy HR support is implemented and independently reviewed on `main` (`e30a7e3`, `556f683`, `bfd2e79`). Migration 0022 is applied to Neon, and Stake's `breezy/stake` source completed its first crawl: 16 active jobs, 16 observations, and one immutable snapshot (`bf390c7b-f0db-4e1f-b381-1a6d85750c28`).
+- **Breezy production state:** Stake's source is active with zero consecutive failures and a recorded success. Platform totals are 58 active ATS sources, 2,081 active jobs, and 57 active hiring employers.
 
 ## Checkpoint
 

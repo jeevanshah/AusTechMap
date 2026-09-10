@@ -137,6 +137,14 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: migration-contract tests passed (3 passed; 8 live-PostGIS integration tests skipped locally) and an independent read-only review approved the migration and correction.
 - Production state: migration 0022 has not been applied to Neon. A Stake registration attempt was rejected by the current enum before any company ATS source or job was written.
 
+## 2026-09-10 — Stake Breezy production registration and initial crawl
+
+- Approval: the user gave full authority in this session to complete the reviewed Breezy rollout, including production migration, source registration, and initial crawl.
+- Migration: `0022_add_breezy_ats_provider.sql` applied successfully to Neon; it was the only pending migration.
+- Result: registered Stake (`hellostake.com`) as `breezy/stake`, then completed crawl `bf390c7b-f0db-4e1f-b381-1a6d85750c28`: 16 jobs created, zero updates, zero expirations, 16 active job observations, and one immutable raw snapshot.
+- Verification: read-back confirms an active source, zero consecutive failures, a recorded source success, migration 22 present, and the succeeded import run/snapshot. Platform totals are 58 active ATS sources, 2,081 active jobs, and 57 active hiring employers.
+- Remediation note: the first headerless request was rejected as HTTP 403 before parsing or job persistence. The reviewed follow-up (`bfd2e79`) added a transparent `AusTechMapBot/1.0` user agent and JSON `Accept` header; the successful retry used that contract.
+
 ## 2026-09-10 — ambiguous-location repair production import
 
 - Approval: user explicitly approved geocoding and importing the 28-row `ambiguous-location-repair-preflight-20260910.csv` fixture to production Neon in this session.
