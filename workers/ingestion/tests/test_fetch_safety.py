@@ -155,9 +155,7 @@ def test_safe_fetch_rejects_a_redirect_to_a_private_address() -> None:
             return _getaddrinfo_returning(_SAFE_PUBLIC_IP)
         return _getaddrinfo_returning("10.0.0.5")
 
-    redirect_response = _FakeResponse(
-        302, b"", {"Location": "http://internal.example.test/jobs"}
-    )
+    redirect_response = _FakeResponse(302, b"", {"Location": "http://internal.example.test/jobs"})
     with (
         patch("socket.getaddrinfo", side_effect=fake_getaddrinfo),
         _patched_connections(redirect_response),
@@ -167,6 +165,27 @@ def test_safe_fetch_rejects_a_redirect_to_a_private_address() -> None:
             "http://safe.example.test/jobs",
             allowed_hosts=frozenset({"safe.example.test", "internal.example.test"}),
         )
+
+
+def test_safe_fetch_validates_redirect_target_before_requesting_it() -> None:
+    redirect_response = _FakeResponse(302, b"", {"Location": "/private/jobs"})
+    validated: list[str] = []
+
+    def reject_disallowed_redirect(url: str) -> None:
+        validated.append(url)
+        raise ValueError("robots disallow redirect")
+
+    with (
+        patch("socket.getaddrinfo", return_value=_getaddrinfo_returning(_SAFE_PUBLIC_IP)),
+        _patched_connections(redirect_response),
+        pytest.raises(ValueError, match="robots"),
+    ):
+        safe_fetch(
+            "http://safe.example.test/jobs",
+            allowed_hosts=frozenset({"safe.example.test"}),
+            redirect_validator=reject_disallowed_redirect,
+        )
+    assert validated == ["http://safe.example.test/private/jobs"]
 
 
 # --- Vector 8: exceeding max_redirects ---

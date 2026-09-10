@@ -30,7 +30,7 @@ import http.client
 import ipaddress
 import socket
 import ssl
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from urllib.parse import urljoin, urlsplit, urlunsplit
 
@@ -204,12 +204,15 @@ def safe_fetch(
     max_redirects: int = DEFAULT_MAX_REDIRECTS,
     max_response_bytes: int = DEFAULT_MAX_RESPONSE_BYTES,
     headers: Mapping[str, str] | None = None,
+    redirect_validator: Callable[[str], None] | None = None,
 ) -> SafeFetchResult:
     """GET url, following up to max_redirects redirects. Every hop
     (including the first) is independently scheme/host-allowlist/DNS/IP
     validated -- a redirect to a disallowed host or an address that
     resolves to a private range is rejected exactly like the initial URL
-    would be, not trusted because the first hop passed."""
+    would be, not trusted because the first hop passed. Callers with a
+    policy that applies to paths (such as robots.txt) may also validate each
+    resolved redirect target before it is requested."""
     request_headers = dict(headers or {})
     current_url = url
     for _ in range(max_redirects + 1):
@@ -223,7 +226,10 @@ def safe_fetch(
         if status in _REDIRECT_STATUSES:
             if not location:
                 raise FetchSafetyError(f"redirect from {current_url} had no Location header")
-            current_url = urljoin(current_url, location)
+            next_url = urljoin(current_url, location)
+            if redirect_validator is not None:
+                redirect_validator(next_url)
+            current_url = next_url
             continue
         return SafeFetchResult(
             final_url=current_url, status_code=status, content=body, content_type=content_type
