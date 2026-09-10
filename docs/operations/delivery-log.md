@@ -122,6 +122,14 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: strict address-fixture validation (24 rows, no errors or duplicate addresses) and `git diff --check`.
 - Residual risk: no candidate has been geocoded or imported. Production geocoding/import remains an explicit approval gate.
 
+## 2026-09-10 — Breezy HR adapter foundation
+
+- Commits: `e30a7e3` (`feat: add Breezy ATS adapter`) and `556f683` (`fix: harden Breezy ATS ingestion`).
+- Scope: added the public `https://{company}.breezy.hr/json` adapter, provider validation, crawl dispatch, snapshot replay, work-style normalisation, hostname validation, and parser tests. Stake's live public board was used only to verify the response shape; it returned 16 active jobs at research time.
+- Verification: scoped Ruff and strict mypy passed; the full ingestion suite passed **277 tests** with **99 integration tests skipped** because no live PostGIS service is available in this workspace; `git diff --check` passed.
+- Review: an isolated read-only Codex review found and the follow-up commit fixed unknown work-style inference, parse-before-store ordering, and malformed UTF-8 handling. A final independent review approved the result.
+- Residual risk: no Breezy source has been registered in Neon and no Breezy production crawl has run. Stake source registration and ingestion remain explicit production-write approval gates.
+
 ## 2026-09-10 — ambiguous-location repair production import
 
 - Approval: user explicitly approved geocoding and importing the 28-row `ambiguous-location-repair-preflight-20260910.csv` fixture to production Neon in this session.
