@@ -1,5 +1,13 @@
 # Autonomous delivery log
 
+## 2026-09-10 - static careers-page discovery foundation
+
+- Commit: `481af52` (`feat: add static careers page parser`).
+- Scope: added `selectolax==0.4.11` (Lexbor backend) and a deterministic static parser for registered careers URLs. It extracts schema.org JSON-LD `JobPosting` data and candidate role links, rejects non-HTTP(S) link schemes and credential-bearing URLs, and only marks an empty client-rendered shell as a later Playwright-fallback candidate.
+- Politeness and safety: the module uses the existing SSRF-safe pinned fetcher, sends the transparent `AusTechMapBot/1.0` user agent, checks `robots.txt` before the initial URL and every same-host redirect target, and applies a two-second per-host delay with immediate exponential backoff after HTTP 429/503. The shared fetcher gained an optional redirect-policy callback to support this path-level policy safely.
+- Verification: scoped Ruff and formatter checks passed; strict mypy passed across all 56 ingestion source files; the final ingestion suite passed **288 tests** with **99 live-PostGIS integration tests skipped**; the frozen-fixture benchmark reported 0.168 ms median and 0.251 ms p95 for 100 parses. An independent read-only review first found the redirect-policy and immediate-backoff defects, then approved the corrected change.
+- Residual risk: this is discovery-only. It has no persistence or scheduler integration, does not automatically invoke Playwright, and must not be pointed at a production employer/source until a registered-source lifecycle and an explicit production approval are in place.
+
 This is the audit trail for changes delivered through the bulk autonomous lane in `AGENTS.md`. Each entry records the commit, validation evidence, scope, and residual risk so routine bulk work can proceed without turning the user into a PR messenger.
 
 ## 2026-09-09 — policy established

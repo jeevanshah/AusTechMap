@@ -6,15 +6,17 @@
 
 - **Current Implementer / Integrator:** Codex (Cursor Auto covering after Codex usage limit) — operating per `AGENTS.md` orchestration / bulk autonomous delivery lane.
 - **Updated at:** 2026-09-10
-- **Reason:** Post-import geographic evidence and cleanup checkpoint.
-- **Task / issue:** Resume employer-cohort and ATS-source expansion. The 304 evidence-free ambiguous locations are a research-only backlog; do not infer locations.
+- **Reason:** Static careers-page discovery foundation landed after the Stake Breezy rollout.
+- **Task / issue:** Resume employer-cohort and hiring-source expansion. The 304 evidence-free ambiguous locations are a research-only backlog; do not infer locations.
 - **Acceptance criteria (this checkpoint):** Add only evidence-backed employers and verified ATS sources; preserve the existing production approval and audit rules for every production write.
 - **Latest completed delivery:** Breezy HR support is implemented and independently reviewed on `main` (`e30a7e3`, `556f683`, `bfd2e79`). Migration 0022 is applied to Neon, and Stake's `breezy/stake` source completed its first crawl: 16 active jobs, 16 observations, and one immutable snapshot (`bf390c7b-f0db-4e1f-b381-1a6d85750c28`).
 - **Breezy production state:** Stake's source is active with zero consecutive failures and a recorded success. Platform totals are 58 active ATS sources, 2,081 active jobs, and 57 active hiring employers.
+- **Latest completed delivery:** `481af52` adds a reviewed static careers-page discovery module. It uses the existing pinned, SSRF-safe fetcher; obeys `robots.txt` on both initial and redirect URLs; applies an in-process per-host adaptive delay; extracts JSON-LD `JobPosting` data and safe candidate role links; and flags an empty client-rendered shell for a later Playwright fallback. It does **not** register a source, crawl production, create jobs, or add a migration.
 
 ## Checkpoint
 
 - **Implementation branch:** `main`
+- **Current implementation checkpoint:** `481af52` (`feat: add static careers page parser`). This documentation sync is the handoff record for that checkpoint; only pre-existing untracked pytest temporary directories should remain, and they must never be staged.
 - **Implementation checkpoint commit:** `f7f2eb5` (location harvest); handoff docs sync `548df4e` — verify with `git rev-parse HEAD`.
 - **Handoff commit:** `548df4e` on `main`.
 - **Working-tree status at checkpoint:** Clean after this docs commit.
