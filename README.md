@@ -33,7 +33,7 @@ verified source URL and passes `validate-address-fixture`. Pipeline notes:
 [`docs/data-quality/README.md`](./docs/data-quality/README.md),
 [`docs/operations/delivery-log.md`](./docs/operations/delivery-log.md).
 
-**Current location status, 10 September 2026:** 34 first-party-backed repair locations have now been user-approved and imported to Neon. The 76 ambiguous links superseded by accepted locations were audited and unlinked; **312** ambiguous links remain research-only because they have no active first-party location evidence. This paragraph supersedes the earlier discovery-only wording above.
+**Current location status, 10 September 2026:** 42 first-party-backed repair locations have now been user-approved and imported to Neon. The 84 ambiguous links superseded by accepted locations were audited and unlinked; **304** ambiguous links remain research-only because they have no active first-party location evidence. This paragraph supersedes the earlier discovery-only wording above.
 
 Cloudflare R2 for the account-deletion ledger remains deliberately deferred until real users are
 admitted. Current priorities: verify street-level locations for map-eligible companies, expand ATS

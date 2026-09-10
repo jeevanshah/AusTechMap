@@ -7,8 +7,8 @@
 - **Current Implementer / Integrator:** Codex (Cursor Auto covering after Codex usage limit) — operating per `AGENTS.md` orchestration / bulk autonomous delivery lane.
 - **Updated at:** 2026-09-10
 - **Reason:** Post-import geographic evidence and cleanup checkpoint.
-- **Task / issue:** Continue only with first-party-backed location research for the 312 evidence-free ambiguous links, or resume normal product/ATS work. Do not infer locations.
-- **Acceptance criteria (this checkpoint):** Wave 2/3 triage → evidence → seed preflight → Neon `seed-employers` → location-candidate manifests committed on `main`; no location geocode/import performed.
+- **Task / issue:** Resume employer-cohort and ATS-source expansion. The 304 evidence-free ambiguous locations are a research-only backlog; do not infer locations.
+- **Acceptance criteria (this checkpoint):** Add only evidence-backed employers and verified ATS sources; preserve the existing production approval and audit rules for every production write.
 
 ## Checkpoint
 
@@ -27,7 +27,7 @@
 - **Approved cleanup:** The user approved unlinking 76 ambiguous company-location links only where the same company already had an accepted location. The operation wrote 76 immutable audit records, deleted no shared `resolved_locations` or evidence, and had zero job foreign-key references.
 - **Live post-cleanup state:** 908 companies; 514 companies with an accepted location; **304 ambiguous links/companies**; 84 total audited superseded-link cleanups; zero remaining superseded links; nine pending review items.
 - **Next safe work:** Resume normal product/ATS work. The remaining 304 ambiguous links have no active first-party evidence; do not infer locations. Five difficult review cases remain quarantined; see `docs/data-quality/ambiguous-location-review-resolution-20260910.csv`.
-- **Deep research follow-up:** A complete structured-data pass across the 178 reachable no-candidate records found six additional complete, unique first-party addresses. `docs/data-quality/deep-first-party-location-repair-preflight-20260910.csv` passes validation but is not imported. If approved, import it with `seed-locations`; then its superseded ambiguous links need the same audited cleanup. The residual research-only queue after that would be 304.
+- **Deep research closeout:** The six-address deep-research fixture was user-approved, imported, verified, and followed by an approved audited unlink of its six superseded ambiguous links. The residual research-only queue is 304; do not infer locations.
 - **Relevant commits:** `1f9825e`, `ed5eb98`, `05544f5`, `27134bb`, `056a536`, `3bb1dac`, `4abba39`, `3760670`, `2ded9c5`.
 
 ## Data-quality cleanup — 9 September 2026
@@ -415,7 +415,7 @@ Key files updated in this milestone:
 
 ## Next actions
 
-1. Verify Wave 2/3 location candidates (39 + 32) with exact first-party page URLs; build address fixtures; validate; geocode only with explicit approval.
-2. Continue scaling the employer cohort towards the 500 / 1,000 employer milestones.
-3. Probe additional ATS boards (e.g. Pinpoint, Breezy, Recruitee, Taleo, SuccessFactors) for other major Australian employers.
-4. Advance Phase 9 commercial features (sponsored opportunities, workforce analytics exports).
+1. Continue scaling the evidence-backed employer cohort toward the 500 / 1,000 milestones.
+2. Probe verified public ATS boards (Pinpoint, Breezy, Recruitee, Taleo, SuccessFactors) and add adapters or sources only after fixture-backed validation.
+3. Run controlled beta onboarding and triage real discovery-loop feedback.
+4. Advance Phase 9 commercial features only where beta evidence shows demand.
