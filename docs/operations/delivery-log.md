@@ -154,6 +154,13 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: 301 passed, 101 skipped locally; strict mypy and targeted Ruff passed. The live PostGIS integration coverage runs in CI once the branch is reviewed/merged.
 - Production state: no Pinpoint company source has been registered and no crawl has run. Cloudflare R2 remains deferred, so no new production snapshot-backed source should be activated.
 
+## 2026-09-11 — Pinpoint provider migration applied to Neon
+
+- Approval: the user explicitly approved applying `0024_add_pinpoint_ats_provider.sql` to production Neon.
+- Result: the checksum-locked runner applied exactly migration 24.
+- Verification: direct read-back confirmed schema version `24`, filename `0024_add_pinpoint_ats_provider.sql`, a stored checksum, and `pinpoint` in the `ats_provider` enum.
+- Production state: no Pinpoint company source is registered and no crawl has run. R2 remains deferred, so no snapshot-backed production source should be activated yet.
+
 ## 2026-09-10 — Breezy HR adapter foundation
 
 - Commits: `e30a7e3` (`feat: add Breezy ATS adapter`) and `556f683` (`fix: harden Breezy ATS ingestion`).
