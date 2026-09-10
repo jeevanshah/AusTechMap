@@ -190,6 +190,14 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: post-write read-back reports 310 ambiguous links, 508 companies with an accepted location, 78 total superseded-link cleanup audit records, and zero remaining superseded ambiguous links.
 - Residual risk: the remaining 310 links have no active first-party location evidence and remain a research queue.
 
+## 2026-09-10 — deep first-party structured-data location sweep
+
+- Commit: `data: deepen remaining location research` (this commit)
+- Scope: rechecked all 178 reachable records without a visible street candidate using first-party structured address data and the same bounded official-page rules.
+- Result: six complete, unique official address candidates were found and pass strict fixture validation. The residual queue falls to 304: 127 unreachable, 172 with no candidate after both passes, and five mismatched or multi-office cases.
+- Verification: bounded official-site fetches only; exact candidate/source manifest retained; `validate-address-fixture` passed for the six-row preflight.
+- Residual risk: no production write occurred. The six-row fixture needs explicit approval before geocoding/import; the remaining 304 locations have no safe automatic resolution.
+
 ## 2026-09-10 — ambiguous-location canonical-host recovery
 
 - Commit: `data: recover ambiguous-location address evidence` (this commit)

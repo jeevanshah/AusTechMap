@@ -1,0 +1,7 @@
+name,domain,street_address,suburb,state,postcode,source_confidence,source_note,source_url
+Alembic Strategy,alembic.com.au,99 Moore St,Leichhardt,NSW,2040,High,single complete structured first-party address candidate,https://alembic.com.au/contact
+Divipay,divipay.com.au,320 Pitt St,Sydney,NSW,2000,High,single complete structured first-party address candidate,https://letsweel.com/
+Hyper Anna,hyperanna.com,Level 17 123 Pitt Street,Sydney,NSW,2000,High,single complete structured first-party address candidate,https://www.alteryx.com/
+InstantScripts,instantscripts.com.au,Level 8 637 Flinders St,Docklands,VIC,3008,High,single complete structured first-party address candidate,https://www.instantscripts.com.au/contact-us
+Intersective,intersective.com,Level 3 4/17-19 Bridge St,Sydney,NSW,2000,High,single complete structured first-party address candidate,https://practera.com/about-us/
+Mobi Solutions,mobisolutions.com.au,8 The Avenue,Birtinya,QLD,4575,High,single complete structured first-party address candidate,https://www.mobisolutions.com.au/

@@ -27,6 +27,7 @@
 - **Approved cleanup:** The user approved unlinking 76 ambiguous company-location links only where the same company already had an accepted location. The operation wrote 76 immutable audit records, deleted no shared `resolved_locations` or evidence, and had zero job foreign-key references.
 - **Live post-cleanup state:** 908 companies; 508 companies with an accepted location; **310 ambiguous links/companies**; 78 total audited superseded-link cleanups; zero remaining superseded links; nine pending review items.
 - **Next safe work:** Resume normal product/ATS work. The remaining 310 ambiguous links have no active first-party evidence; do not infer locations. Five difficult review cases remain quarantined; see `docs/data-quality/ambiguous-location-review-resolution-20260910.csv`.
+- **Deep research follow-up:** A complete structured-data pass across the 178 reachable no-candidate records found six additional complete, unique first-party addresses. `docs/data-quality/deep-first-party-location-repair-preflight-20260910.csv` passes validation but is not imported. If approved, import it with `seed-locations`; then its superseded ambiguous links need the same audited cleanup. The residual research-only queue after that would be 304.
 - **Relevant commits:** `1f9825e`, `ed5eb98`, `05544f5`, `27134bb`, `056a536`, `3bb1dac`, `4abba39`, `3760670`, `2ded9c5`.
 
 ## Data-quality cleanup — 9 September 2026

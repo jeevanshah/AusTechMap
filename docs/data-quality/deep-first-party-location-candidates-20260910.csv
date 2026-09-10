@@ -1,0 +1,12 @@
+domain,name,source_url,address_candidate,extraction
+alembic.com.au,Alembic Strategy,https://alembic.com.au/,"99 Moore St, Leichhardt NSW 2040",structured_first_party
+alembic.com.au,Alembic Strategy,https://alembic.com.au/about,"99 Moore St, Leichhardt NSW 2040",structured_first_party
+alembic.com.au,Alembic Strategy,https://alembic.com.au/case-studies/sustainable-solutions-for-energy-intensive-ai-driven-compute-workloads,"99 Moore St, Leichhardt NSW 2040",structured_first_party
+alembic.com.au,Alembic Strategy,https://alembic.com.au/contact,"99 Moore St, Leichhardt NSW 2040",structured_first_party
+divipay.com.au,Divipay,https://letsweel.com/,"320 Pitt St, Sydney NSW 2000",structured_first_party
+hyperanna.com,Hyper Anna,https://www.alteryx.com/,"Level 17, 123 Pitt Street, Sydney NSW 2000",structured_first_party
+instantscripts.com.au,InstantScripts,https://www.instantscripts.com.au/,"Level 8 / 637 Flinders St., Docklands VIC 3008",structured_first_party
+instantscripts.com.au,InstantScripts,https://www.instantscripts.com.au/contact-us,"Level 8 / 637 Flinders St., Docklands VIC 3008",structured_first_party
+intersective.com,Intersective,https://practera.com/,"Level 3, 4/17-19 Bridge St, Sydney NSW 2000",structured_first_party
+intersective.com,Intersective,https://practera.com/about-us/,"Level 3, 4/17-19 Bridge St, Sydney NSW 2000",structured_first_party
+mobisolutions.com.au,Mobi Solutions,https://www.mobisolutions.com.au/,"8 The Avenue, Birtinya QLD 4575",structured_first_party
