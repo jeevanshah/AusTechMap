@@ -10,6 +10,7 @@ The endpoint is public, read-only, and needs no Breezy account credential.
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Callable
 from contextlib import suppress
 from datetime import datetime
@@ -21,6 +22,9 @@ from austechmap_ingestion.hiring.types import RawJobPosting
 
 class BreezyParseError(Exception):
     """Raised for a malformed Breezy public-board response."""
+
+
+_COMPANY_IDENTIFIER_RE = re.compile(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?")
 
 
 def _string_or_none(value: object) -> str | None:
@@ -70,7 +74,13 @@ def _parse_posting(record: dict[str, Any]) -> RawJobPosting:
         team=None,
         location_text=location_text,
         employment_type_raw=employment_type_raw,
-        remote_type_raw="remote" if location.get("is_remote") is True else "onsite",
+        remote_type_raw=(
+            "remote"
+            if location.get("is_remote") is True
+            else "onsite"
+            if location.get("is_remote") is False
+            else None
+        ),
         country=country,
         posted_at=posted_at,
         source_url=source_url,
@@ -84,7 +94,7 @@ def _parse_posting(record: dict[str, Any]) -> RawJobPosting:
 def parse_breezy_postings(payload: bytes) -> list[RawJobPosting]:
     try:
         data = json.loads(payload)
-    except json.JSONDecodeError as error:
+    except (json.JSONDecodeError, UnicodeDecodeError) as error:
         raise BreezyParseError(f"response was not valid JSON: {error}") from error
     if not isinstance(data, list):
         raise BreezyParseError(f"expected a bare JSON array, got {type(data).__name__}")
@@ -93,10 +103,25 @@ def parse_breezy_postings(payload: bytes) -> list[RawJobPosting]:
     return [_parse_posting(record) for record in data]
 
 
+def fetch_breezy_payload(
+    company: str, *, fetch_fn: Callable[..., SafeFetchResult] = safe_fetch
+) -> bytes:
+    """Fetch a company's public Breezy board without parsing it."""
+    if _COMPANY_IDENTIFIER_RE.fullmatch(company) is None:
+        raise ValueError(f"invalid Breezy company identifier: {company!r}")
+    host = f"{company}.breezy.hr"
+    result = fetch_fn(f"https://{host}/json", allowed_hosts=frozenset({host}))
+    return result.content
+
+
 def fetch_breezy_postings(
     company: str, *, fetch_fn: Callable[..., SafeFetchResult] = safe_fetch
 ) -> tuple[bytes, list[RawJobPosting]]:
-    """Fetch and parse a company's public Breezy board."""
-    host = f"{company}.breezy.hr"
-    result = fetch_fn(f"https://{host}/json", allowed_hosts=frozenset({host}))
-    return result.content, parse_breezy_postings(result.content)
+    """Fetch and parse a company's public Breezy board.
+
+    The ingestion pipeline uses :func:`fetch_breezy_payload` directly so it
+    can store immutable raw bytes before parsing. This convenience function is
+    retained for callers that only need parsed public-board data.
+    """
+    payload = fetch_breezy_payload(company, fetch_fn=fetch_fn)
+    return payload, parse_breezy_postings(payload)

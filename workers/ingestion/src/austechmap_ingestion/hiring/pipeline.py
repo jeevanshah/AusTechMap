@@ -17,7 +17,7 @@ import psycopg
 
 from austechmap_ingestion.fetch_safety import SafeFetchResult, safe_fetch
 from austechmap_ingestion.hiring.ashby import fetch_ashby_postings
-from austechmap_ingestion.hiring.breezy import fetch_breezy_postings
+from austechmap_ingestion.hiring.breezy import fetch_breezy_payload, parse_breezy_postings
 from austechmap_ingestion.hiring.company_sources import (
     CompanyAtsSource,
     record_ats_source_success,
@@ -107,7 +107,7 @@ def run_ats_crawl(
         elif provider == "workable":
             raw_bytes, postings = fetch_workable_postings(identifier, fetch_fn=fetch_fn)
         elif provider == "breezy":
-            raw_bytes, postings = fetch_breezy_postings(identifier, fetch_fn=fetch_fn)
+            raw_bytes = fetch_breezy_payload(identifier, fetch_fn=fetch_fn)
         else:
             raise ValueError(f"unsupported ats_provider: {provider!r}")
 
@@ -118,6 +118,8 @@ def run_ats_crawl(
             content=raw_bytes,
             content_type="application/json",
         )
+        if provider == "breezy":
+            postings = parse_breezy_postings(raw_bytes)
 
         created = updated = unchanged = 0
         seen_external_ids: set[str] = set()

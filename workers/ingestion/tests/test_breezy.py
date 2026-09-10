@@ -65,6 +65,15 @@ def test_parse_breezy_postings_marks_remote_location() -> None:
     assert postings[0].remote_type_raw == "remote"
 
 
+def test_parse_breezy_postings_leaves_missing_remote_flag_unknown() -> None:
+    payload = json.dumps(
+        [{"id": "unknown-1", "name": "Engineer", "url": "https://example.breezy.hr/p/unknown"}]
+    ).encode()
+
+    postings = parse_breezy_postings(payload)
+    assert postings[0].remote_type_raw is None
+
+
 def test_parse_breezy_postings_rejects_non_array_payload() -> None:
     with pytest.raises(BreezyParseError, match="bare JSON array"):
         parse_breezy_postings(b"{}")
@@ -73,6 +82,11 @@ def test_parse_breezy_postings_rejects_non_array_payload() -> None:
 def test_parse_breezy_postings_rejects_invalid_json() -> None:
     with pytest.raises(BreezyParseError, match="not valid JSON"):
         parse_breezy_postings(b"not json")
+
+
+def test_parse_breezy_postings_rejects_invalid_utf8() -> None:
+    with pytest.raises(BreezyParseError, match="not valid JSON"):
+        parse_breezy_postings(b"\xff")
 
 
 def test_parse_breezy_postings_rejects_missing_required_fields() -> None:
@@ -101,3 +115,8 @@ def test_fetch_breezy_postings_uses_company_public_json_feed() -> None:
         "url": "https://stake.breezy.hr/json",
         "allowed_hosts": frozenset({"stake.breezy.hr"}),
     }
+
+
+def test_fetch_breezy_postings_rejects_unsafe_company_identifier() -> None:
+    with pytest.raises(ValueError, match="invalid Breezy company identifier"):
+        fetch_breezy_postings("stake.evil")
