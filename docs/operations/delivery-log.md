@@ -148,7 +148,7 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 
 ## 2026-09-10 — Pinpoint public ATS feed implementation
 
-- Branch / commit: `feat/pinpoint-public-feed` at `9823eff`; intentionally not merged to `main` pending the repository's independent-review or explicit-waiver gate.
+- Branch / commits: `feat/pinpoint-public-feed` at `9823eff`, `b54fe35`, and `681caf7`; fast-forwarded to `main` under the user's explicit independent-review waiver, recorded in `docs/reviews/2026-09-10-pinpoint-public-feed-waiver.md`.
 - Scope: added Pinpoint's documented unauthenticated public careers feed (`https://{company-subdomain}.pinpointhq.com/postings.json`) as a structured ATS provider. The worker snapshots bytes before parsing, supports read-only replay, validates safe subdomain identifiers, and preserves the existing source scheduling/kill-switch lifecycle.
 - Migration: new forward-only `0024_add_pinpoint_ats_provider.sql`; it is **not** applied to Neon.
 - Verification: 301 passed, 101 skipped locally; strict mypy and targeted Ruff passed. The live PostGIS integration coverage runs in CI once the branch is reviewed/merged.
