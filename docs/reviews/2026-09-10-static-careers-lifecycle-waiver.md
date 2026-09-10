@@ -7,8 +7,8 @@ lifecycle and approved Codex to merge the change directly to `main`.
 
 The normal isolated Codex reviewer was quota-blocked. The available Claude Code
 reviewer timed out without returning a verdict. This waiver applies only to
-commit `931125e`; it does not authorize production database promotion, source
-registration, or a production crawl.
+commit `931125e`; it did not itself authorize production database promotion,
+source registration, or a production crawl.
 
 ## Covered change set
 
@@ -27,5 +27,6 @@ registration, or a production crawl.
 ## Residual risks
 
 - No independent AI review completed for this change set.
-- Migration `0023_add_static_careers_provider.sql` has not been applied to Neon.
+- The user later gave separate explicit approval and the checksum-locked runner
+  applied migration `0023_add_static_careers_provider.sql` to Neon successfully.
 - No `static_careers` source has been registered and no production crawl ran.

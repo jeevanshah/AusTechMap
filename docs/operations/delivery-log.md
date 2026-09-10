@@ -1,5 +1,13 @@
 # Autonomous delivery log
 
+## 2026-09-10 - static careers provider migration applied
+
+- Approval: the user explicitly approved applying migration `0023` and registering/crawling the first safe static careers source.
+- Migration: the checksum-locked worker applied exactly `0023_add_static_careers_provider.sql` to Neon successfully; it was the sole pending migration.
+- Source qualification: a bounded, read-only check of current first-party careers URLs found stale 404 paths or redirects outside the deliberately exact registered-host allowlist. No candidate was registered from that evidence.
+- Blocking safety condition: `RAW_SNAPSHOT_BACKEND=r2` and all R2 credentials/bucket settings are absent. The default filesystem backend would strand a production raw snapshot on this local machine, violating immutable-evidence replay guarantees, so no source registration or crawl was attempted.
+- Next action: configure R2, then qualify and register one canonical first-party URL with stable JSON-LD jobs before its first crawl.
+
 ## 2026-09-10 - static careers source lifecycle
 
 - Commit: `931125e` (`feat: operationalize static careers sources`).
