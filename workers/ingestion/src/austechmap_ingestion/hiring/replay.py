@@ -9,25 +9,26 @@ from typing import cast
 import psycopg
 
 from austechmap_ingestion.hiring.ashby import AshbyParseError, parse_ashby_postings
+from austechmap_ingestion.hiring.breezy import BreezyParseError, parse_breezy_postings
 from austechmap_ingestion.hiring.company_sources import AtsProvider
 from austechmap_ingestion.hiring.greenhouse import (
     GreenhouseParseError,
     parse_greenhouse_postings,
 )
 from austechmap_ingestion.hiring.lever import LeverParseError, parse_lever_postings
+from austechmap_ingestion.hiring.normalisation import SkillDef, normalise_job
 from austechmap_ingestion.hiring.smartrecruiters import (
     SmartRecruitersParseError,
     parse_smartrecruiters_postings,
 )
+from austechmap_ingestion.hiring.types import RawJobPosting
 from austechmap_ingestion.hiring.workable import (
     WorkableParseError,
     parse_workable_postings,
 )
-from austechmap_ingestion.hiring.normalisation import SkillDef, normalise_job
-from austechmap_ingestion.hiring.types import RawJobPosting
 from austechmap_ingestion.storage import SnapshotStore
 
-_PROVIDERS = frozenset({"lever", "ashby", "greenhouse", "smartrecruiters", "workable"})
+_PROVIDERS = frozenset({"lever", "ashby", "greenhouse", "smartrecruiters", "workable", "breezy"})
 
 
 class AtsReplayError(RuntimeError):
@@ -130,9 +131,12 @@ def _parse(provider: AtsProvider, payload: bytes) -> list[RawJobPosting]:
             return parse_smartrecruiters_postings(payload)
         if provider == "workable":
             return parse_workable_postings(payload)
+        if provider == "breezy":
+            return parse_breezy_postings(payload)
         raise ValueError(f"unsupported provider: {provider}")
     except (
         AshbyParseError,
+        BreezyParseError,
         GreenhouseParseError,
         LeverParseError,
         SmartRecruitersParseError,

@@ -29,7 +29,9 @@ from austechmap_ingestion.jobs import JobRepository
 
 SOURCE_KEY = "ats-discovery"
 DEFAULT_FIXTURE_PATH = Path(__file__).parent / "fixtures" / "ats_source_seed_20260905.csv"
-_VALID_PROVIDERS = frozenset({"lever", "ashby", "greenhouse", "smartrecruiters", "workable"})
+_VALID_PROVIDERS = frozenset(
+    {"lever", "ashby", "greenhouse", "smartrecruiters", "workable", "breezy"}
+)
 
 
 class AtsSourceSeedError(Exception):

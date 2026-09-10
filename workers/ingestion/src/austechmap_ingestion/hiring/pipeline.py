@@ -17,6 +17,7 @@ import psycopg
 
 from austechmap_ingestion.fetch_safety import SafeFetchResult, safe_fetch
 from austechmap_ingestion.hiring.ashby import fetch_ashby_postings
+from austechmap_ingestion.hiring.breezy import fetch_breezy_postings
 from austechmap_ingestion.hiring.company_sources import (
     CompanyAtsSource,
     record_ats_source_success,
@@ -24,10 +25,10 @@ from austechmap_ingestion.hiring.company_sources import (
 )
 from austechmap_ingestion.hiring.greenhouse import fetch_greenhouse_postings
 from austechmap_ingestion.hiring.lever import fetch_lever_postings
-from austechmap_ingestion.hiring.smartrecruiters import fetch_smartrecruiters_postings
-from austechmap_ingestion.hiring.workable import fetch_workable_postings
 from austechmap_ingestion.hiring.normalisation import SkillDef, normalise_job
 from austechmap_ingestion.hiring.persistence import mark_expired_jobs, persist_job_posting
+from austechmap_ingestion.hiring.smartrecruiters import fetch_smartrecruiters_postings
+from austechmap_ingestion.hiring.workable import fetch_workable_postings
 from austechmap_ingestion.jobs import JobRepository, RunStatus, SnapshotRecord
 from austechmap_ingestion.storage import SnapshotStore
 
@@ -105,6 +106,8 @@ def run_ats_crawl(
             raw_bytes, postings = fetch_smartrecruiters_postings(identifier, fetch_fn=fetch_fn)
         elif provider == "workable":
             raw_bytes, postings = fetch_workable_postings(identifier, fetch_fn=fetch_fn)
+        elif provider == "breezy":
+            raw_bytes, postings = fetch_breezy_postings(identifier, fetch_fn=fetch_fn)
         else:
             raise ValueError(f"unsupported ats_provider: {provider!r}")
 
