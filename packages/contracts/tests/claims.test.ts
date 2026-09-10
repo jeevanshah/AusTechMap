@@ -22,7 +22,8 @@ describe("Phase 9 Contracts: Employer Claims & Data Corrections", () => {
   };
 
   it("successfully parses valid employer claim requests", () => {
-    const parsed = CreateEmployerClaimRequestSchema.safeParse(validClaimRequest);
+    const parsed =
+      CreateEmployerClaimRequestSchema.safeParse(validClaimRequest);
     expect(parsed.success).toBe(true);
     if (parsed.success) {
       expect(parsed.data.claimantEmail).toBe("sarah@atlassian.com");
@@ -68,7 +69,8 @@ describe("Phase 9 Contracts: Employer Claims & Data Corrections", () => {
       submitterName: "Dave Tech",
       submitterEmail: "dave@example.com",
       correctionType: "location_incorrect",
-      details: "The Newcastle office moved to 24 Hunter St, Newcastle NSW 2300.",
+      details:
+        "The Newcastle office moved to 24 Hunter St, Newcastle NSW 2300.",
       evidenceUrl: "https://example.com/press-release",
     };
     const parsed = CreateDataCorrectionRequestSchema.safeParse(validCorrection);
@@ -82,7 +84,8 @@ describe("Phase 9 Contracts: Employer Claims & Data Corrections", () => {
       submitterName: "Dave Tech",
       submitterEmail: "dave@example.com",
       correctionType: "location_incorrect",
-      details: "The Newcastle office moved to 24 Hunter St, Newcastle NSW 2300.",
+      details:
+        "The Newcastle office moved to 24 Hunter St, Newcastle NSW 2300.",
       evidenceUrl: "https://example.com/press-release",
       status: "approved",
       reviewNotes: "Updated location record",

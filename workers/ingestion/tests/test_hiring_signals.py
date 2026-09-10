@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import os
 import uuid
-from datetime import date, datetime, timedelta, timezone
-from decimal import Decimal
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import psycopg
@@ -11,8 +10,6 @@ import pytest
 
 from austechmap_ingestion.db.migrations import apply_migrations
 from austechmap_ingestion.hiring.signals import (
-    METHODOLOGY_VERSION,
-    HiringSignalsStats,
     derive_employer_hiring_signals,
 )
 
@@ -32,21 +29,27 @@ def _database_url() -> str:
 def test_derive_employer_hiring_signals_insufficient_sample_size() -> None:
     database_url = _database_url()
     suffix = uuid.uuid4().hex
-    today = datetime.now(timezone.utc).date()
+    today = datetime.now(UTC).date()
 
     with psycopg.connect(database_url, autocommit=True) as conn:
         # Create company
-        company_id = conn.execute(
+        company_row = conn.execute(
             "INSERT INTO companies (slug, display_name, domain) VALUES (%s, %s, %s) RETURNING id",
             (f"sig-co-{suffix}", f"Signals Co {suffix}", f"sig-{suffix}.example.com"),
-        ).fetchone()[0]
+        ).fetchone()
+        assert company_row is not None
+        company_id = company_row[0]
 
         # Get role family and data source
-        role_family_id = conn.execute("SELECT id FROM role_families LIMIT 1").fetchone()[0]
-        source_id = conn.execute("SELECT id FROM data_sources LIMIT 1").fetchone()[0]
+        role_family_row = conn.execute("SELECT id FROM role_families LIMIT 1").fetchone()
+        source_row = conn.execute("SELECT id FROM data_sources LIMIT 1").fetchone()
+        assert role_family_row is not None
+        assert source_row is not None
+        role_family_id = role_family_row[0]
+        source_id = source_row[0]
 
         # Insert 2 jobs (sample size 2 < 3)
-        job1_id = conn.execute(
+        job1_row = conn.execute(
             """
             INSERT INTO jobs (
                 company_id, source_id, source_system, external_id, title,
@@ -58,7 +61,9 @@ def test_derive_employer_hiring_signals_insufficient_sample_size() -> None:
             RETURNING id
             """,
             (company_id, source_id, f"ext-1-{suffix}", role_family_id),
-        ).fetchone()[0]
+        ).fetchone()
+        assert job1_row is not None
+        job1_id = job1_row[0]
 
         # Add single observation
         conn.execute(
@@ -94,23 +99,29 @@ def test_derive_employer_hiring_signals_insufficient_sample_size() -> None:
 def test_derive_employer_hiring_signals_sufficient_cadence() -> None:
     database_url = _database_url()
     suffix = uuid.uuid4().hex
-    today = datetime.now(timezone.utc).date()
-    t_minus_20 = datetime.now(timezone.utc) - timedelta(days=20)
-    t_minus_5 = datetime.now(timezone.utc) - timedelta(days=5)
+    today = datetime.now(UTC).date()
+    t_minus_20 = datetime.now(UTC) - timedelta(days=20)
+    t_minus_5 = datetime.now(UTC) - timedelta(days=5)
 
     with psycopg.connect(database_url, autocommit=True) as conn:
-        company_id = conn.execute(
+        company_row = conn.execute(
             "INSERT INTO companies (slug, display_name, domain) VALUES (%s, %s, %s) RETURNING id",
             (f"sig-suff-{suffix}", f"Sufficient Co {suffix}", f"suff-{suffix}.example.com"),
-        ).fetchone()[0]
+        ).fetchone()
+        assert company_row is not None
+        company_id = company_row[0]
 
-        role_family_id = conn.execute("SELECT id FROM role_families LIMIT 1").fetchone()[0]
-        source_id = conn.execute("SELECT id FROM data_sources LIMIT 1").fetchone()[0]
+        role_family_row = conn.execute("SELECT id FROM role_families LIMIT 1").fetchone()
+        source_row = conn.execute("SELECT id FROM data_sources LIMIT 1").fetchone()
+        assert role_family_row is not None
+        assert source_row is not None
+        role_family_id = role_family_row[0]
+        source_id = source_row[0]
 
         # Insert 3 jobs
         job_ids = []
         for i in range(3):
-            jid = conn.execute(
+            job_row = conn.execute(
                 """
                 INSERT INTO jobs (
                     company_id, source_id, source_system, external_id, title,
@@ -121,25 +132,50 @@ def test_derive_employer_hiring_signals_sufficient_cadence() -> None:
                         repeat('b', 64), now(), now())
                 RETURNING id
                 """,
-                (company_id, source_id, f"ext-suff-{i}-{suffix}", f"Job {i}", f"job {i}", role_family_id, f"https://example.com/{i}"),
-            ).fetchone()[0]
+                (
+                    company_id,
+                    source_id,
+                    f"ext-suff-{i}-{suffix}",
+                    f"Job {i}",
+                    f"job {i}",
+                    role_family_id,
+                    f"https://example.com/{i}",
+                ),
+            ).fetchone()
+            assert job_row is not None
+            jid = job_row[0]
             job_ids.append(jid)
 
         # Observations across 2 dates 15 days apart, total sample size 3
         conn.execute(
-            "INSERT INTO job_observations (job_id, observed_at, active, content_hash, source_id) VALUES (%s, %s, true, repeat('b', 64), %s)",
+            """
+            INSERT INTO job_observations (
+                job_id, observed_at, active, content_hash, source_id
+            )
+            VALUES (%s, %s, true, repeat('b', 64), %s)
+            """,
             (job_ids[0], t_minus_20, source_id),
         )
         conn.execute(
-            "INSERT INTO job_observations (job_id, observed_at, active, content_hash, source_id) VALUES (%s, %s, true, repeat('b', 64), %s)",
+            """
+            INSERT INTO job_observations (
+                job_id, observed_at, active, content_hash, source_id
+            )
+            VALUES (%s, %s, true, repeat('b', 64), %s)
+            """,
             (job_ids[1], t_minus_5, source_id),
         )
         conn.execute(
-            "INSERT INTO job_observations (job_id, observed_at, active, content_hash, source_id) VALUES (%s, %s, true, repeat('b', 64), %s)",
+            """
+            INSERT INTO job_observations (
+                job_id, observed_at, active, content_hash, source_id
+            )
+            VALUES (%s, %s, true, repeat('b', 64), %s)
+            """,
             (job_ids[2], t_minus_5, source_id),
         )
 
-    stats = derive_employer_hiring_signals(database_url, period_end=today)
+    derive_employer_hiring_signals(database_url, period_end=today)
 
     with psycopg.connect(database_url) as conn:
         sig = conn.execute(

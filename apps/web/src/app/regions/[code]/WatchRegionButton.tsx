@@ -45,7 +45,11 @@ export function WatchRegionButton({
       type="button"
       onClick={handleToggle}
       disabled={isPending}
-      title={isWatching ? `Stop watching ${regionName}` : `Watch ${regionName} for tech & labour updates`}
+      title={
+        isWatching
+          ? `Stop watching ${regionName}`
+          : `Watch ${regionName} for tech & labour updates`
+      }
       className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold shadow-2xs transition-all ${
         isWatching
           ? "border border-terracotta-200 bg-terracotta-50 text-terracotta-800 hover:bg-terracotta-100/80"

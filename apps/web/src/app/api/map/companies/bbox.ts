@@ -88,12 +88,15 @@ export function parseBboxParams(
   const roleFamilyRaw =
     searchParams.get("role_family")?.trim() ||
     searchParams.get("roleFamily")?.trim();
-  const roleFamily = roleFamilyRaw && roleFamilyRaw !== "" ? roleFamilyRaw : null;
+  const roleFamily =
+    roleFamilyRaw && roleFamilyRaw !== "" ? roleFamilyRaw : null;
   const workStyleRaw =
     searchParams.get("work_style")?.trim() ||
     searchParams.get("workStyle")?.trim();
   const workStyle =
-    workStyleRaw === "remote" || workStyleRaw === "hybrid" || workStyleRaw === "onsite"
+    workStyleRaw === "remote" ||
+    workStyleRaw === "hybrid" ||
+    workStyleRaw === "onsite"
       ? workStyleRaw
       : null;
 

@@ -144,7 +144,9 @@ describe("parseBboxParams", () => {
 
   it("parses hiring, role_family, and work_style params", () => {
     const result = parseBboxParams(
-      params("bbox=150,-34,152,-33&hiring=true&role_family=engineering&work_style=remote"),
+      params(
+        "bbox=150,-34,152,-33&hiring=true&role_family=engineering&work_style=remote",
+      ),
     );
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -165,4 +167,3 @@ describe("parseBboxParams", () => {
     }
   });
 });
-

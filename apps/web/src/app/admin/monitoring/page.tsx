@@ -59,7 +59,9 @@ async function loadMonitoringData(): Promise<MonitoringData> {
               count(*) FILTER (WHERE expired_at IS NULL)::text AS active
        FROM jobs;`,
     ),
-    pool.query<{ count: string }>("SELECT count(*)::text AS count FROM events;"),
+    pool.query<{ count: string }>(
+      "SELECT count(*)::text AS count FROM events;",
+    ),
     pool.query<{ count: string }>(
       "SELECT count(*)::text AS count FROM notification_deliveries;",
     ),
@@ -150,7 +152,9 @@ export default async function AdminMonitoringPage() {
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs">
               <div className="flex items-center justify-between text-slate-500">
-                <span className="text-xs font-bold uppercase tracking-wider">Postgres Latency</span>
+                <span className="text-xs font-bold uppercase tracking-wider">
+                  Postgres Latency
+                </span>
                 <Database className="h-4 w-4 text-emerald-600" />
               </div>
               <div className="mt-3 flex items-baseline gap-2">
@@ -161,12 +165,16 @@ export default async function AdminMonitoringPage() {
                   {data.dbLatencyMs < 100 ? "Excellent" : "Nominal"}
                 </span>
               </div>
-              <p className="mt-2 text-xs text-slate-500">Neon PostGIS Serverless Cluster</p>
+              <p className="mt-2 text-xs text-slate-500">
+                Neon PostGIS Serverless Cluster
+              </p>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs">
               <div className="flex items-center justify-between text-slate-500">
-                <span className="text-xs font-bold uppercase tracking-wider">Schema Migration</span>
+                <span className="text-xs font-bold uppercase tracking-wider">
+                  Schema Migration
+                </span>
                 <Server className="h-4 w-4 text-sky-600" />
               </div>
               <div className="mt-3">
@@ -174,56 +182,86 @@ export default async function AdminMonitoringPage() {
                   {data.latestMigration}
                 </span>
               </div>
-              <p className="mt-2 text-xs text-slate-500">Up to date through Phase 7 ledger</p>
+              <p className="mt-2 text-xs text-slate-500">
+                Up to date through Phase 7 ledger
+              </p>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs sm:col-span-2 lg:col-span-1">
               <div className="flex items-center justify-between text-slate-500">
-                <span className="text-xs font-bold uppercase tracking-wider">MFA & RBAC Status</span>
+                <span className="text-xs font-bold uppercase tracking-wider">
+                  MFA & RBAC Status
+                </span>
                 <ShieldCheck className="h-4 w-4 text-indigo-600" />
               </div>
               <div className="mt-3 flex items-baseline gap-2">
-                <span className="text-xl font-bold text-slate-900">Enforced</span>
-                <span className="text-xs font-medium text-emerald-600">Active</span>
+                <span className="text-xl font-bold text-slate-900">
+                  Enforced
+                </span>
+                <span className="text-xs font-medium text-emerald-600">
+                  Active
+                </span>
               </div>
-              <p className="mt-2 text-xs text-slate-500">Staff TOTP & Role Gates Active</p>
+              <p className="mt-2 text-xs text-slate-500">
+                Staff TOTP & Role Gates Active
+              </p>
             </div>
           </section>
 
           {/* Core Pipeline Metrics */}
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-2xs">
-            <h2 className="text-base font-bold text-slate-900">Pipeline Inventory & Volume</h2>
+            <h2 className="text-base font-bold text-slate-900">
+              Pipeline Inventory & Volume
+            </h2>
             <div className="mt-6 grid grid-cols-2 gap-6 sm:grid-cols-4">
               <div>
-                <span className="text-xs font-medium text-slate-500 uppercase">Employers</span>
+                <span className="text-xs font-medium text-slate-500 uppercase">
+                  Employers
+                </span>
                 <p className="mt-1 font-mono text-2xl font-bold text-slate-900">
-                  {data.activeCompanies} <span className="text-xs font-normal text-slate-400">/ {data.totalCompanies}</span>
+                  {data.activeCompanies}{" "}
+                  <span className="text-xs font-normal text-slate-400">
+                    / {data.totalCompanies}
+                  </span>
                 </p>
                 <span className="text-xs text-slate-500">Active / Total</span>
               </div>
 
               <div>
-                <span className="text-xs font-medium text-slate-500 uppercase">Tech Jobs</span>
+                <span className="text-xs font-medium text-slate-500 uppercase">
+                  Tech Jobs
+                </span>
                 <p className="mt-1 font-mono text-2xl font-bold text-slate-900">
-                  {data.activeJobs} <span className="text-xs font-normal text-slate-400">/ {data.totalJobs}</span>
+                  {data.activeJobs}{" "}
+                  <span className="text-xs font-normal text-slate-400">
+                    / {data.totalJobs}
+                  </span>
                 </p>
                 <span className="text-xs text-slate-500">Active / Scraped</span>
               </div>
 
               <div>
-                <span className="text-xs font-medium text-slate-500 uppercase">Change Events</span>
+                <span className="text-xs font-medium text-slate-500 uppercase">
+                  Change Events
+                </span>
                 <p className="mt-1 font-mono text-2xl font-bold text-slate-900">
                   {data.totalEvents}
                 </p>
-                <span className="text-xs text-slate-500">Derived longitudinal</span>
+                <span className="text-xs text-slate-500">
+                  Derived longitudinal
+                </span>
               </div>
 
               <div>
-                <span className="text-xs font-medium text-slate-500 uppercase">Alert Deliveries</span>
+                <span className="text-xs font-medium text-slate-500 uppercase">
+                  Alert Deliveries
+                </span>
                 <p className="mt-1 font-mono text-2xl font-bold text-slate-900">
                   {data.totalDeliveries}
                 </p>
-                <span className="text-xs text-slate-500">Deduplicated ledger</span>
+                <span className="text-xs text-slate-500">
+                  Deduplicated ledger
+                </span>
               </div>
             </div>
           </section>
@@ -232,9 +270,12 @@ export default async function AdminMonitoringPage() {
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-2xs">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-base font-bold text-slate-900">Data Anomaly Monitors</h2>
+                <h2 className="text-base font-bold text-slate-900">
+                  Data Anomaly Monitors
+                </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Automated checks catching data rot, missing locations, or categorisation gaps
+                  Automated checks catching data rot, missing locations, or
+                  categorisation gaps
                 </p>
               </div>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 border border-emerald-200">
@@ -246,7 +287,9 @@ export default async function AdminMonitoringPage() {
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-700">Missing Locations</span>
+                  <span className="text-xs font-semibold text-slate-700">
+                    Missing Locations
+                  </span>
                   {data.anomalies.companiesWithoutLocations > 0 ? (
                     <AlertTriangle className="h-4 w-4 text-amber-500" />
                   ) : (
@@ -256,12 +299,16 @@ export default async function AdminMonitoringPage() {
                 <p className="mt-2 font-mono text-2xl font-bold text-slate-900">
                   {data.anomalies.companiesWithoutLocations}
                 </p>
-                <p className="text-xs text-slate-500 mt-1">Active employers without geometry</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  Active employers without geometry
+                </p>
               </div>
 
               <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-700">Missing Categories</span>
+                  <span className="text-xs font-semibold text-slate-700">
+                    Missing Categories
+                  </span>
                   {data.anomalies.companiesWithoutCategory > 0 ? (
                     <AlertTriangle className="h-4 w-4 text-amber-500" />
                   ) : (
@@ -271,12 +318,16 @@ export default async function AdminMonitoringPage() {
                 <p className="mt-2 font-mono text-2xl font-bold text-slate-900">
                   {data.anomalies.companiesWithoutCategory}
                 </p>
-                <p className="text-xs text-slate-500 mt-1">Employers needing sector mapping</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  Employers needing sector mapping
+                </p>
               </div>
 
               <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-700">Stale Evidence</span>
+                  <span className="text-xs font-semibold text-slate-700">
+                    Stale Evidence
+                  </span>
                   {data.anomalies.staleEvidenceCount > 0 ? (
                     <AlertTriangle className="h-4 w-4 text-amber-500" />
                   ) : (
@@ -286,7 +337,9 @@ export default async function AdminMonitoringPage() {
                 <p className="mt-2 font-mono text-2xl font-bold text-slate-900">
                   {data.anomalies.staleEvidenceCount}
                 </p>
-                <p className="text-xs text-slate-500 mt-1">Claims older than 180 days</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  Claims older than 180 days
+                </p>
               </div>
             </div>
           </section>

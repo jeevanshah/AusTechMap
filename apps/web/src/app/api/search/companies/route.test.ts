@@ -200,7 +200,9 @@ describe("GET /api/search/companies", () => {
     const pool = fakePool([]);
     vi.mocked(getPool).mockReturnValue(pool);
 
-    await GET(request("q=acme&hiring=true&role_family=engineering&work_style=remote"));
+    await GET(
+      request("q=acme&hiring=true&role_family=engineering&work_style=remote"),
+    );
 
     expect(pool.query).toHaveBeenCalledWith(
       expect.any(String),

@@ -56,10 +56,14 @@ export function AccountView({
   initialAlerts,
 }: AccountViewProps) {
   const [activeTab, setActiveTab] = useState<TabType>("searches");
-  const [savedSearches, setSavedSearches] = useState<SavedSearch[]>(initialSavedSearches);
-  const [watchlist, setWatchlist] = useState<WatchlistEntry[]>(initialWatchlist);
+  const [savedSearches, setSavedSearches] =
+    useState<SavedSearch[]>(initialSavedSearches);
+  const [watchlist, setWatchlist] =
+    useState<WatchlistEntry[]>(initialWatchlist);
   const [alerts, setAlerts] = useState<UserAlert[]>(initialAlerts.alerts);
-  const [unreadCount, setUnreadCount] = useState<number>(initialAlerts.unreadCount);
+  const [unreadCount, setUnreadCount] = useState<number>(
+    initialAlerts.unreadCount,
+  );
   const [isPending, startTransition] = useTransition();
   const [actionError, setActionError] = useState<string | null>(null);
 
@@ -84,7 +88,9 @@ export function AccountView({
       const res = await updateSavedSearchFrequencyAction(searchId, freq);
       if (res.success) {
         setSavedSearches((prev) =>
-          prev.map((s) => (s.id === searchId ? { ...s, alertFrequency: freq } : s)),
+          prev.map((s) =>
+            s.id === searchId ? { ...s, alertFrequency: freq } : s,
+          ),
         );
       } else {
         setActionError(res.error ?? "Failed to update notification frequency");
@@ -109,7 +115,9 @@ export function AccountView({
       const res = await markAlertReadAction(alertId);
       if (res.success) {
         setAlerts((prev) =>
-          prev.map((a) => (a.id === alertId ? { ...a, readAt: new Date().toISOString() } : a)),
+          prev.map((a) =>
+            a.id === alertId ? { ...a, readAt: new Date().toISOString() } : a,
+          ),
         );
         setUnreadCount((prev) => Math.max(0, prev - 1));
       }
@@ -121,7 +129,10 @@ export function AccountView({
       const res = await markAllAlertsReadAction();
       if (res.success) {
         setAlerts((prev) =>
-          prev.map((a) => ({ ...a, readAt: a.readAt ?? new Date().toISOString() })),
+          prev.map((a) => ({
+            ...a,
+            readAt: a.readAt ?? new Date().toISOString(),
+          })),
         );
         setUnreadCount(0);
       }
@@ -192,7 +203,8 @@ export function AccountView({
                 )}
               </div>
               <p className="mt-1 text-xs text-slate-500">
-                Personal discovery portfolio, saved opportunity queries, and watchlist alerts.
+                Personal discovery portfolio, saved opportunity queries, and
+                watchlist alerts.
               </p>
             </div>
           </div>
@@ -205,7 +217,9 @@ export function AccountView({
                 className="inline-flex items-center gap-1.5 rounded-lg bg-terracotta-50 border border-terracotta-200 px-3 py-1.5 text-xs font-semibold text-terracotta-800 hover:bg-terracotta-100 transition-colors"
               >
                 <Bell className="h-3.5 w-3.5" />
-                <span>{unreadCount} unread update{unreadCount === 1 ? "" : "s"}</span>
+                <span>
+                  {unreadCount} unread update{unreadCount === 1 ? "" : "s"}
+                </span>
               </button>
             )}
           </div>
@@ -300,8 +314,9 @@ export function AccountView({
                   No saved searches yet
                 </h3>
                 <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">
-                  When filtering companies or regions on the map, click &quot;Save Search&quot; to
-                  bookmark your criteria and receive opportunity alerts.
+                  When filtering companies or regions on the map, click
+                  &quot;Save Search&quot; to bookmark your criteria and receive
+                  opportunity alerts.
                 </p>
                 <div className="mt-5">
                   <Link
@@ -327,7 +342,10 @@ export function AccountView({
                             {search.name}
                           </h3>
                           <span className="font-mono text-[10px] text-slate-400">
-                            Saved {new Date(search.createdAt).toLocaleDateString("en-AU")}
+                            Saved{" "}
+                            {new Date(search.createdAt).toLocaleDateString(
+                              "en-AU",
+                            )}
                           </span>
                         </div>
                         <button
@@ -388,7 +406,10 @@ export function AccountView({
                         <select
                           value={search.alertFrequency}
                           onChange={(e) =>
-                            handleUpdateFrequency(search.id, e.target.value as AlertFrequency)
+                            handleUpdateFrequency(
+                              search.id,
+                              e.target.value as AlertFrequency,
+                            )
                           }
                           disabled={isPending}
                           className="bg-transparent font-medium text-slate-700 hover:text-navy-900 focus:outline-none cursor-pointer text-xs"
@@ -425,8 +446,9 @@ export function AccountView({
                   Your watchlist is empty
                 </h3>
                 <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">
-                  Watch technology employers or regional tech hubs to track headcount momentum,
-                  new visa sponsorship data, and local ecosystem changes.
+                  Watch technology employers or regional tech hubs to track
+                  headcount momentum, new visa sponsorship data, and local
+                  ecosystem changes.
                 </p>
                 <div className="mt-5">
                   <Link
@@ -445,7 +467,9 @@ export function AccountView({
                     Tracked Employers ({watchedCompanies.length})
                   </h3>
                   {watchedCompanies.length === 0 ? (
-                    <p className="text-xs text-slate-400">No employers watched yet.</p>
+                    <p className="text-xs text-slate-400">
+                      No employers watched yet.
+                    </p>
                   ) : (
                     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       {watchedCompanies.map((w) => (
@@ -500,7 +524,9 @@ export function AccountView({
                           </div>
 
                           <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                            <span className="text-[10px] font-mono text-slate-400">Watching</span>
+                            <span className="text-[10px] font-mono text-slate-400">
+                              Watching
+                            </span>
                             <Link
                               href={`/companies/${w.company?.slug ?? ""}`}
                               className="inline-flex items-center gap-1 font-semibold text-terracotta-700 hover:text-terracotta-800"
@@ -521,7 +547,9 @@ export function AccountView({
                     Tracked Regional Tech Hubs ({watchedRegions.length})
                   </h3>
                   {watchedRegions.length === 0 ? (
-                    <p className="text-xs text-slate-400">No regional hubs watched yet.</p>
+                    <p className="text-xs text-slate-400">
+                      No regional hubs watched yet.
+                    </p>
                   ) : (
                     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       {watchedRegions.map((w) => (
@@ -563,7 +591,9 @@ export function AccountView({
                           </div>
 
                           <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                            <span className="text-[10px] font-mono text-slate-400">Watching</span>
+                            <span className="text-[10px] font-mono text-slate-400">
+                              Watching
+                            </span>
                             <Link
                               href={`/regions/${w.sa4Code ?? w.region?.code ?? ""}`}
                               className="inline-flex items-center gap-1 font-semibold text-terracotta-700 hover:text-terracotta-800"
@@ -609,8 +639,8 @@ export function AccountView({
                   You&apos;re all caught up
                 </h3>
                 <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">
-                  New verified employer sponsorships, active tech vacancies, and regional labour
-                  market changes will appear here.
+                  New verified employer sponsorships, active tech vacancies, and
+                  regional labour market changes will appear here.
                 </p>
               </div>
             ) : (
@@ -648,12 +678,16 @@ export function AccountView({
                           </p>
                           <div className="mt-2 flex items-center gap-3">
                             <span className="font-mono text-[10px] text-slate-400">
-                              {new Date(alert.createdAt).toLocaleString("en-AU")}
+                              {new Date(alert.createdAt).toLocaleString(
+                                "en-AU",
+                              )}
                             </span>
                             {alert.link && (
                               <Link
                                 href={alert.link}
-                                onClick={() => isUnread && handleMarkAlertRead(alert.id)}
+                                onClick={() =>
+                                  isUnread && handleMarkAlertRead(alert.id)
+                                }
                                 className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-terracotta-700 hover:underline"
                               >
                                 <span>Inspect</span>
@@ -691,10 +725,10 @@ export function AccountView({
                 Australian Privacy Principles &amp; Data Control
               </h3>
               <p className="mt-1 text-xs text-slate-600 leading-relaxed max-w-2xl">
-                Australia Tech Map follows APP 11 standards: personal data is collected solely to
-                power your saved searches, watchlists, and delivery preferences. You hold full
-                control to delete your account and immediately purge all associated state at any
-                time.
+                Australia Tech Map follows APP 11 standards: personal data is
+                collected solely to power your saved searches, watchlists, and
+                delivery preferences. You hold full control to delete your
+                account and immediately purge all associated state at any time.
               </p>
             </div>
 
@@ -705,8 +739,9 @@ export function AccountView({
                     Delete Account &amp; Purge Personal Data
                   </h4>
                   <p className="mt-0.5 text-xs text-slate-500">
-                    Permanently disable your account, purge saved searches, watchlists, and
-                    undelivered alerts, and record a tombstone audit ledger.
+                    Permanently disable your account, purge saved searches,
+                    watchlists, and undelivered alerts, and record a tombstone
+                    audit ledger.
                   </p>
                 </div>
                 <Link

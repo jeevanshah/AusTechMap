@@ -183,7 +183,8 @@ export default async function ReviewQueuePage() {
                   <div>
                     <dt className="text-slate-500 font-medium">Claimant</dt>
                     <dd className="font-semibold text-slate-900">
-                      {item.payload.claimant_name} ({item.payload.claimant_role})
+                      {item.payload.claimant_name} ({item.payload.claimant_role}
+                      )
                     </dd>
                   </div>
                   <div>
@@ -194,7 +195,9 @@ export default async function ReviewQueuePage() {
                   </div>
                   {item.payload.evidence_url && (
                     <div className="col-span-2">
-                      <dt className="text-slate-500 font-medium">Evidence URL</dt>
+                      <dt className="text-slate-500 font-medium">
+                        Evidence URL
+                      </dt>
                       <dd>
                         <a
                           href={item.payload.evidence_url}
@@ -209,7 +212,9 @@ export default async function ReviewQueuePage() {
                   )}
                   {item.reason && (
                     <div className="col-span-2">
-                      <dt className="text-slate-500 font-medium">Reason / Context</dt>
+                      <dt className="text-slate-500 font-medium">
+                        Reason / Context
+                      </dt>
                       <dd className="italic text-slate-600">{item.reason}</dd>
                     </div>
                   )}
@@ -273,10 +278,12 @@ export default async function ReviewQueuePage() {
 
                 <div className="text-xs text-slate-700 border-y border-amber-100 py-3 space-y-2">
                   <p>
-                    <strong className="text-slate-900">Details:</strong> {item.payload.details}
+                    <strong className="text-slate-900">Details:</strong>{" "}
+                    {item.payload.details}
                   </p>
                   <p className="text-slate-500">
-                    Reported by: {item.payload.submitter_name ?? "Anonymous"} ({item.payload.submitter_email})
+                    Reported by: {item.payload.submitter_name ?? "Anonymous"} (
+                    {item.payload.submitter_email})
                   </p>
                   {item.payload.evidence_url && (
                     <p>

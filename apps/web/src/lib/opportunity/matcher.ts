@@ -29,9 +29,7 @@ export function computeQueryHash(
     prefersRegional: Boolean(preferences.prefersRegional),
   };
 
-  return createHash("sha256")
-    .update(JSON.stringify(normalized))
-    .digest("hex");
+  return createHash("sha256").update(JSON.stringify(normalized)).digest("hex");
 }
 
 export interface RawCompanyData {
@@ -391,10 +389,7 @@ export function scoreCompany(
     const requested = preferences.workStyle.toLowerCase();
     if (companyWorkStyles.has(requested)) {
       workStyleScore = 5;
-    } else if (
-      requested === "remote" &&
-      companyWorkStyles.has("hybrid")
-    ) {
+    } else if (requested === "remote" && companyWorkStyles.has("hybrid")) {
       workStyleScore = 4;
     } else if (companyWorkStyles.size === 0) {
       workStyleScore = 3;

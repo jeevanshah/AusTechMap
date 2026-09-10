@@ -164,7 +164,10 @@ export async function validateSafeUrl(
     }
 
     const firstRecord = lookupResult[0];
-    return { valid: true, resolvedIp: firstRecord ? firstRecord.address : undefined };
+    return {
+      valid: true,
+      resolvedIp: firstRecord ? firstRecord.address : undefined,
+    };
   } catch (err) {
     return {
       valid: false,

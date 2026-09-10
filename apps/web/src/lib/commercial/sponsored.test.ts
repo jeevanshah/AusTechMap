@@ -36,7 +36,9 @@ describe("Commercial Sponsored Placements Engine", () => {
     expect(placements).toHaveLength(1);
     expect(placements[0]?.companyName).toBe("Atlassian");
     expect(placements[0]?.ctaLabel).toBe("View Open Tech Roles");
-    expect(placements[0]?.headline).toBe("Join the Team Behind Jira and Confluence");
+    expect(placements[0]?.headline).toBe(
+      "Join the Team Behind Jira and Confluence",
+    );
   });
 
   it("handles empty placements gracefully", async () => {

@@ -110,7 +110,9 @@ export async function grantEntitlement(
       id: row.id,
       userId: Number(row.user_id),
       entitlement: row.entitlement,
-      grantedByUserId: row.granted_by_user_id ? Number(row.granted_by_user_id) : undefined,
+      grantedByUserId: row.granted_by_user_id
+        ? Number(row.granted_by_user_id)
+        : undefined,
       grantedAt: row.granted_at.toISOString(),
       expiresAt: row.expires_at ? row.expires_at.toISOString() : undefined,
       metadata: row.metadata,

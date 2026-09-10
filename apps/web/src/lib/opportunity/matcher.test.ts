@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  computeQueryHash,
-  type RawCompanyData,
-  scoreCompany,
-} from "./matcher";
+import { computeQueryHash, type RawCompanyData, scoreCompany } from "./matcher";
 import type { OpportunityMatchPreferences } from "@austechmap/contracts";
 
 describe("Opportunity Matcher Engine", () => {

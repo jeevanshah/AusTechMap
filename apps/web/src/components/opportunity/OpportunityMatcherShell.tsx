@@ -162,7 +162,11 @@ export function OpportunityMatcherShell({
     e.preventDefault();
     if (!skillInput.trim()) return;
     const norm = skillInput.trim();
-    if (!preferences.skills.map((s) => s.toLowerCase()).includes(norm.toLowerCase())) {
+    if (
+      !preferences.skills
+        .map((s) => s.toLowerCase())
+        .includes(norm.toLowerCase())
+    ) {
       const updated = { ...preferences, skills: [...preferences.skills, norm] };
       setPreferences(updated);
       runMatch(updated);
@@ -246,7 +250,8 @@ export function OpportunityMatcherShell({
       };
 
       const res = await saveSearchAction(
-        searchName.trim() || `Match: ${preferences.roleFamily || "Tech Opportunities"}`,
+        searchName.trim() ||
+          `Match: ${preferences.roleFamily || "Tech Opportunities"}`,
         filters,
         alertFrequency,
       );
@@ -680,9 +685,9 @@ export function OpportunityMatcherShell({
                   No employers matched these strict criteria
                 </h3>
                 <p className="text-xs text-slate-600 mt-1 max-w-sm mx-auto">
-                  Try unchecking &ldquo;Strict filter&rdquo; on location or work style, or
-                  broadening your role family to see adjacent opportunity
-                  signals.
+                  Try unchecking &ldquo;Strict filter&rdquo; on location or work
+                  style, or broadening your role family to see adjacent
+                  opportunity signals.
                 </p>
               </div>
             ) : (

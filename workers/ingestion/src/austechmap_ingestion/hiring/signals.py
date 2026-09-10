@@ -15,9 +15,8 @@ Implements the automated population of:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
-from typing import Any
 
 import psycopg
 
@@ -43,7 +42,7 @@ def derive_employer_hiring_signals(
 ) -> HiringSignalsStats:
     """Derives and upserts role and skill signals for all companies with hiring data."""
     if period_end is None:
-        period_end = datetime.now(timezone.utc).date()
+        period_end = datetime.now(UTC).date()
     period_start = period_end - timedelta(days=period_days)
 
     role_created = 0
@@ -115,7 +114,8 @@ def derive_employer_hiring_signals(
                 sample_size = sum(count for _, count in obs_rows)
                 observation_dates = [obs_date for obs_date, _ in obs_rows]
 
-                # Sufficiency rule: sample_size >= 3 across >= 2 distinct observation dates >= 14 days apart
+                # Sufficiency requires three observations across at least two
+                # dates that are at least 14 days apart.
                 is_sufficient = False
                 momentum: Decimal | None = None
 
@@ -135,7 +135,9 @@ def derive_employer_hiring_signals(
                       new_jobs, momentum, sample_size, sufficient, methodology_version, generated_at
                     )
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now())
-                    ON CONFLICT (company_id, role_family_id, period_start, period_end, methodology_version)
+                    ON CONFLICT (
+                      company_id, role_family_id, period_start, period_end, methodology_version
+                    )
                     DO UPDATE SET
                       active_jobs = EXCLUDED.active_jobs,
                       new_jobs = EXCLUDED.new_jobs,
@@ -167,7 +169,10 @@ def derive_employer_hiring_signals(
             # 2. Derive Skill Signals per (company_id, skill_id) for active jobs
             skill_rows = connection.execute(
                 """
-                SELECT jsl.skill_id, count(DISTINCT j.id) AS evidence_count, avg(jsl.confidence) AS avg_conf
+                SELECT
+                  jsl.skill_id,
+                  count(DISTINCT j.id) AS evidence_count,
+                  avg(jsl.confidence) AS avg_conf
                 FROM job_skill_links jsl
                 JOIN jobs j ON j.id = jsl.job_id
                 WHERE j.company_id = %s AND j.expired_at IS NULL
@@ -177,7 +182,11 @@ def derive_employer_hiring_signals(
             ).fetchall()
 
             for skill_id, evidence_count, avg_conf in skill_rows:
-                confidence = Decimal(str(round(float(avg_conf), 2))) if avg_conf is not None else Decimal("0.50")
+                confidence = (
+                    Decimal(str(round(float(avg_conf), 2)))
+                    if avg_conf is not None
+                    else Decimal("0.50")
+                )
                 is_sufficient = evidence_count >= 2
 
                 res = connection.execute(
@@ -187,7 +196,9 @@ def derive_employer_hiring_signals(
                       confidence, sufficient, methodology_version, generated_at
                     )
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, now())
-                    ON CONFLICT (company_id, skill_id, period_start, period_end, methodology_version)
+                    ON CONFLICT (
+                      company_id, skill_id, period_start, period_end, methodology_version
+                    )
                     DO UPDATE SET
                       evidence_count = EXCLUDED.evidence_count,
                       confidence = EXCLUDED.confidence,

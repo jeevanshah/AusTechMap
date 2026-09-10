@@ -606,7 +606,9 @@ export function HomeMapShell({
   });
   const [sponsorshipOnly, setSponsorshipOnly] = useState(() => {
     if (typeof window === "undefined") return false;
-    return Boolean(new URLSearchParams(window.location.search).get("sponsorship"));
+    return Boolean(
+      new URLSearchParams(window.location.search).get("sponsorship"),
+    );
   });
   const [regionalOnly, setRegionalOnly] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -699,7 +701,9 @@ export function HomeMapShell({
     setSaveErrorMessage(null);
     setSaveSuccessMessage(null);
 
-    const activeHubMeta = activeHubCity ? HUB_METADATA[activeHubCity] : undefined;
+    const activeHubMeta = activeHubCity
+      ? HUB_METADATA[activeHubCity]
+      : undefined;
     const filters: SavedSearchFilter = {
       query: query || undefined,
       category: selectedCategory || undefined,
@@ -1382,14 +1386,17 @@ export function HomeMapShell({
             {saveSuccessMessage ? (
               <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center">
                 <CheckCircle2 className="mx-auto h-6 w-6 text-emerald-600 mb-1" />
-                <p className="text-xs font-bold text-emerald-900">{saveSuccessMessage}</p>
+                <p className="text-xs font-bold text-emerald-900">
+                  {saveSuccessMessage}
+                </p>
               </div>
             ) : !currentUser ? (
               <div className="space-y-4">
                 <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Signing in with your email lets you save search criteria, track companies and
-                    regional hubs, and receive low-noise opportunity alerts.
+                    Signing in with your email lets you save search criteria,
+                    track companies and regional hubs, and receive low-noise
+                    opportunity alerts.
                   </p>
                 </div>
                 <div className="flex items-center justify-end gap-2 pt-2">
@@ -1436,13 +1443,17 @@ export function HomeMapShell({
                   </label>
                   <select
                     value={saveAlertFrequency}
-                    onChange={(e) => setSaveAlertFrequency(e.target.value as AlertFrequency)}
+                    onChange={(e) =>
+                      setSaveAlertFrequency(e.target.value as AlertFrequency)
+                    }
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-navy-900 focus:border-navy-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-navy-900/15 cursor-pointer"
                   >
                     <option value="never">In-App Only (No email digest)</option>
                     <option value="daily">Daily Opportunity Digest</option>
                     <option value="weekly">Weekly Opportunity Digest</option>
-                    <option value="instant">Instant Updates (Material changes)</option>
+                    <option value="instant">
+                      Instant Updates (Material changes)
+                    </option>
                   </select>
                 </div>
 
@@ -1520,7 +1531,9 @@ export function HomeMapShell({
                     disabled={isSavingSearch}
                     className="inline-flex items-center gap-1.5 rounded-xl bg-terracotta-700 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-terracotta-800 transition-colors disabled:opacity-70"
                   >
-                    {isSavingSearch && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                    {isSavingSearch && (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    )}
                     <span>Save Search</span>
                   </button>
                 </div>
@@ -1576,12 +1589,16 @@ export function HomeMapShell({
                             Standard Employer
                           </span>
                         )}
-                        {selectedEntry.activeJobsCount && selectedEntry.activeJobsCount > 0 && (
-                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 shadow-2xs">
-                            <Zap className="h-3 w-3 text-emerald-600 fill-emerald-600 shrink-0" />
-                            {selectedEntry.activeJobsCount} Live {selectedEntry.activeJobsCount === 1 ? "Role" : "Roles"}
-                          </span>
-                        )}
+                        {selectedEntry.activeJobsCount &&
+                          selectedEntry.activeJobsCount > 0 && (
+                            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 shadow-2xs">
+                              <Zap className="h-3 w-3 text-emerald-600 fill-emerald-600 shrink-0" />
+                              {selectedEntry.activeJobsCount} Live{" "}
+                              {selectedEntry.activeJobsCount === 1
+                                ? "Role"
+                                : "Roles"}
+                            </span>
+                          )}
                         {selectedEntry.primaryCategory && (
                           <CategoryBadge
                             category={selectedEntry.primaryCategory}
@@ -1698,14 +1715,16 @@ export function HomeMapShell({
                   <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-slate-50 p-3 transition-colors hover:border-slate-300 shadow-2xs">
                     <div
                       className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border shadow-2xs ${
-                        selectedEntry.activeJobsCount && selectedEntry.activeJobsCount > 0
+                        selectedEntry.activeJobsCount &&
+                        selectedEntry.activeJobsCount > 0
                           ? "bg-emerald-600 text-white border-emerald-600"
                           : "bg-white text-slate-400 border-slate-200/90"
                       }`}
                     >
                       <Zap
                         className={`h-4 w-4 ${
-                          selectedEntry.activeJobsCount && selectedEntry.activeJobsCount > 0
+                          selectedEntry.activeJobsCount &&
+                          selectedEntry.activeJobsCount > 0
                             ? "fill-white text-white"
                             : "text-slate-400"
                         }`}
@@ -1713,14 +1732,17 @@ export function HomeMapShell({
                     </div>
                     <div className="min-w-0">
                       <span className="block font-heading text-xs font-bold text-navy-900">
-                        {selectedEntry.activeJobsCount && selectedEntry.activeJobsCount > 0
+                        {selectedEntry.activeJobsCount &&
+                        selectedEntry.activeJobsCount > 0
                           ? `${selectedEntry.activeJobsCount} Live ${selectedEntry.activeJobsCount === 1 ? "Vacancy" : "Vacancies"}`
                           : "Hiring Status"}
                       </span>
                       <span className="block text-[11px] text-slate-500 font-medium truncate">
-                        {selectedEntry.topRoleFamilies && selectedEntry.topRoleFamilies.length > 0
+                        {selectedEntry.topRoleFamilies &&
+                        selectedEntry.topRoleFamilies.length > 0
                           ? selectedEntry.topRoleFamilies.join(", ")
-                          : selectedEntry.activeJobsCount && selectedEntry.activeJobsCount > 0
+                          : selectedEntry.activeJobsCount &&
+                              selectedEntry.activeJobsCount > 0
                             ? "Actively Recruiting"
                             : "No Live Vacancies"}
                       </span>
@@ -1761,7 +1783,8 @@ export function HomeMapShell({
                       className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl border border-slate-200/90 bg-white px-3.5 py-2 text-xs font-semibold text-navy-900 hover:bg-slate-50 transition-colors shadow-2xs"
                     >
                       <span>
-                        {selectedEntry.activeJobsCount && selectedEntry.activeJobsCount > 0
+                        {selectedEntry.activeJobsCount &&
+                        selectedEntry.activeJobsCount > 0
                           ? `View ${selectedEntry.activeJobsCount} open ${selectedEntry.activeJobsCount === 1 ? "role" : "roles"}`
                           : "Careers portal"}
                       </span>
@@ -2074,10 +2097,14 @@ export function HomeMapShell({
                               {entry.name}
                             </span>
                             <div className="flex items-center gap-1.5 shrink-0">
-                              {entry.activeJobsCount && entry.activeJobsCount > 0 ? (
+                              {entry.activeJobsCount &&
+                              entry.activeJobsCount > 0 ? (
                                 <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-800 shadow-2xs">
                                   <Zap className="h-2.5 w-2.5 text-emerald-600 fill-emerald-600 shrink-0" />
-                                  {entry.activeJobsCount} live {entry.activeJobsCount === 1 ? "role" : "roles"}
+                                  {entry.activeJobsCount} live{" "}
+                                  {entry.activeJobsCount === 1
+                                    ? "role"
+                                    : "roles"}
                                 </span>
                               ) : (
                                 <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-800 shadow-2xs">
@@ -2108,23 +2135,25 @@ export function HomeMapShell({
                           </div>
 
                           {/* Role Families & Work Style Tags */}
-                          {entry.topRoleFamilies && entry.topRoleFamilies.length > 0 && (
-                            <div className="flex flex-wrap items-center gap-1 mt-1.5">
-                              {entry.topRoleFamilies.slice(0, 3).map((rf) => (
-                                <span
-                                  key={rf}
-                                  className="rounded bg-slate-100/90 px-1.5 py-0.5 font-mono text-[10px] font-medium text-slate-600"
-                                >
-                                  {rf}
-                                </span>
-                              ))}
-                              {entry.workStyles && entry.workStyles.includes("remote") && (
-                                <span className="rounded bg-sky-50 text-sky-700 border border-sky-200/70 px-1.5 py-0.5 font-mono text-[10px] font-semibold">
-                                  Remote
-                                </span>
-                              )}
-                            </div>
-                          )}
+                          {entry.topRoleFamilies &&
+                            entry.topRoleFamilies.length > 0 && (
+                              <div className="flex flex-wrap items-center gap-1 mt-1.5">
+                                {entry.topRoleFamilies.slice(0, 3).map((rf) => (
+                                  <span
+                                    key={rf}
+                                    className="rounded bg-slate-100/90 px-1.5 py-0.5 font-mono text-[10px] font-medium text-slate-600"
+                                  >
+                                    {rf}
+                                  </span>
+                                ))}
+                                {entry.workStyles &&
+                                  entry.workStyles.includes("remote") && (
+                                    <span className="rounded bg-sky-50 text-sky-700 border border-sky-200/70 px-1.5 py-0.5 font-mono text-[10px] font-semibold">
+                                      Remote
+                                    </span>
+                                  )}
+                              </div>
+                            )}
 
                           {entry.hasSponsorshipEvidence && (
                             <div className="flex items-center gap-1.5 mt-1.5">

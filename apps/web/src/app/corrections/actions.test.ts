@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { submitEmployerClaimAction, submitDataCorrectionAction } from "./actions";
+import {
+  submitEmployerClaimAction,
+  submitDataCorrectionAction,
+} from "./actions";
 import * as dbModule from "../../lib/db";
 import * as rateLimitModule from "../../lib/rate-limit";
 import * as ipModule from "../../lib/request-ip";
@@ -84,7 +87,9 @@ describe("Phase 9 Corrections Server Actions", () => {
     );
 
     vi.spyOn(claimQueries, "createEmployerClaim").mockResolvedValue({
-      claim: { id: "claim-1" } as unknown as claimQueries.CreateClaimResult["claim"],
+      claim: {
+        id: "claim-1",
+      } as unknown as claimQueries.CreateClaimResult["claim"],
       reviewQueueItemId: "queue-1",
     });
 
@@ -109,7 +114,9 @@ describe("Phase 9 Corrections Server Actions", () => {
     });
 
     vi.spyOn(claimQueries, "createDataCorrection").mockResolvedValue({
-      correction: { id: "corr-1" } as unknown as claimQueries.CreateCorrectionResult["correction"],
+      correction: {
+        id: "corr-1",
+      } as unknown as claimQueries.CreateCorrectionResult["correction"],
       reviewQueueItemId: "queue-2",
     });
 

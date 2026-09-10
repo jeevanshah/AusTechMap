@@ -57,40 +57,68 @@ export const GOLDEN_QUERIES: GoldenQueryDefinition[] = [
     id: "GQ-01",
     name: "Exact employer: Atlassian",
     type: "search",
-    description: "Canonical employer is first; aliases do not create duplicates.",
+    description:
+      "Canonical employer is first; aliases do not create duplicates.",
     searchParams: { query: "Atlassian" },
     expectedAssertions: (res) => {
       if (res.resultsCount === 0) {
-        return { passed: false, reason: "No results returned for Atlassian", violations: 1, grade: 0 };
+        return {
+          passed: false,
+          reason: "No results returned for Atlassian",
+          violations: 1,
+          grade: 0,
+        };
       }
       const first = res.topResults[0];
       const isAtlassian = first?.name.toLowerCase() === "atlassian";
       if (!first || !isAtlassian) {
-        return { passed: false, reason: `Expected Atlassian #1, got ${first?.name ?? "none"}`, violations: 1, grade: 1 };
+        return {
+          passed: false,
+          reason: `Expected Atlassian #1, got ${first?.name ?? "none"}`,
+          violations: 1,
+          grade: 1,
+        };
       }
-      return { passed: true, reason: "Atlassian ranked #1 without duplicates", violations: 0, grade: 3 };
+      return {
+        passed: true,
+        reason: "Atlassian ranked #1 without duplicates",
+        violations: 0,
+        grade: 3,
+      };
     },
   },
   {
     id: "GQ-02",
     name: "Employer typo: atlassain",
     type: "search",
-    description: "The intended employer is in the top three through trigram matching.",
+    description:
+      "The intended employer is in the top three through trigram matching.",
     searchParams: { query: "atlassain" },
     expectedAssertions: (res) => {
       const top3 = res.topResults.slice(0, 3);
       const found = top3.some((r) => r.name.toLowerCase() === "atlassian");
       if (!found) {
-        return { passed: false, reason: "Atlassian not found in top 3 for typo 'atlassain'", violations: 1, grade: 0 };
+        return {
+          passed: false,
+          reason: "Atlassian not found in top 3 for typo 'atlassain'",
+          violations: 1,
+          grade: 0,
+        };
       }
-      return { passed: true, reason: "Atlassian found in top 3 via trigram matching", violations: 0, grade: 3 };
+      return {
+        passed: true,
+        reason: "Atlassian found in top 3 via trigram matching",
+        violations: 0,
+        grade: 3,
+      };
     },
   },
   {
     id: "GQ-04",
     name: "Multi-signal role: Data Engineer in Sydney (Hybrid)",
     type: "opportunity_match",
-    description: "Every result satisfies location and work-style; role/skills explained.",
+    description:
+      "Every result satisfies location and work-style; role/skills explained.",
     matchPreferences: {
       roleFamily: "data",
       skills: ["Python", "SQL"],
@@ -114,7 +142,12 @@ export const GOLDEN_QUERIES: GoldenQueryDefinition[] = [
           };
         }
       }
-      return { passed: true, reason: "Zero hard constraint violations, Sydney hybrid respected", violations: 0, grade: 3 };
+      return {
+        passed: true,
+        reason: "Zero hard constraint violations, Sydney hybrid respected",
+        violations: 0,
+        grade: 3,
+      };
     },
   },
   {
@@ -136,15 +169,30 @@ export const GOLDEN_QUERIES: GoldenQueryDefinition[] = [
     },
     expectedAssertions: (res) => {
       if (res.resultsCount === 0) {
-        return { passed: false, reason: "No matches found", violations: 1, grade: 0 };
+        return {
+          passed: false,
+          reason: "No matches found",
+          violations: 1,
+          grade: 0,
+        };
       }
-      const topHasGoOrMelb = res.topResults.slice(0, 3).some((r) =>
-        (r.city && r.city.toLowerCase().includes("melbourne")) ||
-        (r.topReasons && r.topReasons.some((t) => t.toLowerCase().includes("go") || t.toLowerCase().includes("melbourne")))
-      );
+      const topHasGoOrMelb = res.topResults
+        .slice(0, 3)
+        .some(
+          (r) =>
+            (r.city && r.city.toLowerCase().includes("melbourne")) ||
+            (r.topReasons &&
+              r.topReasons.some(
+                (t) =>
+                  t.toLowerCase().includes("go") ||
+                  t.toLowerCase().includes("melbourne"),
+              )),
+        );
       return {
         passed: topHasGoOrMelb,
-        reason: topHasGoOrMelb ? "Top results match Go/Melbourne criteria" : "Top matches did not reflect criteria",
+        reason: topHasGoOrMelb
+          ? "Top results match Go/Melbourne criteria"
+          : "Top matches did not reflect criteria",
         violations: 0,
         grade: topHasGoOrMelb ? 3 : 2,
       };
@@ -154,7 +202,8 @@ export const GOLDEN_QUERIES: GoldenQueryDefinition[] = [
     id: "GQ-08",
     name: "National remote: Machine Learning Engineer",
     type: "opportunity_match",
-    description: "Office location is not incorrectly required; remote policy respected.",
+    description:
+      "Office location is not incorrectly required; remote policy respected.",
     matchPreferences: {
       roleFamily: "ai-ml",
       skills: ["Python"],
@@ -169,9 +218,19 @@ export const GOLDEN_QUERIES: GoldenQueryDefinition[] = [
     },
     expectedAssertions: (res) => {
       if (res.resultsCount === 0) {
-        return { passed: false, reason: "No matches found", violations: 1, grade: 0 };
+        return {
+          passed: false,
+          reason: "No matches found",
+          violations: 1,
+          grade: 0,
+        };
       }
-      return { passed: true, reason: "National remote matches returned without office constraint", violations: 0, grade: 3 };
+      return {
+        passed: true,
+        reason: "National remote matches returned without office constraint",
+        violations: 0,
+        grade: 3,
+      };
     },
   },
   {
@@ -193,14 +252,25 @@ export const GOLDEN_QUERIES: GoldenQueryDefinition[] = [
     },
     expectedAssertions: (res) => {
       if (res.resultsCount === 0) {
-        return { passed: false, reason: "No matches found", violations: 1, grade: 0 };
+        return {
+          passed: false,
+          reason: "No matches found",
+          violations: 1,
+          grade: 0,
+        };
       }
-      const hasSkillMention = res.topResults.slice(0, 5).some((r) =>
-        r.topReasons?.some((reason) => reason.toLowerCase().includes("react"))
-      );
+      const hasSkillMention = res.topResults
+        .slice(0, 5)
+        .some((r) =>
+          r.topReasons?.some((reason) =>
+            reason.toLowerCase().includes("react"),
+          ),
+        );
       return {
         passed: hasSkillMention,
-        reason: hasSkillMention ? "React skill evidence surfaced in top matches" : "Skill evidence missing in top 5",
+        reason: hasSkillMention
+          ? "React skill evidence surfaced in top matches"
+          : "Skill evidence missing in top 5",
         violations: 0,
         grade: hasSkillMention ? 3 : 2,
       };
@@ -210,7 +280,8 @@ export const GOLDEN_QUERIES: GoldenQueryDefinition[] = [
     id: "GQ-19",
     name: "Sponsorship evidence: Software Engineer in Sydney",
     type: "opportunity_match",
-    description: "Only current explicit evidence qualifies; zero unsupported sponsorship claims.",
+    description:
+      "Only current explicit evidence qualifies; zero unsupported sponsorship claims.",
     matchPreferences: {
       roleFamily: "software-engineering",
       skills: [],
@@ -226,7 +297,12 @@ export const GOLDEN_QUERIES: GoldenQueryDefinition[] = [
     expectedAssertions: (res) => {
       const topResultsWithSpon = res.topResults.filter((r) => r.hasSponsorship);
       for (const item of res.topResults) {
-        if (!item.hasSponsorship && item.topReasons?.some((r) => r.toLowerCase().includes("labour agreement"))) {
+        if (
+          !item.hasSponsorship &&
+          item.topReasons?.some((r) =>
+            r.toLowerCase().includes("labour agreement"),
+          )
+        ) {
           return {
             passed: false,
             reason: `Unsupported claim violation: ${item.name} claims sponsorship without evidence`,
@@ -247,7 +323,8 @@ export const GOLDEN_QUERIES: GoldenQueryDefinition[] = [
     id: "GQ-21",
     name: "Combined regional filters: Cloud Engineer (Regional + Hybrid)",
     type: "opportunity_match",
-    description: "Both regional classification and hybrid evidence are checked.",
+    description:
+      "Both regional classification and hybrid evidence are checked.",
     matchPreferences: {
       roleFamily: "cloud-platform",
       skills: [],
@@ -262,16 +339,28 @@ export const GOLDEN_QUERIES: GoldenQueryDefinition[] = [
     },
     expectedAssertions: (res) => {
       if (res.resultsCount === 0) {
-        return { passed: false, reason: "No matches found", violations: 1, grade: 0 };
+        return {
+          passed: false,
+          reason: "No matches found",
+          violations: 1,
+          grade: 0,
+        };
       }
-      return { passed: true, reason: "Regional and hybrid signals weighted without breaking constraints", violations: 0, grade: 3 };
+      return {
+        passed: true,
+        reason:
+          "Regional and hybrid signals weighted without breaking constraints",
+        violations: 0,
+        grade: 3,
+      };
     },
   },
   {
     id: "GQ-22",
     name: "Multi-location OR: Sydney OR Melbourne",
     type: "opportunity_match",
-    description: "Either selected city may match; duplicate employers are prohibited.",
+    description:
+      "Either selected city may match; duplicate employers are prohibited.",
     matchPreferences: {
       roleFamily: "architecture",
       skills: [],
@@ -288,16 +377,27 @@ export const GOLDEN_QUERIES: GoldenQueryDefinition[] = [
       const slugs = res.topResults.map((r) => r.slug);
       const uniqueSlugs = new Set(slugs);
       if (slugs.length !== uniqueSlugs.size) {
-        return { passed: false, reason: "Duplicate employer returned in multi-location query", violations: 1, grade: 0 };
+        return {
+          passed: false,
+          reason: "Duplicate employer returned in multi-location query",
+          violations: 1,
+          grade: 0,
+        };
       }
-      return { passed: true, reason: "Zero duplicates in multi-location query", violations: 0, grade: 3 };
+      return {
+        passed: true,
+        reason: "Zero duplicates in multi-location query",
+        violations: 0,
+        grade: 3,
+      };
     },
   },
   {
     id: "GQ-24",
     name: "Zero-result behavior: quantum blockchain astronaut in Hobart",
     type: "opportunity_match",
-    description: "Returns an honest empty state and useful filter guidance, not unrelated employers.",
+    description:
+      "Returns an honest empty state and useful filter guidance, not unrelated employers.",
     matchPreferences: {
       roleFamily: "quantum-blockchain-astronaut",
       skills: ["Antigravity Propulsion"],
@@ -319,20 +419,36 @@ export const GOLDEN_QUERIES: GoldenQueryDefinition[] = [
           grade: 0,
         };
       }
-      return { passed: true, reason: "Honest empty state returned for non-existent criteria", violations: 0, grade: 3 };
+      return {
+        passed: true,
+        reason: "Honest empty state returned for non-existent criteria",
+        violations: 0,
+        grade: 3,
+      };
     },
   },
   {
     id: "GQ-25",
     name: "Map viewport query over Sydney CBD",
     type: "map",
-    description: "Results are bounded to the viewport, clustered at low zoom, with no full-profile payloads.",
-    mapBbox: { west: 151.15, south: -33.95, east: 151.25, north: -33.80 },
+    description:
+      "Results are bounded to the viewport, clustered at low zoom, with no full-profile payloads.",
+    mapBbox: { west: 151.15, south: -33.95, east: 151.25, north: -33.8 },
     expectedAssertions: (res) => {
       if (res.resultsCount === 0) {
-        return { passed: false, reason: "No map points returned in Sydney CBD viewport", violations: 1, grade: 0 };
+        return {
+          passed: false,
+          reason: "No map points returned in Sydney CBD viewport",
+          violations: 1,
+          grade: 0,
+        };
       }
-      return { passed: true, reason: `Map viewport bounded properly (${res.resultsCount} points in bbox)`, violations: 0, grade: 3 };
+      return {
+        passed: true,
+        reason: `Map viewport bounded properly (${res.resultsCount} points in bbox)`,
+        violations: 0,
+        grade: 3,
+      };
     },
   },
 ];
@@ -368,8 +484,14 @@ export async function executeGoldenQuery(
         isRegional: r.isRegional,
       })),
     };
-  } else if (definition.type === "opportunity_match" && definition.matchPreferences) {
-    const matchRes = await matchOpportunities(pool, definition.matchPreferences);
+  } else if (
+    definition.type === "opportunity_match" &&
+    definition.matchPreferences
+  ) {
+    const matchRes = await matchOpportunities(
+      pool,
+      definition.matchPreferences,
+    );
     const latencyMs = Math.round(performance.now() - start);
     execResult = {
       id: definition.id,
@@ -422,9 +544,7 @@ export async function executeGoldenQuery(
   };
 }
 
-export async function evaluateAllGoldenQueries(
-  pool: Pool,
-): Promise<{
+export async function evaluateAllGoldenQueries(pool: Pool): Promise<{
   totalQueries: number;
   passedCount: number;
   failedCount: number;

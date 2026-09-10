@@ -8,11 +8,11 @@
 
 ## 1. Disaster Recovery Objectives (SLAs)
 
-| Metric | Target SLA | Measured Verification | Strategy |
-| :--- | :--- | :--- | :--- |
-| **Recovery Point Objective (RPO)** | < 1 minute | **< 1.0 second** | Continuous Neon Write-Ahead Logging (WAL) & Safekeeper quorum |
-| **Recovery Time Objective (RTO)** | < 15 minutes | **< 5.0 seconds** | Copy-on-Write Neon Branching + Automated In-Memory Verification |
-| **Data Consistency** | 100% | **0 Foreign-Key Violations** | Verified across 26 tables and 7,354 records |
+| Metric                             | Target SLA   | Measured Verification        | Strategy                                                        |
+| :--------------------------------- | :----------- | :--------------------------- | :-------------------------------------------------------------- |
+| **Recovery Point Objective (RPO)** | < 1 minute   | **< 1.0 second**             | Continuous Neon Write-Ahead Logging (WAL) & Safekeeper quorum   |
+| **Recovery Time Objective (RTO)**  | < 15 minutes | **< 5.0 seconds**            | Copy-on-Write Neon Branching + Automated In-Memory Verification |
+| **Data Consistency**               | 100%         | **0 Foreign-Key Violations** | Verified across 26 tables and 7,354 records                     |
 
 ---
 
@@ -21,6 +21,7 @@
 Australia Tech Map uses a hybrid disaster recovery model combining **cloud-native continuous archiving** on Neon PostgreSQL with **portable logical snapshots**:
 
 ### A. Primary Recovery: Neon Continuous WAL Archiving & Point-in-Time Recovery (PITR)
+
 - **Engine**: PostgreSQL 18.6 with PostGIS 3.5 on Neon Serverless.
 - **Mechanism**: All write operations stream directly to distributed Safekeepers. WAL records are archived continuously to object storage.
 - **Capabilities**:
@@ -29,6 +30,7 @@ Australia Tech Map uses a hybrid disaster recovery model combining **cloud-nativ
   - Failover is non-destructive: A restore creates a new branch (`restore-YYYYMMDD`), allowing side-by-side inspection before pointing the application connection string.
 
 ### B. Secondary Recovery: Portable Logical Snapshots
+
 - **Tool**: `node --env-file=.env apps/web/scripts/run-backup-drill.mjs`
 - **Output**: Cryptographically hashed JSON/SQL snapshot directory in `backups/snapshot_<timestamp>/` accompanied by `manifest.json` with SHA-256 integrity checksums.
 - **Coverage**: All 26 application tables, schema migration histories, and spatial reference identifiers.

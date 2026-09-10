@@ -41,16 +41,23 @@ interface MapCompanyRow {
   work_styles: unknown;
 }
 
-function parseWorkStyles(val: unknown): ("remote" | "hybrid" | "onsite")[] | undefined {
+function parseWorkStyles(
+  val: unknown,
+): ("remote" | "hybrid" | "onsite")[] | undefined {
   if (!val) return undefined;
   let arr: string[] = [];
   if (Array.isArray(val)) {
     arr = val;
   } else if (typeof val === "string") {
-    arr = val.replace(/[{}"']/g, "").split(",").map((s) => s.trim()).filter(Boolean);
+    arr = val
+      .replace(/[{}"']/g, "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
   }
-  const valid = arr.filter((s): s is "remote" | "hybrid" | "onsite" =>
-    s === "remote" || s === "hybrid" || s === "onsite",
+  const valid = arr.filter(
+    (s): s is "remote" | "hybrid" | "onsite" =>
+      s === "remote" || s === "hybrid" || s === "onsite",
   );
   return valid.length > 0 ? valid : undefined;
 }
@@ -166,8 +173,12 @@ export async function fetchMapCompanies(
     primaryCategory: row.primary_category,
     hasSponsorshipEvidence: row.has_sponsorship_evidence,
     isRegional: row.is_regional,
-    activeJobsCount: row.active_jobs_count > 0 ? row.active_jobs_count : undefined,
-    topRoleFamilies: row.top_role_families && row.top_role_families.length > 0 ? row.top_role_families : undefined,
+    activeJobsCount:
+      row.active_jobs_count > 0 ? row.active_jobs_count : undefined,
+    topRoleFamilies:
+      row.top_role_families && row.top_role_families.length > 0
+        ? row.top_role_families
+        : undefined,
     workStyles: parseWorkStyles(row.work_styles),
   }));
 

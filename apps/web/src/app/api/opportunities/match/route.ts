@@ -70,18 +70,11 @@ export async function GET(request: Request): Promise<Response> {
   const roleFamily = url.searchParams.get("roleFamily") ?? undefined;
   const skills = url.searchParams.getAll("skills");
   const experienceBand = (url.searchParams.get("experienceBand") ?? "any") as
-    | "entry"
-    | "mid"
-    | "senior"
-    | "lead_principal"
-    | "any";
+    "entry" | "mid" | "senior" | "lead_principal" | "any";
   const locations = url.searchParams.getAll("locations");
   const locationRequired = url.searchParams.get("locationRequired") === "true";
   const workStyle = (url.searchParams.get("workStyle") ?? "any") as
-    | "onsite"
-    | "hybrid"
-    | "remote"
-    | "any";
+    "onsite" | "hybrid" | "remote" | "any";
   const workStyleRequired =
     url.searchParams.get("workStyleRequired") === "true";
   const requiresSponsorship =

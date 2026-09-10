@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Building2, FileText, MapPin, ShieldCheck } from "lucide-react";
+import {
+  ArrowLeft,
+  Building2,
+  FileText,
+  MapPin,
+  ShieldCheck,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Data Corrections, Claims & Employer Updates — Australia Tech Map",
@@ -62,7 +68,11 @@ export default async function CorrectionsPage() {
             Profile Corrections & Employer Claims
           </h1>
           <p className="text-lg leading-relaxed text-slate-600">
-            We are committed to maintaining the most accurate graph of Australian technology employment. If your organization’s profile requires updates to office locations, careers portals, or visa sponsorship status, we provide a rapid, human-reviewed verification process.
+            We are committed to maintaining the most accurate graph of
+            Australian technology employment. If your organization’s profile
+            requires updates to office locations, careers portals, or visa
+            sponsorship status, we provide a rapid, human-reviewed verification
+            process.
           </p>
         </header>
 
@@ -70,25 +80,34 @@ export default async function CorrectionsPage() {
         <section className="grid gap-6 sm:grid-cols-3">
           <div className="rounded-2xl border border-surface-border bg-white p-5 shadow-2xs space-y-3">
             <MapPin className="h-5 w-5 text-terracotta-700" />
-            <h2 className="font-heading text-base font-bold text-navy-900">Office Locations</h2>
+            <h2 className="font-heading text-base font-bold text-navy-900">
+              Office Locations
+            </h2>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Add newly opened regional tech hubs, update corporate headquarters, or clarify remote-only operational policies.
+              Add newly opened regional tech hubs, update corporate
+              headquarters, or clarify remote-only operational policies.
             </p>
           </div>
 
           <div className="rounded-2xl border border-surface-border bg-white p-5 shadow-2xs space-y-3">
             <Building2 className="h-5 w-5 text-sky-700" />
-            <h2 className="font-heading text-base font-bold text-navy-900">Careers & ATS Portals</h2>
+            <h2 className="font-heading text-base font-bold text-navy-900">
+              Careers & ATS Portals
+            </h2>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Connect official Greenhouse, Lever, Workday, or custom careers feeds to ensure active roles appear within 24 hours.
+              Connect official Greenhouse, Lever, Workday, or custom careers
+              feeds to ensure active roles appear within 24 hours.
             </p>
           </div>
 
           <div className="rounded-2xl border border-surface-border bg-white p-5 shadow-2xs space-y-3">
             <ShieldCheck className="h-5 w-5 text-emerald-700" />
-            <h2 className="font-heading text-base font-bold text-navy-900">Sponsorship Evidence</h2>
+            <h2 className="font-heading text-base font-bold text-navy-900">
+              Sponsorship Evidence
+            </h2>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Submit proof of official Department of Home Affairs Accredited Sponsor status or Minister-negotiated Labour Agreements.
+              Submit proof of official Department of Home Affairs Accredited
+              Sponsor status or Minister-negotiated Labour Agreements.
             </p>
           </div>
         </section>
@@ -98,15 +117,35 @@ export default async function CorrectionsPage() {
 
         {/* Verification Standards */}
         <section className="space-y-4 rounded-2xl border border-surface-border bg-white p-7 shadow-2xs">
-          <h2 className="font-heading text-2xl font-bold text-navy-900">Verification & Review Standards</h2>
+          <h2 className="font-heading text-2xl font-bold text-navy-900">
+            Verification & Review Standards
+          </h2>
           <p className="text-sm leading-relaxed text-slate-600">
-            To prevent spam and maintain data provenance (PRODUCT_SPEC.md §11), all modifications undergo review by staff researchers before publication:
+            To prevent spam and maintain data provenance (PRODUCT_SPEC.md §11),
+            all modifications undergo review by staff researchers before
+            publication:
           </p>
           <ul className="list-disc pl-5 text-xs text-slate-600 space-y-2 leading-relaxed">
-            <li><strong>Authorised Domain Email:</strong> Submissions must originate from an email address matching the company’s primary operating domain (e.g. <code>jane@atlassian.com</code>).</li>
-            <li><strong>Official Address Corroboration:</strong> Premises modifications must correspond to a valid physical G-NAF Australian address.</li>
-            <li><strong>Evidence Trail:</strong> Every approved edit is recorded in an immutable audit ledger with the approving staff reviewer’s ID and timestamp.</li>
-            <li><strong>Separation Guarantee:</strong> Employer-provided claims never overwrite independent platform observations; both are displayed with distinct provenance tags.</li>
+            <li>
+              <strong>Authorised Domain Email:</strong> Submissions must
+              originate from an email address matching the company’s primary
+              operating domain (e.g. <code>jane@atlassian.com</code>).
+            </li>
+            <li>
+              <strong>Official Address Corroboration:</strong> Premises
+              modifications must correspond to a valid physical G-NAF Australian
+              address.
+            </li>
+            <li>
+              <strong>Evidence Trail:</strong> Every approved edit is recorded
+              in an immutable audit ledger with the approving staff reviewer’s
+              ID and timestamp.
+            </li>
+            <li>
+              <strong>Separation Guarantee:</strong> Employer-provided claims
+              never overwrite independent platform observations; both are
+              displayed with distinct provenance tags.
+            </li>
           </ul>
         </section>
       </article>

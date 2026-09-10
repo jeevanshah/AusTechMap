@@ -13,7 +13,8 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "My Account · Australia Tech Map",
-  description: "Manage saved searches, employer watchlists, and opportunity alerts.",
+  description:
+    "Manage saved searches, employer watchlists, and opportunity alerts.",
   robots: { index: false },
 };
 

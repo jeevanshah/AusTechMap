@@ -10,7 +10,12 @@ export const dynamic = "force-dynamic";
 function escapeCsvField(val: unknown): string {
   if (val === null || val === undefined) return "";
   const str = String(val).trim();
-  if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
+  if (
+    str.includes(",") ||
+    str.includes('"') ||
+    str.includes("\n") ||
+    str.includes("\r")
+  ) {
     return `"${str.replace(/"/g, '""')}"`;
   }
   return str;
@@ -25,12 +30,17 @@ export async function GET(request: Request) {
   const isStaff = userRole === "admin" || userRole === "reviewer";
 
   const isInstitutional =
-    isStaff || (userId ? await hasEntitlement(pool, userId, "institutional_export") : false);
+    isStaff ||
+    (userId
+      ? await hasEntitlement(pool, userId, "institutional_export")
+      : false);
 
   // Tiered rate limit: 120/min for institutional/staff, 10/min for community/anonymous
   const limit = isInstitutional ? 120 : 10;
   const rateLimitResponse = await enforceApiRateLimit(pool, {
-    scope: isInstitutional ? "api_export_companies_inst" : "api_export_companies_pub",
+    scope: isInstitutional
+      ? "api_export_companies_inst"
+      : "api_export_companies_pub",
     limit,
     windowSeconds: 60,
     lockSeconds: 60,
@@ -145,7 +155,9 @@ export async function GET(request: Request) {
       csvRows.push(
         `# AusTechMap Institutional Intelligence Export (Licensed to: ${user?.email ?? "Staff"}, Generated: ${new Date().toISOString()})`,
       );
-      csvRows.push("# Notice: Data governed by Australia Tech Map Institutional Terms and Source Attribution Registers.");
+      csvRows.push(
+        "# Notice: Data governed by Australia Tech Map Institutional Terms and Source Attribution Registers.",
+      );
     }
 
     csvRows.push(headers.map(escapeCsvField).join(","));
@@ -176,7 +188,9 @@ export async function GET(request: Request) {
       }
 
       row.push(
-        r.verified_at ? new Date(r.verified_at).toISOString().split("T")[0] : "",
+        r.verified_at
+          ? new Date(r.verified_at).toISOString().split("T")[0]
+          : "",
         `https://austechmap.com/companies/${r.slug}`,
       );
 

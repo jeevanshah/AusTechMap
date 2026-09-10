@@ -8,7 +8,9 @@ import {
   resolveDataCorrection,
 } from "./claims";
 
-function fakeClient(queryHandler: (sql: string, params?: unknown[]) => Promise<unknown>) {
+function fakeClient(
+  queryHandler: (sql: string, params?: unknown[]) => Promise<unknown>,
+) {
   return {
     query: vi.fn(queryHandler),
     release: vi.fn(),
@@ -78,8 +80,12 @@ describe("Phase 9 Claims & Corrections Query Layer", () => {
     expect(result.claim.status).toBe("pending");
     expect(result.reviewQueueItemId).toBe("queue-uuid-1");
 
-    expect(executedSql.some((s) => s.includes("INSERT INTO employer_claims"))).toBe(true);
-    expect(executedSql.some((s) => s.includes("INSERT INTO review_queue_items"))).toBe(true);
+    expect(
+      executedSql.some((s) => s.includes("INSERT INTO employer_claims")),
+    ).toBe(true);
+    expect(
+      executedSql.some((s) => s.includes("INSERT INTO review_queue_items")),
+    ).toBe(true);
   });
 
   it("creates a community data correction and enqueues review queue item", async () => {
@@ -155,17 +161,23 @@ describe("Phase 9 Claims & Corrections Query Layer", () => {
     await approveEmployerClaim(pool, "claim-1", 1, "Domain verified");
 
     // Must update company to is_claimed = true
-    const companyUpdate = executedSql.find((s) => s.includes("UPDATE companies"));
+    const companyUpdate = executedSql.find((s) =>
+      s.includes("UPDATE companies"),
+    );
     expect(companyUpdate).toBeDefined();
     expect(companyUpdate).toContain("is_claimed = true");
 
     // Must resolve review queue item
-    const queueUpdate = executedSql.find((s) => s.includes("UPDATE review_queue_items"));
+    const queueUpdate = executedSql.find((s) =>
+      s.includes("UPDATE review_queue_items"),
+    );
     expect(queueUpdate).toBeDefined();
     expect(queueUpdate).toContain("status = 'approved'");
 
     // Must record audit event
-    const auditInsert = executedSql.find((s) => s.includes("INSERT INTO audit_records"));
+    const auditInsert = executedSql.find((s) =>
+      s.includes("INSERT INTO audit_records"),
+    );
     expect(auditInsert).toBeDefined();
   });
 
@@ -188,14 +200,23 @@ describe("Phase 9 Claims & Corrections Query Layer", () => {
 
     const pool = fakePool(client);
 
-    await rejectEmployerClaim(pool, "claim-1", 1, "Corporate domain mismatch and no ASIC proof");
+    await rejectEmployerClaim(
+      pool,
+      "claim-1",
+      1,
+      "Corporate domain mismatch and no ASIC proof",
+    );
 
     // Company table must NOT be updated
-    const companyUpdate = executedSql.find((s) => s.includes("UPDATE companies"));
+    const companyUpdate = executedSql.find((s) =>
+      s.includes("UPDATE companies"),
+    );
     expect(companyUpdate).toBeUndefined();
 
     // Review queue item marked rejected
-    const queueUpdate = executedSql.find((s) => s.includes("UPDATE review_queue_items"));
+    const queueUpdate = executedSql.find((s) =>
+      s.includes("UPDATE review_queue_items"),
+    );
     expect(queueUpdate).toBeDefined();
     expect(queueUpdate).toContain("status = 'rejected'");
   });
@@ -222,11 +243,15 @@ describe("Phase 9 Claims & Corrections Query Layer", () => {
 
     await resolveDataCorrection(pool, "corr-1", "approved", 1, "Accepted");
 
-    const corrUpdate = executedSql.find((s) => s.includes("UPDATE data_corrections"));
+    const corrUpdate = executedSql.find((s) =>
+      s.includes("UPDATE data_corrections"),
+    );
     expect(corrUpdate).toBeDefined();
     expect(corrUpdate).toContain("status = $1");
 
-    const auditInsert = executedSql.find((s) => s.includes("INSERT INTO audit_records"));
+    const auditInsert = executedSql.find((s) =>
+      s.includes("INSERT INTO audit_records"),
+    );
     expect(auditInsert).toBeDefined();
   });
 });

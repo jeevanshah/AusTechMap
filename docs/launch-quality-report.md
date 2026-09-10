@@ -13,29 +13,31 @@ Australia Tech Map has completed its **Phase 8 Production Hardening, Security, O
 
 ### Readiness Scorecard
 
-| Dimension | Target Gate | Current Status | Verdict |
-| :--- | :--- | :--- | :--- |
-| **Geographic Precision** | > 95% mapped locations | **100.0%** (133 / 133 employers with resolved coordinates & SA4 keys) | **PASSED** |
-| **Data Provenance** | > 98% sourced records | **100.0%** (232 immutable evidence records, 0 ungrounded claims) | **PASSED** |
-| **Duplicate Rate** | < 1.0% duplicate rate | **0.0%** (Conservative string normalization + manual review queue) | **PASSED** |
-| **Sponsorship Evidence** | 100% inspectable claims | **100.0%** (Home Affairs accredited sponsor citations with timestamps) | **PASSED** |
-| **Golden Discovery Queries** | 100% relevance score | **11 / 11 queries Grade 3 (100%)**, 0 hard constraint violations | **PASSED** |
-| **Query Latency** | p95 < 150ms | **72ms** average search/match latency; **175ms** DB roundtrip to Neon AWS Sydney | **PASSED** |
-| **Security & Privacy** | Strict CSP, HSTS, MFA, APP 11 | Complete (CSP, HSTS, rate limiting, SSRF guard, TOTP MFA, automated erasure) | **PASSED** |
-| **Health & Observability** | Deep diagnostic checks | `/api/health?deep=true` and `/admin/monitoring` live and operational | **PASSED** |
-| **Launch Cohort Volume** | >= 1,000 launch employers | **133 alpha cohort employers** (Expansion scheduled for Phase 8.1) | **CONDITIONAL** |
+| Dimension                    | Target Gate                   | Current Status                                                                   | Verdict         |
+| :--------------------------- | :---------------------------- | :------------------------------------------------------------------------------- | :-------------- |
+| **Geographic Precision**     | > 95% mapped locations        | **100.0%** (133 / 133 employers with resolved coordinates & SA4 keys)            | **PASSED**      |
+| **Data Provenance**          | > 98% sourced records         | **100.0%** (232 immutable evidence records, 0 ungrounded claims)                 | **PASSED**      |
+| **Duplicate Rate**           | < 1.0% duplicate rate         | **0.0%** (Conservative string normalization + manual review queue)               | **PASSED**      |
+| **Sponsorship Evidence**     | 100% inspectable claims       | **100.0%** (Home Affairs accredited sponsor citations with timestamps)           | **PASSED**      |
+| **Golden Discovery Queries** | 100% relevance score          | **11 / 11 queries Grade 3 (100%)**, 0 hard constraint violations                 | **PASSED**      |
+| **Query Latency**            | p95 < 150ms                   | **72ms** average search/match latency; **175ms** DB roundtrip to Neon AWS Sydney | **PASSED**      |
+| **Security & Privacy**       | Strict CSP, HSTS, MFA, APP 11 | Complete (CSP, HSTS, rate limiting, SSRF guard, TOTP MFA, automated erasure)     | **PASSED**      |
+| **Health & Observability**   | Deep diagnostic checks        | `/api/health?deep=true` and `/admin/monitoring` live and operational             | **PASSED**      |
+| **Launch Cohort Volume**     | >= 1,000 launch employers     | **133 alpha cohort employers** (Expansion scheduled for Phase 8.1)               | **CONDITIONAL** |
 
 ---
 
 ## 2. Launch Gate Evaluations (IMPLEMENTATION_PLAN.md §9)
 
 ### Gate 1: Launch Employer Volume & Coverage
+
 - **Specification Target**: At least 1,000 deliberately selected and enriched employers.
 - **Current Metric**: **133 high-quality seed technology employers** verified in the production Neon PostgreSQL database across all Australian states and territories (NSW, VIC, QLD, WA, SA, ACT, TAS).
 - **Status**: **Conditional Pass** (Alpha Cohort Gate).
 - **Details**: The 133 launch employers represent the highest-visibility tech employers in Australia (e.g., Atlassian, Canva, Airwallex, SafetyCulture, Culture Amp, Ansarada, SiteMinder). As agreed in [IMPLEMENTATION_PLAN.md](../IMPLEMENTATION_PLAN.md) §14 and Phase 7 handoff, the initial alpha cohort prioritised depth of enrichment (100% locations mapped, ATS sources, and verified sponsorship evidence) over raw volume. Scaling the automated ingestion pipeline to reach the 1,000+ mark is scheduled as the immediate next ingestion batch.
 
 ### Gate 2: Usable Mapped Locations
+
 - **Specification Target**: > 95% of launch employers have usable mapped locations.
 - **Current Metric**: **100.0%** (133 / 133 companies have verified `company_locations` mapped to `resolved_locations`).
 - **Status**: **PASSED**.
@@ -45,6 +47,7 @@ Australia Tech Map has completed its **Phase 8 Production Hardening, Security, O
   - Active spatial indexes (`GIST(coordinates)`) in migration `0001` ensure sub-millisecond bounding box lookups.
 
 ### Gate 3: Provenance and Fact Grounding
+
 - **Specification Target**: > 98% of employer records have inspectable provenance.
 - **Current Metric**: **100.0%** (All 133 employers and 92 active jobs are backed by records in `evidence` and `job_observations`).
 - **Status**: **PASSED**.
@@ -56,6 +59,7 @@ Australia Tech Map has completed its **Phase 8 Production Hardening, Security, O
   - Zero ungrounded synthetic claims or hallucinated employers exist in the production database.
 
 ### Gate 4 & 5: Monitored Careers Sources & Job Refresh Freshness
+
 - **Specification Target**: > 95% of monitored careers sources checked within SLA; > 95% of active jobs refreshed within 24 hours.
 - **Current Metric**: **100.0%** of active jobs (92 / 92) observed with active timestamps.
 - **Status**: **PASSED**.
@@ -65,6 +69,7 @@ Australia Tech Map has completed its **Phase 8 Production Hardening, Security, O
   - Expired job detection marks `expired_at` timestamp without deleting historical observations, maintaining longitudinal integrity.
 
 ### Gate 6: Duplicate Company Rate
+
 - **Specification Target**: Unresolved duplicate-company rate is below 1%.
 - **Current Metric**: **0.0%** unresolved duplicates across 133 employers.
 - **Status**: **PASSED**.
@@ -76,15 +81,17 @@ Australia Tech Map has completed its **Phase 8 Production Hardening, Security, O
   - Manual review queue tested and operational via `apps/web/src/app/admin/review`.
 
 ### Gate 7: Sponsorship Evidence Transparency
+
 - **Specification Target**: All displayed sponsorship claims have an inspectable evidence link.
 - **Current Metric**: **100.0%** of displayed sponsorship tags link to official Department of Home Affairs data.
 - **Status**: **PASSED**.
 - **Evidence**:
   - Strict policy in [PRODUCT_SPEC.md](../PRODUCT_SPEC.md) §8: Australia Tech Map never infers visa sponsorship from generic job text.
-  - Only employers with verified citations in the official Home Affairs Register of Accredited Sponsors or Labour Agreements display the *Accredited Sponsor* badge.
+  - Only employers with verified citations in the official Home Affairs Register of Accredited Sponsors or Labour Agreements display the _Accredited Sponsor_ badge.
   - Full transparent citation criteria and dispute procedures published on [`/methodology`](file:///c:/Users/jeeva/Projects/AusTechMap/apps/web/src/app/methodology/page.tsx) and [`/corrections`](file:///c:/Users/jeeva/Projects/AusTechMap/apps/web/src/app/corrections/page.tsx).
 
 ### Gate 8: Government Dataset Versioning
+
 - **Specification Target**: All government datasets have recorded source versions and effective dates.
 - **Current Metric**: **100.0%** of administrative boundaries and labour statistics are versioned.
 - **Status**: **PASSED**.
@@ -95,6 +102,7 @@ Australia Tech Map has completed its **Phase 8 Production Hardening, Security, O
   - Department of Home Affairs Skilled Visa Sponsor Register versioned by quarterly gazette.
 
 ### Gate 9 & 10: Score Reproducibility & Trend Suppression
+
 - **Specification Target**: All published scores reproduce from stored inputs, components, and methodology versions; scores are suppressed when data sufficiency fails.
 - **Current Metric**: **100.0%** score reproducibility and transparent suppression.
 - **Status**: **PASSED**.
@@ -103,6 +111,7 @@ Australia Tech Map has completed its **Phase 8 Production Hardening, Security, O
   - **Regional Tech Opportunity Score**: Bounded 0–100 score calculated from JSA IVI tech demand, NERO tech employment density, regional migration bonus, and employer depth. Regions with insufficient observations are flagged `is_suppressed = true` with a clear "Data Insufficient" badge rather than misleading low scores.
 
 ### Gate 11: Performance and Query Latency Targets
+
 - **Specification Target**: Map and search meet agreed p95 latency targets (< 100ms API, < 150ms map tiles) on desktop and mobile.
 - **Current Metric**:
   - Public Search API (`/api/search/companies`): **35ms - 52ms**.
@@ -112,6 +121,7 @@ Australia Tech Map has completed its **Phase 8 Production Hardening, Security, O
 - **Status**: **PASSED**.
 
 ### Gate 12: Golden Query Relevance Validation
+
 - **Specification Target**: Golden search and Opportunity Match queries meet relevance expectations.
 - **Current Metric**: **11 / 11 queries passed with Grade 3 (100%)** on `apps/web/src/lib/evaluation/goldenQueries.ts`.
 - **Hard Constraint Violations**: **0** (Strict location and work-style constraints strictly enforced).
@@ -124,6 +134,7 @@ Australia Tech Map has completed its **Phase 8 Production Hardening, Security, O
   - Verified map viewport bounding for GQ-25 (Sydney CBD).
 
 ### Gate 13: Retention Engine, Alerts & Duplicate Delivery Prevention
+
 - **Specification Target**: Alert preferences, deduplication, delivery caps, and unsubscribe are verified.
 - **Current Metric**: **100.0%** verified.
 - **Status**: **PASSED**.
@@ -133,6 +144,7 @@ Australia Tech Map has completed its **Phase 8 Production Hardening, Security, O
   - Unsubscribe controls embedded in email templates; user preference updates take effect immediately before delivery dispatch.
 
 ### Gate 14: Administrative & Correction Workflows
+
 - **Specification Target**: Admin merge, evidence review, source disable, crawler replay, and correction workflows pass.
 - **Current Metric**: **100.0%** operational.
 - **Status**: **PASSED**.
@@ -141,6 +153,7 @@ Australia Tech Map has completed its **Phase 8 Production Hardening, Security, O
   - Public employer claims and corrections channel live at [`/corrections`](file:///c:/Users/jeeva/Projects/AusTechMap/apps/web/src/app/corrections/page.tsx).
 
 ### Gate 15: Security Review, Backups & Launch QA
+
 - **Specification Target**: Security review, backup restore, source-policy review, and launch QA are complete.
 - **Current Metric**: Complete production hardening in place.
 - **Status**: **PASSED**.
@@ -156,7 +169,7 @@ Australia Tech Map has completed its **Phase 8 Production Hardening, Security, O
 
 1. **Alpha Cohort Scaling**:
    - The platform is structurally prepared to ingest 1,000+ employers. The seed cohort of 133 employers is 100% enriched.
-   - *Action*: Execute Phase 8.1 batch ingestion to expand from 133 to 1,000+ employers using verified Australian company registries and ATS feeds.
+   - _Action_: Execute Phase 8.1 batch ingestion to expand from 133 to 1,000+ employers using verified Australian company registries and ATS feeds.
 2. **Cloudflare R2 Snapshot Storage Setup**:
    - Raw HTML snapshots for deletion ledger storage are currently staged locally; R2 credentials will be configured prior to public account creation.
 3. **Continuous Monitoring**:

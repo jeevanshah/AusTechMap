@@ -12,30 +12,32 @@ Australia Tech Map is built upon a foundation of verifiable, authoritative publi
 
 ### Source Compliance Matrix
 
-| Dataset | Provider | Licence / Terms | Attribution Mandate | Commercial Use | Audit Status |
-| :--- | :--- | :--- | :--- | :---: | :---: |
-| **ABS ASGS Edition 3** | Australian Bureau of Statistics | CC BY 4.0 International | Required | Permitted | **VERIFIED** |
-| **G-NAF** | Geoscape Australia / data.gov.au | Open G-NAF Licence / CC BY 4.0 | Required | Permitted | **VERIFIED** |
-| **JSA IVI & NERO** | Jobs and Skills Australia | CC BY 4.0 International | Required | Permitted | **VERIFIED** |
-| **Accredited Sponsors** | Dept of Home Affairs | Crown Copyright / Open Gazette | Public Register | Permitted | **VERIFIED** |
-| **Cartography & Tiles** | MapTiler / OpenStreetMap | MapTiler ToS / ODbL | Required on Canvas | Permitted | **VERIFIED** |
-| **ATS Careers Feeds** | Direct Employer ATS APIs | Public API / Fair Dealing | Source Linkage | Permitted | **VERIFIED** |
+| Dataset                 | Provider                         | Licence / Terms                | Attribution Mandate | Commercial Use | Audit Status |
+| :---------------------- | :------------------------------- | :----------------------------- | :------------------ | :------------: | :----------: |
+| **ABS ASGS Edition 3**  | Australian Bureau of Statistics  | CC BY 4.0 International        | Required            |   Permitted    | **VERIFIED** |
+| **G-NAF**               | Geoscape Australia / data.gov.au | Open G-NAF Licence / CC BY 4.0 | Required            |   Permitted    | **VERIFIED** |
+| **JSA IVI & NERO**      | Jobs and Skills Australia        | CC BY 4.0 International        | Required            |   Permitted    | **VERIFIED** |
+| **Accredited Sponsors** | Dept of Home Affairs             | Crown Copyright / Open Gazette | Public Register     |   Permitted    | **VERIFIED** |
+| **Cartography & Tiles** | MapTiler / OpenStreetMap         | MapTiler ToS / ODbL            | Required on Canvas  |   Permitted    | **VERIFIED** |
+| **ATS Careers Feeds**   | Direct Employer ATS APIs         | Public API / Fair Dealing      | Source Linkage      |   Permitted    | **VERIFIED** |
 
 ---
 
 ## 2. Dataset-by-Dataset Audit & Attribution Mandates
 
 ### 1. Australian Statistical Geography Standard (ASGS) Edition 3 (2021–2026)
+
 - **Licensor**: Commonwealth of Australia (Australian Bureau of Statistics).
 - **Licence**: Creative Commons Attribution 4.0 International ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)).
 - **Mandatory Attribution**:
-  > *"Data source: Australian Bureau of Statistics (ABS), Australian Statistical Geography Standard (ASGS) Edition 3, released under CC BY 4.0."*
+  > _"Data source: Australian Bureau of Statistics (ABS), Australian Statistical Geography Standard (ASGS) Edition 3, released under CC BY 4.0."_
 - **Application Implementation**:
   - Displayed in footer notes on all regional profile pages ([`/regions/[code]`](file:///c:/Users/jeeva/Projects/AusTechMap/apps/web/src/app/regions/[code]/page.tsx)).
   - Published in the comprehensive methodology specification ([`/methodology`](file:///c:/Users/jeeva/Projects/AusTechMap/apps/web/src/app/methodology/page.tsx)).
   - Administrative release recorded in database table `geography_releases` with content hash.
 
 ### 2. Geocoded National Address File (G-NAF)
+
 - **Licensor**: Geoscape Australia / Commonwealth of Australia.
 - **Licence**: Open G-NAF End User Licence Agreement (incorporated into data.gov.au terms).
 - **Permitted Use**: Incorporating address records and spatial coordinates into derived geocoding indexes and geographic applications.
@@ -45,32 +47,36 @@ Australia Tech Map is built upon a foundation of verifiable, authoritative publi
   - Only resolved entity locations are stored in the production `resolved_locations` table.
 
 ### 3. Jobs and Skills Australia (JSA) — IVI and NERO Labour Datasets
+
 - **Licensor**: Commonwealth of Australia (Department of Employment and Workplace Relations).
 - **Licence**: CC BY 4.0 International.
 - **Scope**:
   - Internet Vacancy Index (IVI): Monthly regional online job advertisement series.
   - Nowcasting Employment by Region and Occupation (NERO): Quarterly experimental model of employment by region and ANZSCO 4-digit occupation.
 - **Attribution**:
-  > *"Contains Labour Market Data provided by Jobs and Skills Australia under Creative Commons Attribution 4.0 International."*
+  > _"Contains Labour Market Data provided by Jobs and Skills Australia under Creative Commons Attribution 4.0 International."_
 - **Implementation**:
   - Integrated into the ASGS SA4 regional labour market indicators.
   - Transparently versioned in database table `regional_labor_observations`.
 
 ### 4. Department of Home Affairs — Register of Accredited Sponsors & Labour Agreements
+
 - **Licensor**: Commonwealth of Australia (Department of Home Affairs).
 - **Authority**: Public statutory gazette published under Australian government transparency principles.
 - **Strict Citation Policy** ([PRODUCT_SPEC.md](../../PRODUCT_SPEC.md) §8):
   - Australia Tech Map **never infers visa sponsorship** from unstructured keywords in job postings.
-  - An employer only receives the *Accredited Sponsor* indicator if an exact, unexpired match exists in the official Home Affairs Register of Accredited Sponsors or Labour Agreements.
+  - An employer only receives the _Accredited Sponsor_ indicator if an exact, unexpired match exists in the official Home Affairs Register of Accredited Sponsors or Labour Agreements.
   - Every citation records `observed_at`, `status = 'active'`, and links to the official gazette reference in the `evidence` table.
 
 ### 5. Vector Cartography (MapTiler & OpenStreetMap)
+
 - **Providers**: MapTiler Cloud & OpenStreetMap contributors.
 - **Licence**: Open Database License (ODbL) and MapTiler Commercial Cloud Terms.
 - **Attribution**:
   - Visible on the interactive MapLibre GL map canvas: `© MapTiler © OpenStreetMap contributors`.
 
 ### 6. Public ATS Careers Feeds (Greenhouse, Lever, Workable, Ashby, SmartRecruiters)
+
 - **Data Collection Policy** ([PRODUCT_SPEC.md](../../PRODUCT_SPEC.md) §7):
   - Strict compliance with `robots.txt` and polite request rates (< 1 req/sec per domain).
   - Identification via custom User-Agent string: `AusTechMapBot/1.0 (+https://austechmap.internal/bot)`.
@@ -82,13 +88,17 @@ Australia Tech Map is built upon a foundation of verifiable, authoritative publi
 ## 3. Data Retention, Correction & Removal (Take-down) Procedures
 
 ### A. Public Dispute & Correction Channel
+
 Any verified Australian employer, recruitment representative, or workforce organisation may request updates or corrections:
+
 - **Public URL**: [`https://austechmap.internal/corrections`](file:///c:/Users/jeeva/Projects/AusTechMap/apps/web/src/app/corrections/page.tsx)
 - **Submission Channel**: `corrections@austechmap.internal`
 - **SLA**: Initial acknowledgement within 2 business days; review completed within 5 business days.
 
 ### B. Administrative Kill-Switches & Source Disabling
+
 If an employer requests removal of an ATS feed or a source undergoes unexpected format drift:
+
 - Administrative staff can disable the source immediately via `/admin/review` or SQL:
   ```sql
   UPDATE company_ats_sources SET is_active = false, updated_at = now() WHERE company_id = '<company_id>';
@@ -96,7 +106,9 @@ If an employer requests removal of an ATS feed or a source undergoes unexpected 
 - Disabling a source immediately stops crawl runs while preserving immutable historical observations for auditability.
 
 ### C. Australian Privacy Principle (APP) 11 Cryptographic Erasure
+
 In accordance with Australian privacy legislation, candidate user accounts can be completely deleted on demand:
+
 - **Self-Service URL**: `/account/delete`
 - **Mechanism**: Invokes [`erasure.ts`](file:///c:/Users/jeeva/Projects/AusTechMap/apps/web/src/lib/deletion/erasure.ts) hook registry.
 - Deletes user accounts, credentials, saved searches, watchlists, and in-app alerts atomically.

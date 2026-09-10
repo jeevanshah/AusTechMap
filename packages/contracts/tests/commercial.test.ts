@@ -9,9 +9,15 @@ import {
 
 describe("Phase 9.2 Commercial Contracts: Entitlements, Billing & Sponsored Placements", () => {
   it("validates valid entitlement types", () => {
-    expect(EntitlementTypeSchema.safeParse("employer_analytics").success).toBe(true);
-    expect(EntitlementTypeSchema.safeParse("institutional_export").success).toBe(true);
-    expect(EntitlementTypeSchema.safeParse("invalid_entitlement").success).toBe(false);
+    expect(EntitlementTypeSchema.safeParse("employer_analytics").success).toBe(
+      true,
+    );
+    expect(
+      EntitlementTypeSchema.safeParse("institutional_export").success,
+    ).toBe(true);
+    expect(EntitlementTypeSchema.safeParse("invalid_entitlement").success).toBe(
+      false,
+    );
   });
 
   it("validates full UserEntitlement record", () => {
@@ -22,7 +28,10 @@ describe("Phase 9.2 Commercial Contracts: Entitlements, Billing & Sponsored Plac
       grantedByUserId: 1,
       grantedAt: "2026-09-09T00:00:00Z",
       expiresAt: null,
-      metadata: { institutionName: "University of Sydney", department: "Computer Science" },
+      metadata: {
+        institutionName: "University of Sydney",
+        department: "Computer Science",
+      },
     };
     const parsed = UserEntitlementSchema.safeParse(entitlement);
     expect(parsed.success).toBe(true);
@@ -54,7 +63,8 @@ describe("Phase 9.2 Commercial Contracts: Entitlements, Billing & Sponsored Plac
       companyName: "Canva",
       companySlug: "canva",
       campaignName: "Graduates 2027 Regional Hiring",
-      headline: "Join Australia's fastest growing visual communication team in Sydney and regional hubs.",
+      headline:
+        "Join Australia's fastest growing visual communication team in Sydney and regional hubs.",
       targetRoleFamilies: ["software-engineering", "data"],
       targetRegions: ["102", "111"],
       ctaLabel: "Apply to Graduate Cohort",

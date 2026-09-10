@@ -190,10 +190,12 @@ export async function createDataCorrection(
     let companyName = "General / Non-Company";
     let companySlug = "";
     if (data.companyId) {
-      const compRes = await client.query<{ display_name: string; slug: string }>(
-        `SELECT display_name, slug FROM companies WHERE id = $1`,
-        [data.companyId],
-      );
+      const compRes = await client.query<{
+        display_name: string;
+        slug: string;
+      }>(`SELECT display_name, slug FROM companies WHERE id = $1`, [
+        data.companyId,
+      ]);
       if (compRes.rows[0]) {
         companyName = compRes.rows[0].display_name;
         companySlug = compRes.rows[0].slug;
@@ -302,7 +304,10 @@ export async function approveEmployerClaim(
            claimed_by_user_id = $1,
            updated_at = now()
        WHERE id = $2`,
-      [claim.user_id ? Number(claim.user_id) : reviewerUserId, claim.company_id],
+      [
+        claim.user_id ? Number(claim.user_id) : reviewerUserId,
+        claim.company_id,
+      ],
     );
 
     // 2b. Automatically grant employer_analytics entitlement if claimant has user account
@@ -448,7 +453,12 @@ export async function resolveDataCorrection(
            review_notes = $3
        WHERE id = $4 AND status = 'pending'
        RETURNING company_id, submitter_email, correction_type`,
-      [action, reviewerUserId, reviewNotes ?? `Correction marked as ${action}`, correctionId],
+      [
+        action,
+        reviewerUserId,
+        reviewNotes ?? `Correction marked as ${action}`,
+        correctionId,
+      ],
     );
 
     const corr = corrRes.rows[0];

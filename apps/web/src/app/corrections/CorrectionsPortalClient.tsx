@@ -1,12 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  CheckCircle2,
-  FileText,
-  Loader2,
-  ShieldCheck,
-} from "lucide-react";
+import { CheckCircle2, FileText, Loader2, ShieldCheck } from "lucide-react";
 import type { DataCorrectionType } from "@austechmap/contracts";
 import {
   submitDataCorrectionAction,
@@ -37,9 +32,8 @@ export function CorrectionsPortalClient({
   const [officialCareersUrl, setOfficialCareersUrl] = useState("");
   const [claimEvidenceUrl, setClaimEvidenceUrl] = useState("");
   const [isClaimSubmitting, setIsClaimSubmitting] = useState(false);
-  const [claimResult, setClaimResult] = useState<ClaimSubmissionResponse | null>(
-    null,
-  );
+  const [claimResult, setClaimResult] =
+    useState<ClaimSubmissionResponse | null>(null);
 
   // Correction Form State
   const [corrCompanyId, setCorrCompanyId] = useState("");
@@ -134,8 +128,8 @@ export function CorrectionsPortalClient({
             </h2>
             <p className="text-xs text-slate-600 leading-relaxed">
               Claiming your organization allows talent and executive teams to
-              verify official office locations, connect active careers feeds, and
-              receive direct candidate applications. Submissions from email
+              verify official office locations, connect active careers feeds,
+              and receive direct candidate applications. Submissions from email
               addresses matching your company domain undergo priority automated
               verification.
             </p>
@@ -331,8 +325,8 @@ export function CorrectionsPortalClient({
                 <code className="font-mono">{corrResult.correctionId}</code>
               </p>
               <p className="text-emerald-800">
-                Thank you for contributing to data integrity. A staff reviewer will
-                verify this submission.
+                Thank you for contributing to data integrity. A staff reviewer
+                will verify this submission.
               </p>
             </div>
           )}

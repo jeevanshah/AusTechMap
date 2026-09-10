@@ -116,7 +116,9 @@ export async function listWatchlist(
         ? {
             code: row.region_code,
             name: row.region_name ?? `Region ${row.region_code}`,
-            opportunityScore: row.opportunity_score ? Number(row.opportunity_score) : null,
+            opportunityScore: row.opportunity_score
+              ? Number(row.opportunity_score)
+              : null,
           }
         : undefined,
   }));

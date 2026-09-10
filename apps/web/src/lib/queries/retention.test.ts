@@ -6,14 +6,8 @@ import {
   deleteSavedSearch,
   listSavedSearches,
 } from "./savedSearches";
-import {
-  toggleCompanyWatch,
-  toggleRegionWatch,
-} from "./watchlists";
-import {
-  listUserAlerts,
-  markAlertRead,
-} from "./userAlerts";
+import { toggleCompanyWatch, toggleRegionWatch } from "./watchlists";
+import { listUserAlerts, markAlertRead } from "./userAlerts";
 
 describe("savedSearches queries", () => {
   it("listSavedSearches maps database rows to contract models", async () => {
@@ -69,7 +63,11 @@ describe("savedSearches queries", () => {
       query: vi.fn().mockResolvedValue({ rowCount: 1 }),
     } as unknown as Pool;
 
-    const ok = await deleteSavedSearch(pool, 42, "123e4567-e89b-12d3-a456-426614174001");
+    const ok = await deleteSavedSearch(
+      pool,
+      42,
+      "123e4567-e89b-12d3-a456-426614174001",
+    );
     expect(ok).toBe(true);
   });
 });

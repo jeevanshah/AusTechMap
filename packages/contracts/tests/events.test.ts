@@ -27,7 +27,9 @@ describe("Phase 7 Change Event & Delivery Contracts", () => {
 
     const parsed = ChangeEventSchema.parse(valid);
     expect(parsed.eventType).toBe("job.first_seen");
-    expect(parsed.dedupeKey).toBe("job:first_seen:223e4567-e89b-12d3-a456-426614174000");
+    expect(parsed.dedupeKey).toBe(
+      "job:first_seen:223e4567-e89b-12d3-a456-426614174000",
+    );
   });
 
   it("validates NotificationDeliverySchema", () => {
@@ -55,7 +57,8 @@ describe("Phase 7 Change Event & Delivery Contracts", () => {
       items: [
         {
           title: "Atlassian posted 3 new roles",
-          description: "Senior Fullstack Engineer, Data Engineer, Platform Lead in Sydney",
+          description:
+            "Senior Fullstack Engineer, Data Engineer, Platform Lead in Sydney",
           link: "https://austechmap.com.au/companies/atlassian",
           badge: "Watched Company",
         },

@@ -181,12 +181,7 @@ export function MapCanvas({
             "#c2410c",
             "#0f172a",
           ],
-          "circle-radius": [
-            "case",
-            ["==", ["get", "isHiring"], 1],
-            13,
-            11,
-          ],
+          "circle-radius": ["case", ["==", ["get", "isHiring"], 1], 13, 11],
           "circle-opacity": 0.15,
           "circle-stroke-width": 1,
           "circle-stroke-color": [
@@ -214,12 +209,7 @@ export function MapCanvas({
             "#c2410c",
             "#0f172a",
           ],
-          "circle-radius": [
-            "case",
-            ["==", ["get", "isHiring"], 1],
-            7,
-            6.5,
-          ],
+          "circle-radius": ["case", ["==", ["get", "isHiring"], 1], 7, 6.5],
           "circle-stroke-width": 2,
           "circle-stroke-color": "#ffffff",
         },

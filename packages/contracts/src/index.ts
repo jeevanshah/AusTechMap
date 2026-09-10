@@ -16,7 +16,12 @@ export const HealthResponseSchema = z.object({
 
 export type HealthResponse = z.infer<typeof HealthResponseSchema>;
 
-export const WorkStyleSchema = z.enum(["remote", "hybrid", "onsite", "unknown"]);
+export const WorkStyleSchema = z.enum([
+  "remote",
+  "hybrid",
+  "onsite",
+  "unknown",
+]);
 export type WorkStyle = z.infer<typeof WorkStyleSchema>;
 
 export const MapCompanyPointSchema = z.object({
@@ -218,7 +223,12 @@ export const SavedSearchFilterSchema = z.object({
 
 export type SavedSearchFilter = z.infer<typeof SavedSearchFilterSchema>;
 
-export const AlertFrequencySchema = z.enum(["never", "daily", "weekly", "instant"]);
+export const AlertFrequencySchema = z.enum([
+  "never",
+  "daily",
+  "weekly",
+  "instant",
+]);
 export type AlertFrequency = z.infer<typeof AlertFrequencySchema>;
 
 export const SavedSearchSchema = z.object({
@@ -240,14 +250,18 @@ export const CreateSavedSearchRequestSchema = z.object({
   alertFrequency: AlertFrequencySchema.default("never"),
 });
 
-export type CreateSavedSearchRequest = z.infer<typeof CreateSavedSearchRequestSchema>;
+export type CreateSavedSearchRequest = z.infer<
+  typeof CreateSavedSearchRequestSchema
+>;
 
 export const SavedSearchListResponseSchema = z.object({
   version: z.literal(1),
   searches: z.array(SavedSearchSchema),
 });
 
-export type SavedSearchListResponse = z.infer<typeof SavedSearchListResponseSchema>;
+export type SavedSearchListResponse = z.infer<
+  typeof SavedSearchListResponseSchema
+>;
 
 export const WatchlistEntityTypeSchema = z.enum(["company", "region"]);
 export type WatchlistEntityType = z.infer<typeof WatchlistEntityTypeSchema>;
@@ -290,7 +304,9 @@ export const ToggleWatchlistRequestSchema = z.object({
   regionId: z.string().uuid().optional(),
 });
 
-export type ToggleWatchlistRequest = z.infer<typeof ToggleWatchlistRequestSchema>;
+export type ToggleWatchlistRequest = z.infer<
+  typeof ToggleWatchlistRequestSchema
+>;
 
 export const WatchlistListResponseSchema = z.object({
   version: z.literal(1),
@@ -682,6 +698,3 @@ export const SponsoredPlacementSchema = z.object({
   updatedAt: z.string().optional(),
 });
 export type SponsoredPlacement = z.infer<typeof SponsoredPlacementSchema>;
-
-
-

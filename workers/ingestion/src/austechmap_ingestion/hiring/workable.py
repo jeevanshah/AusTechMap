@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable
+from contextlib import suppress
 from datetime import datetime
 from typing import Any
 
@@ -43,12 +44,10 @@ def _parse_posting(record: dict[str, Any]) -> RawJobPosting:
     published_on = record.get("published_on") or record.get("created_at")
     posted_at = None
     if published_on:
-        try:
+        with suppress(ValueError):
             posted_at = datetime.fromisoformat(
                 published_on.replace("Z", "+00:00")
             )
-        except ValueError:
-            pass
 
     return RawJobPosting(
         external_id=str(external_id),

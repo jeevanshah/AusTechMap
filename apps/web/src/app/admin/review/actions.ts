@@ -284,4 +284,3 @@ export async function resolveDataCorrectionAction(
   );
   revalidatePath("/admin/review");
 }
-

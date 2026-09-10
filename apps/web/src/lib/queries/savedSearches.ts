@@ -24,7 +24,9 @@ function mapRow(row: SavedSearchRow): SavedSearch {
     name: row.name,
     filters: row.filters ?? {},
     alertFrequency: row.alert_frequency,
-    lastAlertedAt: row.last_alerted_at ? row.last_alerted_at.toISOString() : null,
+    lastAlertedAt: row.last_alerted_at
+      ? row.last_alerted_at.toISOString()
+      : null,
     createdAt: row.created_at.toISOString(),
     updatedAt: row.updated_at.toISOString(),
   };
@@ -53,7 +55,12 @@ export async function createSavedSearch(
     `INSERT INTO saved_searches (user_id, name, filters, alert_frequency)
      VALUES ($1, $2, $3::jsonb, $4)
      RETURNING id, user_id, name, filters, alert_frequency, last_alerted_at, created_at, updated_at`,
-    [userId, input.name, JSON.stringify(input.filters), input.alertFrequency ?? "never"],
+    [
+      userId,
+      input.name,
+      JSON.stringify(input.filters),
+      input.alertFrequency ?? "never",
+    ],
   );
   const row = result.rows[0];
   if (!row) {

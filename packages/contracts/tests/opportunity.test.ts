@@ -51,7 +51,7 @@ describe("Phase 7 Opportunity Match Contracts", () => {
         hiringMomentum: 10,
         sponsorshipRegionalFit: 10,
         totalScore: 105,
-      })
+      }),
     ).toThrow();
   });
 
@@ -99,7 +99,8 @@ describe("Phase 7 Opportunity Match Contracts", () => {
 
     const response = {
       version: 1 as const,
-      queryHash: "a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890",
+      queryHash:
+        "a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890",
       totalMatches: 1,
       matches: [matchResult],
     };

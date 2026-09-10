@@ -653,7 +653,8 @@ export default async function CompanyProfilePage({
         </p>
       </section>
 
-      {(company.role_signals.length > 0 || company.skill_signals.length > 0) && (
+      {(company.role_signals.length > 0 ||
+        company.skill_signals.length > 0) && (
         <section className="rounded-xl border border-surface-border bg-slate-50/70 p-5 shadow-2xs">
           <div className="flex items-center gap-2 mb-4">
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-100 text-emerald-800">
@@ -664,7 +665,8 @@ export default async function CompanyProfilePage({
                 Hiring Demand &amp; Skills Landscape
               </h2>
               <p className="text-xs text-slate-500">
-                Signals derived from active job vacancies and observed recruitment velocity.
+                Signals derived from active job vacancies and observed
+                recruitment velocity.
               </p>
             </div>
           </div>
@@ -686,7 +688,8 @@ export default async function CompanyProfilePage({
                         {signal.roleFamily}
                       </span>
                       <span className="text-[11px] text-slate-500 font-mono">
-                        {signal.activeJobs} live {signal.activeJobs === 1 ? "role" : "roles"}
+                        {signal.activeJobs} live{" "}
+                        {signal.activeJobs === 1 ? "role" : "roles"}
                       </span>
                     </div>
                     <div>
@@ -700,7 +703,9 @@ export default async function CompanyProfilePage({
                                 : "bg-slate-200 text-slate-700"
                           }`}
                         >
-                          {signal.momentum > 0 ? `+${Math.round(signal.momentum * 100)}%` : `${Math.round(signal.momentum * 100)}%`}
+                          {signal.momentum > 0
+                            ? `+${Math.round(signal.momentum * 100)}%`
+                            : `${Math.round(signal.momentum * 100)}%`}
                         </span>
                       ) : (
                         <span

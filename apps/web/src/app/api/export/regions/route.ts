@@ -11,7 +11,12 @@ export const dynamic = "force-dynamic";
 function escapeCsvField(val: unknown): string {
   if (val === null || val === undefined) return "";
   const str = String(val).trim();
-  if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
+  if (
+    str.includes(",") ||
+    str.includes('"') ||
+    str.includes("\n") ||
+    str.includes("\r")
+  ) {
     return `"${str.replace(/"/g, '""')}"`;
   }
   return str;
@@ -26,12 +31,17 @@ export async function GET() {
   const isStaff = userRole === "admin" || userRole === "reviewer";
 
   const isInstitutional =
-    isStaff || (userId ? await hasEntitlement(pool, userId, "institutional_export") : false);
+    isStaff ||
+    (userId
+      ? await hasEntitlement(pool, userId, "institutional_export")
+      : false);
 
   // Tiered rate limit: 120/min for institutional/staff, 10/min for community/anonymous
   const limit = isInstitutional ? 120 : 10;
   const rateLimitResponse = await enforceApiRateLimit(pool, {
-    scope: isInstitutional ? "api_export_regions_inst" : "api_export_regions_pub",
+    scope: isInstitutional
+      ? "api_export_regions_inst"
+      : "api_export_regions_pub",
     limit,
     windowSeconds: 60,
     lockSeconds: 60,
@@ -81,7 +91,9 @@ export async function GET() {
       csvRows.push(
         `# AusTechMap Institutional Regional Intelligence Export (Licensed to: ${user?.email ?? "Staff"}, Generated: ${new Date().toISOString()})`,
       );
-      csvRows.push("# Notice: Data governed by Australia Tech Map Institutional Terms and Source Attribution Registers.");
+      csvRows.push(
+        "# Notice: Data governed by Australia Tech Map Institutional Terms and Source Attribution Registers.",
+      );
     }
 
     csvRows.push(headers.map(escapeCsvField).join(","));
@@ -101,12 +113,15 @@ export async function GET() {
             ? "Category 3 Regional Area"
             : "Major Metropolitan";
 
-      const score = opp?.score.value !== null && opp?.score.value !== undefined
-        ? opp.score.value
-        : "";
+      const score =
+        opp?.score.value !== null && opp?.score.value !== undefined
+          ? opp.score.value
+          : "";
 
       const isSuppressed = !opp?.score.sufficiency.sufficient;
-      const status = isSuppressed ? "Suppressed (Screening)" : "Sufficient Data";
+      const status = isSuppressed
+        ? "Suppressed (Screening)"
+        : "Sufficient Data";
       const suppressionReason = opp?.score.sufficiency.reasons?.[0] || "";
       const employerCount = opp?.summary.employerCount ?? 0;
       const activeRoles = opp?.summary.activeJobCount ?? 0;

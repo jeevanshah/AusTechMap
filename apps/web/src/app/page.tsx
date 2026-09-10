@@ -198,7 +198,9 @@ export default async function Home() {
               className="inline-flex items-center gap-1.5 rounded-lg border border-surface-border bg-white px-3 py-1.5 text-xs font-semibold text-navy-900 shadow-2xs hover:bg-slate-50 hover:border-slate-300 transition-all"
             >
               <User className="h-3.5 w-3.5 text-slate-500" />
-              <span className="max-w-[100px] truncate sm:max-w-[160px]">{user.email}</span>
+              <span className="max-w-[100px] truncate sm:max-w-[160px]">
+                {user.email}
+              </span>
             </Link>
           ) : (
             <Link
@@ -348,24 +350,43 @@ export default async function Home() {
 
       <footer className="mt-8 border-t border-surface-border pt-6 pb-10 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-500 font-mono">
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-navy-900">Australia Tech Map</span>
+          <span className="font-semibold text-navy-900">
+            Australia Tech Map
+          </span>
           <span>•</span>
           <span>National Opportunity Graph</span>
         </div>
         <div className="flex items-center gap-5 flex-wrap font-sans text-xs text-slate-600">
-          <Link href="/methodology" className="hover:text-navy-900 transition-colors">
+          <Link
+            href="/methodology"
+            className="hover:text-navy-900 transition-colors"
+          >
             Methodology
           </Link>
-          <Link href="/privacy" className="hover:text-navy-900 transition-colors">
+          <Link
+            href="/privacy"
+            className="hover:text-navy-900 transition-colors"
+          >
             Privacy Policy (APP 11)
           </Link>
-          <Link href="/corrections" className="hover:text-navy-900 transition-colors">
+          <Link
+            href="/corrections"
+            className="hover:text-navy-900 transition-colors"
+          >
             Corrections & Claims
           </Link>
-          <a href="/api/export/companies" download className="hover:text-navy-900 transition-colors">
+          <a
+            href="/api/export/companies"
+            download
+            className="hover:text-navy-900 transition-colors"
+          >
             Export Companies (CSV)
           </a>
-          <a href="/api/export/regions" download className="hover:text-navy-900 transition-colors">
+          <a
+            href="/api/export/regions"
+            download
+            className="hover:text-navy-900 transition-colors"
+          >
             Export Regions (CSV)
           </a>
         </div>

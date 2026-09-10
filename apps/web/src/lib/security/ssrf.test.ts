@@ -62,11 +62,17 @@ describe("SSRF Protection & IP Validation", () => {
       const localhostRes = await validateSafeUrl("http://localhost:8080/admin");
       expect(localhostRes.valid).toBe(false);
 
-      const metadataRes = await validateSafeUrl("http://169.254.169.254/latest/meta-data/");
+      const metadataRes = await validateSafeUrl(
+        "http://169.254.169.254/latest/meta-data/",
+      );
       expect(metadataRes.valid).toBe(false);
-      expect(metadataRes.reason).toContain("private, loopback, or reserved range");
+      expect(metadataRes.reason).toContain(
+        "private, loopback, or reserved range",
+      );
 
-      const googleMetaRes = await validateSafeUrl("http://metadata.google.internal/computeMetadata/v1/");
+      const googleMetaRes = await validateSafeUrl(
+        "http://metadata.google.internal/computeMetadata/v1/",
+      );
       expect(googleMetaRes.valid).toBe(false);
     });
 

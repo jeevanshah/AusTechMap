@@ -18,14 +18,14 @@
 
 ## 2. Benchmark Results
 
-| Endpoint | Method | Success Rate | Throughput (RPS) | Avg Latency | p50 (Median) | p95 Latency | p99 Latency |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Shallow Health Check** (`/api/health`) | GET | **50 / 50 (100%)** | **309.7 req/s** | 29ms | **23ms** | 60ms | 63ms |
-| **Categories Metadata** (`/api/categories`) | GET | **50 / 50 (100%)** | **35.5 req/s** | 242ms | **29ms** | 1,073ms* | 1,292ms* |
-| **Trigram Company Search** (`/api/search/companies`) | GET | **50 / 50 (100%)** | **76.7 req/s** | 126ms | **64ms** | 378ms | 379ms |
-| **Opportunity Match Engine** (`/api/opportunities/match`) | GET | **50 / 50 (100%)** | **55.3 req/s** | 171ms | **129ms** | 392ms | 398ms |
+| Endpoint                                                  | Method |    Success Rate    | Throughput (RPS) | Avg Latency | p50 (Median) | p95 Latency | p99 Latency |
+| :-------------------------------------------------------- | :----: | :----------------: | :--------------: | :---------: | :----------: | :---------: | :---------: |
+| **Shallow Health Check** (`/api/health`)                  |  GET   | **50 / 50 (100%)** | **309.7 req/s**  |    29ms     |   **23ms**   |    60ms     |    63ms     |
+| **Categories Metadata** (`/api/categories`)               |  GET   | **50 / 50 (100%)** |  **35.5 req/s**  |    242ms    |   **29ms**   |  1,073ms*   |  1,292ms*   |
+| **Trigram Company Search** (`/api/search/companies`)      |  GET   | **50 / 50 (100%)** |  **76.7 req/s**  |    126ms    |   **64ms**   |    378ms    |    379ms    |
+| **Opportunity Match Engine** (`/api/opportunities/match`) |  GET   | **50 / 50 (100%)** |  **55.3 req/s**  |    171ms    |  **129ms**   |    392ms    |    398ms    |
 
-*\*Note: High p95 on initial cold concurrent batch reflects Neon serverless pool scaling from 0 to 10 concurrent connections. Once pooled, median warm response latency drops to 29ms.*
+_\*Note: High p95 on initial cold concurrent batch reflects Neon serverless pool scaling from 0 to 10 concurrent connections. Once pooled, median warm response latency drops to 29ms._
 
 ---
 

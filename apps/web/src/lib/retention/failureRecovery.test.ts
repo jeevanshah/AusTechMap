@@ -15,36 +15,47 @@ describe("Notification Failure Handling & Backlog Recovery", () => {
     process.env = originalEnv;
   });
 
-  function createMockPool(candidateRows: Array<{
-    user_id: number;
-    user_email: string;
-    events: Array<{
+  function createMockPool(
+    candidateRows: Array<{
+      user_id: number;
+      user_email: string;
+      events: Array<{
+        eventId: string;
+        eventType: string;
+        payload: Record<string, unknown>;
+        occurredAt: string;
+      }>;
+    }>,
+  ) {
+    const insertedDeliveries: Array<{
+      userId: number;
       eventId: string;
-      eventType: string;
-      payload: Record<string, unknown>;
-      occurredAt: string;
-    }>;
-  }>) {
-    const insertedDeliveries: Array<{ userId: number; eventId: string; windowKey: string }> = [];
+      windowKey: string;
+    }> = [];
 
-    const mockQuery = vi.fn().mockImplementation((queryText: string, params?: unknown[]) => {
-      if (queryText.includes("FROM candidate_events") || queryText.includes("SELECT user_id, user_email")) {
-        return Promise.resolve({ rows: candidateRows });
-      }
-
-      if (queryText.includes("INSERT INTO notification_deliveries")) {
-        if (params) {
-          insertedDeliveries.push({
-            userId: Number(params[0]),
-            eventId: String(params[1]),
-            windowKey: String(params[2]),
-          });
+    const mockQuery = vi
+      .fn()
+      .mockImplementation((queryText: string, params?: unknown[]) => {
+        if (
+          queryText.includes("FROM candidate_events") ||
+          queryText.includes("SELECT user_id, user_email")
+        ) {
+          return Promise.resolve({ rows: candidateRows });
         }
-        return Promise.resolve({ rowCount: 1 });
-      }
 
-      return Promise.resolve({ rows: [] });
-    });
+        if (queryText.includes("INSERT INTO notification_deliveries")) {
+          if (params) {
+            insertedDeliveries.push({
+              userId: Number(params[0]),
+              eventId: String(params[1]),
+              windowKey: String(params[2]),
+            });
+          }
+          return Promise.resolve({ rowCount: 1 });
+        }
+
+        return Promise.resolve({ rows: [] });
+      });
 
     return {
       pool: { query: mockQuery } as unknown as Pool,
@@ -62,7 +73,11 @@ describe("Notification Failure Handling & Backlog Recovery", () => {
           {
             eventId: "evt-001",
             eventType: "job.first_seen",
-            payload: { companyName: "Canva", companySlug: "canva", title: "Senior Frontend Engineer" },
+            payload: {
+              companyName: "Canva",
+              companySlug: "canva",
+              title: "Senior Frontend Engineer",
+            },
             occurredAt: new Date().toISOString(),
           },
         ],
@@ -85,7 +100,9 @@ describe("Notification Failure Handling & Backlog Recovery", () => {
     expect(result.emailsSent).toBe(0);
     expect(result.eventsDelivered).toBe(0);
     expect(result.errors.length).toBe(1);
-    expect(result.errors[0]).toContain("Internal Server Error from mail gateway");
+    expect(result.errors[0]).toContain(
+      "Internal Server Error from mail gateway",
+    );
 
     // CRITICAL: Event must NOT be recorded in notification_deliveries so backlog can be recovered
     expect(insertedDeliveries.length).toBe(0);
@@ -100,7 +117,11 @@ describe("Notification Failure Handling & Backlog Recovery", () => {
           {
             eventId: "evt-002",
             eventType: "sponsorship.evidence_added",
-            payload: { companyName: "Atlassian", companySlug: "atlassian", agreementType: "Labour Agreement" },
+            payload: {
+              companyName: "Atlassian",
+              companySlug: "atlassian",
+              agreementType: "Labour Agreement",
+            },
             occurredAt: new Date().toISOString(),
           },
         ],
@@ -110,7 +131,10 @@ describe("Notification Failure Handling & Backlog Recovery", () => {
     const { pool, insertedDeliveries } = createMockPool(candidateRows);
 
     // Mock network drop
-    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("Connection reset by peer")));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockRejectedValue(new Error("Connection reset by peer")),
+    );
 
     const result = await sendEmailDigests(pool, { frequency: "weekly" });
 
@@ -131,13 +155,21 @@ describe("Notification Failure Handling & Backlog Recovery", () => {
           {
             eventId: "evt-backlog-001",
             eventType: "job.first_seen",
-            payload: { companyName: "SafetyCulture", companySlug: "safetyculture", title: "Mobile Lead" },
+            payload: {
+              companyName: "SafetyCulture",
+              companySlug: "safetyculture",
+              title: "Mobile Lead",
+            },
             occurredAt: new Date().toISOString(),
           },
           {
             eventId: "evt-backlog-002",
             eventType: "job.first_seen",
-            payload: { companyName: "Culture Amp", companySlug: "culture-amp", title: "Staff SRE" },
+            payload: {
+              companyName: "Culture Amp",
+              companySlug: "culture-amp",
+              title: "Staff SRE",
+            },
             occurredAt: new Date().toISOString(),
           },
         ],
@@ -176,7 +208,11 @@ describe("Notification Failure Handling & Backlog Recovery", () => {
           {
             eventId: "evt-user1",
             eventType: "job.first_seen",
-            payload: { companyName: "Airtasker", companySlug: "airtasker", title: "Backend Engineer" },
+            payload: {
+              companyName: "Airtasker",
+              companySlug: "airtasker",
+              title: "Backend Engineer",
+            },
             occurredAt: new Date().toISOString(),
           },
         ],
@@ -188,7 +224,11 @@ describe("Notification Failure Handling & Backlog Recovery", () => {
           {
             eventId: "evt-user2",
             eventType: "job.first_seen",
-            payload: { companyName: "Employment Hero", companySlug: "employment-hero", title: "Staff Engineer" },
+            payload: {
+              companyName: "Employment Hero",
+              companySlug: "employment-hero",
+              title: "Staff Engineer",
+            },
             occurredAt: new Date().toISOString(),
           },
         ],

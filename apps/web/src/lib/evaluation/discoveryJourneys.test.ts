@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { scoreCompany, computeQueryHash, type RawCompanyData } from "../opportunity/matcher";
+import {
+  scoreCompany,
+  computeQueryHash,
+  type RawCompanyData,
+} from "../opportunity/matcher";
 import type { OpportunityMatchPreferences } from "@austechmap/contracts";
 
 function makePreferences(
@@ -73,11 +77,19 @@ describe("Critical Discovery Journeys QA Contracts (PRODUCT_SPEC.md §2.3)", () 
 
       // Verify human-readable reason explanation
       expect(scored.topReasons.length).toBeGreaterThan(0);
-      expect(scored.topReasons.some((r) => r.toLowerCase().includes("role") || r.toLowerCase().includes("hiring"))).toBe(true);
+      expect(
+        scored.topReasons.some(
+          (r) =>
+            r.toLowerCase().includes("role") ||
+            r.toLowerCase().includes("hiring"),
+        ),
+      ).toBe(true);
 
       // Verify active role source links
       expect(scored.sampleActiveRoles.length).toBe(1);
-      expect(scored.sampleActiveRoles[0]!.sourceUrl).toBe("https://www.atlassian.com/company/careers/job-1");
+      expect(scored.sampleActiveRoles[0]!.sourceUrl).toBe(
+        "https://www.atlassian.com/company/careers/job-1",
+      );
     });
 
     it("withholds match results when mandatory constraints are not met", () => {
@@ -117,7 +129,9 @@ describe("Critical Discovery Journeys QA Contracts (PRODUCT_SPEC.md §2.3)", () 
   describe("Journey B: Sponsorship Discovery", () => {
     it("ensures sponsorship claims are backed by explicit evidence", () => {
       expect(sampleCompany.has_sponsorship_evidence).toBe(true);
-      expect(sampleCompany.sponsorship_summary).toBe("Approved Labour Agreement");
+      expect(sampleCompany.sponsorship_summary).toBe(
+        "Approved Labour Agreement",
+      );
 
       // Company without evidence must never manufacture or infer sponsorship
       const companyWithoutSponsorship: RawCompanyData = {

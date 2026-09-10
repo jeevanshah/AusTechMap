@@ -75,10 +75,13 @@ export async function submitEmployerClaimAction(
   }
 
   // Check company exists
-  const compRes = await pool.query<{ id: string; domain: string | null; display_name: string }>(
-    `SELECT id, domain, display_name FROM companies WHERE id = $1`,
-    [data.companyId],
-  );
+  const compRes = await pool.query<{
+    id: string;
+    domain: string | null;
+    display_name: string;
+  }>(`SELECT id, domain, display_name FROM companies WHERE id = $1`, [
+    data.companyId,
+  ]);
   const company = compRes.rows[0];
   if (!company) {
     return {
@@ -91,8 +94,15 @@ export async function submitEmployerClaimAction(
   let domainMatched = false;
   if (company.domain) {
     const emailDomain = data.claimantEmail.split("@")[1]?.toLowerCase().trim();
-    const cleanCompanyDomain = company.domain.toLowerCase().replace(/^www\./, "").trim();
-    if (emailDomain && (emailDomain === cleanCompanyDomain || emailDomain.endsWith("." + cleanCompanyDomain))) {
+    const cleanCompanyDomain = company.domain
+      .toLowerCase()
+      .replace(/^www\./, "")
+      .trim();
+    if (
+      emailDomain &&
+      (emailDomain === cleanCompanyDomain ||
+        emailDomain.endsWith("." + cleanCompanyDomain))
+    ) {
       domainMatched = true;
     }
   }
@@ -123,7 +133,8 @@ export async function submitEmployerClaimAction(
   } catch (err) {
     return {
       ok: false,
-      error: err instanceof Error ? err.message : "Failed to record employer claim.",
+      error:
+        err instanceof Error ? err.message : "Failed to record employer claim.",
     };
   }
 }
@@ -185,7 +196,10 @@ export async function submitDataCorrectionAction(
   } catch (err) {
     return {
       ok: false,
-      error: err instanceof Error ? err.message : "Failed to submit correction report.",
+      error:
+        err instanceof Error
+          ? err.message
+          : "Failed to submit correction report.",
     };
   }
 }

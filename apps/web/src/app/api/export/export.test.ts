@@ -61,7 +61,9 @@ vi.mock("../../../lib/queries/getRegionOpportunity", () => ({
   }),
 }));
 
-function fakePool(queryHandler: (sql: string, params?: unknown[]) => unknown): Pool {
+function fakePool(
+  queryHandler: (sql: string, params?: unknown[]) => unknown,
+): Pool {
   return {
     query: vi.fn().mockImplementation((sql, params) => {
       const rows = queryHandler(sql, params);
@@ -73,7 +75,9 @@ function fakePool(queryHandler: (sql: string, params?: unknown[]) => unknown): P
 describe("CSV Export Endpoints & Institutional Controls", () => {
   beforeEach(() => {
     vi.mocked(getPool).mockReset();
-    (authModule.auth as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+    (authModule.auth as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
+      null,
+    );
     vi.spyOn(entitlementsModule, "hasEntitlement").mockResolvedValue(false);
   });
 
@@ -98,22 +102,30 @@ describe("CSV Export Endpoints & Institutional Controls", () => {
         ]),
       );
 
-      const request = new Request("http://localhost/api/export/companies?sponsorship=true");
+      const request = new Request(
+        "http://localhost/api/export/companies?sponsorship=true",
+      );
       const response = await getCompaniesExport(request);
 
       expect(response.status).toBe(200);
       expect(response.headers.get("Content-Type")).toContain("text/csv");
-      expect(response.headers.get("Content-Disposition")).toContain("attachment; filename=");
+      expect(response.headers.get("Content-Disposition")).toContain(
+        "attachment; filename=",
+      );
 
       const csvText = await response.text();
       expect(csvText).toContain("Company Name");
       expect(csvText).toContain("Atlassian");
       expect(csvText).toContain("Skilled Refugee Pilot");
-      expect(csvText).not.toContain("# AusTechMap Institutional Intelligence Export");
+      expect(csvText).not.toContain(
+        "# AusTechMap Institutional Intelligence Export",
+      );
     });
 
     it("includes institutional watermark and audited columns for licensed analysts", async () => {
-      (authModule.auth as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
+      (
+        authModule.auth as unknown as ReturnType<typeof vi.fn>
+      ).mockResolvedValue({
         user: { id: "42", email: "analyst@csiro.au", role: "user" },
       });
       vi.spyOn(entitlementsModule, "hasEntitlement").mockResolvedValue(true);
@@ -144,7 +156,9 @@ describe("CSV Export Endpoints & Institutional Controls", () => {
 
       expect(response.status).toBe(200);
       const csvText = await response.text();
-      expect(csvText).toContain("# AusTechMap Institutional Intelligence Export (Licensed to: analyst@csiro.au");
+      expect(csvText).toContain(
+        "# AusTechMap Institutional Intelligence Export (Licensed to: analyst@csiro.au",
+      );
       expect(csvText).toContain("ABN,ACN,Active Evidence Count");
       expect(csvText).toContain("80158929938");
     });
@@ -173,7 +187,9 @@ describe("CSV Export Endpoints & Institutional Controls", () => {
     });
 
     it("includes institutional component breakdown for licensed analysts", async () => {
-      (authModule.auth as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
+      (
+        authModule.auth as unknown as ReturnType<typeof vi.fn>
+      ).mockResolvedValue({
         user: { id: "42", email: "analyst@csiro.au", role: "user" },
       });
       vi.spyOn(entitlementsModule, "hasEntitlement").mockResolvedValue(true);
@@ -191,8 +207,12 @@ describe("CSV Export Endpoints & Institutional Controls", () => {
       const response = await getRegionsExport();
       expect(response.status).toBe(200);
       const csvText = await response.text();
-      expect(csvText).toContain("# AusTechMap Institutional Regional Intelligence Export");
-      expect(csvText).toContain("Employer Depth Score,Vacancies Score,Momentum Score");
+      expect(csvText).toContain(
+        "# AusTechMap Institutional Regional Intelligence Export",
+      );
+      expect(csvText).toContain(
+        "Employer Depth Score,Vacancies Score,Momentum Score",
+      );
     });
   });
 });

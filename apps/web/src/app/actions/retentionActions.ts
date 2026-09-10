@@ -19,10 +19,7 @@ import {
   toggleCompanyWatch,
   toggleRegionWatch,
 } from "../../lib/queries/watchlists";
-import {
-  markAlertRead,
-  markAllAlertsRead,
-} from "../../lib/queries/userAlerts";
+import { markAlertRead, markAllAlertsRead } from "../../lib/queries/userAlerts";
 
 export async function saveSearchAction(
   name: string,
@@ -59,7 +56,10 @@ export async function deleteSavedSearchAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to delete saved search",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to delete saved search",
     };
   }
 }
@@ -71,13 +71,21 @@ export async function updateSavedSearchFrequencyAction(
   try {
     const actor = await requireUser();
     const pool = getPool();
-    const ok = await updateSavedSearchAlertFrequency(pool, actor.id, searchId, frequency);
+    const ok = await updateSavedSearchAlertFrequency(
+      pool,
+      actor.id,
+      searchId,
+      frequency,
+    );
     revalidatePath("/account");
     return { success: ok };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update alert frequency",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to update alert frequency",
     };
   }
 }
@@ -94,7 +102,8 @@ export async function toggleCompanyWatchAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to toggle watchlist",
+      error:
+        error instanceof Error ? error.message : "Failed to toggle watchlist",
     };
   }
 }
@@ -112,7 +121,10 @@ export async function toggleRegionWatchAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to toggle region watch",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to toggle region watch",
     };
   }
 }
@@ -129,7 +141,10 @@ export async function removeWatchlistEntryAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to remove watchlist entry",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to remove watchlist entry",
     };
   }
 }
@@ -146,7 +161,8 @@ export async function markAlertReadAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to mark alert as read",
+      error:
+        error instanceof Error ? error.message : "Failed to mark alert as read",
     };
   }
 }
@@ -165,7 +181,10 @@ export async function markAllAlertsReadAction(): Promise<{
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to mark alerts as read",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to mark alerts as read",
     };
   }
 }

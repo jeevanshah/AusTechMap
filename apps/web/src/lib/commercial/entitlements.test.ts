@@ -7,7 +7,9 @@ import {
   revokeEntitlement,
 } from "./entitlements";
 
-function fakeClient(queryHandler: (sql: string, params?: unknown[]) => Promise<unknown>) {
+function fakeClient(
+  queryHandler: (sql: string, params?: unknown[]) => Promise<unknown>,
+) {
   return {
     query: vi.fn(queryHandler),
     release: vi.fn(),
@@ -90,8 +92,12 @@ describe("Commercial Entitlements Engine", () => {
 
     expect(res.id).toBe("ent-uuid-1");
     expect(res.entitlement).toBe("institutional_export");
-    expect(executedSql.some((s) => s.includes("INSERT INTO user_entitlements"))).toBe(true);
-    expect(executedSql.some((s) => s.includes("INSERT INTO audit_records"))).toBe(true);
+    expect(
+      executedSql.some((s) => s.includes("INSERT INTO user_entitlements")),
+    ).toBe(true);
+    expect(
+      executedSql.some((s) => s.includes("INSERT INTO audit_records")),
+    ).toBe(true);
   });
 
   it("revokes entitlement and logs audit record", async () => {
@@ -104,7 +110,11 @@ describe("Commercial Entitlements Engine", () => {
 
     await revokeEntitlement(pool, 42, "institutional_export", 1);
 
-    expect(executedSql.some((s) => s.includes("DELETE FROM user_entitlements"))).toBe(true);
-    expect(executedSql.some((s) => s.includes("INSERT INTO audit_records"))).toBe(true);
+    expect(
+      executedSql.some((s) => s.includes("DELETE FROM user_entitlements")),
+    ).toBe(true);
+    expect(
+      executedSql.some((s) => s.includes("INSERT INTO audit_records")),
+    ).toBe(true);
   });
 });

@@ -47,7 +47,11 @@ export function WatchCompanyButton({
       type="button"
       onClick={handleToggle}
       disabled={isPending}
-      title={isWatching ? "Stop watching this employer" : "Watch for hiring & sponsorship updates"}
+      title={
+        isWatching
+          ? "Stop watching this employer"
+          : "Watch for hiring & sponsorship updates"
+      }
       className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold shadow-2xs transition-all ${
         isWatching
           ? "border border-terracotta-200 bg-terracotta-50 text-terracotta-800 hover:bg-terracotta-100/80"
