@@ -168,6 +168,14 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: Ruff, mypy strict, and the ingestion suite (268 passed, 99 integration/environment skips locally). The new live-PostGIS integration test will run where `TEST_DATABASE_URL` is configured.
 - Residual risk: the command is intentionally narrow. It only promotes an already-linked ambiguous location with exact active first-party source evidence; it does not replace `seed-locations` for newly researched addresses.
 
+## 2026-09-10 — complete residual ambiguous-location research sweep
+
+- Commit: `data: research remaining ambiguous locations` (this commit)
+- Scope: rechecked all 312 live ambiguous company-location links without active first-party location evidence, using only canonical company sites, standard contact/location paths, and same-origin location-shaped links.
+- Result: two safe locality-matching, complete first-party addresses were selected and pass strict fixture validation. Of the remaining 310, 127 domains were unreachable, 178 were reachable without a street candidate, and five had only mismatched or multi-office candidates.
+- Verification: bounded first-party fetches only; exact source/candidate manifest retained; `validate-address-fixture` passed for the two-row preflight.
+- Residual risk: no production write occurred. The two-row preflight requires explicit approval before geocoding/import; the other 310 records remain unresolved rather than inferred.
+
 ## 2026-09-10 — ambiguous-location canonical-host recovery
 
 - Commit: `data: recover ambiguous-location address evidence` (this commit)
