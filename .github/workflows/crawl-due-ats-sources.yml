@@ -1,0 +1,42 @@
+name: Crawl due ATS sources
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type CRAWL_DUE_SOURCES to start the production crawl
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-ats-crawl
+  cancel-in-progress: false
+
+jobs:
+  crawl:
+    name: Controlled due-source crawl
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      CONFIRMATION: ${{ inputs.confirmation }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      PYTHONPATH: workers/ingestion/src
+      RAW_SNAPSHOT_BACKEND: r2
+      RAW_SNAPSHOT_BUCKET: ${{ secrets.RAW_SNAPSHOT_BUCKET }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Require explicit crawl confirmation
+        run: test "$CONFIRMATION" = "CRAWL_DUE_SOURCES"
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: workers/ingestion/requirements-dev.lock
+      - run: python -m pip install -r workers/ingestion/requirements-dev.lock
+      - run: python -m austechmap_ingestion crawl-jobs --due --worker-id github-actions-ats-crawler
