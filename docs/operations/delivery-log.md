@@ -310,3 +310,19 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Operational state: raw-snapshot storage and the first manual production crawl are now verified.
   The crawl workflow remains manually dispatched; automatic scheduling stays deferred until the
   Railway/freshness-SLA milestone.
+
+## 2026-09-11 — verified ATS source expansion staged for first crawl
+
+- Approval: the user explicitly approved registering and crawling five newly verified ATS sources,
+  and pausing Mable's SmartRecruiters source in favour of its verified Lever source.
+- Fresh board validation: CreditorWatch/Workable returned 10 postings, DUG/Breezy 12,
+  LegalVision/Workable 29, Lyka/Workable 16, Mable/Lever 22, and Zutec/Workable 3.
+- Result: all six source registrations were created with no conflicts. Mable's existing
+  `smartrecruiters/mable` source was paused—not deleted—with an append-only status-change audit
+  record; its new `lever/mable` source is active.
+- Verification: direct production read-back confirms each new source is active with zero consecutive
+  failures and currently due. Mable's former SmartRecruiters source is paused and excluded from
+  due-source selection.
+- Next action: dispatch the already approved manual `Crawl due ATS sources` workflow. At this point
+  the only due active sources are the six registrations above, so the workflow is bounded to this
+  batch.
