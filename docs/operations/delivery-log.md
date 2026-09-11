@@ -334,3 +334,10 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Scope: processed all 6 due sources (CreditorWatch, DUG, LegalVision, Lyka, Mable Lever board, and Zutec).
 - Provider idempotency fix: the Lever crawl for Mable executed cleanly without same-day key collision against the earlier SmartRecruiters crawl, validated by the provider-scoped idempotency key fix in `4368287`.
 - Production state: all 6 due sources crawled successfully with immutable raw snapshots stored in R2. Zero due active sources remain.
+
+## 2026-09-11 — SafetyCulture Ashby ATS source registered
+
+- Approval: user explicitly approved registering SafetyCulture (`safetyculture.com`) on Ashby (`ashby:mitti`).
+- Verification: live endpoint probe (`https://api.ashbyhq.com/posting-api/job-board/mitti`) returned 39 active postings (19 Sydney software/security/product engineering roles).
+- Result: registered source `1fb13f46-beab-4f0e-864c-982a67dce928` on Neon with status `active` and due for crawl. Direct read-back confirms 1 due source.
+- Next action: manually dispatch `Crawl due ATS sources` workflow on GitHub Actions with input `CRAWL_DUE_SOURCES`.
