@@ -346,7 +346,7 @@ export default async function AdminMonitoringPage() {
               </span>
             </div>
 
-            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
               <SourceHealthMetric
                 label="Active"
                 value={data.sourceHealth.summary.active}
@@ -369,6 +369,12 @@ export default async function AdminMonitoringPage() {
                 label="Quarantined"
                 value={data.sourceHealth.summary.quarantined}
                 detail="Requires an audited operator decision"
+                tone="text-terracotta-900"
+              />
+              <SourceHealthMetric
+                label="Count drops"
+                value={data.sourceHealth.summary.jobCountAnomalies}
+                detail="Latest crawl is 50% or lower than its baseline"
                 tone="text-terracotta-900"
               />
             </div>
@@ -400,6 +406,11 @@ export default async function AdminMonitoringPage() {
                         >
                           {SOURCE_STATUS_STYLE[source.status].label}
                         </span>
+                        {source.jobCountAnomaly ? (
+                          <span className="inline-flex items-center gap-1 rounded border border-terracotta-300 bg-terracotta-50 px-2 py-0.5 text-xs font-semibold text-terracotta-900">
+                            <AlertTriangle className="h-3 w-3" /> Job-count drop
+                          </span>
+                        ) : null}
                       </div>
                       <p className="mt-1 break-all font-mono text-xs leading-5 text-slate-500">
                         {source.provider} / {source.identifier}
@@ -408,6 +419,16 @@ export default async function AdminMonitoringPage() {
                         <p className="mt-1 text-xs leading-5 text-slate-600">
                           {source.statusReason ??
                             `Latest failure: ${source.lastFailureCode}`}
+                        </p>
+                      ) : null}
+                      {source.jobCountAnomaly ? (
+                        <p className="mt-1 text-xs leading-5 text-terracotta-900">
+                          Latest crawl reported{" "}
+                          {source.jobCountAnomaly.reportedJobCount} roles vs a
+                          median baseline of{" "}
+                          {source.jobCountAnomaly.baselineJobCount} across{" "}
+                          {source.jobCountAnomaly.baselineSampleSize} prior
+                          crawls.
                         </p>
                       ) : null}
                     </div>

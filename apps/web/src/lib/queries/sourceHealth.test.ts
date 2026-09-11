@@ -15,6 +15,7 @@ describe("getAtsSourceHealth", () => {
             overdue: "2",
             failing: "1",
             quarantined: "1",
+            job_count_anomalies: "1",
           },
         ],
       })
@@ -35,6 +36,11 @@ describe("getAtsSourceHealth", () => {
             last_failure_code: null,
             status_reason: null,
             is_overdue: true,
+            reported_job_count: 4,
+            baseline_job_count: "12",
+            baseline_sample_size: 3,
+            is_job_count_anomaly: true,
+            anomaly_detected_at: new Date("2026-09-11T01:00:00Z"),
           },
           {
             id: "source-2",
@@ -51,6 +57,11 @@ describe("getAtsSourceHealth", () => {
             last_failure_code: "parse_failed",
             status_reason: "Automatic quarantine after terminal failures",
             is_overdue: false,
+            reported_job_count: null,
+            baseline_job_count: null,
+            baseline_sample_size: null,
+            is_job_count_anomaly: null,
+            anomaly_detected_at: null,
           },
           {
             id: "source-3",
@@ -67,6 +78,11 @@ describe("getAtsSourceHealth", () => {
             last_failure_code: "http_503",
             status_reason: null,
             is_overdue: false,
+            reported_job_count: null,
+            baseline_job_count: null,
+            baseline_sample_size: null,
+            is_job_count_anomaly: null,
+            anomaly_detected_at: null,
           },
         ],
       });
@@ -76,7 +92,13 @@ describe("getAtsSourceHealth", () => {
     expect(query).toHaveBeenCalledTimes(2);
     expect(query.mock.calls[1]?.[1]).toEqual([100]);
     expect(result).toMatchObject({
-      summary: { total: 102, overdue: 2, failing: 1, quarantined: 1 },
+      summary: {
+        total: 102,
+        overdue: 2,
+        failing: 1,
+        quarantined: 1,
+        jobCountAnomalies: 1,
+      },
       truncated: true,
       sources: [
         {
@@ -84,6 +106,12 @@ describe("getAtsSourceHealth", () => {
           status: "overdue",
           activeJobs: 12,
           lastAttemptedAt: "2026-09-11T01:00:00.000Z",
+          jobCountAnomaly: {
+            reportedJobCount: 4,
+            baselineJobCount: 12,
+            baselineSampleSize: 3,
+            detectedAt: "2026-09-11T01:00:00.000Z",
+          },
         },
         {
           id: "source-2",
@@ -104,7 +132,14 @@ describe("getAtsSourceHealth", () => {
     await expect(
       getAtsSourceHealth({ query } as unknown as Pool),
     ).resolves.toEqual({
-      summary: { total: 0, active: 0, overdue: 0, failing: 0, quarantined: 0 },
+      summary: {
+        total: 0,
+        active: 0,
+        overdue: 0,
+        failing: 0,
+        quarantined: 0,
+        jobCountAnomalies: 0,
+      },
       sources: [],
       truncated: false,
     });

@@ -241,8 +241,11 @@ def run_ats_crawl(
     record_ats_source_success(
         database_url,
         source_id=company_ats_source.id,
+        import_run_id=claim.run_id,
         observed_at=crawl_time,
         fetched_jobs=len(postings),
+        actor_id=worker_id,
+        request_id=claim.log_correlation_id,
     )
 
     return AtsCrawlResult(claim.run_id, True, len(postings), created, updated, unchanged, expired)

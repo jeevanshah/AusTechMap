@@ -5,6 +5,7 @@ from __future__ import annotations
 import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from typing import Literal, cast
 
 import psycopg
@@ -37,6 +38,10 @@ ACTIVE_BOARD_INTERVAL = timedelta(hours=24)
 EMPTY_BOARD_INTERVAL = timedelta(hours=72)
 TERMINAL_FAILURE_INTERVAL = timedelta(hours=24)
 QUARANTINE_THRESHOLD = 3
+JOB_COUNT_BASELINE_SIZE = 3
+JOB_COUNT_MINIMUM_BASELINE = Decimal("10")
+JOB_COUNT_COLLAPSE_RATIO = Decimal("0.5")
+JOB_COUNT_BASELINE_METHOD = "median_previous_3_successful_crawls_v1"
 _VALID_STATUSES = frozenset({"active", "paused", "quarantined", "disabled"})
 
 
@@ -100,14 +105,35 @@ def record_ats_source_success(
     database_url: str,
     *,
     source_id: uuid.UUID,
+    import_run_id: uuid.UUID,
     observed_at: datetime,
     fetched_jobs: int,
+    actor_id: str,
+    request_id: str | None = None,
 ) -> AtsSourceOperationalState:
     if fetched_jobs < 0:
         raise ValueError("fetched_jobs must not be negative")
     completed_at = _aware(observed_at)
     interval = ACTIVE_BOARD_INTERVAL if fetched_jobs > 0 else EMPTY_BOARD_INTERVAL
-    with psycopg.connect(database_url) as connection:
+    with psycopg.connect(database_url) as connection, connection.transaction():
+        history_rows = connection.execute(
+            """
+            SELECT reported_job_count
+            FROM ats_source_crawl_metrics
+            WHERE company_ats_source_id = %s
+            ORDER BY observed_at DESC, id DESC
+            LIMIT %s
+            """,
+            (source_id, JOB_COUNT_BASELINE_SIZE),
+        ).fetchall()
+        previous_counts = [cast(int, row[0]) for row in history_rows]
+        baseline = _median_job_count(previous_counts)
+        is_anomaly = (
+            len(previous_counts) == JOB_COUNT_BASELINE_SIZE
+            and baseline is not None
+            and baseline >= JOB_COUNT_MINIMUM_BASELINE
+            and Decimal(fetched_jobs) <= baseline * JOB_COUNT_COLLAPSE_RATIO
+        )
         row = connection.execute(
             """
             UPDATE company_ats_sources
@@ -122,8 +148,56 @@ def record_ats_source_success(
             """,
             (completed_at, completed_at, completed_at + interval, source_id),
         ).fetchone()
-    if row is None:
-        raise AtsSourceOperationError(f"ATS source not found: {source_id}")
+        if row is None:
+            raise AtsSourceOperationError(f"ATS source not found: {source_id}")
+        connection.execute(
+            """
+            INSERT INTO ats_source_crawl_metrics (
+              company_ats_source_id, import_run_id, observed_at,
+              reported_job_count, baseline_job_count, baseline_sample_size,
+              baseline_method, is_job_count_anomaly
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                source_id,
+                import_run_id,
+                completed_at,
+                fetched_jobs,
+                baseline,
+                len(previous_counts),
+                JOB_COUNT_BASELINE_METHOD,
+                is_anomaly,
+            ),
+        )
+        if is_anomaly:
+            connection.execute(
+                """
+                INSERT INTO audit_records (
+                  actor_type, actor_id, action, target_type, target_id,
+                  after_state, metadata, request_id
+                )
+                VALUES (
+                  'worker', %s, 'ats_source_job_count_anomaly_detected',
+                  'company_ats_source', %s, %s, %s, %s
+                )
+                """,
+                (
+                    actor_id,
+                    str(source_id),
+                    Jsonb({"is_job_count_anomaly": True}),
+                    Jsonb(
+                        {
+                            "reported_job_count": fetched_jobs,
+                            "baseline_job_count": str(baseline),
+                            "baseline_sample_size": len(previous_counts),
+                            "baseline_method": JOB_COUNT_BASELINE_METHOD,
+                            "collapse_ratio": str(JOB_COUNT_COLLAPSE_RATIO),
+                        }
+                    ),
+                    request_id or uuid.uuid4().hex,
+                ),
+            )
     return _state(row)
 
 
@@ -298,6 +372,16 @@ def _state(row: tuple[object, ...]) -> AtsSourceOperationalState:
         consecutive_failures=cast(int, row[2]),
         next_crawl_at=cast(datetime, row[3]),
     )
+
+
+def _median_job_count(counts: list[int]) -> Decimal | None:
+    if not counts:
+        return None
+    ordered = sorted(counts)
+    middle = len(ordered) // 2
+    if len(ordered) % 2:
+        return Decimal(ordered[middle])
+    return (Decimal(ordered[middle - 1]) + Decimal(ordered[middle])) / 2
 
 
 def _aware(value: datetime) -> datetime:
