@@ -25,3 +25,13 @@ working directory changed.
 Resume production ingestion only after a private R2 bucket and bucket-scoped read/write credentials
 are configured in the worker runtime, one test object passes write/read/checksum verification, and
 the user explicitly approves the first production crawl.
+
+## Status update — 11 September 2026
+
+The R2 provisioning portion of this pause is complete. The user created private Standard bucket
+`austechmap-raw-production`, saved bucket-scoped object read/write credentials in the GitHub
+`production` environment, and manually ran `Verify R2 storage`. GitHub Actions run `34571167209`
+completed successfully: it wrote one small unique content-addressed probe, read it back, and
+verified its SHA-256 without touching Neon.
+
+The first production `Crawl due ATS sources` remains separately gated by explicit user approval.

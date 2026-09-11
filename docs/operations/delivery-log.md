@@ -1,5 +1,12 @@
 # Autonomous delivery log
 
+## 2026-09-11 - R2 immutable-storage verification passed
+
+- Approval and action: after provisioning a private Standard R2 bucket and bucket-scoped object read/write credentials, the user manually ran GitHub Actions workflow `Verify R2 storage`.
+- Result: run `34571167209`, job `103173386542` succeeded in 22 seconds. It wrote one small unique content-addressed probe, read it back, and verified its SHA-256 without accessing Neon.
+- Production boundary: this proves R2 storage is ready for immutable snapshots. No company, job, location, or source data changed; no ATS crawl was started.
+- Next action: the first `Crawl due ATS sources` run remains an explicit production-data approval gate.
+
 ## 2026-09-11 - ATS job-count anomaly migration applied
 
 - Approval: the user explicitly approved applying migration `0025` to production Neon.
