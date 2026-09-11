@@ -91,7 +91,11 @@ def run_ats_crawl(
 
     enqueued = repository.enqueue(
         run_type="ats_job_fetch",
-        idempotency_key=f"{identifier}:{crawl_time.date().isoformat()}",
+        # ATS identifiers are only unique within a provider.  For example,
+        # a company can move from SmartRecruiters to Lever while both boards
+        # use the identifier "mable".  Provider-scoping prevents the new
+        # board from being mistaken for the old board's same-day crawl.
+        idempotency_key=f"{provider}:{identifier}:{crawl_time.date().isoformat()}",
         source_id=crawl_source_id,
         payload={"ats_provider": provider, "ats_identifier": identifier},
         scheduled_for=crawl_time,

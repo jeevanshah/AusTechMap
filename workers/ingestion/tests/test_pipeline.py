@@ -32,13 +32,20 @@ def _database_url() -> str:
 
 
 def _setup_company_ats_source(
-    database_url: str, suffix: str, ats_provider: str, ats_identifier: str
+    database_url: str,
+    suffix: str,
+    ats_provider: str,
+    ats_identifier: str,
+    *,
+    append_suffix_to_identifier: bool = True,
 ) -> CompanyAtsSource:
     unique_identifier = (
         f"{ats_identifier.rstrip('/')}/{suffix}"
         if ats_provider == "static_careers"
         else f"{ats_identifier}-{suffix}"
     )
+    if not append_suffix_to_identifier:
+        unique_identifier = ats_identifier
     repository = JobRepository(database_url)
     source_id = repository.ensure_source(
         source_key=f"pipeline-test-discovery-{suffix}",
@@ -340,6 +347,57 @@ def test_run_ats_crawl_is_idempotent_at_the_run_level_on_the_same_day() -> None:
     assert first.created is True
     assert second.created is False
     assert second.run_id == first.run_id
+
+
+@pytest.mark.integration
+def test_run_ats_crawl_scopes_same_day_idempotency_to_provider() -> None:
+    # An ATS board identifier is provider-scoped.  A company can migrate from
+    # one ATS to another and retain the same identifier, so the two boards
+    # must each receive a crawl on the same day.
+    database_url = _database_url()
+    suffix = uuid.uuid4().hex
+    lever_source = _setup_company_ats_source(
+        database_url,
+        f"lever-{suffix}",
+        "lever",
+        "shared-board",
+        append_suffix_to_identifier=False,
+    )
+    greenhouse_source = _setup_company_ats_source(
+        database_url,
+        f"greenhouse-{suffix}",
+        "greenhouse",
+        "shared-board",
+        append_suffix_to_identifier=False,
+    )
+    repository = JobRepository(database_url)
+    store = FilesystemSnapshotStore(
+        Path(tempfile.gettempdir()) / f"pipeline-provider-scope-{suffix}"
+    )
+    crawl_day = datetime(2026, 1, 1, tzinfo=UTC)
+
+    lever_result = run_ats_crawl(
+        repository,
+        store,
+        database_url=database_url,
+        company_ats_source=lever_source,
+        skills=(),
+        fetch_fn=lambda *a, **kw: _fake_fetch("lever_immutable_postings.json"),
+        now=crawl_day,
+    )
+    greenhouse_result = run_ats_crawl(
+        repository,
+        store,
+        database_url=database_url,
+        company_ats_source=greenhouse_source,
+        skills=(),
+        fetch_fn=lambda *a, **kw: _fake_fetch("greenhouse_cultureamp_postings.json"),
+        now=crawl_day,
+    )
+
+    assert lever_result.created is True
+    assert greenhouse_result.created is True
+    assert greenhouse_result.run_id != lever_result.run_id
 
 
 @pytest.mark.integration
