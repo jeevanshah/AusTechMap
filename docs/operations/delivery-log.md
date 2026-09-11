@@ -341,3 +341,12 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: live endpoint probe (`https://api.ashbyhq.com/posting-api/job-board/mitti`) returned 39 active postings (19 Sydney software/security/product engineering roles).
 - Result: registered source `1fb13f46-beab-4f0e-864c-982a67dce928` on Neon with status `active` and due for crawl. Direct read-back confirms 1 due source.
 - Next action: manually dispatch `Crawl due ATS sources` workflow on GitHub Actions with input `CRAWL_DUE_SOURCES`.
+
+## 2026-09-11 — SafetyCulture Ashby ATS crawl completed with R2 snapshots
+
+- Workflow dispatch: user manually dispatched `Crawl due ATS sources` on `main` (`75d7306`) with input `CRAWL_DUE_SOURCES`.
+- Result: GitHub Actions run [`34605582244`](https://github.com/jeevanshah/AusTechMap/actions/runs/34605582244) completed successfully in 1m 30s (13:39:43–13:41:13 UTC).
+- Scope: crawled SafetyCulture (`ashby:mitti`), successfully ingesting all 39 open positions (including 19 Sydney software, platform, security, and product roles).
+- Snapshot & metrics: immutable raw snapshot written to Cloudflare R2; crawl metrics and job observations persisted.
+- Post-crawl derivations: `derive-hiring-signals` created 3 new role signals and 15 new skill signals across 63 companies; `run-retention-pipeline.mjs` derived 39 new `job.first_seen` events into `events`.
+- Platform totals: 64 active ATS sources, 2,206 live unexpired jobs, 3,129 longitudinal change events. Zero due active sources remain.
