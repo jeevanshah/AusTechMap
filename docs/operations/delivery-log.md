@@ -350,3 +350,10 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Snapshot & metrics: immutable raw snapshot written to Cloudflare R2; crawl metrics and job observations persisted.
 - Post-crawl derivations: `derive-hiring-signals` created 3 new role signals and 15 new skill signals across 63 companies; `run-retention-pipeline.mjs` derived 39 new `job.first_seen` events into `events`.
 - Platform totals: 64 active ATS sources, 2,206 live unexpired jobs, 3,129 longitudinal change events. Zero due active sources remain.
+
+## 2026-09-12 — Harrison.ai Ashby ATS source registered
+
+- Approval: user explicitly approved registering Harrison.ai (`harrison.ai`) on Ashby (`ashby:harrison.ai`).
+- Verification: live endpoint probe (`https://api.ashbyhq.com/posting-api/job-board/harrison.ai`) returned 7 active postings (including Australian engineering and finance roles in Perth and Sydney).
+- Result: registered source `3ab7dd4e-5537-4b09-b29d-f795ac1ce110` on Neon with status `active` and due for crawl. Direct read-back confirms 1 due source.
+- Next action: manually dispatch `Crawl due ATS sources` workflow on GitHub Actions with input `CRAWL_DUE_SOURCES`.
