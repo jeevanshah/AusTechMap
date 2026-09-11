@@ -159,6 +159,12 @@ export default async function Home() {
             Map
           </span>
           <Link
+            href="/jobs"
+            className="text-slate-700 hover:text-navy-900 transition-colors font-medium"
+          >
+            Live jobs
+          </Link>
+          <Link
             href="/opportunities"
             className="text-slate-700 hover:text-navy-900 transition-colors font-medium flex items-center gap-1"
           >

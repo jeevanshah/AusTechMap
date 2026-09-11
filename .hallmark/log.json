@@ -1,5 +1,14 @@
 [
   {
+    "date": "2026-09-11",
+    "macrostructure": "Index-First",
+    "theme": "National Registry",
+    "enrichment": "none",
+    "nav": "N9 Edge-aligned minimal",
+    "footer": "existing application shell",
+    "brief": "Public verified live-jobs registry"
+  },
+  {
     "date": "2026-09-08",
     "macrostructure": "Ecosystem Index",
     "theme": "National Registry",
