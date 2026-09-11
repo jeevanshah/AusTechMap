@@ -5,7 +5,7 @@
 ## Switch
 
 - **Current Implementer / Integrator:** Codex (Cursor Auto covering after Codex usage limit) — operating per `AGENTS.md` orchestration / bulk autonomous delivery lane.
-- **Updated at:** 2026-09-10
+- **Updated at:** 2026-09-11
 - **Reason:** Static careers-page discovery foundation landed after the Stake Breezy rollout.
 - **Task / issue:** Resume employer-cohort and hiring-source expansion. The 304 evidence-free ambiguous locations are a research-only backlog; do not infer locations.
 - **Acceptance criteria (this checkpoint):** Add only evidence-backed employers and verified ATS sources; preserve the existing production approval and audit rules for every production write.
@@ -16,6 +16,7 @@
 - **Production migration state:** The user explicitly approved and the checksum-locked runner applied `0023_add_static_careers_provider.sql` to Neon on 2026-09-10. No static source was registered or crawled: R2 credentials are not configured, so production immutable snapshots would otherwise be stranded on a local filesystem.
 - **Latest completed delivery:** Pinpoint public-feed support was fast-forwarded to `main` under the user's explicit independent-review waiver. The waiver is recorded in `docs/reviews/2026-09-10-pinpoint-public-feed-waiver.md`. The user explicitly approved and the checksum-locked runner applied `0024_add_pinpoint_ats_provider.sql` to Neon on 2026-09-11; read-back confirmed version 24, its stored checksum, and the `pinpoint` enum value. No Pinpoint source is registered or crawled. R2 remains explicitly deferred.
 - **Latest completed delivery:** `feat/ats-source-discovery-preflight` (`30171eb`, `6e8c78e`) was fast-forwarded to `main` under the user's explicit independent-review waiver, recorded in `docs/reviews/2026-09-11-ats-source-discovery-preflight-waiver.md`. It adds a robots-first, SSRF-safe, read-only cohort scanner for known public ATS board links. It scanned 995 fixture URLs, produced 24 review candidates, and independently validated six non-empty boards (CreditorWatch, DUG, LegalVision, Lyka, Mable, and Zutec; 93 roles total). Artifacts: `docs/data-quality/ats-source-discovery-*-20260911.csv`. No Neon write, source registration, or crawl occurred; R2 remains the gate for those steps.
+- **Latest completed delivery:** `feat/public-jobs-explorer` (`4c75c3c`) was fast-forwarded to `main` under the user's explicit independent-review waiver, recorded in `docs/reviews/2026-09-11-public-jobs-explorer-waiver.md`. It adds the public `/jobs` registry: a parameterized, server-rendered list of active roles, bounded to 100 results, with title/employer search and role-family/work-style filters. Results link to the company profile and official application URL. It makes no schema, Neon-data, or source-registration change.
 - **Latest completed delivery:** `8d7ca5f` restores repository CI hygiene: tracked Prettier formatting plus worker Ruff and strict-mypy compliance. The user waived independent review; the durable record is `docs/reviews/2026-09-10-ci-quality-waiver.md`. GitHub Actions run `34483412375` passed both web and live-PostGIS ingestion jobs after integration tests were made independent of shared seed order and runner-clock timing. Migration `0024` is verified in CI and was applied to Neon on 2026-09-11.
 
 ## Checkpoint
