@@ -295,3 +295,18 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Result: 36 domains were recovered; four produced single complete first-party address candidates. The repair preflight now has 28 rows, all passing strict validation; no additional multi-office case was selected.
 - Verification: bounded first-party fetches only, strict address-fixture validation (28 rows, no errors or duplicate addresses), and `git diff --check`.
 - Residual risk: no candidate has been geocoded or imported. Production geocoding/import remains an explicit approval gate.
+
+## 2026-09-11 — first production due-source crawl with R2 snapshots
+
+- Approval: the user explicitly approved the first production `Crawl due ATS sources` workflow after
+  completing the private R2 bucket, credentials, and immutable probe gate.
+- Result: GitHub Actions run [`34571550432`](https://github.com/jeevanshah/AusTechMap/actions/runs/34571550432)
+  completed successfully on `main`. It processed all 56 sources due at dispatch time; every
+  `ats_job_fetch` run succeeded and no active source remained due at completion.
+- Verification: direct production read-back confirmed 56 immutable R2-backed raw snapshots totaling
+  23,018,197 bytes, 56 matching append-only crawl metrics, zero job-count anomalies, and 2,156 job
+  observations. Attempt metrics total 2,068 fetched postings, 91 jobs created, 21 updated, 1,956
+  unchanged, and 89 expired. No retry, dead-letter, or failed outcome was recorded.
+- Operational state: raw-snapshot storage and the first manual production crawl are now verified.
+  The crawl workflow remains manually dispatched; automatic scheduling stays deferred until the
+  Railway/freshness-SLA milestone.
