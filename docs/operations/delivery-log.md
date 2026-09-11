@@ -1,5 +1,12 @@
 # Autonomous delivery log
 
+## 2026-09-11 - ATS job-count anomaly migration applied
+
+- Approval: the user explicitly approved applying migration `0025` to production Neon.
+- Migration: after a read-only preflight confirmed production contained exactly versions 1 through 24, the checksum-locked worker applied exactly `0025_add_ats_source_crawl_metrics.sql`.
+- Verification: direct read-back confirmed version 25, its recorded SHA-256 checksum, the `ats_source_crawl_metrics` table, and its two append-only triggers.
+- Production boundary: this was schema-only. It registered no source, triggered no crawl, configured no R2 service, and changed no existing job, company, or location data.
+
 ## 2026-09-10 - static careers provider migration applied
 
 - Approval: the user explicitly approved applying migration `0023` and registering/crawling the first safe static careers source.
