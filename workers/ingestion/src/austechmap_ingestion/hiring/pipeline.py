@@ -12,7 +12,7 @@ import hashlib
 import re
 import uuid
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 
 import psycopg
@@ -120,6 +120,16 @@ def run_ats_crawl(
         if enqueued.created:
             raise RuntimeError(f"New ATS crawl run could not be claimed: {enqueued.run_id}")
         return AtsCrawlResult(enqueued.run_id, False, 0, 0, 0, 0, 0)
+
+    # Reconcile claim.source_id with crawl_source_id if a pre-existing same-day
+    # run row was originally enqueued with a differing or stale source_id.
+    if claim.source_id != crawl_source_id:
+        with psycopg.connect(database_url) as connection:
+            connection.execute(
+                "UPDATE import_runs SET source_id = %s WHERE id = %s",
+                (crawl_source_id, claim.run_id),
+            )
+        claim = replace(claim, source_id=crawl_source_id)
 
     try:
         if provider == "lever":
