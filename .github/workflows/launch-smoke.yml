@@ -1,0 +1,32 @@
+name: Launch smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Canonical HTTPS URL of the deployment to check
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: launch-smoke-${{ inputs.base_url }}
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    name: Public deployment smoke check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run test -w @austechmap/web -- scripts/launch-smoke.test.ts
+      - run: node apps/web/scripts/launch-smoke.mjs "$BASE_URL"
+        env:
+          BASE_URL: ${{ inputs.base_url }}
