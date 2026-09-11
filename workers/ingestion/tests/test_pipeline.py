@@ -13,10 +13,10 @@ import pytest
 from austechmap_ingestion.db.migrations import apply_migrations
 from austechmap_ingestion.fetch_safety import SafeFetchResult
 from austechmap_ingestion.hiring.company_sources import CompanyAtsSource
-from austechmap_ingestion.hiring.pipeline import run_ats_crawl
+from austechmap_ingestion.hiring.pipeline import build_ats_source_key, run_ats_crawl
 from austechmap_ingestion.hiring.replay import replay_ats_snapshot
 from austechmap_ingestion.jobs import JobRepository
-from austechmap_ingestion.storage import FilesystemSnapshotStore
+from austechmap_ingestion.storage import SOURCE_KEY, FilesystemSnapshotStore
 
 REPOSITORY_ROOT = Path(__file__).parents[3]
 MIGRATIONS_DIRECTORY = REPOSITORY_ROOT / "db" / "migrations"
@@ -260,6 +260,47 @@ def test_run_ats_crawl_succeeds_with_a_mixed_case_ats_identifier() -> None:
 
     assert result.created is True
     assert result.fetched == 7
+
+
+def test_build_ats_source_key_sanitizes_identifiers() -> None:
+    cases = [
+        ("ashby", "harrison.ai", "ats-ashby-harrison-ai"),
+        ("lever", "MixedCase", "ats-lever-mixedcase"),
+        ("workable", "some.sub_domain-test", "ats-workable-some-sub_domain-test"),
+        ("greenhouse", "co/special", "ats-greenhouse-co-special"),
+        ("breezy", "company.hr", "ats-breezy-company-hr"),
+    ]
+    for provider, identifier, expected in cases:
+        key = build_ats_source_key(provider, identifier)
+        assert key == expected
+        assert SOURCE_KEY.fullmatch(key) is not None
+
+
+@pytest.mark.integration
+def test_run_ats_crawl_succeeds_with_a_dotted_ats_identifier() -> None:
+    # Real bug found running against production: Ashby board identifiers
+    # may contain dots (e.g. "harrison.ai"), but SnapshotStore.put() requires
+    # a source_key containing only lowercase letters, digits, '_' or '-' --
+    # sanitizing the identifier slug prevents ValueError on dotted identifiers.
+    database_url = _database_url()
+    suffix = uuid.uuid4().hex
+    company_ats_source = _setup_company_ats_source(
+        database_url, suffix, "ashby", "harrison.ai", append_suffix_to_identifier=False
+    )
+    repository = JobRepository(database_url)
+    store = FilesystemSnapshotStore(Path(tempfile.gettempdir()) / f"pipeline-test-{suffix}")
+
+    result = run_ats_crawl(
+        repository,
+        store,
+        database_url=database_url,
+        company_ats_source=company_ats_source,
+        skills=(),
+        fetch_fn=lambda *a, **kw: _fake_fetch("ashby_immutable_postings.json"),
+    )
+
+    assert result.created is True
+    assert result.fetched == 6
 
 
 @pytest.mark.integration

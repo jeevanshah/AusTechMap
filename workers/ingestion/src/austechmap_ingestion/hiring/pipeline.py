@@ -9,6 +9,7 @@ bytes are fetched.
 from __future__ import annotations
 
 import hashlib
+import re
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -53,6 +54,20 @@ class AtsCrawlResult:
     jobs_expired: int
 
 
+def build_ats_source_key(provider: str, identifier: str) -> str:
+    """Build a valid snapshot and provenance source_key from an ATS provider and identifier.
+
+    SnapshotStore.put() requires a lowercase slug containing only [a-z0-9_-]. ATS identifiers
+    may be legitimately mixed-case (e.g. Lever's 'Zeller') or contain dots/symbols
+    (e.g. Ashby's 'harrison.ai'). Sanitizing the identifier slug prevents storage errors
+    while preserving the raw case-sensitive identifier for the fetch URL and provenance records.
+    """
+    if provider == "static_careers":
+        return f"ats-static-careers-{hashlib.sha256(identifier.encode('utf-8')).hexdigest()[:24]}"
+    slug = re.sub(r"[^a-z0-9_-]+", "-", identifier.lower()).strip("-")
+    return f"ats-{provider}-{slug}"
+
+
 def run_ats_crawl(
     repository: JobRepository,
     store: SnapshotStore,
@@ -67,15 +82,7 @@ def run_ats_crawl(
     crawl_time = datetime.now(UTC) if now is None else now
     identifier = company_ats_source.ats_identifier
     provider = company_ats_source.ats_provider
-    # Lowercased for internal storage/source keys only -- SnapshotStore.put()
-    # requires a lowercase slug, but the real ATS site/board identifier
-    # (used for the actual fetch URL below) is legitimately case-sensitive
-    # for some providers (e.g. Lever's "Zeller", "Lumary" 404 in lowercase).
-    source_key = (
-        f"ats-static-careers-{hashlib.sha256(identifier.encode('utf-8')).hexdigest()[:24]}"
-        if provider == "static_careers"
-        else f"ats-{provider}-{identifier}".lower()
-    )
+    source_key = build_ats_source_key(provider, identifier)
     snapshot_content_type = "application/json"
     static_document: StaticCareersDocument | None = None
 
