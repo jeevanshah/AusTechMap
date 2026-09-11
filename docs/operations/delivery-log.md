@@ -326,3 +326,11 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Next action: dispatch the already approved manual `Crawl due ATS sources` workflow. At this point
   the only due active sources are the six registrations above, so the workflow is bounded to this
   batch.
+
+## 2026-09-11 — verified ATS source expansion crawl completed with R2 snapshots
+
+- Workflow dispatch: user manually dispatched `Crawl due ATS sources` on `main` (`4b37b14`) with input `CRAWL_DUE_SOURCES`.
+- Result: GitHub Actions run [`34601208896`](https://github.com/jeevanshah/AusTechMap/actions/runs/34601208896), job `103268679082` completed successfully in 1m 19s (12:52:46–12:54:05 UTC).
+- Scope: processed all 6 due sources (CreditorWatch, DUG, LegalVision, Lyka, Mable Lever board, and Zutec).
+- Provider idempotency fix: the Lever crawl for Mable executed cleanly without same-day key collision against the earlier SmartRecruiters crawl, validated by the provider-scoped idempotency key fix in `4368287`.
+- Production state: all 6 due sources crawled successfully with immutable raw snapshots stored in R2. Zero due active sources remain.
