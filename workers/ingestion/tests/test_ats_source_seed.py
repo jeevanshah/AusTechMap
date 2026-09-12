@@ -33,7 +33,7 @@ def test_default_fixture_exists_and_parses() -> None:
     assert DEFAULT_FIXTURE_PATH.exists()
     seeds = load_ats_source_seed_fixture()
     assert seeds == ATS_SOURCE_SEED
-    assert len(seeds) == 57
+    assert len(seeds) == 71
     by_domain = {seed.company_domain: seed for seed in seeds}
     assert by_domain["kasada.io"].ats_provider == "lever"
     assert by_domain["kasada.io"].ats_identifier == "kasada"
@@ -49,6 +49,18 @@ def test_default_fixture_exists_and_parses() -> None:
     assert by_domain["sqc.com.au"].ats_identifier == "sqc"
     assert by_domain["clipboard.app"].ats_provider == "ashby"
     assert by_domain["clipboard.app"].ats_identifier == "clipboard"
+    assert by_domain["airlockdigital.com"].ats_provider == "greenhouse"
+    assert by_domain["airlockdigital.com"].ats_identifier == "airlockdigital"
+    assert by_domain["vast.energy"].ats_provider == "ashby"
+    assert by_domain["vast.energy"].ats_identifier == "vast"
+    assert by_domain["mx51.io"].ats_provider == "greenhouse"
+    assert by_domain["mx51.io"].ats_identifier == "mx51"
+    assert by_domain["macquarietechnologygroup.com"].ats_provider == "lever"
+    assert by_domain["macquarietechnologygroup.com"].ats_identifier == "macquarietechnologygroup"
+    assert by_domain["swoop.com.au"].ats_provider == "ashby"
+    assert by_domain["swoop.com.au"].ats_identifier == "swoop"
+    assert by_domain["appen.com"].ats_provider == "lever"
+    assert by_domain["appen.com"].ats_identifier == "appen"
     assert by_domain["vowfood.com"].ats_provider == "ashby"
     assert by_domain["vowfood.com"].ats_identifier == "vow"
     assert by_domain["cultureamp.com"].ats_provider == "greenhouse"

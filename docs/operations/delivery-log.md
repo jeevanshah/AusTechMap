@@ -1,5 +1,19 @@
 # Autonomous delivery log
 
+## 2026-09-12 - Batch 6 ATS sources registered (6 new active sources, 71 total)
+
+- Scope: identified, verified against live public APIs, and registered 6 active ATS sources for Batch 6 employers into `company_ats_sources` and `ats_source_seed_20260905.csv`:
+  1. `airlockdigital.com` -> `greenhouse:airlockdigital` (HTTP 200, 25 live jobs)
+  2. `vast.energy` -> `ashby:vast` (HTTP 200, active board)
+  3. `mx51.io` -> `greenhouse:mx51` (HTTP 200, active board)
+  4. `macquarietechnologygroup.com` -> `lever:macquarietechnologygroup` (HTTP 200, 17 live jobs)
+  5. `swoop.com.au` -> `ashby:swoop` (HTTP 200, 13 live jobs)
+  6. `appen.com` -> `lever:appen` (HTTP 200, 19 live jobs)
+- Quality gates: 100% API verified (zero guess-based registrations), all matched to canonical `companies` in Neon, registered with `source_id = '6c74f1f0-ff3f-44cf-88c6-6496c41e32af'` (`ats-discovery`).
+- Execution: `seed-ats-sources` executed cleanly against Neon (`{"created": 6, "reused": 65}`).
+- Production state: **71 active ATS sources** (72 total rows in `company_ats_sources`), 1,007 active canonical companies, 965 companies with mapped locations (95.83%), 970 company locations, 2,717 evidence records, 3,283 longitudinal change events.
+- Verification: all 71 fixture entries parsed and validated in `test_ats_source_seed.py`, `ruff check` clean, monorepo vitest and pytest passing.
+
 ## 2026-09-12 - Location Top-Up seeded: >95% Mapped Locations Launch Gate passed
 
 - Approval: user explicitly approved Option 1 and authorized the production write (`seed-locations` for `batch6_location_topup_20260912.csv`).
