@@ -478,3 +478,44 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
   - Verified Job Skill Links: **1,750**
   - Longitudinal Change Events: **3,597**
   - Automated Tests Passing: **531** (46 contracts + 178 web + 307 ingestion)
+
+## 2026-09-12 — Phase 5 ATS scaleup toward 150 sources (123 active sources)
+
+- Scope: registered and crawled 26 net-new verified ATS sources across Ashby, Greenhouse, Lever, Workable, Breezy, and Pinpoint for prominent Australian scaleups and technology employers.
+- Boards registered & crawled:
+  - Heidi Health (`ashby:heidihealth.com.au`): 90 jobs
+  - Partly (`ashby:partly.com`): 38 jobs
+  - Propeller Aero (`workable:propeller`): 26 jobs
+  - BlueRock (`workable:the-blue-rock`): 15 jobs
+  - Actionstep (`workable:actionstep`): 10 jobs
+  - Cover Genius (`pinpoint:covergenius`): 3 jobs
+  - WiseTech Global (`pinpoint:wisetechglobal`): 3 jobs
+  - Assignar (`breezy:assignar`): 2 jobs
+  - Montu (`greenhouse:montu`): 1 job
+  - HappyCo (`lever:happyco`): 8 jobs
+  - Tracksuit Australia (`ashby:tracksuit`): 18 jobs
+  - Willow Technology (`lever:willowinc`): 4 jobs
+  - Samsara Networks AU (`greenhouse:samsara`): 262 jobs
+  - Canary Technologies AU (`lever:canarytechnologies`): 26 jobs
+  - Behavox AU (`greenhouse:behavox`): 43 jobs
+  - Fareharbor AU (`greenhouse:fareharbor`): 23 jobs
+  - Forter Australia (`greenhouse:forter`): 33 jobs
+  - LearnUpon AU (`greenhouse:learnupon`): 14 jobs
+  - Machinify AU (`greenhouse:machinifyinc`): 49 jobs
+  - Raiz Invest (`pinpoint:raiz`): 5 jobs
+  - 1Breadcrumb (`ashby:breadcrumb`): 1 job
+  - Telnyx (`greenhouse:telnyx54`): 54 jobs
+  - 4 verified boards currently listing 0 open positions (IntelliHR, Reejig, Stile Education, Skedulo).
+- Ingested metrics: **728 postings fetched, 723 net-new live positions persisted** to Neon DB.
+- Post-crawl derivations:
+  - `derive_employer_hiring_signals`: derived 43 new role signals and 53 new skill signals across 109 active hiring employers (bringing platform totals to 609 role signals and 912 skill signals).
+  - `run-retention-pipeline.mjs`: derived **723 new longitudinal `job.first_seen` change events** into `events` table (bringing total to 4,320 change events). Verified 100% idempotency with 0 new events on re-run.
+- Production state:
+  - Canonical Active Companies: **1,007**
+  - Mapped Physical Addresses: **965** (95.83%)
+  - Active Monitored ATS Sources: **123** (123 crawled, 100.0% coverage)
+  - Active Live Jobs: **3,250** (jumped from 2,527)
+  - Active Hiring Employers: **109** (jumped from 87)
+  - Verified Job Skill Links: **1,988**
+  - Longitudinal Change Events: **4,320**
+  - Automated Tests Passing: **531** (46 contracts + 178 web + 307 ingestion)
