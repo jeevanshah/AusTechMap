@@ -4,29 +4,24 @@
 
 ## Switch
 
-- **Current Implementer / Integrator:** Codex (Cursor Auto covering after Codex usage limit) — operating per `AGENTS.md` orchestration / bulk autonomous delivery lane.
-- **Updated at:** 2026-09-11
-- **Reason:** Static careers-page discovery foundation landed after the Stake Breezy rollout.
-- **Task / issue:** Resume employer-cohort and hiring-source expansion. The 304 evidence-free ambiguous locations are a research-only backlog; do not infer locations.
+- **Current Implementer / Integrator:** Codex — operating per `AGENTS.md` orchestration / bulk autonomous delivery lane.
+- **Updated at:** 2026-09-12
+- **Reason:** Successful registration and Cloudflare R2 production crawls of SafetyCulture and Harrison.ai; dotted ATS identifier bug fixed.
+- **Task / issue:** Advance towards 1,000-employer V1 Launch Gate. The 304 evidence-free ambiguous locations are a research-only backlog; do not infer locations.
 - **Acceptance criteria (this checkpoint):** Add only evidence-backed employers and verified ATS sources; preserve the existing production approval and audit rules for every production write.
-- **Latest completed delivery:** Breezy HR support is implemented and independently reviewed on `main` (`e30a7e3`, `556f683`, `bfd2e79`). Migration 0022 is applied to Neon, and Stake's `breezy/stake` source completed its first crawl: 16 active jobs, 16 observations, and one immutable snapshot (`bf390c7b-f0db-4e1f-b381-1a6d85750c28`).
-- **Breezy production state:** Stake's source is active with zero consecutive failures and a recorded success. Platform totals are 58 active ATS sources, 2,081 active jobs, and 57 active hiring employers.
-- **Latest completed delivery:** `481af52` adds a reviewed static careers-page discovery module. It uses the existing pinned, SSRF-safe fetcher; obeys `robots.txt` on both initial and redirect URLs; applies an in-process per-host adaptive delay; extracts JSON-LD `JobPosting` data and safe candidate role links; and flags an empty client-rendered shell for a later Playwright fallback. It does **not** register a source, crawl production, create jobs, or add a migration.
-- **Latest completed delivery:** `931125e` operationalizes `static_careers` as a scheduled provider, with a forward-only migration `0023`, URL validation at registration, immutable HTML snapshot-before-parse, conservative JSON-LD-only job persistence, and read-only replay. The user explicitly waived independent AI review after both available reviewer processes were unavailable; the waiver is recorded in `docs/reviews/2026-09-10-static-careers-lifecycle-waiver.md`. Migration 0023 is **not** applied to Neon, and no static source is registered or crawled in production.
-- **Production migration state:** The user explicitly approved and the checksum-locked runner applied `0023_add_static_careers_provider.sql` to Neon on 2026-09-10. No static source was registered or crawled: R2 credentials are not configured, so production immutable snapshots would otherwise be stranded on a local filesystem.
-- **Latest completed delivery:** Pinpoint public-feed support was fast-forwarded to `main` under the user's explicit independent-review waiver. The waiver is recorded in `docs/reviews/2026-09-10-pinpoint-public-feed-waiver.md`. The user explicitly approved and the checksum-locked runner applied `0024_add_pinpoint_ats_provider.sql` to Neon on 2026-09-11; read-back confirmed version 24, its stored checksum, and the `pinpoint` enum value. No Pinpoint source is registered or crawled. R2 remains explicitly deferred.
-- **Latest completed delivery:** `feat/ats-source-discovery-preflight` (`30171eb`, `6e8c78e`) was fast-forwarded to `main` under the user's explicit independent-review waiver, recorded in `docs/reviews/2026-09-11-ats-source-discovery-preflight-waiver.md`. It adds a robots-first, SSRF-safe, read-only cohort scanner for known public ATS board links. It scanned 995 fixture URLs, produced 24 review candidates, and independently validated six non-empty boards (CreditorWatch, DUG, LegalVision, Lyka, Mable, and Zutec; 93 roles total). Artifacts: `docs/data-quality/ats-source-discovery-*-20260911.csv`. No Neon write, source registration, or crawl occurred; R2 remains the gate for those steps.
-- **Latest completed delivery:** `feat/public-jobs-explorer` (`4c75c3c`) was fast-forwarded to `main` under the user's explicit independent-review waiver, recorded in `docs/reviews/2026-09-11-public-jobs-explorer-waiver.md`. It adds the public `/jobs` registry: a parameterized, server-rendered list of active roles, bounded to 100 results, with title/employer search and role-family/work-style filters. Results link to the company profile and official application URL. It makes no schema, Neon-data, or source-registration change.
-- **Latest completed delivery:** `feat/source-health-monitoring` (`2ec9e75`) was fast-forwarded to `main` under the user's explicit independent-review waiver, recorded in `docs/reviews/2026-09-11-source-health-monitoring-waiver.md`. It adds a staff-only source-health section to `/admin/monitoring`, using the existing lifecycle fields: status, next-crawl overdue state, failure count, quarantine reason, active jobs, and attempt/success timestamps. It makes no source-state, schema, or production-data change.
-- **Latest completed delivery:** `8d7ca5f` restores repository CI hygiene: tracked Prettier formatting plus worker Ruff and strict-mypy compliance. The user waived independent review; the durable record is `docs/reviews/2026-09-10-ci-quality-waiver.md`. GitHub Actions run `34483412375` passed both web and live-PostGIS ingestion jobs after integration tests were made independent of shared seed order and runner-clock timing. Migration `0024` is verified in CI and was applied to Neon on 2026-09-11.
+- **Latest completed delivery:** `4368287` scoped ATS same-day crawl idempotency keys by provider (`{provider}:{identifier}:{date}`), preventing Mable's new Lever board from colliding with its same-day SmartRecruiters crawl. Fast-forward merged with review waiver `4b37b14`.
+- **Latest completed delivery:** Migration 0025 applied to Neon; R2 immutable snapshot storage verified in GitHub Actions run `34571167209`.
+- **Latest completed delivery:** First 6-source production ATS crawl completed with R2 snapshots in GitHub Actions run `34601208896` (CreditorWatch, DUG, LegalVision, Lyka, Mable Lever, Zutec).
+- **Latest completed delivery:** SafetyCulture (`ashby:mitti`) registered and crawled with R2 snapshots in GitHub Actions run `34605582244` (39 open positions ingested, 19 Sydney engineering/product roles).
+- **Latest completed delivery:** Harrison.ai (`ashby:harrison.ai`) registered and crawled with R2 snapshots in GitHub Actions run `34659857835` (7 open positions ingested, Perth and Sydney roles).
+- **Bugfixes delivered:** `653203b` added `build_ats_source_key` slug sanitization to handle dotted ATS identifiers (`harrison.ai` -> `ats-ashby-harrison-ai`) conforming to snapshot storage regex constraints; `0f2cc88` added `claim.source_id` reconciliation for retried same-day runs.
+- **Derivations completed:** Post-crawl hiring signals derived (9 new skill signals, 196 skill signals updated, 136 role signals updated); retention pipeline derived (7 new change events into `events`).
+- **Production state:** 908 canonical companies (453 accepted mapped locations, 304 quarantined ambiguous), 65 active ATS sources (0 due), 2,213 live unexpired jobs, 3,136 longitudinal change events, 25 database migrations applied, 530 automated tests passing monorepo-wide.
 
 ## Checkpoint
 
 - **Implementation branch:** `main`
-- **Current implementation checkpoint:** `481af52` (`feat: add static careers page parser`). This documentation sync is the handoff record for that checkpoint; only pre-existing untracked pytest temporary directories should remain, and they must never be staged.
-- **Current implementation checkpoint:** `931125e` (`feat: operationalize static careers sources`). This handoff record follows that checkpoint; migration 0023 requires a separate explicit Neon-application approval.
-- **Implementation checkpoint commit:** `f7f2eb5` (location harvest); handoff docs sync `548df4e` — verify with `git rev-parse HEAD`.
-- **Handoff commit:** `548df4e` on `main`.
+- **Current implementation checkpoint:** `0f2cc88` (`fix: reconcile claimed run source_id with crawl_source_id`).
 - **Working-tree status at checkpoint:** Clean after this docs commit.
 - **Remote:** `origin/main` synchronized after push.
 

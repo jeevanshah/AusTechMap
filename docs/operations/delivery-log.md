@@ -357,3 +357,13 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Verification: live endpoint probe (`https://api.ashbyhq.com/posting-api/job-board/harrison.ai`) returned 7 active postings (including Australian engineering and finance roles in Perth and Sydney).
 - Result: registered source `3ab7dd4e-5537-4b09-b29d-f795ac1ce110` on Neon with status `active` and due for crawl. Direct read-back confirms 1 due source.
 - Next action: manually dispatch `Crawl due ATS sources` workflow on GitHub Actions with input `CRAWL_DUE_SOURCES`.
+
+## 2026-09-12 — Harrison.ai Ashby ATS crawl completed with R2 snapshots
+
+- Workflow dispatch: user manually dispatched `Crawl due ATS sources` on `main` (`0f2cc88`) with input `CRAWL_DUE_SOURCES`.
+- Result: GitHub Actions run [`34659857835`](https://github.com/jeevanshah/AusTechMap/actions/runs/34659857835) completed successfully in 40s (23:55:49–23:56:29 UTC).
+- Scope: crawled Harrison.ai (`ashby:harrison.ai`), successfully ingesting all 7 open positions (including Perth radiology deployment engineering and Sydney financial analysis roles).
+- Snapshot & metrics: immutable raw snapshot written to Cloudflare R2 (`raw/ats-ashby-harrison-ai/4b/4b7a229d5cfa4b93bca2a9cfe774b49cb4ad8ce4b9266d8347d6f7094623c14c`, 134,690 bytes); crawl metrics and job observations persisted.
+- Bugfix & reconciliation: diagnosed dotted identifier failure in `source_key` (`ValueError`), added `build_ats_source_key` slug sanitization (`653203b`), and added claim `source_id` reconciliation for retried runs (`0f2cc88`).
+- Post-crawl derivations: `derive-hiring-signals` created 9 new skill signals and updated 196 skill signals across 64 companies; `run-retention-pipeline.mjs` derived 7 new `job.first_seen` events into `events`.
+- Platform totals: 65 active ATS sources, 2,213 live unexpired jobs, 3,136 longitudinal change events. Zero due active sources remain.
