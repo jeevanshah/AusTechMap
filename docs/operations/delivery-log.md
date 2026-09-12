@@ -1,5 +1,26 @@
 # Autonomous delivery log
 
+## 2026-09-13 - Nearmap Australian Corporate Headquarters Relocation to Sydney Barangaroo
+
+- **Scope & Context**:
+  - Incorporated verified user feedback and first-party corporate disclosure (`https://www.nearmap.com/au/contact`): Nearmap completely ceased physical operations at its former Perth laboratory (1002 Hay Street, Perth WA) and centralized its Australian corporate headquarters, executive leadership, and primary staff to Sydney (Tower One, 100 Barangaroo Avenue, Barangaroo NSW 2000).
+- **Production Database Updates**:
+  - `companies`: Updated company record `a923d740-0002-4f7b-869e-6a845c4353c5` to canonical slug `nearmap`, display name `Nearmap`, and status `active` (transitioned from legacy placeholder `nearmap-perth-lab` in `pending_review`).
+  - `resolved_locations`: Created/verified resolution for `100 Barangaroo Avenue, Barangaroo NSW 2000, Australia` with exact coordinates `POINT(151.2021604 -33.8637896)` and mapped to ASGS statistical regions: SA2 `Sydney (North) - Millers Point` (`4b210c0d-b33c-4283-9b69-af0298bd66c4`), SA3 `Sydney Inner City`, SA4 `Sydney - City and Inner South`, LGA `Sydney`, POA `2000`.
+  - `company_locations`: Relocated company location `eee3d553-3e24-46ef-a9b4-73cbaec5d8e6` from Perth to Barangaroo head office.
+  - `jobs`: Re-linked all 35 live canonical positions from SmartRecruiters board `nearmap` to the new Barangaroo company location.
+  - `evidence`:
+    - Inserted first-party location evidence record `156dd671-0655-426d-8df8-23e761c14efd` referencing `https://www.nearmap.com/au/contact` (confidence 1.00).
+    - Updated seed research claim `70365057-01e5-4cff-9b81-2ea842cfc02c` from obsolete Perth lab notation to `Aerial photogrammetry, high-resolution geospatial content, and location intelligence (corporate headquarters in Barangaroo)`.
+  - `audit_records`: Logged immutable audit record `89af9665-3e63-448f-8052-396335e368af` (`action = 'relocate_headquarters'`) capturing full before/after state.
+- **Fixture Updates**:
+  - `alpha_seed_cohort_20260905.csv`: Renamed `Nearmap (Perth Lab)` to `Nearmap`, city to `Sydney`.
+  - `alpha_seed_cohort_addresses_20260905.csv`: Updated street address from `Level 1, 1002 Hay Street, Perth WA 6000` to `100 Barangaroo Avenue, Barangaroo NSW 2000`.
+- **Verification**:
+  - Ingestion test suite: 53 tests passed (seed, address validation, geocoding).
+  - Web test suite: 178 tests passed across 39 files.
+  - Live page verification at `http://localhost:3000/companies/nearmap`: 200 OK, renders Nearmap Barangaroo HQ, 35 live jobs, and interactive map marker. Perth references 100% eliminated from live metadata.
+
 ## 2026-09-13 - Phase 5 Scaleup: 152 Monitored ATS Sources (3,548 Live Jobs), Tech ANZSCO Expansion & Commercial Claim Concierge
 
 - **Scope & Highlights**:

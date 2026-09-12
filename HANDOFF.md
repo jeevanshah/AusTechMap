@@ -6,15 +6,14 @@
 
 - **Current Implementer / Integrator:** Codex — operating per `AGENTS.md` orchestration / bulk autonomous delivery lane.
 - **Updated at:** 2026-09-13
-- **Reason:** Phase 5 scaleup to 150+ sources: 152 active ATS sources registered and crawled with 100% success rate; live jobs expanded to **3,548** across **131 active hiring employers**; Tech ANZSCO occupational mapping expanded; Hallmark-styled "Claim Profile & Partner With Us" concierge inquiry modal deployed on company profiles.
-- **Task / issue:** 150+ ATS sources milestone achieved (**152 monitored sources**); live jobs reached **3,548** across **131 hiring companies**; Tech ANZSCO occupational units expanded in `anzsco4_role_family_v1.csv`; commercial lead capture live at `/companies/[slug]`.
-- **Acceptance criteria (this checkpoint):** Add only evidence-backed employers and verified ATS sources; zero guess-based registrations; preserve production audit rules and database schema integrity.
-- **Latest completed delivery:** Phase 5 scaleup milestone: 29 net-new verified ATS sources registered into Neon `company_ats_sources` and fixture `ats_source_seed_20260905.csv` (152 total active sources in Neon DB).
-- **Latest completed delivery:** Production crawl across all uncrawled sources completed with 100% success rate: **+198 net-new live jobs persisted** to Neon DB (**3,548 total canonical live jobs**).
-- **Latest completed delivery:** Post-crawl derivations completed: 104 role signals and 145 skill signals derived via `derive_employer_hiring_signals` across 131 active hiring employers; **205 new `job.first_seen` events** derived into `events` table via `run-retention-pipeline.mjs` (bringing total longitudinal change events to **4,525**).
-- **Latest completed delivery:** Track 1: Expanded `anzsco4_role_family_v1.csv` to map official ICT unit groups `2611`, `2612`, `2621` into canonical role families with 100% pytest pass.
-- **Latest completed delivery:** Track 3: Built and wired `ClaimProfileModal.tsx` on `/companies/[slug]` with fast-track corporate email domain verification and multi-intent capture (`profile_verification`, `employer_pro`, `data_partnership`).
-- **Production state:** **1,007 canonical companies** (1,007 unique domains, 1,007 unique slugs), **965 mapped employers (95.83%)**, 970 company locations, **152 active ATS sources (100.0% crawled)**, **3,548 live unexpired jobs**, **131 active hiring employers**, **713 role signals**, **1,057 skill signals**, 2,717 evidence records, **4,525 longitudinal change events**, 25 database migrations applied, 531 automated tests passing monorepo-wide.
+- **Reason:** Nearmap Australian corporate headquarters relocation: verified corporate disclosure that Nearmap ceased operations in Perth and centralized Australian headquarters to Sydney (100 Barangaroo Avenue, Barangaroo NSW 2000); updated company record (`nearmap-perth-lab` -> `nearmap`), physical location, evidence, and audit logs.
+- **Task / issue:** Production data integrity: Nearmap corporate headquarters relocation to Sydney Barangaroo.
+- **Acceptance criteria (this checkpoint):** Zero-inference physical location verification; first-party evidence URL cited (`https://www.nearmap.com/au/contact`); immutable audit record logged; test suites passing 100%.
+- **Latest completed delivery:** Corporate record migration: updated company `a923d740-0002-4f7b-869e-6a845c4353c5` to canonical slug `nearmap`, name `Nearmap`, and status `active`.
+- **Latest completed delivery:** Location resolution & linking: geocoded `100 Barangaroo Avenue, Barangaroo NSW 2000` (`POINT(151.2021604 -33.8637896)`), linked to ASGS SA2/SA3/SA4/LGA/POA regions, updated company location `eee3d553-3e24-46ef-a9b4-73cbaec5d8e6`, and re-linked all 35 live positions.
+- **Latest completed delivery:** Evidence & audit logging: persisted first-party location evidence `156dd671-0655-426d-8df8-23e761c14efd` (confidence: 1.00), updated seed research claim `70365057-01e5-4cff-9b81-2ea842cfc02c`, and recorded immutable audit record `89af9665-3e63-448f-8052-396335e368af`.
+- **Latest completed delivery:** Fixtures: updated `alpha_seed_cohort_20260905.csv` and `alpha_seed_cohort_addresses_20260905.csv` to keep local repository fixtures synchronized with production Neon database.
+- **Production state:** **1,007 canonical companies** (1,007 unique domains, 1,007 unique slugs), **965 mapped employers (95.83%)**, 970 company locations, **152 active ATS sources (100.0% crawled)**, **3,548 live unexpired jobs**, **131 active hiring employers**, **713 role signals**, **1,057 skill signals**, 2,718 evidence records, **4,525 longitudinal change events**, 25 database migrations applied, 531 automated tests passing monorepo-wide.
 
 ## Checkpoint
 
