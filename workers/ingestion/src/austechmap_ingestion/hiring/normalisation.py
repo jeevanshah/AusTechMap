@@ -292,30 +292,53 @@ def normalise_job(
     return normalised, skill_matches
 
 
-_AUSTRALIAN_GEO_PATTERNS = re.compile(
+_AUSTRALIAN_EXPLICIT_PATTERNS = re.compile(
     r"\b("
     r"australia|australian|anz|aus|"
     r"nsw|vic|qld|wa|sa|act|tas|nt|"
     r"new\s+south\s+wales|victoria|queensland|western\s+australia|south\s+australia|"
-    r"tasmania|northern\s+territory|"
+    r"tasmania|northern\s+territory"
+    r")\b",
+    re.IGNORECASE,
+)
+
+_AUSTRALIAN_CITY_PATTERNS = re.compile(
+    r"\b("
     r"sydney|melbourne|brisbane|perth|adelaide|canberra|hobart|darwin|"
     r"gold\s+coast|sunshine\s+coast|newcastle|wollongong|geelong|ballarat|bendigo|"
     r"toowoomba|cairns|townsville|albury|wodonga|launceston|echuca|"
     r"barangaroo|pyrmont|surry\s+hills|north\s+sydney|macquarie\s+park|parramatta|"
-    r"cremorne|richmond|southbank|docklands|fortitude\s+valley"
+    r"cremorne|richmond|southbank|docklands|fortitude\s+valley|kurnell|brendale|dandenong"
     r")\b",
     re.IGNORECASE,
 )
 
 _EXPLICIT_FOREIGN_PATTERNS = re.compile(
     r"\b("
-    r"united\s+states|usa|san\s+francisco|new\s+york|chicago|los\s+angeles|seattle|mountain\s+view|"
-    r"united\s+kingdom|london|manchester|belfast|edinburgh|"
-    r"canada|toronto|montreal|vancouver|"
-    r"philippines|manila|singapore|tokyo|japan|india|bangalore|mumbai|"
-    r"germany|berlin|munich|france|paris|spain|barcelona|madrid|italy|milan|rome|"
-    r"dubai|abu\s+dhabi|uae"
+    r"united\s+states|usa|america|united\s+kingdom|uk|gb|great\s+britain|england|scotland|wales|"
+    r"ireland|canada|philippines|singapore|japan|india|germany|deutschland|france|spain|españa|"
+    r"italy|italia|netherlands|holland|poland|portugal|new\s+zealand|nz|south\s+africa|brazil|brasil|"
+    r"mexico|qatar|saudi\s+arabia|uae|dubai|abu\s+dhabi|malaysia|china|taiwan|hong\s+kong|korea|vietnam|"
+    r"indonesia|sweden|switzerland|austria|denmark|norway|finland|"
+    r"san\s+francisco|new\s+york|chicago|los\s+angeles|seattle|mountain\s+view|austin|texas|california|"
+    r"denver|colorado|boston|virginia|georgia|atlanta|kansas\s+city|florida|orlando|carlsbad|la\s+grange|"
+    r"salt\s+lake\s+city|nevada|sparks|phoenix|arizona|glendale|clearwater|fort\s+worth|oregon|portland|"
+    r"dallas|houston|toronto|montreal|vancouver|calgary|alberta|ontario|london|manchester|belfast|edinburgh|"
+    r"newcastle\s+upon\s+tyne|dublin|manila|taguig|tokyo|bangalore|bengaluru|mumbai|delhi|hyderabad|pune|"
+    r"gurugram|chennai|berlin|munich|frankfurt|paris|barcelona|madrid|milan|rome|amsterdam|warsaw|lisbon|"
+    r"auckland|christchurch|wellington|palmerston\s+north|são\s+paulo|sao\s+paulo|kuala\s+lumpur|shanghai|"
+    r"shenzhen|beijing|seoul"
     r")\b",
+    re.IGNORECASE,
+)
+
+_FOREIGN_COUNTRY_CODE_SUFFIX = re.compile(
+    r",\s*(?:us|gb|uk|nz|ca|in|sg|ph|my|de|fr|ie|jp|nl|br|pl|se|ch|at|dk|no|fi)\b",
+    re.IGNORECASE,
+)
+
+_AU_COUNTRY_CODE = re.compile(
+    r"(?:,\s*|\b)au(?:\b|\s*,|\s*$)|(?:^|\b)au\s*-\s*",
     re.IGNORECASE,
 )
 
@@ -331,12 +354,27 @@ def is_australian_location(location_text: str | None) -> bool:
     if not location_text or not location_text.strip():
         return False
     cleaned = location_text.strip()
-    if re.search(r"(?:,\s*|\b)au(?:\b|\s*,)", cleaned, re.IGNORECASE):
-        return True
-    has_au_match = bool(_AUSTRALIAN_GEO_PATTERNS.search(cleaned))
-    has_foreign_match = bool(_EXPLICIT_FOREIGN_PATTERNS.search(cleaned))
-    if has_au_match:
-        return True
-    if has_foreign_match:
+
+    has_foreign_suffix = bool(_FOREIGN_COUNTRY_CODE_SUFFIX.search(cleaned))
+    has_explicit_au = bool(_AUSTRALIAN_EXPLICIT_PATTERNS.search(cleaned))
+    has_explicit_foreign = bool(_EXPLICIT_FOREIGN_PATTERNS.search(cleaned))
+    has_au_code = bool(_AU_COUNTRY_CODE.search(cleaned))
+
+    # If tagged with a foreign country suffix (e.g. ', us', ', gb') and no explicit AU
+    if has_foreign_suffix and not has_explicit_au:
         return False
+
+    # If tagged with explicit foreign country/city and no explicit AU
+    if has_explicit_foreign and not has_explicit_au:
+        return False
+
+    # Explicit AU mentions (Australia, NSW, VIC, etc.) or AU code
+    if has_explicit_au or has_au_code:
+        return True
+
+    # Australian city matches (e.g. "Sydney", "Melbourne") when no foreign markers
+    has_city = bool(_AUSTRALIAN_CITY_PATTERNS.search(cleaned))
+    if has_city and not has_explicit_foreign:
+        return True
+
     return False

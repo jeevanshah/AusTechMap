@@ -1,5 +1,26 @@
 # Autonomous delivery log
 
+## 2026-09-13 - Comprehensive Geographic Cleansing: Full Purge of Multinational Non-AU Jobs & 23 International ATS Board Quarantines
+
+- **Scope & Highlights**:
+  1. **Strict Multi-National Location Filtering & International Purge**:
+     - Upgraded `is_australian_location` in `austechmap_ingestion.hiring.normalisation` to deterministically reject foreign countries, cities (e.g. London, San Francisco, Chicago, Singapore, Manila, Auckland, Pune), and ISO 3166-1 alpha-2 country suffixes (e.g. `, us`, `, gb`, `, nz`, `, in`, `, ph`, `, my`, `, ca`, `, de`), including disambiguating foreign namesakes (e.g. `Newcastle upon Tyne, England, gb`, `Sydney, Nova Scotia, Canada`, `Perth, Scotland, UK`).
+     - Executed complete database purge across all previously ingested jobs: purged **2,318 non-Australian positions** (e.g. US/UK/EU/Asia openings belonging to multinational Australian scaleups like Airwallex, Culture Amp, Rokt, Xplor, and Zip Co) along with their dependent `job_observations` and `job_skill_links`.
+     - Live database now contains **992 pure, verified Australian tech jobs** across **100 active Australian hiring tech employers**, with **0 foreign jobs remaining**.
+  2. **Quarantine of 23 False-Match / International ATS Boards**:
+     - Forensically investigated ATS boards with 0 Australian positions or international collisions (`alembic-strategy`, `appen`, `astute-payroll`, `cape`, `clipboard`, `coupa-software-au`, `dataro`, `dremio`, `fareharbor-au`, `fleet-space-technologies`, `forter-australia`, `happyco`, `leaflink-au`, `learnupon-au`, `liven`, `machinify-au`, `partly`, `readytech`, `safetyculture:mitti`, `samsara-networks-au`, `sentient-vision-systems:aechelontechnology`, `telnyx`, `timely`).
+     - Quarantined in `company_ats_sources` (`status = 'disabled'`, `status_reason = 'international_name_collision'`) and linked `data_sources` with immutable audit trail.
+     - Disabled 7 foreign placeholder company entities (`leaflink-au`, `learnupon-au`, `machinify-au`, `samsara-networks-au`, `coupa-software-au`, `fareharbor-au`, `forter-australia`) with `disabled_reason = 'foreign_entity_no_au_headquarters'`.
+     - Pruned fixture `ats_source_seed_20260905.csv` to **115 verified Australian tech ATS sources** (100% Australian tech headquarters).
+  3. **Hiring Signal Re-derivation & Invariant Audit**:
+     - Re-derived longitudinal hiring signals via `derive_employer_hiring_signals` across all 100 hiring employers (131 role signals, 185 skill signals updated).
+     - Verified core database invariants: 0 missing core fields, 0 duplicate domains, 0 duplicate slugs, 0 orphan locations, 0 orphan jobs, 0 foreign jobs.
+- **Verification**:
+  - Full ingestion test suite: **338 passed**, 104 skipped.
+  - Web test suite: **178 passed** across 39 files.
+  - Contracts test suite: **46 passed** across 10 files.
+  - Database invariant audit passed 100%.
+
 ## 2026-09-13 - Systematic Geographic Integrity Remediation: ATS International Collision Quarantine, Name Sanitization & Location Drift Detector
 
 - **Scope & Highlights**:
