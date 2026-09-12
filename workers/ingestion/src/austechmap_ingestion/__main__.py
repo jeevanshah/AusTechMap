@@ -39,6 +39,7 @@ from austechmap_ingestion.employers.labour_agreements import (
     load_labour_agreements_fixture,
     match_labour_agreements,
 )
+from austechmap_ingestion.employers.location_drift import detect_location_drift
 from austechmap_ingestion.employers.location_promotion import (
     LocationPromotionError,
     promote_evidenced_locations,
@@ -243,6 +244,13 @@ def build_parser() -> argparse.ArgumentParser:
     ats_discovery_parser.add_argument("--output", type=Path, required=True)
     ats_discovery_parser.add_argument("--workers", type=int, default=4)
     ats_discovery_parser.add_argument("--timeout-seconds", type=float, default=6.0)
+    drift_parser = subparsers.add_parser(
+        "detect-location-drift",
+        help="audit active companies for headquarters vs live hiring location drift",
+    )
+    drift_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    drift_parser.add_argument("--min-jobs", type=int, default=3)
+    drift_parser.add_argument("--enqueue-review", action="store_true", default=False)
     taxonomy_parser = subparsers.add_parser(
         "seed-taxonomy", help="seed the v1 role-family and skills taxonomies"
     )
@@ -1008,6 +1016,45 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "roleSignalsUpdated": signals_stats.role_signals_updated,
                     "skillSignalsCreated": signals_stats.skill_signals_created,
                     "skillSignalsUpdated": signals_stats.skill_signals_updated,
+                },
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "detect-location-drift":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        try:
+            drift_stats = detect_location_drift(
+                args.database_url,
+                min_jobs=args.min_jobs,
+                enqueue_review=args.enqueue_review,
+            )
+        except (ValueError, psycopg.Error) as error:
+            print(f"Location drift detection failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "companiesEvaluated": drift_stats.companies_evaluated,
+                    "driftCandidatesFound": drift_stats.drift_candidates_found,
+                    "reviewItemsEnqueued": drift_stats.review_items_enqueued,
+                    "candidates": [
+                        {
+                            "slug": c.slug,
+                            "displayName": c.display_name,
+                            "recordedAddress": c.recorded_address,
+                            "homeState": c.home_state,
+                            "detectedState": c.detected_state,
+                            "totalJobs": c.total_jobs,
+                            "jobsInDetectedState": c.jobs_in_detected_state,
+                            "sampleLocations": list(c.sample_locations),
+                        }
+                        for c in drift_stats.candidates
+                    ],
                 },
                 separators=(",", ":"),
                 sort_keys=True,

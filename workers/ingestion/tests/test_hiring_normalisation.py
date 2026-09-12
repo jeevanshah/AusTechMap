@@ -9,6 +9,7 @@ from austechmap_ingestion.hiring.normalisation import (
     classify_seniority,
     compute_job_content_hash,
     extract_skills,
+    is_australian_location,
     map_work_style,
     normalise_job,
     normalise_title,
@@ -180,3 +181,35 @@ def test_normalise_job_content_hash_is_unaffected_by_the_raw_blob() -> None:
         _posting(raw={"lists": ["a", "b"], "extraNoise": 123}), provider="ashby", skills=()
     )
     assert first.content_hash == second.content_hash
+
+
+@pytest.mark.parametrize(
+    ("location_text", "expected"),
+    [
+        ("Barangaroo, NSW, au", True),
+        ("Sydney, Australia", True),
+        ("Melbourne, Victoria", True),
+        ("Brisbane QLD", True),
+        ("Perth, WA", True),
+        ("Adelaide, South Australia", True),
+        ("Canberra ACT", True),
+        ("Hobart, Tasmania", True),
+        ("Darwin, NT", True),
+        ("Richmond, Victoria", True),
+        ("Remote - Australia", True),
+        ("Australia - Remote", True),
+        ("San Francisco, CA, us", False),
+        ("Mountain View, CA, us", False),
+        ("New York, NY", False),
+        ("London, England, United Kingdom", False),
+        ("Belfast", False),
+        ("Manila", False),
+        ("Tokyo, Japan", False),
+        ("Paris, France", False),
+        ("Berlin, Germany", False),
+        ("", False),
+        (None, False),
+    ],
+)
+def test_is_australian_location(location_text: str | None, expected: bool) -> None:
+    assert is_australian_location(location_text) is expected

@@ -6,14 +6,16 @@
 
 - **Current Implementer / Integrator:** Codex — operating per `AGENTS.md` orchestration / bulk autonomous delivery lane.
 - **Updated at:** 2026-09-13
-- **Reason:** Nearmap Australian corporate headquarters relocation: verified corporate disclosure that Nearmap ceased operations in Perth and centralized Australian headquarters to Sydney (100 Barangaroo Avenue, Barangaroo NSW 2000); updated company record (`nearmap-perth-lab` -> `nearmap`), physical location, evidence, and audit logs.
-- **Task / issue:** Production data integrity: Nearmap corporate headquarters relocation to Sydney Barangaroo.
-- **Acceptance criteria (this checkpoint):** Zero-inference physical location verification; first-party evidence URL cited (`https://www.nearmap.com/au/contact`); immutable audit record logged; test suites passing 100%.
-- **Latest completed delivery:** Corporate record migration: updated company `a923d740-0002-4f7b-869e-6a845c4353c5` to canonical slug `nearmap`, name `Nearmap`, and status `active`.
-- **Latest completed delivery:** Location resolution & linking: geocoded `100 Barangaroo Avenue, Barangaroo NSW 2000` (`POINT(151.2021604 -33.8637896)`), linked to ASGS SA2/SA3/SA4/LGA/POA regions, updated company location `eee3d553-3e24-46ef-a9b4-73cbaec5d8e6`, and re-linked all 35 live positions.
-- **Latest completed delivery:** Evidence & audit logging: persisted first-party location evidence `156dd671-0655-426d-8df8-23e761c14efd` (confidence: 1.00), updated seed research claim `70365057-01e5-4cff-9b81-2ea842cfc02c`, and recorded immutable audit record `89af9665-3e63-448f-8052-396335e368af`.
-- **Latest completed delivery:** Fixtures: updated `alpha_seed_cohort_20260905.csv` and `alpha_seed_cohort_addresses_20260905.csv` to keep local repository fixtures synchronized with production Neon database.
-- **Production state:** **1,007 canonical companies** (1,007 unique domains, 1,007 unique slugs), **965 mapped employers (95.83%)**, 970 company locations, **152 active ATS sources (100.0% crawled)**, **3,548 live unexpired jobs**, **131 active hiring employers**, **713 role signals**, **1,057 skill signals**, 2,718 evidence records, **4,525 longitudinal change events**, 25 database migrations applied, 531 automated tests passing monorepo-wide.
+- **Reason:** Systematic Geographic Integrity Remediation: Audited all 152 ATS feeds for international collision; quarantined 14 false-match non-Australian feeds (e.g. US Hireup, Athena NY, Swoop Minneapolis, Raiz EU) and purged 145 foreign jobs; sanitized 12 qualified company names/slugs and relocated Kinetic IT to Perth national HQ; built deterministic `is_australian_location` gate on ATS crawl pipeline; built automated location drift detection engine and CLI.
+- **Task / issue:** Production data integrity: Eliminate non-Australian job contamination and detect headquarters drift.
+- **Acceptance criteria (this checkpoint):** 100% of persisted jobs represent legitimate Australian employment; zero non-Australian job contamination; deterministic geographic gate on crawler; automated drift detection; test suites passing 100%.
+- **Latest completed delivery:** Quarantined 14 international collision ATS feeds in `company_ats_sources` and `data_sources` (`status = 'disabled'`, `status_reason = 'international_name_collision'`) with immutable audit records.
+- **Latest completed delivery:** Purged 145 foreign jobs and re-derivable signals from database, keeping **3,310 verified live Australian canonical jobs** across **117 active hiring employers**.
+- **Latest completed delivery:** Sanitized 12 qualified outpost company names (e.g. `Kinetic IT (Darwin Hub)` -> `Kinetic IT`, `Dremio (Australia Hub)` -> `Dremio`, `Youi Insurance (Tech Campus)` -> `Youi Insurance`), and relocated Kinetic IT to Perth national HQ (`54 Terrace Road, East Perth WA 6004`).
+- **Latest completed delivery:** Added `is_australian_location` gate to `normalisation.py` and `pipeline.py` to ensure only Australian positions are persisted during ATS crawls.
+- **Latest completed delivery:** Built `location_drift.py` and `detect-location-drift` CLI command in `__main__.py` to automatically detect and flag headquarters vs. live hiring drift.
+- **Latest completed delivery:** Synchronized fixtures: pruned `ats_source_seed_20260905.csv` to **138 verified Australian sources**; updated `alpha_seed_cohort_20260905.csv` and `alpha_seed_cohort_addresses_20260905.csv`.
+- **Production state:** **1,007 canonical companies** (1,007 unique domains, 1,007 unique slugs), **965 mapped employers (95.83%)**, 970 company locations, **138 active ATS sources (100.0% verified Australian)**, **3,310 live Australian jobs**, **117 active hiring employers**, 2,718 evidence records, 25 database migrations applied, 508 automated tests passing monorepo-wide.
 
 ## Checkpoint
 

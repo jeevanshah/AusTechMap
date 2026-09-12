@@ -290,3 +290,53 @@ def normalise_job(
         content_hash=content_hash,
     )
     return normalised, skill_matches
+
+
+_AUSTRALIAN_GEO_PATTERNS = re.compile(
+    r"\b("
+    r"australia|australian|anz|aus|"
+    r"nsw|vic|qld|wa|sa|act|tas|nt|"
+    r"new\s+south\s+wales|victoria|queensland|western\s+australia|south\s+australia|"
+    r"tasmania|northern\s+territory|"
+    r"sydney|melbourne|brisbane|perth|adelaide|canberra|hobart|darwin|"
+    r"gold\s+coast|sunshine\s+coast|newcastle|wollongong|geelong|ballarat|bendigo|"
+    r"toowoomba|cairns|townsville|albury|wodonga|launceston|echuca|"
+    r"barangaroo|pyrmont|surry\s+hills|north\s+sydney|macquarie\s+park|parramatta|"
+    r"cremorne|richmond|southbank|docklands|fortitude\s+valley"
+    r")\b",
+    re.IGNORECASE,
+)
+
+_EXPLICIT_FOREIGN_PATTERNS = re.compile(
+    r"\b("
+    r"united\s+states|usa|san\s+francisco|new\s+york|chicago|los\s+angeles|seattle|mountain\s+view|"
+    r"united\s+kingdom|london|manchester|belfast|edinburgh|"
+    r"canada|toronto|montreal|vancouver|"
+    r"philippines|manila|singapore|tokyo|japan|india|bangalore|mumbai|"
+    r"germany|berlin|munich|france|paris|spain|barcelona|madrid|italy|milan|rome|"
+    r"dubai|abu\s+dhabi|uae"
+    r")\b",
+    re.IGNORECASE,
+)
+
+
+def is_australian_location(location_text: str | None) -> bool:
+    """Determine whether an ATS raw location represents an Australian position.
+
+    Returns True if an explicit Australian state, city, precinct, or country code
+    is present, or if it indicates Australia-wide remote.
+    Returns False if location is absent, or mentions explicitly foreign jurisdictions
+    without Australian presence.
+    """
+    if not location_text or not location_text.strip():
+        return False
+    cleaned = location_text.strip()
+    if re.search(r"(?:,\s*|\b)au(?:\b|\s*,)", cleaned, re.IGNORECASE):
+        return True
+    has_au_match = bool(_AUSTRALIAN_GEO_PATTERNS.search(cleaned))
+    has_foreign_match = bool(_EXPLICIT_FOREIGN_PATTERNS.search(cleaned))
+    if has_au_match:
+        return True
+    if has_foreign_match:
+        return False
+    return False

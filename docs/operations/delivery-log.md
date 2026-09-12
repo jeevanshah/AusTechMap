@@ -1,5 +1,28 @@
 # Autonomous delivery log
 
+## 2026-09-13 - Systematic Geographic Integrity Remediation: ATS International Collision Quarantine, Name Sanitization & Location Drift Detector
+
+- **Scope & Highlights**:
+  1. **Purge & Quarantine 14 False-Match International ATS Feeds**:
+     - Audited all 152 ATS sources for non-Australian job contamination. Identified 14 international brand-name collisions on global boards (e.g. US executive recruiter `athena`, US gaming recruiter `hireup`, Minneapolis aerospace `swoop`, NYC digital media `luminary`, European `raiz`).
+     - Disabled the 14 feeds in `company_ats_sources` (`status = 'disabled'`, `status_reason = 'international_name_collision'`) and `data_sources` with immutable audit trail.
+     - Purged 145 non-Australian jobs, observations, and derived skill/role signals, ensuring 100% of persisted jobs represent legitimate Australian employment (**3,310 verified live canonical jobs** across **117 active hiring employers**).
+     - Pruned fixture `ats_source_seed_20260905.csv` from 152 down to **138 verified Australian sources**.
+  2. **Sanitize Qualified Outpost Names & Suffixes**:
+     - Sanitized compound names and slugs for 12 canonical companies seeded with outpost/branch qualifiers (e.g. `Kinetic IT (Darwin Hub)` -> `Kinetic IT`, `Youi Insurance (Tech Campus)` -> `Youi Insurance`, `Dremio (Australia Hub)` -> `Dremio`, `Cotton On Group (Digital & Tech)` -> `Cotton On Group`, `nib Group (Tech Hub)` -> `nib Group`, `FirstWave (Opmantek)` -> `FirstWave`, `Instaclustr (NetApp)` -> `Instaclustr`, `VGW (Virtual Gaming Worlds)` -> `VGW`, `Mineral Resources Tech (MinRes)` -> `Mineral Resources`, `Silicon Quantum Computing (SQC)` -> `Silicon Quantum Computing`, `Canberra Data Centres (CDC)` -> `Canberra Data Centres`, `FCTG Tech (Flight Centre)` -> `Flight Centre Technology`).
+     - Relocated Kinetic IT from Darwin branch outpost to its national corporate headquarters at 54 Terrace Road, East Perth WA 6004 with full PostGIS coordinate resolution.
+     - Synchronized `alpha_seed_cohort_20260905.csv` and `alpha_seed_cohort_addresses_20260905.csv`.
+  3. **Strict Australian Geography Gate on ATS Ingestion Pipeline**:
+     - Built `is_australian_location` in `austechmap_ingestion.hiring.normalisation` with deterministic regex recognition of Australian states, territories, major tech precincts, and remote-in-Australia markers, with explicit foreign jurisdiction exclusions.
+     - Integrated into `pipeline.py` posting ingestion loop: non-Australian roles on multi-national boards are automatically dropped prior to persistence.
+  4. **Automated Location Drift Detection Engine & CLI**:
+     - Built `location_drift.py` and registered `detect-location-drift` CLI command in `__main__.py`.
+     - Automatically compares an employer's recorded head office state against the distribution of its active Australian job postings, surfacing potential headquarters drift (e.g. Nearmap Perth -> Sydney pattern) into structured reports and staff review queues.
+- **Verification**:
+  - Full ingestion test suite: **330 passed**, 104 skipped across 434 tests.
+  - Web test suite: **178 passed** across 39 files.
+  - `detect-location-drift` evaluated 94 hiring employers on live Neon DB with zero unhandled exceptions.
+
 ## 2026-09-13 - Nearmap Australian Corporate Headquarters Relocation to Sydney Barangaroo
 
 - **Scope & Context**:

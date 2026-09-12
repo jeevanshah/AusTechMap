@@ -27,7 +27,11 @@ from austechmap_ingestion.hiring.company_sources import (
 )
 from austechmap_ingestion.hiring.greenhouse import fetch_greenhouse_postings
 from austechmap_ingestion.hiring.lever import fetch_lever_postings
-from austechmap_ingestion.hiring.normalisation import SkillDef, normalise_job
+from austechmap_ingestion.hiring.normalisation import (
+    SkillDef,
+    is_australian_location,
+    normalise_job,
+)
 from austechmap_ingestion.hiring.persistence import mark_expired_jobs, persist_job_posting
 from austechmap_ingestion.hiring.pinpoint import fetch_pinpoint_payload, parse_pinpoint_postings
 from austechmap_ingestion.hiring.smartrecruiters import fetch_smartrecruiters_postings
@@ -182,6 +186,8 @@ def run_ats_crawl(
         seen_external_ids: set[str] = set()
         with psycopg.connect(database_url) as connection, connection.transaction():
             for posting in postings:
+                if not is_australian_location(posting.location_text):
+                    continue
                 seen_external_ids.add(posting.external_id)
                 normalised, skill_matches = normalise_job(posting, provider=provider, skills=skills)
                 result = persist_job_posting(
