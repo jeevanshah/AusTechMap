@@ -7,8 +7,8 @@
      - Conducted systematic discovery sweeps across unmapped canonical Australian tech employers in Neon.
      - Verified and onboarded 44 new bona fide Australian tech feeds across SmartRecruiters, Greenhouse, Lever, Ashby, and Pinpoint (e.g. WiseTech Global, PaperCut Software, Sentient Vision Systems / Shield AI Melbourne CV lab, Montu, GO1, Appen, Hireup, Vix Technology, CVCheck / Kinatico, Superloop, Iress, Elmo Software, ReadyTech, Whispir, Qoria, Tesserent, Hansen Technologies, Bravura Solutions, HUB24, Praemium, Class, Senetas, Tritium, Temple & Webster, WithYouWithMe, Practera, Swoop Aero, Baraja, Gilmour Space, Fleet Space, Propic, Cubiko, Sherpa, Carbar, Honey Insurance, Lendi, Symple Loans, Tyro, Till Payments, Openpay, HappyCo, Willow Technology, Raiz Invest, Partly).
      - Gated 100% of candidate boards by `is_australian_location` and Australian corporate identity checks, eliminating foreign job pollution.
-     - Scaled active verified ATS feeds in Neon PostgreSQL from 115 to **154 sources** (and synchronized `ats_source_seed_20260905.csv` to 159 rows).
-     - Ingested 56 live Australian roles, bringing total live canonical Australian jobs in Neon to **1,048 jobs** across **108 active hiring employers** with **0 foreign positions**.
+     - Scaled active verified ATS feeds in Neon PostgreSQL from 115 to **155 sources** (and synchronized `ats_source_seed_20260905.csv` to 160 rows, including onboarding **NCS Group / NCS Australia** `smartrecruiters:ncsaustralia`).
+     - Ingested 138 live Australian roles (including 82 from NCS Australia), bringing total live canonical Australian jobs in Neon to **1,130 jobs** across **110 active hiring employers** with **0 foreign positions**.
      - Refreshed hiring signals and sponsorship evidence across all hiring companies.
   2. **Option 3: Retention Engine & Alert Dispatcher Worker (Phase 7)**:
      - Built `workers/ingestion/src/austechmap_ingestion/retention/dispatch_alerts.py` and registered `dispatch-alerts` CLI subcommand in `__main__.py`.
