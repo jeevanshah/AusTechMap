@@ -6,9 +6,11 @@
 
 - **Current Implementer / Integrator:** Codex — operating per `AGENTS.md` orchestration / bulk autonomous delivery lane.
 - **Updated at:** 2026-09-12
-- **Reason:** Phase 5 scaleup: 26 verified ATS sources registered (hipages, Procreate, Quantium, Plenti, Prezzee, Spaceship, SunDrive, Splend, Polynovo, Who Gives A Crap, Enboarder, Easygo, Cyara, Ignition, Alembic, Coupa, Tibra, Rumin8, Wisr, Stax, Sendle, VGW, Catch, Dataro, Cape, Liven), advancing active ATS sources from 71 to **97**.
-- **Task / issue:** 1,000-Employer V1 Launch Gate (1,007 companies) and >95% Mapped Locations Gate (965 / 1,007 = 95.83%) satisfied; Phase 5 ATS coverage scaled toward 300-source target.
+- **Reason:** Phase 5 scaleup crawl completed: 32 active ATS sources crawled, ingesting 304 net-new live jobs; hiring signals derived (171 role signals, 278 skill signals) and 314 longitudinal change events persisted.
+- **Task / issue:** 1,000-Employer V1 Launch Gate (1,007 companies) and >95% Mapped Locations Gate (965 / 1,007 = 95.83%) satisfied; active ATS monitored sources scaled to 97 with 100% crawl completion.
 - **Acceptance criteria (this checkpoint):** Add only evidence-backed employers and verified ATS sources; preserve the existing production approval and audit rules for every production write.
+- **Latest completed delivery:** Phase 5 scaleup crawl: 32 active ATS sources crawled across Lever, Ashby, Greenhouse, and Workable with 100% success rate (+304 net-new live positions persisted). Active unexpired jobs expanded to **2,527** across **87 hiring employers**.
+- **Latest completed delivery:** Post-crawl derivations completed: 171 employer role signals and 278 employer skill signals derived via `derive_employer_hiring_signals`; 314 new `job.first_seen` events derived into `events` table via `run-retention-pipeline.mjs` (100% idempotent).
 - **Latest completed delivery:** Phase 5 scaleup: 26 verified ATS sources registered into Neon `company_ats_sources` and fixture `ats_source_seed_20260905.csv` (`{"created": 26, "reused": 71}`). Active ATS sources increased to **97**.
 - **Latest completed delivery:** Batch 6 ATS sources (6 net-new verified public ATS boards) registered into Neon `company_ats_sources` and fixture `ats_source_seed_20260905.csv` (`{"created": 6, "reused": 65}`).
 - **Latest completed delivery:** Location top-up (`batch6_location_topup_20260912.csv`, 48 head offices) researched, validated, and geocoded via `seed-locations`, bringing mapped employer coverage to **965 of 1,007 active companies (95.83%)**, surpassing the >95% V1 Launch Gate.
@@ -19,8 +21,8 @@
 - **Latest completed delivery:** SafetyCulture (`ashby:mitti`) registered and crawled with R2 snapshots in GitHub Actions run `34605582244` (39 open positions ingested, 19 Sydney engineering/product roles).
 - **Latest completed delivery:** Harrison.ai (`ashby:harrison.ai`) registered and crawled with R2 snapshots in GitHub Actions run `34659857835` (7 open positions ingested, Perth and Sydney roles).
 - **Bugfixes delivered:** `653203b` added `build_ats_source_key` slug sanitization to handle dotted ATS identifiers (`harrison.ai` -> `ats-ashby-harrison-ai`) conforming to snapshot storage regex constraints; `0f2cc88` added `claim.source_id` reconciliation for retried same-day runs.
-- **Derivations completed:** Retention pipeline derived (48 new `location_added` change events committed into `events`, bringing total to 3,283 events).
-- **Production state:** **1,007 canonical companies** (1,007 unique domains, 1,007 unique slugs), **965 mapped employers (95.83%)**, 970 company locations, **97 active ATS sources** (98 total rows in `company_ats_sources`), 2,213 live unexpired jobs, 2,717 evidence records, 3,283 longitudinal change events, 25 database migrations applied, 411 automated tests passing monorepo-wide.
+- **Derivations completed:** Retention pipeline derived (314 new `job.first_seen` change events committed into `events`, bringing total to 3,597 events).
+- **Production state:** **1,007 canonical companies** (1,007 unique domains, 1,007 unique slugs), **965 mapped employers (95.83%)**, 970 company locations, **97 active ATS sources (100.0% crawled)**, **2,527 live unexpired jobs**, **87 active hiring employers**, **1,750 verified skill links**, **566 role signals**, **859 skill signals**, 2,717 evidence records, **3,597 longitudinal change events**, 25 database migrations applied, 531 automated tests passing monorepo-wide.
 
 ## Checkpoint
 

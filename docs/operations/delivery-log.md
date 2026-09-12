@@ -437,3 +437,44 @@ This is the audit trail for changes delivered through the bulk autonomous lane i
 - Bugfix & reconciliation: diagnosed dotted identifier failure in `source_key` (`ValueError`), added `build_ats_source_key` slug sanitization (`653203b`), and added claim `source_id` reconciliation for retried runs (`0f2cc88`).
 - Post-crawl derivations: `derive-hiring-signals` created 9 new skill signals and updated 196 skill signals across 64 companies; `run-retention-pipeline.mjs` derived 7 new `job.first_seen` events into `events`.
 - Platform totals: 65 active ATS sources, 2,213 live unexpired jobs, 3,136 longitudinal change events. Zero due active sources remain.
+
+## 2026-09-12 — Phase 5 ATS scaleup crawl and post-crawl derivations
+
+- Scope: crawled 32 uncrawled active ATS sources across Lever, Ashby, Greenhouse, and Workable (Batch 6 + scaleup cohort).
+- Results: 32/32 crawls succeeded with zero unhandled exceptions.
+  - Airlock Digital (`greenhouse:airlockdigital`): 25 jobs
+  - Macquarie Technology Group (`lever:macquarietechnologygroup`): 17 jobs
+  - Swoop Telecom (`ashby:swoop`): 13 jobs
+  - Appen (`lever:appen`): 19 jobs
+  - hipages Group (`greenhouse:hipagesgroup`): 10 jobs
+  - Quantium (`greenhouse:quantium`): 31 jobs
+  - Plenti (`lever:plenti`): 11 jobs
+  - Prezzee (`greenhouse:prezzee`): 9 jobs
+  - Spaceship (`greenhouse:spaceship`): 1 job
+  - SunDrive Solar (`lever:sundrivesolar`): 1 job
+  - Splend Tech (`lever:splend`): 10 jobs
+  - Polynovo (`greenhouse:polynovo`): 12 jobs
+  - Who Gives A Crap (`greenhouse:whogivesacrap`): 8 jobs
+  - Enboarder (`greenhouse:enboarder`): 5 jobs
+  - Easygo Gaming (`greenhouse:easygo`): 32 jobs
+  - Cyara (`lever:cyara`): 19 jobs
+  - Ignition (`ashby:ignition`): 10 jobs
+  - Alembic (`ashby:alembic`): 10 jobs
+  - Coupa Software AU (`lever:coupa`): 31 jobs
+  - Dataro (`ashby:dataro`): 2 jobs
+  - Cape (`ashby:cape`): 26 jobs
+  - Liven (`ashby:liven`): 2 jobs
+  - 10 active boards had 0 currently listed roles (Procreate, Vast Solar, mx51, Tibra Capital, Rumin8, Wisr, Stax, Sendle, VGW, Catch).
+- Ingested metrics: **304 net-new live job postings** persisted with content-addressed raw snapshots and taxonomy skill mapping.
+- Post-crawl derivations:
+  - `derive_employer_hiring_signals`: derived 171 new role signals and 278 new skill signals across 87 active hiring employers (bringing platform totals to 566 role signals and 859 skill signals).
+  - `run-retention-pipeline.mjs`: derived **314 new longitudinal `job.first_seen` change events** into `events` table (bringing total to 3,597 change events). Verified 100% idempotency with 0 new events on re-run.
+- Production state:
+  - Canonical Active Companies: **1,007**
+  - Mapped Physical Addresses: **965** (95.83%)
+  - Active Monitored ATS Sources: **97** (97 crawled, 100.0% coverage)
+  - Active Live Jobs: **2,527**
+  - Active Hiring Employers: **87**
+  - Verified Job Skill Links: **1,750**
+  - Longitudinal Change Events: **3,597**
+  - Automated Tests Passing: **531** (46 contracts + 178 web + 307 ingestion)
