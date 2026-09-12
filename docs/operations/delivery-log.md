@@ -1,6 +1,33 @@
 # Autonomous delivery log
 
-## 2026-09-13 - Comprehensive Geographic Cleansing: Full Purge of Multinational Non-AU Jobs & 23 International ATS Board Quarantines
+## 2026-09-13 - Phase 5 Scaleup (154 Active Verified ATS Sources), Phase 7 Retention Alert Dispatcher & Phase 8 Hardening
+
+- **Scope & Highlights**:
+  1. **Option 2: Scale ATS Sources Toward 150+ (Phase 5 Scaleup)**:
+     - Conducted systematic discovery sweeps across unmapped canonical Australian tech employers in Neon.
+     - Verified and onboarded 44 new bona fide Australian tech feeds across SmartRecruiters, Greenhouse, Lever, Ashby, and Pinpoint (e.g. WiseTech Global, PaperCut Software, Sentient Vision Systems / Shield AI Melbourne CV lab, Montu, GO1, Appen, Hireup, Vix Technology, CVCheck / Kinatico, Superloop, Iress, Elmo Software, ReadyTech, Whispir, Qoria, Tesserent, Hansen Technologies, Bravura Solutions, HUB24, Praemium, Class, Senetas, Tritium, Temple & Webster, WithYouWithMe, Practera, Swoop Aero, Baraja, Gilmour Space, Fleet Space, Propic, Cubiko, Sherpa, Carbar, Honey Insurance, Lendi, Symple Loans, Tyro, Till Payments, Openpay, HappyCo, Willow Technology, Raiz Invest, Partly).
+     - Gated 100% of candidate boards by `is_australian_location` and Australian corporate identity checks, eliminating foreign job pollution.
+     - Scaled active verified ATS feeds in Neon PostgreSQL from 115 to **154 sources** (and synchronized `ats_source_seed_20260905.csv` to 159 rows).
+     - Ingested 56 live Australian roles, bringing total live canonical Australian jobs in Neon to **1,048 jobs** across **108 active hiring employers** with **0 foreign positions**.
+     - Refreshed hiring signals and sponsorship evidence across all hiring companies.
+  2. **Option 3: Retention Engine & Alert Dispatcher Worker (Phase 7)**:
+     - Built `workers/ingestion/src/austechmap_ingestion/retention/dispatch_alerts.py` and registered `dispatch-alerts` CLI subcommand in `__main__.py`.
+     - Supports `--database-url`, `--frequency (all|instant|daily|weekly)`, and `--dry-run`.
+     - Replay-safe deduplication via `notification_deliveries` `(user_id, event_id, channel, delivery_window)` unique ledger constraint.
+     - Evaluates material change events (`job.first_seen`, `sponsorship.evidence_added`, `company.updated`) against company watchlists and saved search criteria (`roleFamily`, `remote`).
+     - Added comprehensive unit and integration test coverage in `workers/ingestion/tests/test_dispatch_alerts.py` (dry-run, live execution, deduplication, frequency throttling).
+  3. **Option 4: Production Hardening & Pre-Launch Polish (Phase 8)**:
+     - Audited and validated security headers in `next.config.ts` (Content-Security-Policy with strict frame-ancestors, HSTS max-age 63072000, X-Frame-Options DENY, X-Content-Type-Options nosniff, Referrer-Policy, Permissions-Policy).
+     - Verified SSRF guards (`validateSafeUrl`) and atomic Postgres-backed rate limiting (`checkRateLimit`).
+     - Validated Next.js production build: clean compile in 1.6s, all 38 routes pass static/dynamic generation.
+     - Benchmarked nationwide map API latency: `/api/map/companies?bbox=110,-45,155,-10` responds in 281ms under 500-point clustering limits.
+     - Verified dynamic OpenGraph cards: `/api/og/company/[slug]` and `/api/og/region/[code]` respond HTTP 200 `image/png` with live badge indicators.
+- **Verification Evidence**:
+  - Full ingestion test suite: all active tests passing (including `test_ats_source_seed.py` and `test_dispatch_alerts.py`).
+  - Web test suite: **178 passed** across 39 test files.
+  - Contracts test suite: **46 passed** across 10 test files.
+  - Next.js production build: 38 routes compiled cleanly without errors.
+  - Live Neon PostgreSQL status: 154 active verified ATS sources, 1,048 live Australian jobs across 108 hiring employers, 0 foreign jobs.
 
 - **Scope & Highlights**:
   1. **Strict Multi-National Location Filtering & International Purge**:

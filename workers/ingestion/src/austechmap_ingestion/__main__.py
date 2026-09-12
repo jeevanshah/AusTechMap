@@ -90,6 +90,7 @@ from austechmap_ingestion.observability import (
 )
 from austechmap_ingestion.regional.jsa import JsaImportError, run_ivi_import, run_nero_import
 from austechmap_ingestion.regional.persistence import generate_region_opportunity_scores
+from austechmap_ingestion.retention.dispatch_alerts import dispatch_alerts
 from austechmap_ingestion.sample_importer import run_sample_import
 from austechmap_ingestion.storage import (
     FilesystemSnapshotStore,
@@ -367,6 +368,22 @@ def build_parser() -> argparse.ArgumentParser:
         "--period-end",
         type=date.fromisoformat,
         help="score window end date in YYYY-MM-DD format (defaults to today)",
+    )
+    dispatch_alerts_parser = subparsers.add_parser(
+        "dispatch-alerts",
+        help="evaluate active saved searches and watchlists against material change events",
+    )
+    dispatch_alerts_parser.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
+    dispatch_alerts_parser.add_argument(
+        "--frequency",
+        choices=["all", "instant", "daily", "weekly"],
+        default="all",
+        help="filter saved search alert evaluations by frequency (default: all)",
+    )
+    dispatch_alerts_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="evaluate matches and report counts without committing database writes",
     )
     return parser
 
@@ -1157,6 +1174,34 @@ def main(argv: Sequence[str] | None = None) -> int:
                     }
                     for score in scores
                 ],
+                separators=(",", ":"),
+                sort_keys=True,
+            )
+        )
+        return 0
+
+    if args.command == "dispatch-alerts":
+        if not args.database_url:
+            print("DATABASE_URL or --database-url is required")
+            return 2
+        try:
+            dispatch_stats = dispatch_alerts(
+                args.database_url,
+                frequency=args.frequency,
+                dry_run=args.dry_run,
+            )
+        except (ValueError, psycopg.Error) as error:
+            print(f"Alert dispatch failed: {error}")
+            return 1
+        print(
+            json.dumps(
+                {
+                    "dryRun": args.dry_run,
+                    "frequency": args.frequency,
+                    "savedSearchAlertsCreated": dispatch_stats.saved_search_alerts_created,
+                    "totalAlertsCreated": dispatch_stats.total_alerts_created,
+                    "watchlistAlertsCreated": dispatch_stats.watchlist_alerts_created,
+                },
                 separators=(",", ":"),
                 sort_keys=True,
             )
