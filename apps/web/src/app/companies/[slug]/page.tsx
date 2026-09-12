@@ -20,6 +20,7 @@ import type { MapCompanyPoint } from "@austechmap/contracts";
 import { auth } from "../../../auth";
 import { CareersLink } from "./CareersLink";
 import { WatchCompanyButton } from "./WatchCompanyButton";
+import { ClaimProfileModal } from "./ClaimProfileModal";
 import { getCategoryIconPath } from "../../../lib/category-icons";
 import { MapCanvas, type Bbox } from "../../../components/map/MapCanvas";
 import { trackEvent } from "../../../lib/analytics";
@@ -423,13 +424,13 @@ export default async function CompanyProfilePage({
                 <span>Verified Employer Profile</span>
               </div>
             ) : (
-              <Link
-                href="/corrections"
-                className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-[11px] font-medium text-slate-600 hover:text-navy-900 hover:border-slate-300 transition-colors"
-                title="Claim this profile or submit official employer updates"
-              >
-                <span>Claim or update this profile</span>
-              </Link>
+              <ClaimProfileModal
+                companyId={company.id}
+                companyName={company.display_name}
+                companySlug={company.slug}
+                companyDomain={company.domain}
+                isClaimed={company.is_claimed}
+              />
             )}
           </div>
           <div className="flex items-center gap-2 flex-wrap">
@@ -458,6 +459,17 @@ export default async function CompanyProfilePage({
               initialWatching={isWatching}
               isSignedIn={Boolean(userId)}
             />
+            {!company.is_claimed && (
+              <ClaimProfileModal
+                companyId={company.id}
+                companyName={company.display_name}
+                companySlug={company.slug}
+                companyDomain={company.domain}
+                isClaimed={company.is_claimed}
+                triggerLabel="Partner / Claim"
+                triggerClassName="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50/80 px-3 py-1.5 text-xs font-semibold text-emerald-900 shadow-2xs hover:bg-emerald-100/80 transition-colors cursor-pointer"
+              />
+            )}
           </div>
         </div>
         <dl className="flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs text-slate-600 tabular-nums">

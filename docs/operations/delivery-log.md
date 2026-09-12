@@ -1,6 +1,42 @@
 # Autonomous delivery log
 
-## 2026-09-12 - Phase 5 scaleup: 26 verified ATS sources registered (97 active total)
+## 2026-09-13 - Phase 5 Scaleup: 152 Monitored ATS Sources (3,548 Live Jobs), Tech ANZSCO Expansion & Commercial Claim Concierge
+
+- **Scope & Highlights**:
+  1. **Track 1: Tech ANZSCO Expansion**:
+     - Expanded `anzsco4_role_family_v1.csv` to map official Australian ICT unit groups: `2611 ICT Business and Systems Analysts` -> `product-delivery`, `2612 Multimedia Specialists and Web Developers` -> `software-engineering`, `2621 Database and Systems Administrators, and ICT Security Specialists` -> `security`.
+     - Updated fixture assertions in `test_jsa.py` and confirmed 100% test pass.
+  2. **Track 2: Scale Monitored ATS Sources to 152+**:
+     - Discovered, verified, and onboarded 29 net-new Australian technology employer boards across SmartRecruiters, Ashby, Pinpoint, Breezy, Greenhouse, and Workable:
+       - SmartRecruiters: Bigtincan, FinClear, InstantScripts, Judo Bank, Kagome Digital Ag, Lumi Business, NextDC, Redbubble, SEEK, Versent, Equatorial Launch Australia, CyberCX, Hireup.
+       - Ashby: ReadyTech, Luminary, Deel (Astute Payroll).
+       - Pinpoint: Fluent Commerce, Preezie, Sonder.
+       - Breezy: CEVO, Edrolo, Insentra.
+       - Greenhouse: LeafLink AU.
+       - Workable: Basiq, Biteable, Birchal, Blackbird Tech, Koala Tech, Pet Circle.
+     - Registered into Neon DB `company_ats_sources` and fixture `ats_source_seed_20260905.csv` (152 total active sources).
+     - Crawled all uncrawled sources with 100% crawl success rate, creating **+198 net-new positions** in Neon DB (**3,548 total canonical live jobs** across **131 active hiring employers**).
+     - Derived updated hiring signals via `derive_employer_hiring_signals`: 104 new role signals, 145 new skill signals.
+     - Derived 205 new longitudinal change events into `events` table (reaching **4,525 total events**).
+  3. **Track 3: "Claim Profile & Partner With Us" Concierge Modal**:
+     - Built `ClaimProfileModal.tsx` in `apps/web/src/app/companies/[slug]/ClaimProfileModal.tsx` with Hallmark design standards.
+     - Integrated into `/companies/[slug]` header actions and verification badge area.
+     - Supports three commercial inquiry channels: `profile_verification` ("Verify & Claim Profile"), `employer_pro` ("Employer Pro Subscription"), and `data_partnership` ("Data & Talent Intelligence").
+     - Fast-track corporate domain matching verification hint when claimant email matches company domain.
+     - Submits atomically to `employer_claims` and enqueues into staff `review_queue_items`.
+  4. **Track 4: Verification & Automated Checks**:
+     - Production Next.js build compiled cleanly in 1.38s with zero errors or warnings.
+     - Pytest suite: 307 passed, 104 skipped.
+     - Contracts Vitest: 46 passed.
+     - Web Vitest: 178 passed across 39 files.
+     - End-to-end local server verification across all primary routes (`/`, `/companies/[slug]`, `/opportunities`, `/api/health`, `/api/map/companies`, `/api/og/company/[slug]`, `/api/opportunities/match`).
+- **Production State**:
+  - Active Monitored ATS Sources: **152** (100% crawled)
+  - Canonical Live Jobs: **3,548**
+  - Distinct Hiring Employers: **131**
+  - Mapped Physical Addresses: **965** (95.83% of 1,007 active companies)
+  - Total Evidence Records: **2,717**
+  - Longitudinal Events: **4,525**
 
 - Scope: executed discovery sweep and live API verification across all 936 unmapped technology employers in Neon, identifying and onboarding 26 verified active ATS boards across Greenhouse, Lever, Ashby, and Workable into `company_ats_sources` and fixture `ats_source_seed_20260905.csv`:
   1. `hipages.com.au` (hipages Group) -> `greenhouse:hipagesgroup` (10 live jobs in Sydney)

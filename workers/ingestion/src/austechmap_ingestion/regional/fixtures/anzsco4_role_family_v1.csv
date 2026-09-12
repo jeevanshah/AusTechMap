@@ -1,7 +1,10 @@
 anzsco4_code,anzsco4_title,role_family_key,rationale
 2241,"Actuaries, Mathematicians and Statisticians",data,"Direct statistical and mathematical work; the broader actuarial component is retained transparently in the source title."
 2324,"Graphic and Web Designers, and Illustrators",design,"Direct design work; no attempt is made to split the published unit group."
+2611,"ICT Business and Systems Analysts",product-delivery,"Direct ICT business analysis, systems architecture, and product delivery work."
+2612,"Multimedia Specialists and Web Developers",software-engineering,"Direct web application, frontend UI, and interactive multimedia software engineering."
 2613,Software and Applications Programmers,software-engineering,"Direct software and application development."
+2621,"Database and Systems Administrators, and ICT Security Specialists",security,"Direct systems administration, cloud infrastructure, and cybersecurity operations."
 2631,Computer Network Professionals,it-infrastructure,"Direct computer-network infrastructure work."
 2633,Telecommunications Engineering Professionals,it-infrastructure,"Direct telecommunications infrastructure work."
 3131,ICT Support Technicians,it-infrastructure,"Direct ICT support and infrastructure operations work."

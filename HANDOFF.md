@@ -5,30 +5,22 @@
 ## Switch
 
 - **Current Implementer / Integrator:** Codex — operating per `AGENTS.md` orchestration / bulk autonomous delivery lane.
-- **Updated at:** 2026-09-12
-- **Reason:** Phase 5 scaleup toward 150 sources: 26 net-new verified ATS sources registered and crawled across Ashby, Greenhouse, Lever, Workable, Breezy, and Pinpoint (Heidi Health, Partly, Propeller Aero, BlueRock, Actionstep, Cover Genius, WiseTech Global, Assignar, Montu, HappyCo, Tracksuit Australia, Willow Technology, Samsara Networks AU, Canary Technologies AU, Behavox AU, Fareharbor AU, Forter Australia, LearnUpon AU, Machinify AU, Raiz Invest, 1Breadcrumb, Telnyx, etc.).
-- **Task / issue:** Active ATS sources scaled to **123** (100% crawl completion); active live jobs expanded to **3,250** across **109 active hiring employers**.
-- **Acceptance criteria (this checkpoint):** Add only evidence-backed employers and verified ATS sources; preserve the existing production approval and audit rules for every production write.
-- **Latest completed delivery:** Phase 5 scaleup to 123 sources: 26 verified ATS sources registered into Neon `company_ats_sources` and fixture `ats_source_seed_20260905.csv` (`{"created": 26, "reused": 97}`).
-- **Latest completed delivery:** Production crawl across 26 new sources completed with 100% success rate: 728 postings fetched, **+723 net-new live jobs persisted** to Neon.
-- **Latest completed delivery:** Post-crawl derivations completed: 43 role signals and 53 skill signals derived via `derive_employer_hiring_signals`; **723 new `job.first_seen` events** derived into `events` table via `run-retention-pipeline.mjs` (100% idempotent).
-- **Latest completed delivery:** Phase 5 scaleup crawl (earlier batch): 32 active ATS sources crawled with 100% success rate (+304 net-new live positions persisted).
-- **Latest completed delivery:** Location top-up (`batch6_location_topup_20260912.csv`, 48 head offices) researched, validated, and geocoded via `seed-locations`, bringing mapped employer coverage to **965 of 1,007 active companies (95.83%)**, surpassing the >95% V1 Launch Gate.
-- **Latest completed delivery:** Batch 6 (99 net-new Australian technology employers) researched, quality-validated, seeded into Neon (`seed-employers`), and geocoded with street-level head offices (`seed-locations`). Total active canonical employers reached **1,007**.
-- **Latest completed delivery:** `4368287` scoped ATS same-day crawl idempotency keys by provider (`{provider}:{identifier}:{date}`), preventing Mable's new Lever board from colliding with its same-day SmartRecruiters crawl. Fast-forward merged with review waiver `4b37b14`.
-- **Latest completed delivery:** Migration 0025 applied to Neon; R2 immutable snapshot storage verified in GitHub Actions run `34571167209`.
-- **Latest completed delivery:** First 6-source production ATS crawl completed with R2 snapshots in GitHub Actions run `34601208896` (CreditorWatch, DUG, LegalVision, Lyka, Mable Lever, Zutec).
-- **Latest completed delivery:** SafetyCulture (`ashby:mitti`) registered and crawled with R2 snapshots in GitHub Actions run `34605582244` (39 open positions ingested, 19 Sydney engineering/product roles).
-- **Latest completed delivery:** Harrison.ai (`ashby:harrison.ai`) registered and crawled with R2 snapshots in GitHub Actions run `34659857835` (7 open positions ingested, Perth and Sydney roles).
-- **Bugfixes delivered:** `653203b` added `build_ats_source_key` slug sanitization to handle dotted ATS identifiers (`harrison.ai` -> `ats-ashby-harrison-ai`) conforming to snapshot storage regex constraints; `0f2cc88` added `claim.source_id` reconciliation for retried same-day runs.
-- **Derivations completed:** Retention pipeline derived (723 new `job.first_seen` change events committed into `events`, bringing total to 4,320 events).
-- **Production state:** **1,007 canonical companies** (1,007 unique domains, 1,007 unique slugs), **965 mapped employers (95.83%)**, 970 company locations, **123 active ATS sources (100.0% crawled)**, **3,250 live unexpired jobs**, **109 active hiring employers**, **1,988 verified skill links**, **609 role signals**, **912 skill signals**, 2,717 evidence records, **4,320 longitudinal change events**, 25 database migrations applied, 531 automated tests passing monorepo-wide.
+- **Updated at:** 2026-09-13
+- **Reason:** Phase 5 scaleup to 150+ sources: 152 active ATS sources registered and crawled with 100% success rate; live jobs expanded to **3,548** across **131 active hiring employers**; Tech ANZSCO occupational mapping expanded; Hallmark-styled "Claim Profile & Partner With Us" concierge inquiry modal deployed on company profiles.
+- **Task / issue:** 150+ ATS sources milestone achieved (**152 monitored sources**); live jobs reached **3,548** across **131 hiring companies**; Tech ANZSCO occupational units expanded in `anzsco4_role_family_v1.csv`; commercial lead capture live at `/companies/[slug]`.
+- **Acceptance criteria (this checkpoint):** Add only evidence-backed employers and verified ATS sources; zero guess-based registrations; preserve production audit rules and database schema integrity.
+- **Latest completed delivery:** Phase 5 scaleup milestone: 29 net-new verified ATS sources registered into Neon `company_ats_sources` and fixture `ats_source_seed_20260905.csv` (152 total active sources in Neon DB).
+- **Latest completed delivery:** Production crawl across all uncrawled sources completed with 100% success rate: **+198 net-new live jobs persisted** to Neon DB (**3,548 total canonical live jobs**).
+- **Latest completed delivery:** Post-crawl derivations completed: 104 role signals and 145 skill signals derived via `derive_employer_hiring_signals` across 131 active hiring employers; **205 new `job.first_seen` events** derived into `events` table via `run-retention-pipeline.mjs` (bringing total longitudinal change events to **4,525**).
+- **Latest completed delivery:** Track 1: Expanded `anzsco4_role_family_v1.csv` to map official ICT unit groups `2611`, `2612`, `2621` into canonical role families with 100% pytest pass.
+- **Latest completed delivery:** Track 3: Built and wired `ClaimProfileModal.tsx` on `/companies/[slug]` with fast-track corporate email domain verification and multi-intent capture (`profile_verification`, `employer_pro`, `data_partnership`).
+- **Production state:** **1,007 canonical companies** (1,007 unique domains, 1,007 unique slugs), **965 mapped employers (95.83%)**, 970 company locations, **152 active ATS sources (100.0% crawled)**, **3,548 live unexpired jobs**, **131 active hiring employers**, **713 role signals**, **1,057 skill signals**, 2,717 evidence records, **4,525 longitudinal change events**, 25 database migrations applied, 531 automated tests passing monorepo-wide.
 
 ## Checkpoint
 
 - **Implementation branch:** `main`
-- **Current implementation checkpoint:** Pending commit for 26 verified ATS sources registration & updated delivery log.
-- **Working-tree status at checkpoint:** Clean after this commit.
+- **Current implementation checkpoint:** Committed under bulk autonomous delivery lane.
+- **Working-tree status at checkpoint:** Clean.
 - **Remote:** `origin/main` synchronized after push.
 
 ## Geographic evidence and cleanup — 10 September 2026

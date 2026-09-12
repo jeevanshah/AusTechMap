@@ -164,8 +164,18 @@ def test_default_occupation_mapping_is_narrow_and_explained() -> None:
     mappings = load_occupation_role_mapping()
 
     assert DEFAULT_MAPPING_PATH.exists()
-    assert set(mappings) == {"2241", "2324", "2613", "2631", "2633", "3131", "3132"}
-    assert "2621" not in mappings  # Combined database, systems administration, and security group.
+    assert set(mappings) == {
+        "2241",
+        "2324",
+        "2611",
+        "2612",
+        "2613",
+        "2621",
+        "2631",
+        "2633",
+        "3131",
+        "3132",
+    }
     assert all(mapping.rationale for mapping in mappings.values())
 
 
