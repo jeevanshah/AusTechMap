@@ -1,5 +1,39 @@
 # Autonomous delivery log
 
+## 2026-09-12 - Phase 5 scaleup: 26 verified ATS sources registered (97 active total)
+
+- Scope: executed discovery sweep and live API verification across all 936 unmapped technology employers in Neon, identifying and onboarding 26 verified active ATS boards across Greenhouse, Lever, Ashby, and Workable into `company_ats_sources` and fixture `ats_source_seed_20260905.csv`:
+  1. `hipages.com.au` (hipages Group) -> `greenhouse:hipagesgroup` (10 live jobs in Sydney)
+  2. `procreate.com` (Savage Interactive) -> `lever:procreate` (10 live jobs in Hobart / Sydney)
+  3. `quantium.com.au` (Quantium) -> `greenhouse:quantium` (31 live jobs in Sydney / Melbourne)
+  4. `plenti.com.au` (Plenti) -> `lever:plenti` (11 live jobs in Sydney / Adelaide / QLD)
+  5. `prezzee.com` (Prezzee) -> `greenhouse:prezzee` (9 live jobs in Sydney / Melbourne)
+  6. `spaceship.com.au` (Spaceship) -> `greenhouse:spaceship` (1 live job in Sydney)
+  7. `sundrive.com` (SunDrive Solar) -> `lever:sundrivesolar` (1 live job in Sydney Kurnell)
+  8. `splend.com.au` (Splend Tech) -> `lever:splend` (10 live jobs in Sydney / Brisbane)
+  9. `polynovo.com` (Polynovo) -> `greenhouse:polynovo` (12 live jobs in Port Melbourne)
+  10. `whogivesacrap.org` (Who Gives A Crap) -> `greenhouse:whogivesacrap` (8 live jobs in AU Remote)
+  11. `enboarder.com` (Enboarder) -> `greenhouse:enboarder` (5 live jobs in Sydney)
+  12. `easygo.gg` (Easygo Gaming) -> `greenhouse:easygo` (32 live jobs in Melbourne)
+  13. `cyara.com` (Cyara) -> `lever:cyara` (19 live jobs in Melbourne / AU)
+  14. `ignitionapp.com` (Ignition) -> `ashby:ignition` (10 live jobs in Sydney)
+  15. `alembic.com.au` (Alembic Strategy) -> `ashby:alembic` (10 live jobs)
+  16. `coupa.com` (Coupa Software AU) -> `lever:coupa` (31 live jobs, including AVP Enterprise Australia)
+  17. `tibra.com` (Tibra Capital) -> `workable:tibra-capital-1` (algorithmic trading, verified from careers page)
+  18. `rumin8.com` (Rumin8) -> `lever:rumin8` (Perth climate tech, verified from careers page)
+  19. `wisr.com.au` (Wisr) -> `lever:wisr` (Sydney ASX-listed fintech, verified from careers page)
+  20. `stax.io` (Stax) -> `lever:stax` (Melbourne cloud management)
+  21. `sendle.com` (Sendle) -> `greenhouse:sendle` (Sydney tech logistics)
+  22. `vgw.co` (VGW) -> `greenhouse:vgw` (Perth tech)
+  23. `catch.com.au` (Catch.com.au) -> `ashby:catch` (Melbourne e-commerce tech)
+  24. `dataro.io` (Dataro) -> `ashby:dataro` (2 live jobs in Sydney)
+  25. `getcape.io` (Cape) -> `ashby:cape` (26 live jobs in Sydney)
+  26. `liven.love` (Liven) -> `ashby:liven` (2 live jobs in AU Remote)
+- Quality gates: 100% verified against live provider APIs (zero ungrounded URL guessing), all matched to canonical Neon `companies` records, overseas false positive name collisions excluded (e.g. ELA US, Safetech Canada, Mobi MA, Nudge SF).
+- Execution: `seed-ats-sources` executed cleanly against Neon (`{"created": 26, "reused": 71}`).
+- Production state: **97 active ATS sources** (98 total rows in `company_ats_sources`), 1,007 active canonical companies, 965 mapped employers (95.83%), 970 company locations, 2,717 evidence records, 3,283 longitudinal change events.
+- Verification: all 97 fixture entries parsed and validated in `test_ats_source_seed.py`, `ruff check` clean, monorepo vitest and pytest passing.
+
 ## 2026-09-12 - Batch 6 ATS sources registered (6 new active sources, 71 total)
 
 - Scope: identified, verified against live public APIs, and registered 6 active ATS sources for Batch 6 employers into `company_ats_sources` and `ats_source_seed_20260905.csv`:

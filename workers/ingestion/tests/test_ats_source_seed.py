@@ -33,7 +33,7 @@ def test_default_fixture_exists_and_parses() -> None:
     assert DEFAULT_FIXTURE_PATH.exists()
     seeds = load_ats_source_seed_fixture()
     assert seeds == ATS_SOURCE_SEED
-    assert len(seeds) == 71
+    assert len(seeds) == 97
     by_domain = {seed.company_domain: seed for seed in seeds}
     assert by_domain["kasada.io"].ats_provider == "lever"
     assert by_domain["kasada.io"].ats_identifier == "kasada"
@@ -61,6 +61,16 @@ def test_default_fixture_exists_and_parses() -> None:
     assert by_domain["swoop.com.au"].ats_identifier == "swoop"
     assert by_domain["appen.com"].ats_provider == "lever"
     assert by_domain["appen.com"].ats_identifier == "appen"
+    assert by_domain["hipages.com.au"].ats_provider == "greenhouse"
+    assert by_domain["hipages.com.au"].ats_identifier == "hipagesgroup"
+    assert by_domain["procreate.com"].ats_provider == "lever"
+    assert by_domain["procreate.com"].ats_identifier == "procreate"
+    assert by_domain["quantium.com.au"].ats_provider == "greenhouse"
+    assert by_domain["quantium.com.au"].ats_identifier == "quantium"
+    assert by_domain["plenti.com.au"].ats_provider == "lever"
+    assert by_domain["plenti.com.au"].ats_identifier == "plenti"
+    assert by_domain["prezzee.com"].ats_provider == "greenhouse"
+    assert by_domain["prezzee.com"].ats_identifier == "prezzee"
     assert by_domain["vowfood.com"].ats_provider == "ashby"
     assert by_domain["vowfood.com"].ats_identifier == "vow"
     assert by_domain["cultureamp.com"].ats_provider == "greenhouse"
