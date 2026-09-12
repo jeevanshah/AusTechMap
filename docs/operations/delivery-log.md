@@ -1,5 +1,15 @@
 # Autonomous delivery log
 
+## 2026-09-12 - Location Top-Up seeded: >95% Mapped Locations Launch Gate passed
+
+- Approval: user explicitly approved Option 1 and authorized the production write (`seed-locations` for `batch6_location_topup_20260912.csv`).
+- Scope: researched, validated, and geocoded verified street-level head offices for 48 previously unmapped active canonical companies in Neon, advancing mapped employer coverage from 917 (91.06%) to **965 (95.83%)** out of 1,007 active companies.
+- Quality gates: 100% strict address contract compliance (`validate_address_fixture`: valid=True, 0 errors), 100% specific street numbers (0 numberless addresses), 100% matched to existing Neon canonical companies, zero unexplained address reuse.
+- Production execution:
+  - `seed-locations`: 48 company locations geocoded via Nominatim (33 resolved, 15 reused existing physical point) with 48 exact first-party `location_source` evidence rows created (`batch6_location_topup_20260912.csv`).
+  - `run-retention-pipeline.mjs`: 48 new `location_added` change events derived and committed to `events`.
+- Production state: **1,007 active canonical companies**, **965 companies with mapped locations (95.83%)**, 970 total company locations, 2,717 evidence records, 3,283 longitudinal change events, 25 database migrations applied, 411 automated tests passing monorepo-wide.
+
 ## 2026-09-12 - Batch 6 seeded: 1,000-Employer V1 Launch Gate crossed
 
 - Approval: user explicitly reviewed and approved the implementation plan and authorized the production write (`seed-employers` and `seed-locations`).

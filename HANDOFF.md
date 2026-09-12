@@ -6,9 +6,10 @@
 
 - **Current Implementer / Integrator:** Codex — operating per `AGENTS.md` orchestration / bulk autonomous delivery lane.
 - **Updated at:** 2026-09-12
-- **Reason:** Batch 6 (99 verified employers) seeded; 1,000-employer V1 Launch Gate crossed (1,007 active canonical companies).
-- **Task / issue:** 1,000-Employer V1 Launch Gate achieved. The 304 evidence-free ambiguous locations remain a research-only backlog; do not infer locations.
+- **Reason:** Location top-up (48 verified head offices) seeded; >95% Mapped Locations Launch Gate passed (965 / 1,007 = 95.83%).
+- **Task / issue:** 1,000-Employer V1 Launch Gate and >95% Mapped Locations Gate achieved. The 304 evidence-free ambiguous locations remain a research-only backlog; do not infer locations.
 - **Acceptance criteria (this checkpoint):** Add only evidence-backed employers and verified ATS sources; preserve the existing production approval and audit rules for every production write.
+- **Latest completed delivery:** Location top-up (`batch6_location_topup_20260912.csv`, 48 head offices) researched, validated, and geocoded via `seed-locations`, bringing mapped employer coverage to **965 of 1,007 active companies (95.83%)**, surpassing the >95% V1 Launch Gate.
 - **Latest completed delivery:** Batch 6 (99 net-new Australian technology employers) researched, quality-validated, seeded into Neon (`seed-employers`), and geocoded with street-level head offices (`seed-locations`). Total active canonical employers reached **1,007**.
 - **Latest completed delivery:** `4368287` scoped ATS same-day crawl idempotency keys by provider (`{provider}:{identifier}:{date}`), preventing Mable's new Lever board from colliding with its same-day SmartRecruiters crawl. Fast-forward merged with review waiver `4b37b14`.
 - **Latest completed delivery:** Migration 0025 applied to Neon; R2 immutable snapshot storage verified in GitHub Actions run `34571167209`.
@@ -16,13 +17,13 @@
 - **Latest completed delivery:** SafetyCulture (`ashby:mitti`) registered and crawled with R2 snapshots in GitHub Actions run `34605582244` (39 open positions ingested, 19 Sydney engineering/product roles).
 - **Latest completed delivery:** Harrison.ai (`ashby:harrison.ai`) registered and crawled with R2 snapshots in GitHub Actions run `34659857835` (7 open positions ingested, Perth and Sydney roles).
 - **Bugfixes delivered:** `653203b` added `build_ats_source_key` slug sanitization to handle dotted ATS identifiers (`harrison.ai` -> `ats-ashby-harrison-ai`) conforming to snapshot storage regex constraints; `0f2cc88` added `claim.source_id` reconciliation for retried same-day runs.
-- **Derivations completed:** Post-seed hiring signals derived (136 role signals created, 205 skill signals created); retention pipeline derived (99 new `location_added` change events committed into `events`).
-- **Production state:** **1,007 canonical companies** (1,007 unique domains, 1,007 unique slugs), 922 company locations across 917 mapped employers, 65 active ATS sources (0 due), 2,213 live unexpired jobs, 2,669 evidence records, 3,235 longitudinal change events, 25 database migrations applied, 411 automated tests passing monorepo-wide.
+- **Derivations completed:** Retention pipeline derived (48 new `location_added` change events committed into `events`, bringing total to 3,283 events).
+- **Production state:** **1,007 canonical companies** (1,007 unique domains, 1,007 unique slugs), **965 mapped employers (95.83%)**, 970 company locations, 65 active ATS sources (0 due), 2,213 live unexpired jobs, 2,717 evidence records, 3,283 longitudinal change events, 25 database migrations applied, 411 automated tests passing monorepo-wide.
 
 ## Checkpoint
 
 - **Implementation branch:** `main`
-- **Current implementation checkpoint:** Pending commit for Batch 6 fixtures & delivery log.
+- **Current implementation checkpoint:** Pending commit for location top-up fixture & delivery log.
 - **Working-tree status at checkpoint:** Clean after this docs commit.
 - **Remote:** `origin/main` synchronized after push.
 
