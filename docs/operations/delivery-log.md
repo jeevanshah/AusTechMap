@@ -1,5 +1,17 @@
 # Autonomous delivery log
 
+## 2026-09-12 - Batch 6 seeded: 1,000-Employer V1 Launch Gate crossed
+
+- Approval: user explicitly reviewed and approved the implementation plan and authorized the production write (`seed-employers` and `seed-locations`).
+- Scope: researched, validated, and seeded Batch 6 (99 net-new Australian technology employers) with verified street-level head offices, advancing canonical employers from 908 to **1,007**.
+- Quality gates: 100% strict evidence contract compliance (`validate_seed_fixture_evidence`: 0 errors), 100% strict address contract compliance (`validate_address_fixture`: valid=True, 0 errors), zero numberless addresses, zero unexplained address reuse, zero domain or slug collisions against existing Neon records.
+- Production execution:
+  - `seed-employers`: 99 new canonical companies created (`batch6_expansion_cohort_20260912.csv`).
+  - `seed-locations`: 99 company locations geocoded via Nominatim (66 resolved, 33 reused existing physical point) with 99 exact first-party `location_source` evidence rows created (`batch6_expansion_cohort_addresses_20260912.csv`).
+  - `derive-hiring-signals`: 136 role signals created, 205 skill signals created across active companies.
+  - `run-retention-pipeline.mjs`: 99 `location_added` change events derived and committed to `events`.
+- Production state: **1,007 active canonical companies** (1,007 unique domains, 1,007 unique slugs), 922 company locations across 917 mapped employers, 2,669 evidence records, 3,235 longitudinal change events, 25 database migrations applied, 411 automated tests passing monorepo-wide.
+
 ## 2026-09-11 - R2 immutable-storage verification passed
 
 - Approval and action: after provisioning a private Standard R2 bucket and bucket-scoped object read/write credentials, the user manually ran GitHub Actions workflow `Verify R2 storage`.
