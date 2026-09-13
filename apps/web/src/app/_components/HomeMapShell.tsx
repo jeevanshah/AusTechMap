@@ -194,6 +194,150 @@ const HUB_METADATA: Record<string, HubMeta> = {
     icon: Building2,
     sa4Code: "202",
   },
+  Launceston: {
+    state: "TAS",
+    center: [147.1358, -41.4332],
+    zoom: 12,
+    tag: "Tamar Valley Digital & AgriTech Innovation",
+    icon: Network,
+    sa4Code: "602",
+  },
+  Orange: {
+    state: "NSW",
+    center: [149.0998, -33.2836],
+    zoom: 12,
+    tag: "Central West Precision AgTech & Mining Software",
+    icon: Cpu,
+    sa4Code: "103",
+  },
+  Toowoomba: {
+    state: "QLD",
+    center: [151.9507, -27.5598],
+    zoom: 12,
+    tag: "Darling Downs AgTech, Energy & Logistics",
+    icon: Cpu,
+    sa4Code: "317",
+  },
+  Ballarat: {
+    state: "VIC",
+    center: [143.8503, -37.5622],
+    zoom: 12,
+    tag: "Ballarat Tech Park, HealthTech & Cybersecurity",
+    icon: Shield,
+    sa4Code: "201",
+  },
+  Cairns: {
+    state: "QLD",
+    center: [145.7781, -16.9186],
+    zoom: 12,
+    tag: "Tropical Marine Science, Aviation & CleanTech",
+    icon: Anchor,
+    sa4Code: "306",
+  },
+  Townsville: {
+    state: "QLD",
+    center: [146.8169, -19.2590],
+    zoom: 12,
+    tag: "North Queensland Clean Energy, Defence & Marine",
+    icon: Zap,
+    sa4Code: "318",
+  },
+  Mackay: {
+    state: "QLD",
+    center: [149.1868, -21.1411],
+    zoom: 12,
+    tag: "Biofutures, Mining Systems & Heavy Engineering",
+    icon: Cpu,
+    sa4Code: "312",
+  },
+  "Alice Springs": {
+    state: "NT",
+    center: [133.8807, -23.698],
+    zoom: 12,
+    tag: "Centre for Appropriate Tech, Space & Solar",
+    icon: Radio,
+    sa4Code: "702",
+  },
+  Morwell: {
+    state: "VIC",
+    center: [146.4, -38.2333],
+    zoom: 12,
+    tag: "Latrobe Valley Energy Transition & Industrial Automation",
+    icon: Zap,
+    sa4Code: "205",
+  },
+  Moe: {
+    state: "VIC",
+    center: [146.2667, -38.1833],
+    zoom: 12,
+    tag: "Gippsland Renewable Energy & Engineering Cluster",
+    icon: Zap,
+    sa4Code: "205",
+  },
+  "Byron Bay": {
+    state: "NSW",
+    center: [153.6167, -28.6474],
+    zoom: 12,
+    tag: "Northern Rivers Creative Tech & Sustainability",
+    icon: Rocket,
+    sa4Code: "112",
+  },
+  Emerald: {
+    state: "QLD",
+    center: [148.15, -23.5333],
+    zoom: 12,
+    tag: "Central Highlands Agriculture & Resources Tech",
+    icon: Cpu,
+    sa4Code: "308",
+  },
+  Griffith: {
+    state: "NSW",
+    center: [146.04, -34.2889],
+    zoom: 12,
+    tag: "Riverina Agri-food Innovation & Water Tech",
+    icon: Anchor,
+    sa4Code: "113",
+  },
+  "Central Coast": {
+    state: "NSW",
+    center: [151.3417, -33.4267],
+    zoom: 12,
+    tag: "Food Innovation & Coastal Tech Corridor",
+    icon: Network,
+    sa4Code: "102",
+  },
+  "Coffs Harbour": {
+    state: "NSW",
+    center: [153.1141, -30.2963],
+    zoom: 12,
+    tag: "Mid North Coast Digital & Creative Enterprise",
+    icon: Network,
+    sa4Code: "104",
+  },
+  Bunbury: {
+    state: "WA",
+    center: [115.6333, -33.3256],
+    zoom: 12,
+    tag: "South West Clean Energy & Port Logistics",
+    icon: Anchor,
+    sa4Code: "501",
+  },
+  Shepparton: {
+    state: "VIC",
+    center: [145.3992, -36.3811],
+    zoom: 12,
+    tag: "Goulburn Valley FoodTech & Automated Logistics",
+    icon: Cpu,
+    sa4Code: "216",
+  },
+  Warrnambool: {
+    state: "VIC",
+    center: [142.4833, -38.3833],
+    zoom: 12,
+    tag: "Great Ocean Road Renewable Energy & Dairy Tech",
+    icon: Zap,
+    sa4Code: "217",
+  },
   Sydney: {
     state: "NSW",
     center: [151.2093, -33.8688],
@@ -447,49 +591,72 @@ export function HomeMapShell({
       .catch(() => {});
   }, [initialHubs]);
 
-  const displayedHubs = useMemo<DisplayedHub[]>(() => {
-    if (hubs.length > 0) {
-      return hubs.map((hub) => {
-        const meta = HUB_METADATA[hub.city] ?? {
-          state: "AU",
-          center: [133.7751, -25.2744] as [number, number],
-          zoom: 11,
-          tag: "Designated Regional Innovation Zone",
-          icon: MapPin,
-        };
-        return {
-          city: hub.city,
-          state: meta.state,
-          count: hub.count,
-          center: meta.center,
-          zoom: meta.zoom,
-          tag: meta.tag,
-          icon: meta.icon,
-          sa4Code: meta.sa4Code,
-        };
-      });
-    }
-    return Object.entries(HUB_METADATA)
-      .filter(
-        ([city]) =>
-          city !== "Sydney" && city !== "Melbourne" && city !== "Brisbane",
-      )
-      .map(([city, meta]) => ({
-        city,
-        state: meta.state,
-        count: 0,
-        center: meta.center,
-        zoom: meta.zoom,
-        tag: meta.tag,
-        icon: meta.icon,
-        sa4Code: meta.sa4Code,
-      }));
-  }, [hubs]);
   const router = useRouter();
   const [query, setQuery] = useState(() => {
     if (typeof window === "undefined") return "";
     return new URLSearchParams(window.location.search).get("q") ?? "";
   });
+
+  const displayedHubs = useMemo<DisplayedHub[]>(() => {
+    let list: DisplayedHub[] = [];
+    if (hubs.length > 0) {
+      list = hubs
+        .filter(
+          (hub) =>
+            hub.city !== "Sydney" &&
+            hub.city !== "Melbourne" &&
+            hub.city !== "Brisbane",
+        )
+        .map((hub) => {
+          const meta = HUB_METADATA[hub.city] ?? {
+            state: CITY_STATE_MAP[hub.city] ?? "AU",
+            center: [133.7751, -25.2744] as [number, number],
+            zoom: 11,
+            tag: "Designated Regional Innovation Zone",
+            icon: MapPin,
+          };
+          return {
+            city: hub.city,
+            state: meta.state || (CITY_STATE_MAP[hub.city] ?? "AU"),
+            count: hub.count,
+            center: meta.center,
+            zoom: meta.zoom,
+            tag: meta.tag,
+            icon: meta.icon,
+            sa4Code: meta.sa4Code,
+          };
+        });
+    } else {
+      list = Object.entries(HUB_METADATA)
+        .filter(
+          ([city]) =>
+            city !== "Sydney" && city !== "Melbourne" && city !== "Brisbane",
+        )
+        .map(([city, meta]) => ({
+          city,
+          state: meta.state,
+          count: 0,
+          center: meta.center,
+          zoom: meta.zoom,
+          tag: meta.tag,
+          icon: meta.icon,
+          sa4Code: meta.sa4Code,
+        }));
+    }
+
+    if (query.trim() !== "") {
+      const q = query.trim().toLowerCase();
+      list = list.filter(
+        (hub) =>
+          hub.city.toLowerCase().includes(q) ||
+          hub.state.toLowerCase().includes(q) ||
+          hub.tag.toLowerCase().includes(q) ||
+          (hub.sa4Code && hub.sa4Code.toLowerCase().includes(q)),
+      );
+    }
+
+    return list;
+  }, [hubs, query]);
   const [searchResults, setSearchResults] = useState<
     CompanySearchResult[] | null
   >(null);
@@ -548,7 +715,30 @@ export function HomeMapShell({
   const [currentZoom, setCurrentZoom] = useState<number | null>(null);
   const [activeDirectoryTab, setActiveDirectoryTab] = useState<
     "companies" | "sponsors" | "regions"
-  >("companies");
+  >(() => {
+    if (typeof window === "undefined") return "companies";
+    const tab = new URLSearchParams(window.location.search).get("tab");
+    if (tab === "regions" || tab === "sponsors" || tab === "companies") {
+      return tab;
+    }
+    return "companies";
+  });
+
+  const handleTabChange = useCallback(
+    (tab: "companies" | "sponsors" | "regions") => {
+      setActiveDirectoryTab(tab);
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        if (tab === "companies") {
+          url.searchParams.delete("tab");
+        } else {
+          url.searchParams.set("tab", tab);
+        }
+        window.history.replaceState(null, "", url.toString());
+      }
+    },
+    [],
+  );
   const moveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -880,21 +1070,24 @@ export function HomeMapShell({
     selectedWorkStyle,
   ]);
 
-  const handlePointClick = useCallback((slug: string) => {
-    isFocusingPointRef.current = true;
-    setSelectedSlug(slug);
-    setActiveDirectoryTab((prevTab) =>
-      prevTab === "regions" ? "companies" : prevTab,
-    );
-    trackEvent("map_company_clicked", { slug });
+  const handlePointClick = useCallback(
+    (slug: string) => {
+      isFocusingPointRef.current = true;
+      setSelectedSlug(slug);
+      handleTabChange("companies");
+      trackEvent("map_company_clicked", { slug });
 
-    setTimeout(() => {
-      const cardEl = document.getElementById(`company-card-${slug}`);
-      if (cardEl) {
-        cardEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      }
-    }, 150);
-  }, []);
+      const scrollCard = () => {
+        const cardEl = document.getElementById(`company-card-${slug}`);
+        if (cardEl) {
+          cardEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+      };
+      setTimeout(scrollCard, 50);
+      setTimeout(scrollCard, 200);
+    },
+    [handleTabChange],
+  );
 
   const isSearching = query.trim() !== "";
   const rawListEntries = isSearching
@@ -992,6 +1185,9 @@ export function HomeMapShell({
     if (activeDirectoryTab === "sponsors") {
       pts = pts.filter((point) => point.hasSponsorshipEvidence);
     }
+    if (activeDirectoryTab === "regions") {
+      pts = pts.filter((point) => point.isRegional);
+    }
     return pts;
   }, [
     points,
@@ -1002,10 +1198,53 @@ export function HomeMapShell({
     activeDirectoryTab,
   ]);
 
-  const selectedEntry =
-    listEntries.find((entry) => entry.slug === selectedSlug) ??
-    rawListEntries.find((entry) => entry.slug === selectedSlug) ??
-    null;
+  const selectedEntry = useMemo<ListEntry | null>(() => {
+    if (!selectedSlug) return null;
+    const foundInList =
+      listEntries.find((entry) => entry.slug === selectedSlug) ??
+      rawListEntries.find((entry) => entry.slug === selectedSlug);
+    if (foundInList) return foundInList;
+
+    const pt =
+      displayedPoints.find((p) => p.slug === selectedSlug) ??
+      points.find((p) => p.slug === selectedSlug) ??
+      initialPoints.find((p) => p.slug === selectedSlug);
+    if (pt) {
+      return {
+        slug: pt.slug,
+        name: pt.name,
+        domain: extractDomainFromUrl(pt.careersUrl, pt.slug),
+        careersUrl: pt.careersUrl,
+        city: pt.city,
+        primaryCategory: pt.primaryCategory,
+        hasSponsorshipEvidence: pt.hasSponsorshipEvidence,
+        isRegional: pt.isRegional,
+        activeJobsCount: pt.activeJobsCount,
+        topRoleFamilies: pt.topRoleFamilies,
+        workStyles: pt.workStyles,
+      };
+    }
+    return null;
+  }, [
+    selectedSlug,
+    listEntries,
+    rawListEntries,
+    displayedPoints,
+    points,
+    initialPoints,
+  ]);
+
+  // Ensure the selected company is ALWAYS present in the rendered list entries
+  const finalDisplayedEntries = useMemo(() => {
+    let entries = displayedEntries;
+    if (
+      selectedEntry &&
+      !entries.some((entry) => entry.slug === selectedEntry.slug)
+    ) {
+      entries = [selectedEntry, ...entries];
+    }
+    return entries;
+  }, [displayedEntries, selectedEntry]);
 
   const handleResetFilters = () => {
     setQuery("");
@@ -1026,15 +1265,21 @@ export function HomeMapShell({
   };
 
   const handleSelectHub = (hub: DisplayedHub) => {
-    if (activeHubCity === hub.city && activeDirectoryTab === "companies") {
+    if (activeHubCity === hub.city) {
       setActiveHubCity(null);
       setQuery("");
-      setActiveDirectoryTab("regions");
+      handleTabChange("regions");
       setCameraTarget({
         center: [133.7751, -25.2744],
         zoom: 4,
         timestamp: Date.now(),
       });
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("hub");
+        url.searchParams.set("tab", "regions");
+        window.history.replaceState(null, "", url.toString());
+      }
       return;
     }
     setActiveHubCity(hub.city);
@@ -1043,9 +1288,15 @@ export function HomeMapShell({
       zoom: hub.zoom,
       timestamp: Date.now(),
     });
-    setQuery(hub.city);
-    setActiveDirectoryTab("companies");
+    setQuery("");
+    handleTabChange("companies");
     setShowMapMobile(true);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("hub", hub.city);
+      url.searchParams.delete("tab");
+      window.history.replaceState(null, "", url.toString());
+    }
     trackEvent("regional_hub_selected", { city: hub.city });
 
     // Scroll smoothly to directory controls
@@ -1476,14 +1727,20 @@ export function HomeMapShell({
                   onClick={() => {
                     setActiveHubCity(null);
                     setQuery("");
-                    setActiveDirectoryTab("regions");
+                    handleTabChange("regions");
                     setCameraTarget({
                       center: [133.7751, -25.2744],
                       zoom: 4,
                       timestamp: Date.now(),
                     });
+                    if (typeof window !== "undefined") {
+                      const url = new URL(window.location.href);
+                      url.searchParams.delete("hub");
+                      url.searchParams.set("tab", "regions");
+                      window.history.replaceState(null, "", url.toString());
+                    }
                   }}
-                  className="inline-flex items-center gap-1 font-semibold text-terracotta-700 hover:text-terracotta-800 hover:underline shrink-0"
+                  className="inline-flex items-center gap-1 font-semibold text-terracotta-700 hover:text-terracotta-800 hover:underline shrink-0 cursor-pointer"
                 >
                   <ArrowLeft className="h-3.5 w-3.5" />
                   All regions
@@ -1505,8 +1762,8 @@ export function HomeMapShell({
             <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
               <button
                 type="button"
-                onClick={() => setActiveDirectoryTab("companies")}
-                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all ${
+                onClick={() => handleTabChange("companies")}
+                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
                   activeDirectoryTab === "companies"
                     ? "bg-navy-900 text-white shadow-xs"
                     : "text-slate-600 hover:text-navy-900 hover:bg-slate-100"
@@ -1525,8 +1782,8 @@ export function HomeMapShell({
               </button>
               <button
                 type="button"
-                onClick={() => setActiveDirectoryTab("sponsors")}
-                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all ${
+                onClick={() => handleTabChange("sponsors")}
+                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
                   activeDirectoryTab === "sponsors"
                     ? "bg-navy-900 text-white shadow-xs"
                     : "text-slate-600 hover:text-navy-900 hover:bg-slate-100"
@@ -1545,8 +1802,8 @@ export function HomeMapShell({
               </button>
               <button
                 type="button"
-                onClick={() => setActiveDirectoryTab("regions")}
-                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all ${
+                onClick={() => handleTabChange("regions")}
+                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
                   activeDirectoryTab === "regions"
                     ? "bg-navy-900 text-white shadow-xs"
                     : "text-slate-600 hover:text-navy-900 hover:bg-slate-100"
@@ -1566,8 +1823,8 @@ export function HomeMapShell({
             </div>
             <span className="whitespace-nowrap font-mono text-[11px] text-slate-500 font-medium shrink-0 hidden sm:inline">
               {activeDirectoryTab === "regions"
-                ? `${displayedHubs.length} hubs`
-                : `${displayedEntries.length} in view`}
+                ? `${displayedHubs.length} ${displayedHubs.length === 1 ? "hub" : "hubs"}`
+                : `${finalDisplayedEntries.length} in view`}
             </span>
           </div>
 
@@ -1610,84 +1867,109 @@ export function HomeMapShell({
                   </div>
                 </div>
 
-                {/* Regional Hub Cards */}
-                {displayedHubs.map((hub) => {
-                  const isActive = activeHubCity === hub.city;
-                  return (
-                    <div
-                      key={hub.city}
-                      onClick={() => handleSelectHub(hub)}
-                      className={`group relative flex flex-col gap-2 rounded-xl border p-3.5 text-left transition-all cursor-pointer ${
-                        isActive
-                          ? "border-navy-900 bg-slate-50 shadow-xs ring-1 ring-navy-900/10"
-                          : "border-surface-border bg-white hover:border-slate-300 hover:bg-slate-50/50"
-                      }`}
+                {/* Regional Hub Cards or Empty State */}
+                {displayedHubs.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50/70 p-6 text-center shadow-2xs">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200/80 text-slate-500 mb-2.5">
+                      <Compass className="h-5 w-5" />
+                    </div>
+                    <p className="font-heading text-sm font-bold text-navy-900">
+                      No regional hubs matching &ldquo;{query}&rdquo;
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1 max-w-xs leading-relaxed">
+                      Try searching by state (e.g. WA, NSW, QLD), city name, or technology sector.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setQuery("");
+                        setActiveHubCity(null);
+                      }}
+                      className="mt-3.5 inline-flex items-center gap-1.5 rounded-lg border border-slate-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-navy-900 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer"
                     >
-                      {/* Active Indicator Strip */}
-                      {isActive && (
-                        <span
-                          aria-hidden="true"
-                          className="absolute left-0 top-2.5 bottom-2.5 w-1 rounded-r-full bg-terracotta-700"
-                        />
-                      )}
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3 min-w-0">
+                      <RotateCcw className="h-3 w-3 text-slate-500" />
+                      <span>View all regional hubs</span>
+                    </button>
+                  </div>
+                ) : (
+                  displayedHubs.map((hub) => {
+                    const isActive = activeHubCity === hub.city;
+                    return (
+                      <div
+                        key={hub.city}
+                        onClick={() => handleSelectHub(hub)}
+                        className={`group relative flex flex-col gap-2 rounded-xl border p-3.5 text-left transition-all cursor-pointer ${
+                          isActive
+                            ? "border-navy-900 bg-slate-50 shadow-xs ring-1 ring-navy-900/10"
+                            : "border-surface-border bg-white hover:border-slate-300 hover:bg-slate-50/50"
+                        }`}
+                      >
+                        {/* Active Indicator Strip */}
+                        {isActive && (
                           <span
-                            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border ${
-                              isActive
-                                ? "bg-navy-900 text-white border-navy-900"
-                                : "bg-slate-50 text-navy-900 border-surface-border"
-                            }`}
-                          >
-                            <hub.icon className="h-4 w-4" />
-                          </span>
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-heading text-sm font-bold text-navy-900 truncate">
-                                {hub.city}
-                              </span>
-                              <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-slate-600 uppercase">
-                                {hub.state}
+                            aria-hidden="true"
+                            className="absolute left-0 top-2.5 bottom-2.5 w-1 rounded-r-full bg-terracotta-700"
+                          />
+                        )}
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <span
+                              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border ${
+                                isActive
+                                  ? "bg-navy-900 text-white border-navy-900"
+                                  : "bg-slate-50 text-navy-900 border-surface-border"
+                              }`}
+                            >
+                              <hub.icon className="h-4 w-4" />
+                            </span>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="font-heading text-sm font-bold text-navy-900 truncate">
+                                  {hub.city}
+                                </span>
+                                <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-slate-600 uppercase">
+                                  {hub.state}
+                                </span>
+                              </div>
+                              <span className="text-xs text-slate-500 line-clamp-1">
+                                {hub.tag}
                               </span>
                             </div>
-                            <span className="text-xs text-slate-500 line-clamp-1">
-                              {hub.tag}
+                          </div>
+                          <div className="flex items-center gap-1.5 shrink-0 font-mono text-xs">
+                            <span className="font-bold text-navy-900">
+                              {hub.count}
                             </span>
+                            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-0.5 group-hover:text-navy-900 transition-all" />
                           </div>
                         </div>
-                        <div className="flex items-center gap-1.5 shrink-0 font-mono text-xs">
-                          <span className="font-bold text-navy-900">
-                            {hub.count}
-                          </span>
-                          <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-0.5 group-hover:text-navy-900 transition-all" />
-                        </div>
-                      </div>
 
-                      {hub.sa4Code && (
-                        <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
-                          <span className="text-[11px] text-slate-400 font-mono">
-                            ABS SA4 {hub.sa4Code}
-                          </span>
-                          <Link
-                            href={`/regions/${hub.sa4Code}`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-1 font-semibold text-terracotta-700 hover:text-terracotta-800 hover:underline transition-colors"
-                          >
-                            <span>Labour &amp; Opportunity Report</span>
-                            <ArrowUpRight className="h-3 w-3" />
-                          </Link>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                        {hub.sa4Code && (
+                          <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                            <span className="text-[11px] text-slate-400 font-mono">
+                              ABS SA4 {hub.sa4Code}
+                            </span>
+                            <Link
+                              href={`/regions/${hub.sa4Code}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center gap-1 font-semibold text-terracotta-700 hover:text-terracotta-800 hover:underline transition-colors"
+                            >
+                              <span>Labour &amp; Opportunity Report</span>
+                              <ArrowUpRight className="h-3 w-3" />
+                            </Link>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
               </div>
             )}
 
             {/* If Companies or Sponsors Tab is Active */}
             {activeDirectoryTab !== "regions" && (
               <>
-                {displayedEntries.length === 0 ? (
+                {finalDisplayedEntries.length === 0 ? (
                   <div className="rounded-xl border border-surface-border bg-white p-6 text-center text-sm text-slate-500">
                     <p className="font-medium text-slate-700">
                       {activeDirectoryTab === "sponsors"
@@ -1715,7 +1997,7 @@ export function HomeMapShell({
                     )}
                   </div>
                 ) : (
-                  displayedEntries.map((entry) => {
+                  finalDisplayedEntries.map((entry) => {
                     const isSelected = entry.slug === selectedSlug;
                     const pt = points.find((p) => p.slug === entry.slug);
 
@@ -2075,7 +2357,9 @@ export function HomeMapShell({
                 : "text-slate-300 hover:text-white"
             }`}
           >
-            List ({listEntries.length})
+            {activeDirectoryTab === "regions"
+              ? `Hubs (${displayedHubs.length})`
+              : `List (${listEntries.length})`}
           </button>
           <button
             type="button"
