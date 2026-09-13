@@ -95,3 +95,30 @@ export async function updateSavedSearchAlertFrequency(
   );
   return (result.rowCount ?? 0) > 0;
 }
+
+export async function pauseAllSavedSearches(
+  pool: Pool,
+  userId: number,
+): Promise<number> {
+  const result = await pool.query(
+    `UPDATE saved_searches
+     SET alert_frequency = 'never'
+     WHERE user_id = $1 AND alert_frequency <> 'never'`,
+    [userId],
+  );
+  return result.rowCount ?? 0;
+}
+
+export async function resumeAllSavedSearches(
+  pool: Pool,
+  userId: number,
+  defaultFrequency: AlertFrequency = "weekly",
+): Promise<number> {
+  const result = await pool.query(
+    `UPDATE saved_searches
+     SET alert_frequency = $2
+     WHERE user_id = $1 AND alert_frequency = 'never'`,
+    [userId, defaultFrequency],
+  );
+  return result.rowCount ?? 0;
+}

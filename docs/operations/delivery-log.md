@@ -1,5 +1,36 @@
 # Autonomous delivery log
 
+## 2026-09-13 - Visual Account Dashboard (/account): Watchlists & Saved Searches Management
+
+- **Scope & Highlights**:
+  1. **Interactive Saved Searches Management Interface**:
+     - Upgraded `/account` to render rich, interactive saved search cards with explicit status badges (`Active · Weekly Digest`, `Active · Daily Digest`, `Active · Instant`, or `Paused · Muted`).
+     - Added 1-click **Pause & Resume** toggle buttons, dynamically switching `alertFrequency` between active cadence and `'never'` while caching the previous frequency in memory for single-click restoration.
+     - Implemented tactile 4-way segmented alert frequency switcher (`Paused`, `Daily`, `Weekly`, `Instant`) with instant optimistic updates and loading spinners via React `useTransition`.
+     - Added formatted filter chip badges for keyword queries, role families, sectors/categories, work styles, hub cities, SA4 codes, Subclass 482 sponsorship, and active hiring filters.
+     - Added direct "Run on Map" link restoring the user's filtered view on `/` with full query parameters.
+     - Added smooth optimistic search deletion with rollback on error.
+  2. **Comprehensive Watchlists Management (Employers & Regional Hubs)**:
+     - Built sub-tab segmented filter (`All Items`, `Employers`, `Regional Hubs`) with live count badges.
+     - Added rich company cards featuring monogram avatar, company display name, city, sector, Subclass 482 sponsorship badge, regional badge, watching-since date, and dossier links.
+     - Added regional hub cards featuring ABS SA4 code, Region name, Regional Opportunity Score badge, and regional report links.
+     - Added per-item **Notification Muting** (`toggleWatchlistMuteAction`), enabling users to silence email and in-app updates for specific employers or regional hubs without unwatching them.
+     - Implemented private career memo notes (`updateWatchlistNotesAction`), allowing users to record private notes (e.g. application dates, interview notes, recruiter contacts) directly on watched employers.
+  3. **KPI Overview Metrics Strip & Batch Controls**:
+     - Built 4 live stat cards: Saved Searches (with active vs. paused breakdown), Watched Employers, Watched Regional Hubs, and Unread In-App Alerts.
+     - Added delivery schedule callout explaining Resend email digest timing (Instant, Daily 08:00 AEST, Weekly Mondays).
+     - Added batch action controls: "Pause All Alerts" and "Resume All (Weekly)" buttons for fast global management.
+  4. **New Server Actions & Backend Queries**:
+     - Exported `pauseAllSavedSearchesAction`, `resumeAllSavedSearchesAction`, `updateWatchlistNotesAction`, and `toggleWatchlistMuteAction` in `retentionActions.ts`.
+     - Added batch database queries in `savedSearches.ts` and `watchlists.ts`.
+     - Added 12 comprehensive unit tests in `apps/web/src/app/actions/retentionActions.test.ts`.
+- **Verification Evidence**:
+  - Web unit tests: **194 passed** across 40 test files (0 failures).
+  - TypeScript check: `npm run typecheck --prefix apps/web` exited with **0 errors**.
+  - Production build: `npm run build --prefix apps/web` compiled all 38 routes in 4.6s.
+  - Auth gating: unauthenticated request to `/account` issues HTTP 307 temporary redirect to `/sign-in?callbackUrl=/account`.
+  - `git diff --check` passed with 0 whitespace errors or conflict markers.
+
 ## 2026-09-13 - Regional Hub Map Point Selection Bug Resolution & Regions Tab UX Elevation
 
 - **Scope & Highlights**:

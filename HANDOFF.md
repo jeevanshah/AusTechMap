@@ -6,19 +6,19 @@
 
 - **Current Implementer / Integrator:** Codex — operating per `AGENTS.md` orchestration / bulk autonomous delivery lane.
 - **Updated at:** 2026-09-13
-- **Reason:** Regional Hub Map Point Selection Bug Resolution & Regions Tab UX Elevation: Fixed bug where clicking single dots on map in regional hubs failed to select or render company cards; resolved `selectedEntry` across all map points and dynamically prepended selected companies to `finalDisplayedEntries`; eliminated 20-result search limit bottleneck when selecting regional hubs; added comprehensive metadata (coordinates, tags, SA4 codes) for all 25 active regional tech hubs; synchronized `?tab=regions` and `?hub=...` URL parameters; filtered Tier-1 metro capitals from regional hubs tab.
-- **Task / issue:** Map Interaction & Regional Directory: Fix map point selection in regional hubs and elevate the Regions tab experience.
-- **Acceptance criteria (this checkpoint):** Clicking any dot on the map guarantees the company card is selected and scrolled into view on the sidebar and in the map popup; full metadata and SA4 links for all 25 regional hubs; query-based hub filtering with empty state; URL sync for `?tab=regions`; 100% test pass rate (178/178 tests).
-- **Latest completed delivery:** Resolved map point selection bug in regional hubs (`selectedEntry` fallback across all points and dynamic inclusion in `finalDisplayedEntries`).
-- **Latest completed delivery:** Comprehensive regional hub metadata expansion across all 25 Australian regional tech hubs with official SA4 codes and dossier links.
-- **Latest completed delivery:** Uncapped regional hub browsing (cleared artificial keyword search bottleneck so all viewport employers are displayed).
-- **Latest completed delivery:** Bidirectional URL parameter synchronization (`?tab=regions`, `?hub=...`) via `window.history.replaceState`.
-- **Production state:** **1,007 canonical companies**, **155 active verified ATS sources**, **1,130 live Australian jobs**, **110 active hiring employers**, 2,718 evidence records, 25 database migrations applied, 178 web tests passing (39 suites), clean TypeScript check, 0 whitespace errors.
+- **Reason:** Visual Account Dashboard (/account): Watchlists & Saved Searches Management: Built interactive management interface inside `/account` for users to view, pause, adjust email alert frequencies (instant, daily digest, weekly, never), and delete saved searches and watched employers/regions; added 1-click pause & resume toggles, segmented pill frequency switcher, batch controls (Pause All / Resume All), per-item notification muting, career memo notes, top KPI overview metrics strip, and 12 unit tests.
+- **Task / issue:** Visual Account Dashboard (`/account`): Watchlists & Saved Searches Management.
+- **Acceptance criteria (this checkpoint):** Full interactive management for saved searches and watchlists; 1-click pause/resume; segmented frequency switcher; batch pause/resume; per-item notification mute; career notes; 100% test pass rate (194/194 tests).
+- **Latest completed delivery:** Overhauled `AccountView.tsx` with top KPI metrics banner, Resend digest schedule callout, and batch action controls.
+- **Latest completed delivery:** Interactive saved searches cards with 1-click pause/resume, segmented frequency switcher (`Paused`, `Daily`, `Weekly`, `Instant`), filter badges, and direct "Run on Map" link.
+- **Latest completed delivery:** Watchlists management with sub-tab filtering (`All`, `Employers`, `Regional Hubs`), notification muting, and private career memo notes.
+- **Latest completed delivery:** Added server actions `pauseAllSavedSearchesAction`, `resumeAllSavedSearchesAction`, `updateWatchlistNotesAction`, and `toggleWatchlistMuteAction` with 12 unit tests.
+- **Production state:** **1,007 canonical companies**, **155 active verified ATS sources**, **1,130 live Australian jobs**, **110 active hiring employers**, 2,718 evidence records, 25 database migrations applied, 194 web tests passing (40 suites), clean TypeScript check, 0 whitespace errors.
 
 ## Checkpoint
 
 - **Implementation branch:** `main`
-- **Current implementation checkpoint:** `54324c8` (committed under bulk autonomous delivery lane).
+- **Current implementation checkpoint:** In flight (ready to commit under bulk autonomous delivery lane).
 - **Working-tree status at checkpoint:** Clean.
 - **Remote:** Synchronizing with `origin/main`.
 

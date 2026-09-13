@@ -12,12 +12,15 @@ import { getPool } from "../../lib/db";
 import {
   createSavedSearch,
   deleteSavedSearch,
+  pauseAllSavedSearches,
+  resumeAllSavedSearches,
   updateSavedSearchAlertFrequency,
 } from "../../lib/queries/savedSearches";
 import {
   removeWatchlistEntry,
   toggleCompanyWatch,
   toggleRegionWatch,
+  updateWatchlistNotes,
 } from "../../lib/queries/watchlists";
 import { markAlertRead, markAllAlertsRead } from "../../lib/queries/userAlerts";
 
@@ -185,6 +188,105 @@ export async function markAllAlertsReadAction(): Promise<{
         error instanceof Error
           ? error.message
           : "Failed to mark alerts as read",
+    };
+  }
+}
+
+export async function pauseAllSavedSearchesAction(): Promise<{
+  success: boolean;
+  count?: number;
+  error?: string;
+}> {
+  try {
+    const actor = await requireUser();
+    const pool = getPool();
+    const count = await pauseAllSavedSearches(pool, actor.id);
+    revalidatePath("/account");
+    return { success: true, count };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to pause all saved searches",
+    };
+  }
+}
+
+export async function resumeAllSavedSearchesAction(
+  frequency: AlertFrequency = "weekly",
+): Promise<{
+  success: boolean;
+  count?: number;
+  error?: string;
+}> {
+  try {
+    const actor = await requireUser();
+    const pool = getPool();
+    const count = await resumeAllSavedSearches(pool, actor.id, frequency);
+    revalidatePath("/account");
+    return { success: true, count };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to resume saved searches",
+    };
+  }
+}
+
+export async function updateWatchlistNotesAction(
+  entryId: string,
+  rawNotes: string | null,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const actor = await requireUser();
+    const pool = getPool();
+    const ok = await updateWatchlistNotes(pool, actor.id, entryId, rawNotes);
+    revalidatePath("/account");
+    return { success: ok };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to update watchlist notes",
+    };
+  }
+}
+
+export async function toggleWatchlistMuteAction(
+  entryId: string,
+  currentNotes: string | null,
+  muted: boolean,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const actor = await requireUser();
+    const pool = getPool();
+    let meta: { muted?: boolean; memo?: string } = {};
+    if (currentNotes) {
+      try {
+        meta = JSON.parse(currentNotes);
+      } catch {
+        meta = { memo: currentNotes };
+      }
+    }
+    meta.muted = muted;
+    const serialized = JSON.stringify(meta);
+    const ok = await updateWatchlistNotes(pool, actor.id, entryId, serialized);
+    revalidatePath("/account");
+    return { success: ok };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to update watchlist alert preferences",
     };
   }
 }

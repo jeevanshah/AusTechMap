@@ -5,8 +5,15 @@ import {
   createSavedSearch,
   deleteSavedSearch,
   listSavedSearches,
+  pauseAllSavedSearches,
+  resumeAllSavedSearches,
+  updateSavedSearchAlertFrequency,
 } from "./savedSearches";
-import { toggleCompanyWatch, toggleRegionWatch } from "./watchlists";
+import {
+  toggleCompanyWatch,
+  toggleRegionWatch,
+  updateWatchlistNotes,
+} from "./watchlists";
 import { listUserAlerts, markAlertRead } from "./userAlerts";
 
 describe("savedSearches queries", () => {
@@ -70,9 +77,54 @@ describe("savedSearches queries", () => {
     );
     expect(ok).toBe(true);
   });
+
+  it("updateSavedSearchAlertFrequency updates alert_frequency", async () => {
+    const pool = {
+      query: vi.fn().mockResolvedValue({ rowCount: 1 }),
+    } as unknown as Pool;
+
+    const ok = await updateSavedSearchAlertFrequency(
+      pool,
+      42,
+      "search-id-1",
+      "instant",
+    );
+    expect(ok).toBe(true);
+  });
+
+  it("pauseAllSavedSearches pauses all active searches for user", async () => {
+    const pool = {
+      query: vi.fn().mockResolvedValue({ rowCount: 3 }),
+    } as unknown as Pool;
+
+    const count = await pauseAllSavedSearches(pool, 42);
+    expect(count).toBe(3);
+  });
+
+  it("resumeAllSavedSearches sets paused searches to specified cadence", async () => {
+    const pool = {
+      query: vi.fn().mockResolvedValue({ rowCount: 2 }),
+    } as unknown as Pool;
+
+    const count = await resumeAllSavedSearches(pool, 42, "daily");
+    expect(count).toBe(2);
+  });
 });
 
 describe("watchlists queries", () => {
+  it("updateWatchlistNotes updates notes metadata", async () => {
+    const pool = {
+      query: vi.fn().mockResolvedValue({ rowCount: 1 }),
+    } as unknown as Pool;
+
+    const ok = await updateWatchlistNotes(
+      pool,
+      42,
+      "entry-uuid-1",
+      JSON.stringify({ muted: true, memo: "Applied for backend role" }),
+    );
+    expect(ok).toBe(true);
+  });
   it("toggleCompanyWatch deletes when already watching, inserts when not", async () => {
     // 1. When existing
     const poolExisting = {

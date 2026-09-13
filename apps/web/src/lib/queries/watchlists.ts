@@ -202,3 +202,16 @@ export async function removeWatchlistEntry(
   );
   return (result.rowCount ?? 0) > 0;
 }
+
+export async function updateWatchlistNotes(
+  pool: Pool,
+  userId: number,
+  entryId: string,
+  notes: string | null,
+): Promise<boolean> {
+  const result = await pool.query(
+    "UPDATE watchlists SET notes = $1, updated_at = now() WHERE id = $2 AND user_id = $3",
+    [notes, entryId, userId],
+  );
+  return (result.rowCount ?? 0) > 0;
+}
