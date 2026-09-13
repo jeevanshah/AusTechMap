@@ -6,21 +6,20 @@
 
 - **Current Implementer / Integrator:** Codex — operating per `AGENTS.md` orchestration / bulk autonomous delivery lane.
 - **Updated at:** 2026-09-13
-- **Reason:** Systematic Geographic Integrity Remediation: Audited all 152 ATS feeds for international collision; quarantined 14 false-match non-Australian feeds (e.g. US Hireup, Athena NY, Swoop Minneapolis, Raiz EU) and purged 145 foreign jobs; sanitized 12 qualified company names/slugs and relocated Kinetic IT to Perth national HQ; built deterministic `is_australian_location` gate on ATS crawl pipeline; built automated location drift detection engine and CLI.
-- **Task / issue:** Production data integrity: Eliminate non-Australian job contamination and detect headquarters drift.
-- **Acceptance criteria (this checkpoint):** 100% of persisted jobs represent legitimate Australian employment; zero non-Australian job contamination; deterministic geographic gate on crawler; automated drift detection; test suites passing 100%.
-- **Latest completed delivery:** Quarantined 14 international collision ATS feeds in `company_ats_sources` and `data_sources` (`status = 'disabled'`, `status_reason = 'international_name_collision'`) with immutable audit records.
-- **Latest completed delivery:** Purged 145 foreign jobs and re-derivable signals from database, keeping **3,310 verified live Australian canonical jobs** across **117 active hiring employers**.
-- **Latest completed delivery:** Sanitized 12 qualified outpost company names (e.g. `Kinetic IT (Darwin Hub)` -> `Kinetic IT`, `Dremio (Australia Hub)` -> `Dremio`, `Youi Insurance (Tech Campus)` -> `Youi Insurance`), and relocated Kinetic IT to Perth national HQ (`54 Terrace Road, East Perth WA 6004`).
-- **Latest completed delivery:** Added `is_australian_location` gate to `normalisation.py` and `pipeline.py` to ensure only Australian positions are persisted during ATS crawls.
-- **Latest completed delivery:** Built `location_drift.py` and `detect-location-drift` CLI command in `__main__.py` to automatically detect and flag headquarters vs. live hiring drift.
-- **Latest completed delivery:** Synchronized fixtures: pruned `ats_source_seed_20260905.csv` to **138 verified Australian sources**; updated `alpha_seed_cohort_20260905.csv` and `alpha_seed_cohort_addresses_20260905.csv`.
-- **Production state:** **1,007 canonical companies** (1,007 unique domains, 1,007 unique slugs), **965 mapped employers (95.83%)**, 970 company locations, **138 active ATS sources (100.0% verified Australian)**, **3,310 live Australian jobs**, **117 active hiring employers**, 2,718 evidence records, 25 database migrations applied, 508 automated tests passing monorepo-wide.
+- **Reason:** Comprehensive UI/UX Elevation: Resolved base collection URL 404s (`/companies/` -> `/#directory-content`, `/regions/` -> `/?tab=regions#directory-content`); redesigned Company Profile Dossier (`/companies/[slug]`) to 12-column layout with interactive `CompanyRolesList` real-time search and discipline chips; elevated National Live Jobs Registry (`/jobs`) with discipline filter pills and live results summary bar; built unified `GlobalNavbar` with mobile sub-navigation pill strip across all pages; built `CompanyBrandMark` proxy with deterministic fallbacks; elevated brand 404 page; WCAG `:focus-visible` accessibility and selection styling.
+- **Task / issue:** UI/UX Elevation & Route Resolution: Eliminate base collection 404s, elevate secondary pages, mobile navigation, and interactive in-dossier role discovery.
+- **Acceptance criteria (this checkpoint):** Zero 404s on `/companies/` and `/regions/`; full-width 2-column company dossier with real-time role search and DHA 482 evidence; live jobs registry with discipline chips and summary counts; site-wide mobile sub-navigation pill strip; 100% test pass rate (178/178 tests).
+- **Latest completed delivery:** Base collection URL 404 resolution via clean permanent redirects (`/companies/` -> `/#directory-content`, `/regions/` -> `/?tab=regions#directory-content`).
+- **Latest completed delivery:** Built `GlobalNavbar` with mobile sub-nav pill strip, `CompanyBrandMark` shared logo proxy, and unified them across all public pages (Home, Jobs, Company, Regions, Opportunity Match, Methodology, 404).
+- **Latest completed delivery:** Redesigned Company Profile Dossier (`/companies/[slug]`) into full-width 12-column layout featuring `CompanyRolesList` (client-side real-time keyword search, role discipline filter chips, direct apply buttons, and graceful empty states).
+- **Latest completed delivery:** Elevated National Live Jobs Registry (`/jobs`) with quick discipline filter chips (`All roles`, `Engineering`, `Data & AI`, etc.), live count summary bar, and rich job cards.
+- **Latest completed delivery:** Added WCAG high-contrast `:focus-visible` outline rings, terracotta selection styling, and on-brand 404 page (`/not-found.tsx`).
+- **Production state:** **1,007 canonical companies**, **155 active verified ATS sources**, **1,130 live Australian jobs**, **110 active hiring employers**, 2,718 evidence records, 25 database migrations applied, 178 web tests passing (39 suites), clean TypeScript check, 0 whitespace errors.
 
 ## Checkpoint
 
 - **Implementation branch:** `main`
-- **Current implementation checkpoint:** Committed under bulk autonomous delivery lane.
+- **Current implementation checkpoint:** `06b79e1` (committed under bulk autonomous delivery lane).
 - **Working-tree status at checkpoint:** Clean.
 - **Remote:** `origin/main` synchronized after push.
 

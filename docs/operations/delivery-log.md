@@ -1,5 +1,34 @@
 # Autonomous delivery log
 
+## 2026-09-13 - Comprehensive UI/UX Elevation: Secondary Pages Redesign, In-Dossier Role Discovery & Site-Wide Mobile Navigation
+
+- **Scope & Highlights**:
+  1. **Base Collection URL 404 Resolution & Clean Permanent Redirects**:
+     - Created `apps/web/src/app/companies/page.tsx` issuing `permanentRedirect("/#directory-content")`. Resolves user 404 when navigating to `/companies/` or `/companies`.
+     - Created `apps/web/src/app/regions/page.tsx` issuing `permanentRedirect("/?tab=regions#directory-content")`.
+  2. **Unified Site-Wide Navigation & Brand Identity (`GlobalNavbar` & `CompanyBrandMark`)**:
+     - Built `GlobalNavbar.tsx`: Standardized brand logo (`/brand/logo.jpg`), contextual subtitles, desktop navigation links (`Map Explorer`, `Live jobs`, `Opportunity Match`, `Methodology`), live session authentication indicator, and a horizontally scrollable mobile sub-navigation pill strip (`Map`, `Live jobs`, `Opportunity Match`, `Methodology`) ensuring smartphone users never face hidden menus.
+     - Replaced custom desktop header in `apps/web/src/app/page.tsx` with `<GlobalNavbar />`, leveraging `extraRightAction` for the `+ Add company` CTA and achieving 100% visual and structural harmony across all pages.
+     - Built `CompanyBrandMark.tsx`: 128px Google Favicon proxy with deterministic fallback initials across four sizes (`sm`, `md`, `lg`, `xl`). Integrated into company profiles, live jobs, regional employer feeds, opportunity matches, and promoted employer placements.
+  3. **Company Profile Dossier Redesign (`/companies/[slug]`)**:
+     - Upgraded from narrow 768px layout to full-width 12-column national registry dossier.
+     - Integrated `CompanyRolesList.tsx`: client-side real-time keyword search, role discipline filter chips (`Engineering`, `Product`, etc.), direct apply actions, and graceful empty states.
+     - Main column: Active open roles, recruitment momentum signals, top required skills with evidence counts, Subclass 482 visa sponsorship evidence dossier, and registry indexing notes.
+     - Sidebar column: Factsheet, interactive premises map (`MapCanvas`), and claim profile modal.
+  4. **National Live Jobs Registry Elevation (`/jobs`)**:
+     - Added quick role-family filter chips (`All roles`, `Engineering`, `Data & AI`, etc.) for 1-click filtering.
+     - Added dynamic live results count and filter summary bar with quick reset CTA.
+     - Elevated job cards with `CompanyBrandMark`, seniority badge, work style badge, posted date, and direct application links.
+  5. **WCAG Accessibility & Design Refinement**:
+     - Added custom Australian Terracotta selection styling (`::selection`) in `globals.css`.
+     - Enforced high-contrast `:focus-visible` outline rings across all interactive elements.
+     - Elevated custom 404 page (`/not-found.tsx`) with brand mark, status pill, and navigation shortcuts.
+- **Verification Evidence**:
+  - Web unit test suite: **178/178 tests passed** across all 39 test files.
+  - TypeScript compiler: `npx tsc --noEmit -p apps/web/tsconfig.json` exited with **0 errors**.
+  - `git diff --check` passed cleanly with 0 whitespace errors or conflict markers.
+  - HTTP Endpoints: `/` (200), `/companies/` (308 redirect), `/companies/atlassian` (200), `/jobs` (200), `/opportunities` (200), `/regions/101` (200), `/methodology` (200), `/random-404` (404).
+
 ## 2026-09-13 - Phase 5 Scaleup (154 Active Verified ATS Sources), Phase 7 Retention Alert Dispatcher & Phase 8 Hardening
 
 - **Scope & Highlights**:
