@@ -6,22 +6,21 @@
 
 - **Current Implementer / Integrator:** Codex — operating per `AGENTS.md` orchestration / bulk autonomous delivery lane.
 - **Updated at:** 2026-09-13
-- **Reason:** Comprehensive UI/UX Elevation: Resolved base collection URL 404s (`/companies/` -> `/#directory-content`, `/regions/` -> `/?tab=regions#directory-content`); redesigned Company Profile Dossier (`/companies/[slug]`) to 12-column layout with interactive `CompanyRolesList` real-time search and discipline chips; elevated National Live Jobs Registry (`/jobs`) with discipline filter pills and live results summary bar; built unified `GlobalNavbar` with mobile sub-navigation pill strip across all pages; built `CompanyBrandMark` proxy with deterministic fallbacks; elevated brand 404 page; WCAG `:focus-visible` accessibility and selection styling.
-- **Task / issue:** UI/UX Elevation & Route Resolution: Eliminate base collection 404s, elevate secondary pages, mobile navigation, and interactive in-dossier role discovery.
-- **Acceptance criteria (this checkpoint):** Zero 404s on `/companies/` and `/regions/`; full-width 2-column company dossier with real-time role search and DHA 482 evidence; live jobs registry with discipline chips and summary counts; site-wide mobile sub-navigation pill strip; 100% test pass rate (178/178 tests).
-- **Latest completed delivery:** Base collection URL 404 resolution via clean permanent redirects (`/companies/` -> `/#directory-content`, `/regions/` -> `/?tab=regions#directory-content`).
-- **Latest completed delivery:** Built `GlobalNavbar` with mobile sub-nav pill strip, `CompanyBrandMark` shared logo proxy, and unified them across all public pages (Home, Jobs, Company, Regions, Opportunity Match, Methodology, 404).
-- **Latest completed delivery:** Redesigned Company Profile Dossier (`/companies/[slug]`) into full-width 12-column layout featuring `CompanyRolesList` (client-side real-time keyword search, role discipline filter chips, direct apply buttons, and graceful empty states).
-- **Latest completed delivery:** Elevated National Live Jobs Registry (`/jobs`) with quick discipline filter chips (`All roles`, `Engineering`, `Data & AI`, etc.), live count summary bar, and rich job cards.
-- **Latest completed delivery:** Added WCAG high-contrast `:focus-visible` outline rings, terracotta selection styling, and on-brand 404 page (`/not-found.tsx`).
+- **Reason:** Regional Hub Map Point Selection Bug Resolution & Regions Tab UX Elevation: Fixed bug where clicking single dots on map in regional hubs failed to select or render company cards; resolved `selectedEntry` across all map points and dynamically prepended selected companies to `finalDisplayedEntries`; eliminated 20-result search limit bottleneck when selecting regional hubs; added comprehensive metadata (coordinates, tags, SA4 codes) for all 25 active regional tech hubs; synchronized `?tab=regions` and `?hub=...` URL parameters; filtered Tier-1 metro capitals from regional hubs tab.
+- **Task / issue:** Map Interaction & Regional Directory: Fix map point selection in regional hubs and elevate the Regions tab experience.
+- **Acceptance criteria (this checkpoint):** Clicking any dot on the map guarantees the company card is selected and scrolled into view on the sidebar and in the map popup; full metadata and SA4 links for all 25 regional hubs; query-based hub filtering with empty state; URL sync for `?tab=regions`; 100% test pass rate (178/178 tests).
+- **Latest completed delivery:** Resolved map point selection bug in regional hubs (`selectedEntry` fallback across all points and dynamic inclusion in `finalDisplayedEntries`).
+- **Latest completed delivery:** Comprehensive regional hub metadata expansion across all 25 Australian regional tech hubs with official SA4 codes and dossier links.
+- **Latest completed delivery:** Uncapped regional hub browsing (cleared artificial keyword search bottleneck so all viewport employers are displayed).
+- **Latest completed delivery:** Bidirectional URL parameter synchronization (`?tab=regions`, `?hub=...`) via `window.history.replaceState`.
 - **Production state:** **1,007 canonical companies**, **155 active verified ATS sources**, **1,130 live Australian jobs**, **110 active hiring employers**, 2,718 evidence records, 25 database migrations applied, 178 web tests passing (39 suites), clean TypeScript check, 0 whitespace errors.
 
 ## Checkpoint
 
 - **Implementation branch:** `main`
-- **Current implementation checkpoint:** `06b79e1` (committed under bulk autonomous delivery lane).
+- **Current implementation checkpoint:** `54324c8` (committed under bulk autonomous delivery lane).
 - **Working-tree status at checkpoint:** Clean.
-- **Remote:** `origin/main` synchronized after push.
+- **Remote:** Synchronizing with `origin/main`.
 
 ## Geographic evidence and cleanup — 10 September 2026
 

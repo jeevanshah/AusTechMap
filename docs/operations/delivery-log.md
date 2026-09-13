@@ -1,5 +1,30 @@
 # Autonomous delivery log
 
+## 2026-09-13 - Regional Hub Map Point Selection Bug Resolution & Regions Tab UX Elevation
+
+- **Scope & Highlights**:
+  1. **Map Point Selection Bug in Regional Hubs & Viewports**:
+     - Investigated and resolved issue where clicking single dots on the map in a regional hub (e.g. Perth Hub) failed to select or show the company card in the directory feed.
+     - Root cause: `handleSelectHub` previously set `query = hub.city`, forcing the directory feed into keyword search mode capped at 20 text-search hits and omitting companies with branch locations in Perth or names not matching the literal text "Perth". Clicking any unindexed dot resulted in `selectedEntry` resolving to `null`.
+     - Fixed `selectedEntry` resolution to systematically fall back across `listEntries`, `rawListEntries`, `displayedPoints`, and `points` (never `null` when clicking a map point).
+     - Built `finalDisplayedEntries`: dynamically prepends the selected company to the top of the directory feed if it wasn't already in view, rendering with `id="company-card-${slug}"`, active terracotta indicator bar, and `Selected` badge, and ensuring smooth scroll into view.
+     - In `handleSelectHub`, cleared `query` (`setQuery("")`) so the feed displays all employers in that hub's map viewport directly from `points` without the 20-result full-text search limitation.
+     - In `handlePointClick`, invoked `handleTabChange("companies")` with dual-frame scroll retry timers (`50ms` and `200ms`), ensuring clicking any dot while on the Regions or Sponsors tab immediately switches to the Companies directory and scrolls to that company's card.
+  2. **Comprehensive Regional Hub Metadata (All 25 Australian Hubs)**:
+     - Expanded `HUB_METADATA` from 14 to all 25 active regional tech hubs returned by `/api/regions` (adding accurate coordinates, zoom levels, specialized innovation corridor tags, and official ABS SA4 codes for Launceston, Toowoomba, Orange, Ballarat, Cairns, Townsville, Mackay, Alice Springs, Morwell, Moe, Byron Bay, Emerald, Griffith, Central Coast, Coffs Harbour, Bunbury, Shepparton, Warrnambool).
+     - Fixed fallback state lookup so non-metadata cities resolve to `CITY_STATE_MAP[hub.city]` rather than generic `"AU"`.
+     - Filtered out Tier-1 metropolitan capitals (`Sydney`, `Melbourne`, `Brisbane`) from `displayedHubs` so the tab displays authentic designated regional innovation corridors.
+  3. **Regions Tab Search & URL Synchronization**:
+     - Initialized `activeDirectoryTab` from URL search parameters (`?tab=regions`).
+     - Added query-based filtering within the Regions tab (filtering by city, state, specialized tag, or SA4 code) with a Hallmark empty state and reset button.
+     - Added bidirectional URL state synchronization (`window.history.replaceState`) for tab switches and hub selections.
+     - Fixed mobile toggle button count to display `Hubs ({count})` when viewing the Regions tab.
+- **Verification Evidence**:
+  - TypeScript compiler: `npx tsc --noEmit -p apps/web/tsconfig.json` exited with **0 errors**.
+  - Vitest suite: **178/178 tests passed** across all 39 test files.
+  - `git diff --check` passed cleanly with 0 whitespace errors or conflict markers.
+  - HTTP Endpoints: `/?tab=regions` (200), `/?hub=Perth` (200).
+
 ## 2026-09-13 - Comprehensive UI/UX Elevation: Secondary Pages Redesign, In-Dossier Role Discovery & Site-Wide Mobile Navigation
 
 - **Scope & Highlights**:
