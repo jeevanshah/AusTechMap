@@ -5,6 +5,7 @@ import type { MapCompanyPoint, RegionalHub } from "@austechmap/contracts";
 
 import { auth } from "../auth";
 import { AnimatedCounter } from "../components/ui/AnimatedCounter";
+import { GlobalNavbar } from "../components/ui/GlobalNavbar";
 import { HomeMapShell } from "./_components/HomeMapShell";
 import { DatabaseNotConfiguredError, getPool } from "../lib/db";
 import { fetchMapCompanies } from "../lib/queries/mapCompanies";
@@ -132,100 +133,22 @@ export default async function Home() {
       </a>
 
       {/* Global Brand Header with Terracotta CTA */}
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-surface-border pb-4">
-        <div className="flex items-center gap-3">
-          <div className="relative h-10 w-10 overflow-hidden rounded-xl border border-surface-border shadow-2xs bg-white">
-            <Image
-              src="/brand/logo.jpg"
-              alt="Australia Tech Map Logo"
-              width={40}
-              height={40}
-              className="h-full w-full object-cover"
-              priority
-            />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-heading text-base font-bold tracking-tight text-navy-900 leading-none">
-              Australia Tech Map
-            </span>
-            <span className="text-xs text-slate-500 font-medium mt-1">
-              People. Companies. Opportunities.
-            </span>
-          </div>
-        </div>
-
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-          <span className="text-navy-900 font-semibold cursor-default border-b-2 border-terracotta-700 pb-0.5">
-            Map
-          </span>
-          <Link
-            href="/jobs"
-            className="text-slate-700 hover:text-navy-900 transition-colors font-medium"
-          >
-            Live jobs
-          </Link>
-          <Link
-            href="/opportunities"
-            className="text-slate-700 hover:text-navy-900 transition-colors font-medium flex items-center gap-1"
-          >
-            <span>Opportunity Match</span>
-            <span className="rounded-full bg-terracotta-50 border border-terracotta-200 px-1.5 py-0.2 text-[10px] font-bold text-terracotta-800">
-              New
-            </span>
-          </Link>
+      {/* 1. Global Navigation Bar */}
+      <GlobalNavbar
+        currentPage="map"
+        userEmail={user?.email}
+        subtitle="People. Companies. Opportunities."
+        extraRightAction={
           <a
-            href="#directory-content"
-            className="hover:text-navy-900 transition-colors"
-          >
-            Companies
-          </a>
-          <a
-            href="#directory-content"
-            className="hover:text-navy-900 transition-colors"
-          >
-            Regions
-          </a>
-          <Link
-            href="/methodology"
-            className="hover:text-navy-900 transition-colors"
-          >
-            Methodology
-          </Link>
-        </nav>
-
-        <div className="flex items-center gap-2.5">
-          <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-surface-border bg-white px-3 py-1 font-mono text-[11px] font-semibold text-slate-800 shadow-2xs">
-            <span className="h-2 w-2 rounded-full bg-emerald-600" />
-            Verified Registry
-          </span>
-          {user ? (
-            <Link
-              href="/account"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-surface-border bg-white px-3 py-1.5 text-xs font-semibold text-navy-900 shadow-2xs hover:bg-slate-50 hover:border-slate-300 transition-all"
-            >
-              <User className="h-3.5 w-3.5 text-slate-500" />
-              <span className="max-w-[100px] truncate sm:max-w-[160px]">
-                {user.email}
-              </span>
-            </Link>
-          ) : (
-            <Link
-              href="/sign-in"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-surface-border bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:border-slate-300 hover:text-navy-900 transition-all"
-            >
-              <span>Sign in</span>
-            </Link>
-          )}
-          <a
-            href="https://github.com/jeevanshah/AusTechMap"
+            href="https://github.com/jeeva/AusTechMap"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-terracotta-700 hover:bg-terracotta-800 active:scale-95 text-white px-3.5 py-1.5 text-xs font-semibold shadow-xs transition-all"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-terracotta-700 hover:bg-terracotta-800 active:scale-95 text-white px-3 py-1.5 text-xs font-semibold shadow-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 shrink-0"
           >
-            + Add your company
+            <span>+ Add company</span>
           </a>
-        </div>
-      </header>
+        }
+      />
 
       {/* Compact Studio Masthead: Headline Left, 4 Stat Cards Right */}
       <section className="relative overflow-hidden rounded-2xl border border-surface-border bg-white p-6 sm:p-7 shadow-2xs">

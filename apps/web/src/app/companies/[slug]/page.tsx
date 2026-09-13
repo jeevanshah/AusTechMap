@@ -27,6 +27,7 @@ import { WatchCompanyButton } from "./WatchCompanyButton";
 import { ClaimProfileModal } from "./ClaimProfileModal";
 import { CompanyBrandMark } from "../../../components/ui/CompanyBrandMark";
 import { GlobalNavbar } from "../../../components/ui/GlobalNavbar";
+import { CompanyRolesList } from "./CompanyRolesList";
 import { getCategoryIconPath } from "../../../lib/category-icons";
 import { MapCanvas, type Bbox } from "../../../components/map/MapCanvas";
 import { trackEvent } from "../../../lib/analytics";
@@ -585,85 +586,11 @@ export default async function CompanyProfilePage({
               )}
             </div>
 
-            {company.open_jobs.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/70 p-6 text-center">
-                <p className="text-sm font-medium text-slate-700">
-                  No active job postings currently indexed for this employer.
-                </p>
-                {company.careers_url && (
-                  <p className="text-xs text-slate-500 mt-1">
-                    Check their{" "}
-                    <a
-                      href={company.careers_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-semibold text-terracotta-700 hover:underline"
-                    >
-                      official careers portal
-                    </a>{" "}
-                    for unlisted or directly advertised opportunities.
-                  </p>
-                )}
-              </div>
-            ) : (
-              <ul className="flex flex-col gap-3">
-                {company.open_jobs.map((job, index) => (
-                  <li
-                    key={`${job.title}-${job.postedAt ?? index}-${index}`}
-                    className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all"
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div className="min-w-0 space-y-1.5 flex-1">
-                        {job.sourceUrl ? (
-                          <a
-                            href={job.sourceUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 font-heading text-base font-bold text-navy-900 hover:text-terracotta-700 transition-colors group"
-                          >
-                            <span className="group-hover:underline">
-                              {job.title}
-                            </span>
-                            <ExternalLink className="h-3.5 w-3.5 text-slate-400 group-hover:text-terracotta-700 transition-colors" />
-                          </a>
-                        ) : (
-                          <h3 className="font-heading text-base font-bold text-navy-900">
-                            {job.title}
-                          </h3>
-                        )}
-
-                        <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                          {job.roleFamily && (
-                            <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-semibold text-slate-700">
-                              {job.roleFamily}
-                            </span>
-                          )}
-                          {SENIORITY_LABELS[job.seniority] && (
-                            <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-medium text-slate-600">
-                              {SENIORITY_LABELS[job.seniority]}
-                            </span>
-                          )}
-                          {REMOTE_TYPE_LABELS[job.remoteType] && (
-                            <span className="rounded bg-sky-50 text-sky-700 border border-sky-200/70 px-2 py-0.5 font-mono text-[10px] font-semibold">
-                              {REMOTE_TYPE_LABELS[job.remoteType]}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {job.postedAt && (
-                        <span
-                          suppressHydrationWarning
-                          className="font-mono text-[11px] text-slate-400 shrink-0"
-                        >
-                          {new Date(job.postedAt).toLocaleDateString("en-AU")}
-                        </span>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <CompanyRolesList
+              jobs={company.open_jobs}
+              companyName={company.display_name}
+              careersUrl={company.careers_url}
+            />
           </section>
 
           {/* Hiring Demand & Skills Landscape */}

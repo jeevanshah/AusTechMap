@@ -259,6 +259,38 @@ export default async function JobsPage({
               )}
             </div>
           </form>
+
+          {/* Quick Role Family Chips */}
+          {data && data.roleFamilies.length > 0 && (
+            <div className="mt-3 flex flex-wrap items-center gap-1.5 pt-3 border-t border-slate-200/80">
+              <span className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">
+                Discipline:
+              </span>
+              <Link
+                href="/jobs"
+                className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+                  !filters.roleFamily
+                    ? "bg-navy-900 text-white shadow-2xs font-bold"
+                    : "bg-white border border-slate-200/90 text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                All roles
+              </Link>
+              {data.roleFamilies.slice(0, 8).map((rf) => (
+                <Link
+                  key={rf.key}
+                  href={`/jobs?role_family=${encodeURIComponent(rf.key)}${filters.query ? `&q=${encodeURIComponent(filters.query)}` : ""}${filters.workStyle ? `&work_style=${encodeURIComponent(filters.workStyle)}` : ""}`}
+                  className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+                    filters.roleFamily === rf.key
+                      ? "bg-navy-900 text-white shadow-2xs font-bold"
+                      : "bg-white border border-slate-200/90 text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  {rf.label}
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -272,6 +304,31 @@ export default async function JobsPage({
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
           Showing the first 100 of {data.total} matching roles. Refine your
           filters to view specific sectors or locations.
+        </div>
+      )}
+
+      {/* Results Count & Filter Summary */}
+      {data && (
+        <div className="flex items-center justify-between text-xs text-slate-600 font-medium px-1">
+          <div className="flex items-center gap-2">
+            <span>
+              Showing <strong className="text-navy-900 font-bold">{data.jobs.length}</strong> of{" "}
+              <strong className="text-navy-900 font-bold">{data.total}</strong> active verified roles
+            </span>
+            {activeFilters && (
+              <span className="rounded-full bg-terracotta-50 border border-terracotta-200 px-2 py-0.5 text-[10px] font-bold text-terracotta-800">
+                Filtered view
+              </span>
+            )}
+          </div>
+          {activeFilters && (
+            <Link
+              href="/jobs"
+              className="text-terracotta-700 hover:text-terracotta-800 hover:underline font-semibold"
+            >
+              Reset all filters
+            </Link>
+          )}
         </div>
       )}
 
