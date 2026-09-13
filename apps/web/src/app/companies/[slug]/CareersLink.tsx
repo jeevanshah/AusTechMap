@@ -6,9 +6,13 @@ import { trackEvent } from "../../../lib/analytics";
 export function CareersLink({
   slug,
   careersUrl,
+  className,
+  label = "Careers Portal",
 }: {
   slug: string;
   careersUrl: string;
+  className?: string;
+  label?: string;
 }) {
   return (
     <a
@@ -16,10 +20,13 @@ export function CareersLink({
       target="_blank"
       rel="noopener noreferrer"
       onClick={() => trackEvent("careers_link_clicked", { slug })}
-      className="inline-flex items-center gap-1.5 rounded-md bg-navy-900 px-4 py-2 text-xs font-medium text-white transition-colors duration-150 motion-reduce:transition-none hover:bg-navy-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ochre-600 focus-visible:ring-offset-2"
+      className={
+        className ??
+        "inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-terracotta-700 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-terracotta-800 active:scale-95 transition-all"
+      }
     >
-      <span>Careers page</span>
-      <ExternalLink className="h-3.5 w-3.5 text-slate-300" />
+      <span>{label}</span>
+      <ExternalLink className="h-3.5 w-3.5" />
     </a>
   );
 }

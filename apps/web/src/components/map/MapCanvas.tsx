@@ -6,6 +6,7 @@ import {
   config,
   type GeoJSONSource,
   type MapLayerMouseEvent,
+  type PaddingOptions,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef } from "react";
@@ -42,6 +43,8 @@ export interface Bbox {
 export interface CameraTarget {
   center: [number, number]; // [lng, lat]
   zoom?: number;
+  offset?: [number, number];
+  padding?: PaddingOptions;
   timestamp?: number;
 }
 
@@ -49,12 +52,16 @@ export interface MapCanvasProps {
   points: MapCompanyPoint[];
   initialBbox: Bbox;
   cameraTarget?: CameraTarget | null;
+  selectedSlug?: string | null;
   interactive?: boolean;
   onMoveEnd?: (bbox: Bbox, zoom: number) => void;
   onPointClick?: (slug: string) => void;
 }
 
-function pointsToGeoJson(points: MapCompanyPoint[]): FeatureCollection {
+function pointsToGeoJson(
+  points: MapCompanyPoint[],
+  selectedSlug?: string | null,
+): FeatureCollection {
   return {
     type: "FeatureCollection",
     features: points.map((point) => ({
@@ -66,6 +73,7 @@ function pointsToGeoJson(points: MapCompanyPoint[]): FeatureCollection {
         isRegional: point.isRegional ? 1 : 0,
         activeJobsCount: point.activeJobsCount ?? 0,
         isHiring: (point.activeJobsCount ?? 0) > 0 ? 1 : 0,
+        isSelected: selectedSlug && point.slug === selectedSlug ? 1 : 0,
       },
       geometry: { type: "Point", coordinates: [point.lng, point.lat] },
     })),
@@ -78,6 +86,7 @@ export function MapCanvas({
   points,
   initialBbox,
   cameraTarget,
+  selectedSlug,
   interactive = true,
   onMoveEnd,
   onPointClick,
@@ -196,6 +205,25 @@ export function MapCanvas({
         },
       });
       map.addLayer({
+        id: "unclustered-point-selected-ring",
+        type: "circle",
+        source: SOURCE_ID,
+        filter: [
+          "all",
+          ["!", ["has", "point_count"]],
+          ["==", ["get", "isSelected"], 1],
+        ],
+        paint: {
+          "circle-color": "#c2410c",
+          "circle-radius": 15,
+          "circle-opacity": 0.25,
+          "circle-stroke-width": 2.5,
+          "circle-stroke-color": "#c2410c",
+          "circle-stroke-opacity": 0.9,
+        },
+      });
+
+      map.addLayer({
         id: "unclustered-point",
         type: "circle",
         source: SOURCE_ID,
@@ -274,13 +302,19 @@ export function MapCanvas({
         const slug = feature?.properties?.slug as string | undefined;
         if (slug) onPointClickRef.current?.(slug);
         if (feature?.geometry.type === "Point") {
-          map.easeTo({
+          const isDesktop =
+            typeof window !== "undefined" && window.innerWidth >= 640;
+          const easeOptions: Parameters<typeof map.easeTo>[0] = {
             center: (feature.geometry as GeoJSON.Point).coordinates as [
               number,
               number,
             ],
-            duration: 300,
-          });
+            duration: 350,
+          };
+          if (isDesktop) {
+            easeOptions.padding = { left: 320, top: 0, right: 0, bottom: 0 };
+          }
+          map.easeTo(easeOptions);
         }
       };
 
@@ -299,20 +333,40 @@ export function MapCanvas({
       }
     });
 
-    if (onMoveEndRef.current) {
-      map.on("moveend", () => {
-        const bounds = map.getBounds();
-        onMoveEndRef.current?.(
-          {
-            west: bounds.getWest(),
-            south: bounds.getSouth(),
-            east: bounds.getEast(),
-            north: bounds.getNorth(),
-          },
-          map.getZoom(),
-        );
-      });
-    }
+    map.on("moveend", () => {
+      const bounds = map.getBounds();
+      const zoom = map.getZoom();
+      let west = bounds.getWest();
+      let east = bounds.getEast();
+      let south = bounds.getSouth();
+      let north = bounds.getNorth();
+
+      // When zoomed out to continental / national scale (zoom <= 5) or spanning the globe,
+      // use canonical Australia bounds so all nationwide companies are loaded without clipping
+      if (zoom <= 5 || east - west >= 300) {
+        west = 96;
+        east = 168;
+        south = -45;
+        north = -9;
+      } else {
+        west = Math.max(-180, Math.min(180, west));
+        east = Math.max(-180, Math.min(180, east));
+        south = Math.max(-89.9, Math.min(89.9, south));
+        north = Math.max(-89.9, Math.min(89.9, north));
+        if (west >= east) {
+          west = -180;
+          east = 180;
+        }
+        if (south >= north) {
+          south = -89.9;
+          north = 89.9;
+        }
+      }
+      onMoveEndRef.current?.(
+        { west, south, east, north },
+        zoom,
+      );
+    });
 
     return () => {
       map.remove();
@@ -328,19 +382,26 @@ export function MapCanvas({
     const map = mapRef.current;
     if (!map) return;
     const source = map.getSource(SOURCE_ID) as GeoJSONSource | undefined;
-    source?.setData(pointsToGeoJson(points));
-  }, [points]);
+    source?.setData(pointsToGeoJson(points, selectedSlug));
+  }, [points, selectedSlug]);
 
   useEffect(() => {
     if (!cameraTarget) return;
     const map = mapRef.current;
     if (!map) return;
-    map.flyTo({
+    const flyOptions: Parameters<typeof map.flyTo>[0] = {
       center: cameraTarget.center,
       zoom: cameraTarget.zoom ?? 11,
       essential: true,
       duration: 1200,
-    });
+    };
+    if (cameraTarget.offset) {
+      flyOptions.offset = cameraTarget.offset;
+    }
+    if (cameraTarget.padding) {
+      flyOptions.padding = cameraTarget.padding;
+    }
+    map.flyTo(flyOptions);
   }, [cameraTarget]);
 
   return (

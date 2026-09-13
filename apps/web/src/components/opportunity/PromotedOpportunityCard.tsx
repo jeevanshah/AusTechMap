@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Sparkles, ArrowRight, ShieldCheck } from "lucide-react";
 import type { SponsoredPlacement } from "@austechmap/contracts";
+import { CompanyBrandMark } from "../ui/CompanyBrandMark";
 
 interface PromotedOpportunityCardProps {
   placement: SponsoredPlacement;
@@ -26,14 +27,21 @@ export function PromotedOpportunityCard({
   return (
     <div className="relative overflow-hidden rounded-2xl border border-amber-300/80 bg-gradient-to-r from-amber-50/60 via-orange-50/30 to-amber-50/40 p-4 shadow-sm transition-all hover:border-amber-400 dark:border-amber-500/30 dark:from-amber-950/20 dark:to-orange-950/10">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200/60 pb-2.5 dark:border-amber-500/20">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-amber-900 uppercase dark:bg-amber-900/60 dark:text-amber-200">
-            <Sparkles className="h-2.5 w-2.5 text-amber-600 dark:text-amber-300" />
-            Promoted Partner
-          </span>
-          <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
-            {placement.companyName}
-          </span>
+        <div className="flex items-center gap-2.5">
+          <CompanyBrandMark
+            slug={placement.companySlug}
+            name={placement.companyName || "Partner"}
+            size="sm"
+          />
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-amber-900 uppercase dark:bg-amber-900/60 dark:text-amber-200">
+              <Sparkles className="h-2.5 w-2.5 text-amber-600 dark:text-amber-300" />
+              Promoted Partner
+            </span>
+            <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
+              {placement.companyName}
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-1 text-[10px] text-amber-900/70 dark:text-amber-300/80">
           <ShieldCheck className="h-3 w-3 text-emerald-600" />

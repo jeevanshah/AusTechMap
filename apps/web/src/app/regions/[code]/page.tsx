@@ -19,6 +19,8 @@ import { DatabaseNotConfiguredError, getPool } from "../../../lib/db";
 import { getRegionOpportunity } from "../../../lib/queries/getRegionOpportunity";
 import { isWatchingRegion } from "../../../lib/queries/watchlists";
 import { WatchRegionButton } from "./WatchRegionButton";
+import { CompanyBrandMark } from "../../../components/ui/CompanyBrandMark";
+import { GlobalNavbar } from "../../../components/ui/GlobalNavbar";
 
 export const dynamic = "force-dynamic";
 
@@ -157,38 +159,51 @@ export default async function RegionPage({
 
   return (
     <main
-      className={`${styles.page} mx-auto min-h-screen max-w-6xl px-5 py-6 sm:px-8 sm:py-10 lg:px-10`}
+      className={`${styles.page} mx-auto min-h-screen max-w-7xl px-4 py-6 sm:px-8 sm:py-8`}
     >
-      <nav className="flex items-center justify-between gap-4 border-b border-surface-border pb-4">
-        <Link
-          href="/"
-          className="inline-flex min-h-11 items-center whitespace-nowrap text-sm font-semibold text-navy-900 hover:text-terracotta-700 active:text-terracotta-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" /> Directory
-        </Link>
+      <GlobalNavbar
+        currentPage="regions"
+        userEmail={session?.user?.email}
+        subtitle="Regional Ecosystem Dossier"
+      />
+
+      {/* Action / Breadcrumb Bar */}
+      <nav className="mt-4 flex flex-wrap items-center justify-between gap-4 border-b border-surface-border pb-4 text-xs font-semibold text-slate-500">
+        <div className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="inline-flex items-center text-terracotta-700 hover:text-terracotta-800 transition-colors"
+          >
+            <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Back to map directory
+          </Link>
+          <span>•</span>
+          <span>Regional Hubs</span>
+          <span>•</span>
+          <span className="text-navy-900 font-bold">{region.name}</span>
+        </div>
         <div className="flex items-center gap-4 flex-wrap">
           <a
             href={`/api/og/region/${region.code}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-11 items-center whitespace-nowrap text-sm font-semibold text-slate-700 hover:text-navy-900 active:text-terracotta-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
+            className="inline-flex items-center text-slate-700 hover:text-navy-900 transition-colors"
             title="Open high-resolution regional share card"
           >
-            Share card <ArrowUpRight className="ml-1.5 h-4 w-4" />
+            Share card <ArrowUpRight className="ml-1 h-3.5 w-3.5" />
           </a>
           <a
             href="/api/export/regions"
             download
-            className="inline-flex min-h-11 items-center whitespace-nowrap text-sm font-semibold text-slate-700 hover:text-navy-900 active:text-terracotta-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
+            className="inline-flex items-center text-slate-700 hover:text-navy-900 transition-colors"
             title="Download Australian regional ecosystem dataset"
           >
-            Export CSV <ArrowUpRight className="ml-1.5 h-4 w-4" />
+            Export CSV <ArrowUpRight className="ml-1 h-3.5 w-3.5" />
           </a>
           <a
             href={`/api/regions/${region.code}/opportunity`}
-            className="inline-flex min-h-11 items-center whitespace-nowrap text-sm font-semibold text-terracotta-700 underline decoration-slate-300 underline-offset-4 hover:decoration-terracotta-700 active:text-terracotta-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
+            className="inline-flex items-center text-terracotta-700 underline decoration-slate-300 underline-offset-4 hover:decoration-terracotta-700 transition-colors"
           >
-            API record <ArrowUpRight className="ml-1.5 h-4 w-4" />
+            API record <ArrowUpRight className="ml-1 h-3.5 w-3.5" />
           </a>
         </div>
       </nav>
@@ -302,18 +317,21 @@ export default async function RegionPage({
                   >
                     <Link
                       href={`/companies/${employer.slug}`}
-                      className="grid min-h-16 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 py-3 hover:text-terracotta-700 active:text-terracotta-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
+                      className="flex min-h-16 items-center justify-between gap-4 py-3 group hover:text-terracotta-700 active:text-terracotta-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
                     >
-                      <span className="min-w-0">
-                        <span className="block truncate font-semibold text-navy-900">
-                          {employer.name}
+                      <div className="flex items-center gap-3.5 min-w-0">
+                        <CompanyBrandMark name={employer.name} size="md" />
+                        <span className="min-w-0">
+                          <span className="block truncate font-semibold text-navy-900 group-hover:text-terracotta-700 transition-colors">
+                            {employer.name}
+                          </span>
+                          <span className="mt-0.5 block truncate text-xs text-slate-500">
+                            {employer.primaryCategory ??
+                              "No niche classification"}
+                          </span>
                         </span>
-                        <span className="mt-1 block truncate text-sm text-slate-500">
-                          {employer.primaryCategory ??
-                            "No niche classification"}
-                        </span>
-                      </span>
-                      <span className="whitespace-nowrap font-mono text-xs tabular-nums text-slate-600">
+                      </div>
+                      <span className="whitespace-nowrap rounded-full bg-slate-100 px-2.5 py-1 font-mono text-xs font-semibold tabular-nums text-slate-700">
                         {employer.activeJobCount} active
                       </span>
                     </Link>

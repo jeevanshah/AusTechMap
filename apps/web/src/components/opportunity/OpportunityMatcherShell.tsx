@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -29,6 +30,7 @@ import type {
 } from "@austechmap/contracts";
 
 import { PromotedOpportunityCard } from "./PromotedOpportunityCard";
+import { CompanyBrandMark } from "../ui/CompanyBrandMark";
 import { matchOpportunitiesAction } from "../../app/actions/opportunityActions";
 import {
   saveSearchAction,
@@ -275,9 +277,15 @@ export function OpportunityMatcherShell({
       {/* Top Header */}
       <header className="sticky top-0 z-30 flex items-center justify-between border-b border-surface-border bg-white/90 px-4 py-3 backdrop-blur-md sm:px-8">
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-navy-900 text-white font-bold text-sm shadow-xs transition-transform group-hover:scale-105">
-              AU
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="relative h-8 w-8 overflow-hidden rounded-lg border border-slate-200/80 shadow-2xs transition-transform group-hover:scale-105">
+              <Image
+                src="/brand/logo.jpg"
+                alt="Australia Tech Map"
+                fill
+                className="object-cover"
+                sizes="32px"
+              />
             </div>
             <div className="flex flex-col">
               <span className="font-bold text-sm text-navy-900 leading-none">
@@ -297,6 +305,12 @@ export function OpportunityMatcherShell({
           <span className="text-navy-900 cursor-default border-b-2 border-terracotta-700 pb-0.5">
             Opportunity Match
           </span>
+          <Link
+            href="/jobs"
+            className="hover:text-navy-900 transition-colors"
+          >
+            Live Jobs
+          </Link>
           <Link
             href="/regions/101"
             className="hover:text-navy-900 transition-colors"
@@ -340,7 +354,7 @@ export function OpportunityMatcherShell({
             <div>
               <div className="inline-flex items-center gap-1.5 rounded-full border border-terracotta-200 bg-terracotta-50 px-2.5 py-0.5 text-xs font-semibold text-terracotta-800 mb-2">
                 <Sparkles className="h-3.5 w-3.5 text-terracotta-700" />
-                Phase 7 Opportunity Graph
+                Verified Opportunity Match
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-navy-900">
                 Targeted Australian Tech Opportunity Match
@@ -703,14 +717,16 @@ export function OpportunityMatcherShell({
                     >
                       {/* Card Header: Score, Name, Meta, Watch Button */}
                       <div className="flex items-start justify-between gap-4">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Link
-                              href={`/companies/${match.companySlug}`}
-                              className="font-bold text-base text-navy-900 hover:text-terracotta-700 transition-colors"
-                            >
-                              {match.companyName}
-                            </Link>
+                        <div className="flex items-start gap-3.5">
+                          <CompanyBrandMark name={match.companyName} size="md" />
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <Link
+                                href={`/companies/${match.companySlug}`}
+                                className="font-bold text-base text-navy-900 hover:text-terracotta-700 transition-colors"
+                              >
+                                {match.companyName}
+                              </Link>
                             {match.primaryCategory && (
                               <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700">
                                 {match.primaryCategory}
@@ -732,12 +748,13 @@ export function OpportunityMatcherShell({
                           {match.sponsorshipSummary && (
                             <div className="inline-flex items-center gap-1 text-xs font-semibold text-terracotta-800 bg-terracotta-50 border border-terracotta-200 rounded-md px-2 py-0.5">
                               <ShieldCheck className="h-3.5 w-3.5 text-terracotta-700" />
-                              {match.sponsorshipSummary}
+                              <span>{match.sponsorshipSummary}</span>
                             </div>
                           )}
                         </div>
+                      </div>
 
-                        <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3">
                           {/* Match Score Badge */}
                           <div
                             className={`flex flex-col items-center justify-center rounded-xl px-3 py-1.5 border shadow-2xs ${

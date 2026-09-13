@@ -27,6 +27,7 @@ import {
   Plus,
   Radio,
   Rocket,
+  RotateCcw,
   Search,
   Shield,
   ShieldCheck,
@@ -51,7 +52,14 @@ import {
   type Bbox,
   type CameraTarget,
 } from "../../components/map/MapCanvas";
+import {
+  CompanyBrandMark,
+  extractDomainFromUrl,
+} from "../../components/ui/CompanyBrandMark";
+import { getCategoryIconPath } from "../../lib/category-icons";
 import { trackEvent } from "../../lib/analytics";
+
+export { getCategoryIconPath };
 
 export interface HomeMapShellProps {
   initialPoints: MapCompanyPoint[];
@@ -212,223 +220,121 @@ const HUB_METADATA: Record<string, HubMeta> = {
   },
 };
 
-interface BrandAvatar {
-  bg: string;
-  text: string;
-  label: string;
-}
-
-const BRAND_METADATA: Record<string, BrandAvatar> = {
-  atlassian: {
-    bg: "bg-[#0052cc]",
-    text: "text-white",
-    label: "A",
-  },
-  canva: {
-    bg: "bg-gradient-to-tr from-[#00c4cc] to-[#7d2ae8]",
-    text: "text-white",
-    label: "C",
-  },
-  afterpay: {
-    bg: "bg-[#b2fce4]",
-    text: "text-[#0f172a]",
-    label: "AP",
-  },
-  csiro: {
-    bg: "bg-[#001e3d]",
-    text: "text-[#00e676]",
-    label: "CS",
-  },
-  "quantum-brilliance": {
-    bg: "bg-[#0f172a]",
-    text: "text-[#38bdf8]",
-    label: "QB",
-  },
-  "gilmour-space": {
-    bg: "bg-[#1e293b]",
-    text: "text-[#f97316]",
-    label: "GS",
-  },
-  airwallex: {
-    bg: "bg-[#ff4d00]",
-    text: "text-white",
-    label: "AW",
-  },
-  safetyculture: {
-    bg: "bg-[#002f6c]",
-    text: "text-white",
-    label: "SC",
-  },
-  envato: {
-    bg: "bg-[#81b441]",
-    text: "text-white",
-    label: "E",
-  },
-  zip: {
-    bg: "bg-[#251f47]",
-    text: "text-white",
-    label: "ZIP",
-  },
-  "leonardo-ai": {
-    bg: "bg-[#180d2b]",
-    text: "text-[#e879f9]",
-    label: "L",
-  },
-  "culture-amp": {
-    bg: "bg-[#242424]",
-    text: "text-[#ff6079]",
-    label: "CA",
-  },
-  iress: {
-    bg: "bg-[#002f6c]",
-    text: "text-white",
-    label: "IR",
-  },
-  "mineral-resources-tech-minres": {
-    bg: "bg-[#1e3a8a]",
-    text: "text-white",
-    label: "MR",
-  },
+const CITY_STATE_MAP: Record<string, string> = {
+  Sydney: "NSW",
+  Melbourne: "VIC",
+  Brisbane: "QLD",
+  Perth: "WA",
+  Adelaide: "SA",
+  Canberra: "ACT",
+  Hobart: "TAS",
+  Darwin: "NT",
+  Newcastle: "NSW",
+  Wollongong: "NSW",
+  Geelong: "VIC",
+  "Gold Coast": "QLD",
+  "Sunshine Coast": "QLD",
+  Bendigo: "VIC",
+  Ballarat: "VIC",
+  Cairns: "QLD",
+  Townsville: "QLD",
+  Toowoomba: "QLD",
+  Orange: "NSW",
+  "Wagga Wagga": "NSW",
+  Albury: "NSW",
+  Armidale: "NSW",
+  Dubbo: "NSW",
+  Bathurst: "NSW",
+  "Coffs Harbour": "NSW",
+  "Port Macquarie": "NSW",
+  "Byron Bay": "NSW",
+  "Central Coast": "NSW",
+  Gosford: "NSW",
+  Mildura: "VIC",
+  Shepparton: "VIC",
+  Wangaratta: "VIC",
+  Warrnambool: "VIC",
+  Traralgon: "VIC",
+  Morwell: "VIC",
+  Moe: "VIC",
+  Bairnsdale: "VIC",
+  Castlemaine: "VIC",
+  Echuca: "VIC",
+  Seymour: "VIC",
+  Lara: "VIC",
+  Lilydale: "VIC",
+  Frankston: "VIC",
+  Dandenong: "VIC",
+  Mornington: "VIC",
+  Mackay: "QLD",
+  Rockhampton: "QLD",
+  Bundaberg: "QLD",
+  "Hervey Bay": "QLD",
+  Gladstone: "QLD",
+  Emerald: "QLD",
+  "Mount Isa": "QLD",
+  Noosa: "QLD",
+  Ipswich: "QLD",
+  Logan: "QLD",
+  Caboolture: "QLD",
+  Cleveland: "QLD",
+  Atherton: "QLD",
+  Innisfail: "QLD",
+  Gympie: "QLD",
+  Maryborough: "QLD",
+  Roma: "QLD",
+  Chinchilla: "QLD",
+  Stanthorpe: "QLD",
+  Weipa: "QLD",
+  Albany: "WA",
+  Bunbury: "WA",
+  Busselton: "WA",
+  Geraldton: "WA",
+  Kalgoorlie: "WA",
+  Karratha: "WA",
+  "Port Hedland": "WA",
+  Broome: "WA",
+  Exmouth: "WA",
+  Newman: "WA",
+  Northam: "WA",
+  Henderson: "WA",
+  Kwinana: "WA",
+  Fremantle: "WA",
+  Joondalup: "WA",
+  Midland: "WA",
+  Mandurah: "WA",
+  "Mount Gambier": "SA",
+  Whyalla: "SA",
+  "Port Augusta": "SA",
+  "Port Lincoln": "SA",
+  "Victor Harbor": "SA",
+  Renmark: "SA",
+  Clare: "SA",
+  Tanunda: "SA",
+  Ceduna: "SA",
+  "Roxby Downs": "SA",
+  Launceston: "TAS",
+  Devonport: "TAS",
+  Burnie: "TAS",
+  "George Town": "TAS",
+  "Alice Springs": "NT",
+  Nhulunbuy: "NT",
 };
 
-function getCompanyAvatar(slug: string, name: string): BrandAvatar {
-  if (BRAND_METADATA[slug]) {
-    return BRAND_METADATA[slug];
+export function formatLocation(city: string | null | undefined): string {
+  if (!city) return "Australia";
+  const trimmed = city.trim();
+  const state = CITY_STATE_MAP[trimmed] ?? HUB_METADATA[trimmed]?.state;
+  if (state) {
+    return `${trimmed}, ${state}`;
   }
-  const clean = name.trim();
-  const initials =
-    clean
-      .split(/\s+/)
-      .map((w) => w[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase() || "AU";
-  const colors = [
-    { bg: "bg-navy-900", text: "text-white" },
-    { bg: "bg-slate-800", text: "text-white" },
-  ];
-  let hash = 0;
-  for (let i = 0; i < slug.length; i++) {
-    hash = (hash * 31 + slug.charCodeAt(i)) | 0;
+  if (/\b(NSW|VIC|QLD|WA|SA|ACT|TAS|NT)\b/i.test(trimmed)) {
+    return trimmed;
   }
-  const picked = colors[Math.abs(hash) % colors.length] ?? colors[0]!;
-  return {
-    bg: picked.bg,
-    text: picked.text,
-    label: initials,
-  };
+  return `${trimmed}, Australia`;
 }
 
-const KNOWN_DOMAINS: Record<string, string> = {
-  sitemate: "sitemate.com",
-  accelo: "accelo.com",
-  atlassian: "atlassian.com",
-  canva: "canva.com",
-  afterpay: "afterpay.com",
-  airwallex: "airwallex.com",
-  safetyculture: "safetyculture.com",
-  "culture-amp": "cultureamp.com",
-  "mineral-resources-tech-minres": "mineralresources.com.au",
-  csiro: "csiro.au",
-  "csiro-data61": "data61.csiro.au",
-  "quantum-brilliance": "quantumbrilliance.com",
-  "gilmour-space": "gspacetech.com",
-  zip: "zip.co",
-  envato: "envato.com",
-  "leonardo-ai": "leonardo.ai",
-  iress: "iress.com",
-  wooliesx: "wooliesx.com.au",
-  "up-ferocia": "up.com.au",
-  "wisetech-global": "wisetechglobal.com",
-};
 
-function extractDomainFromUrl(
-  url: string | null | undefined,
-  slug: string,
-): string {
-  if (KNOWN_DOMAINS[slug]) {
-    return KNOWN_DOMAINS[slug]!;
-  }
-  if (url) {
-    try {
-      const u = new URL(url);
-      const host = u.hostname.toLowerCase().replace(/^www\./, "");
-      if (
-        !host.includes("lever.co") &&
-        !host.includes("greenhouse.io") &&
-        !host.includes("workable.com") &&
-        !host.includes("bamboohr.com") &&
-        !host.includes("ashbyhq.com")
-      ) {
-        return host;
-      }
-    } catch {
-      // fallback
-    }
-  }
-  return `${slug}.com`;
-}
-
-function CompanyBrandMark({
-  slug,
-  name,
-  domain,
-  careersUrl,
-  size = "md",
-}: {
-  slug: string;
-  name: string;
-  domain?: string | null;
-  careersUrl?: string | null;
-  size?: "sm" | "md" | "lg";
-}) {
-  const [imgFailed, setImgFailed] = useState(false);
-  const avatar = getCompanyAvatar(slug, name);
-  const resolvedDomain = useMemo(
-    () => domain || extractDomainFromUrl(careersUrl, slug),
-    [domain, careersUrl, slug],
-  );
-
-  const sizeClasses = {
-    sm: "h-9 w-9 rounded-lg text-xs",
-    md: "h-10 w-10 rounded-xl text-xs",
-    lg: "h-11 w-11 sm:h-13 sm:w-13 rounded-xl sm:rounded-2xl text-sm sm:text-base",
-  }[size];
-
-  const logoUrl =
-    resolvedDomain && !imgFailed
-      ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(resolvedDomain)}&sz=128`
-      : null;
-
-  return (
-    <div
-      suppressHydrationWarning
-      className={`relative flex shrink-0 items-center justify-center overflow-hidden border border-slate-200/90 bg-white shadow-2xs ${sizeClasses}`}
-    >
-      {logoUrl ? (
-        /* eslint-disable-next-line @next/next/no-img-element */
-        <img
-          src={logoUrl}
-          alt={`${name} logo`}
-          loading="lazy"
-          suppressHydrationWarning
-          className="h-full w-full object-contain p-1.5"
-          onError={() => setImgFailed(true)}
-        />
-      ) : (
-        <div
-          suppressHydrationWarning
-          className={`flex h-full w-full items-center justify-center font-heading font-black ${avatar.bg} ${avatar.text}`}
-        >
-          {avatar.label}
-        </div>
-      )}
-    </div>
-  );
-}
-
-import { getCategoryIconPath } from "../../lib/category-icons";
-export { getCategoryIconPath };
 
 function CategoryBadge({
   category,
@@ -461,61 +367,52 @@ function CategoryBadge({
   );
 }
 
-const QUICK_SECTORS = [
-  { key: "ai-ml", label: "AI & Data", icon: "/assets/categories/ai_data.png" },
-  { key: "fintech", label: "FinTech", icon: "/assets/categories/fintech.png" },
-  { key: "saas", label: "SaaS", icon: "/assets/categories/saas.png" },
-  {
-    key: "climate-tech",
-    label: "ClimateTech",
-    icon: "/assets/categories/climatetech.png",
-  },
-  {
-    key: "healthtech",
-    label: "HealthTech",
-    icon: "/assets/categories/healthtech.png",
-  },
-  {
-    key: "space",
-    label: "Space & Defence",
-    icon: "/assets/categories/space_defence.png",
-  },
-  { key: "agritech", label: "AgTech", icon: "/assets/categories/agtech.png" },
-  { key: "govtech", label: "GovTech", icon: "/assets/categories/govtech.png" },
-];
-
 function pointsToListEntries(points: MapCompanyPoint[]): ListEntry[] {
-  return points.map((point) => ({
-    slug: point.slug,
-    name: point.name,
-    domain: extractDomainFromUrl(point.careersUrl, point.slug),
-    careersUrl: point.careersUrl,
-    city: point.city,
-    primaryCategory: point.primaryCategory,
-    hasSponsorshipEvidence: point.hasSponsorshipEvidence,
-    isRegional: point.isRegional,
-    activeJobsCount: point.activeJobsCount,
-    topRoleFamilies: point.topRoleFamilies,
-    workStyles: point.workStyles,
-  }));
+  const seen = new Set<string>();
+  const entries: ListEntry[] = [];
+  for (const point of points) {
+    if (seen.has(point.slug)) continue;
+    seen.add(point.slug);
+    entries.push({
+      slug: point.slug,
+      name: point.name,
+      domain: extractDomainFromUrl(point.careersUrl, point.slug),
+      careersUrl: point.careersUrl,
+      city: point.city,
+      primaryCategory: point.primaryCategory,
+      hasSponsorshipEvidence: point.hasSponsorshipEvidence,
+      isRegional: point.isRegional,
+      activeJobsCount: point.activeJobsCount,
+      topRoleFamilies: point.topRoleFamilies,
+      workStyles: point.workStyles,
+    });
+  }
+  return entries;
 }
 
 function searchResultsToListEntries(
   results: CompanySearchResult[],
 ): ListEntry[] {
-  return results.map((result) => ({
-    slug: result.slug,
-    name: result.name,
-    domain: result.domain,
-    careersUrl: null,
-    city: result.city,
-    primaryCategory: result.primaryCategory,
-    hasSponsorshipEvidence: result.hasSponsorshipEvidence,
-    isRegional: result.isRegional,
-    activeJobsCount: result.activeJobsCount,
-    topRoleFamilies: result.topRoleFamilies,
-    workStyles: result.workStyles,
-  }));
+  const seen = new Set<string>();
+  const entries: ListEntry[] = [];
+  for (const result of results) {
+    if (seen.has(result.slug)) continue;
+    seen.add(result.slug);
+    entries.push({
+      slug: result.slug,
+      name: result.name,
+      domain: result.domain,
+      careersUrl: null,
+      city: result.city,
+      primaryCategory: result.primaryCategory,
+      hasSponsorshipEvidence: result.hasSponsorshipEvidence,
+      isRegional: result.isRegional,
+      activeJobsCount: result.activeJobsCount,
+      topRoleFamilies: result.topRoleFamilies,
+      workStyles: result.workStyles,
+    });
+  }
+  return entries;
 }
 
 export function HomeMapShell({
@@ -656,6 +553,15 @@ export function HomeMapShell({
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const didMountMapFetchRef = useRef(false);
+  const [searchAsMapMoves, setSearchAsMapMoves] = useState(true);
+  const [hasMovedMapSinceSearch, setHasMovedMapSinceSearch] = useState(false);
+  const [triggerBboxSearch, setTriggerBboxSearch] = useState(0);
+  const isFocusingPointRef = useRef(false);
+
+  const executeBboxSearch = useCallback(() => {
+    setHasMovedMapSinceSearch(false);
+    setTriggerBboxSearch((prev) => prev + 1);
+  }, []);
 
   const computeDefaultSearchName = useCallback(() => {
     const parts: string[] = [];
@@ -766,6 +672,9 @@ export function HomeMapShell({
       timestamp: Date.now(),
     });
     setActiveHubCity(null);
+    setCurrentBbox(initialBbox);
+    setCurrentZoom(4);
+    setTriggerBboxSearch((prev) => prev + 1);
   };
 
   // Global spotlight keyboard shortcut (Cmd+K / Ctrl+K)
@@ -852,20 +761,87 @@ export function HomeMapShell({
     selectedWorkStyle,
   ]);
 
-  const handleMoveEnd = useCallback((bbox: Bbox, zoom: number) => {
-    if (moveTimeoutRef.current) clearTimeout(moveTimeoutRef.current);
-    moveTimeoutRef.current = setTimeout(() => {
-      setCurrentBbox(bbox);
-      setCurrentZoom(zoom);
-    }, MOVE_DEBOUNCE_MS);
-  }, []);
+  const handleMoveEnd = useCallback(
+    (bbox: Bbox, zoom: number) => {
+      if (moveTimeoutRef.current) clearTimeout(moveTimeoutRef.current);
+      moveTimeoutRef.current = setTimeout(() => {
+        // If this move was triggered by focusing an employer point, don't crush results
+        if (isFocusingPointRef.current) {
+          isFocusingPointRef.current = false;
+          return;
+        }
+
+        let west = bbox.west;
+        let east = bbox.east;
+        let south = bbox.south;
+        let north = bbox.north;
+
+        // When zoomed out to continental / national scale (zoom <= 5) or spanning the globe,
+        // use canonical Australia bounds so all nationwide companies are loaded without clipping
+        if (zoom <= 5 || east - west >= 300) {
+          west = 96;
+          east = 168;
+          south = -45;
+          north = -9;
+        } else {
+          west = Math.max(-180, Math.min(180, west));
+          east = Math.max(-180, Math.min(180, east));
+          south = Math.max(-89.9, Math.min(89.9, south));
+          north = Math.max(-89.9, Math.min(89.9, north));
+          if (west >= east) {
+            west = -180;
+            east = 180;
+          }
+          if (south >= north) {
+            south = -89.9;
+            north = 89.9;
+          }
+        }
+
+        setCurrentBbox({ west, south, east, north });
+        setCurrentZoom(zoom);
+
+        if (searchAsMapMoves) {
+          setTriggerBboxSearch((prev) => prev + 1);
+          setHasMovedMapSinceSearch(false);
+        } else {
+          setHasMovedMapSinceSearch(true);
+        }
+      }, MOVE_DEBOUNCE_MS);
+    },
+    [searchAsMapMoves],
+  );
 
   useEffect(() => {
     if (!didMountMapFetchRef.current) {
       didMountMapFetchRef.current = true;
       return;
     }
-    const bboxParam = `${currentBbox.west},${currentBbox.south},${currentBbox.east},${currentBbox.north}`;
+    let west = currentBbox.west;
+    let east = currentBbox.east;
+    let south = currentBbox.south;
+    let north = currentBbox.north;
+
+    if ((currentZoom !== null && currentZoom <= 5) || east - west >= 300) {
+      west = 96;
+      east = 168;
+      south = -45;
+      north = -9;
+    } else {
+      west = Math.max(-180, Math.min(180, west));
+      east = Math.max(-180, Math.min(180, east));
+      south = Math.max(-89.9, Math.min(89.9, south));
+      north = Math.max(-89.9, Math.min(89.9, north));
+      if (west >= east) {
+        west = -180;
+        east = 180;
+      }
+      if (south >= north) {
+        south = -89.9;
+        north = 89.9;
+      }
+    }
+    const bboxParam = `${west},${south},${east},${north}`;
     const zoomParam = currentZoom !== null ? `&zoom=${currentZoom}` : "";
     const categoryParam = selectedCategory
       ? `&category=${encodeURIComponent(selectedCategory)}`
@@ -892,6 +868,7 @@ export function HomeMapShell({
         /* keep showing the last-known points rather than clearing the map */
       });
   }, [
+    triggerBboxSearch,
     currentBbox,
     currentZoom,
     selectedCategory,
@@ -904,6 +881,7 @@ export function HomeMapShell({
   ]);
 
   const handlePointClick = useCallback((slug: string) => {
+    isFocusingPointRef.current = true;
     setSelectedSlug(slug);
     setActiveDirectoryTab((prevTab) =>
       prevTab === "regions" ? "companies" : prevTab,
@@ -1089,12 +1067,12 @@ export function HomeMapShell({
 
   return (
     <div className="flex flex-col gap-5">
-      {/* 1. Unified Command Search & Filter Strip */}
-      <div className="flex flex-col gap-2 rounded-2xl border border-surface-border bg-white p-2.5 shadow-2xs">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2">
+      {/* 1. Unified Ultra-Compact Command Bar (Single Row, Sticky) */}
+      <div className="sticky top-0 z-30 bg-canvas/95 backdrop-blur-md py-1">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 rounded-2xl border border-surface-border bg-white px-3 py-2 shadow-2xs">
           {/* Main Search Input */}
-          <div className="relative flex-1 flex items-center">
-            <span className="pointer-events-none absolute left-3.5 text-slate-400">
+          <div className="relative flex-1 flex items-center min-w-[200px]">
+            <span className="pointer-events-none absolute left-3 text-slate-400">
               <Search className="h-4 w-4" />
             </span>
             <input
@@ -1112,10 +1090,10 @@ export function HomeMapShell({
                   setActiveHubCity(null);
                 }
               }}
-              placeholder="Search companies, roles, technologies... (Press ⌘K)"
-              className="w-full rounded-xl border border-slate-200/90 bg-slate-50/80 py-2.5 pr-20 pl-10 text-sm font-medium text-navy-900 placeholder:text-slate-400 focus:border-navy-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-navy-900/15 transition-all"
+              placeholder="Search companies, roles, cities... (Press ⌘K)"
+              className="w-full rounded-xl border border-slate-200/90 bg-slate-50/80 py-1.5 pr-14 pl-9 text-xs sm:text-sm font-medium text-navy-900 placeholder:text-slate-400 focus:border-navy-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-navy-900/15 transition-all"
             />
-            <div className="absolute right-3 flex items-center gap-1.5">
+            <div className="absolute right-2.5 flex items-center gap-1">
               {query.length > 0 ? (
                 <button
                   type="button"
@@ -1137,96 +1115,31 @@ export function HomeMapShell({
             </div>
           </div>
 
-          {/* Region Dropdown Selector */}
-          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200/90 bg-slate-50/80 px-3 py-1.5">
-            <MapPin className="h-4 w-4 text-slate-400 shrink-0" />
-            <select
-              value={activeHubCity ?? ""}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (!val) {
-                  setActiveHubCity(null);
-                  setQuery("");
-                } else {
-                  const hub = displayedHubs.find((h) => h.city === val);
-                  if (hub) handleSelectHub(hub);
-                  else {
-                    setActiveHubCity(val);
-                    setQuery(val);
-                  }
-                }
-              }}
-              className="text-xs font-semibold text-navy-900 bg-transparent focus:outline-none cursor-pointer py-1"
-            >
-              <option value="">
-                All regional hubs ({displayedHubs.length})
-              </option>
-              {displayedHubs.map((hub) => (
-                <option key={hub.city} value={hub.city}>
-                  {hub.city}, {hub.state} ({hub.count})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Sector Category Dropdown */}
-          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200/90 bg-slate-50/80 px-3 py-1.5">
-            <Layers className="h-4 w-4 text-slate-400 shrink-0" />
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="text-xs font-semibold text-navy-900 bg-transparent focus:outline-none cursor-pointer py-1"
-            >
-              <option value="">All sectors</option>
-              {categoryGroups.map((group) => (
-                <optgroup key={group.groupLabel} label={group.groupLabel}>
-                  {group.items.map((cat) => (
-                    <option key={cat.key} value={cat.key}>
-                      {cat.label}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-          </div>
-
-          {/* Work Style Dropdown */}
-          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200/90 bg-slate-50/80 px-3 py-1.5">
-            <Building2 className="h-4 w-4 text-slate-400 shrink-0" />
-            <select
-              value={selectedWorkStyle}
-              onChange={(e) =>
-                setSelectedWorkStyle(
-                  e.target.value as "remote" | "hybrid" | "onsite" | "",
-                )
-              }
-              className="text-xs font-semibold text-navy-900 bg-transparent focus:outline-none cursor-pointer py-1"
-            >
-              <option value="">All work styles</option>
-              <option value="remote">Remote (AU-wide)</option>
-              <option value="hybrid">Hybrid</option>
-              <option value="onsite">On-site</option>
-            </select>
-          </div>
-
-          {/* Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto py-1">
+          {/* Inline Filter Controls (Single non-wrapping row) */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-nowrap shrink-0 py-0.5">
+            {/* Actively hiring button */}
             <button
               type="button"
               onClick={() => setHiringOnly(!hiringOnly)}
               aria-pressed={hiringOnly}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-semibold transition-all ${
                 hiringOnly
                   ? "border border-emerald-700 bg-emerald-700 text-white shadow-xs"
-                  : "border border-slate-200/90 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                  : "border border-slate-200/90 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 shadow-2xs"
               }`}
             >
-              <Zap
-                className={`h-3.5 w-3.5 ${
-                  hiringOnly ? "text-white" : "text-emerald-600"
-                }`}
-              />
-              <span>Actively hiring</span>
+              <span className="relative flex h-2 w-2">
+                {hiringOnly && (
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-200 opacity-75" />
+                )}
+                <span
+                  className={`relative inline-flex h-2 w-2 rounded-full ${
+                    hiringOnly ? "bg-white" : "bg-emerald-500"
+                  }`}
+                />
+              </span>
+              <span className="hidden sm:inline">Actively hiring</span>
+              <span className="sm:hidden">Hiring</span>
               {hiringCount > 0 && (
                 <span
                   className={`rounded-full px-1.5 py-0.2 font-mono text-[10px] font-bold ${
@@ -1240,32 +1153,15 @@ export function HomeMapShell({
               )}
             </button>
 
-            {availableRoleFamilies.length > 0 && (
-              <div className="flex items-center gap-1 rounded-xl border border-slate-200/90 bg-white px-2.5 py-1 text-xs">
-                <Cpu className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                <select
-                  value={selectedRoleFamily}
-                  onChange={(e) => setSelectedRoleFamily(e.target.value)}
-                  className="text-xs font-semibold text-navy-900 bg-transparent focus:outline-none cursor-pointer py-1"
-                >
-                  <option value="">All roles</option>
-                  {availableRoleFamilies.map((rf) => (
-                    <option key={rf} value={rf}>
-                      {rf}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
+            {/* Sponsorship Toggle */}
             <button
               type="button"
               onClick={() => setSponsorshipOnly(!sponsorshipOnly)}
               aria-pressed={sponsorshipOnly}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-semibold transition-all ${
                 sponsorshipOnly
                   ? "border border-navy-900 bg-navy-900 text-white shadow-xs"
-                  : "border border-slate-200/90 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                  : "border border-slate-200/90 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 shadow-2xs"
               }`}
             >
               <ShieldCheck
@@ -1273,17 +1169,18 @@ export function HomeMapShell({
                   sponsorshipOnly ? "text-white" : "text-slate-400"
                 }`}
               />
-              Sponsorship
+              <span>482 Visas</span>
             </button>
 
+            {/* Regional Only Toggle */}
             <button
               type="button"
               onClick={() => setRegionalOnly(!regionalOnly)}
               aria-pressed={regionalOnly}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-semibold transition-all ${
                 regionalOnly
                   ? "border border-navy-900 bg-navy-900 text-white shadow-xs"
-                  : "border border-slate-200/90 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                  : "border border-slate-200/90 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 shadow-2xs"
               }`}
             >
               <Compass
@@ -1291,19 +1188,63 @@ export function HomeMapShell({
                   regionalOnly ? "text-white" : "text-slate-400"
                 }`}
               />
-              Regional only
+              <span>Regional</span>
             </button>
 
+            {/* Sector Category Dropdown */}
+            <div className="flex items-center gap-1 rounded-xl border border-slate-200/90 bg-slate-50/80 px-2.5 py-1.5 hover:border-slate-300 transition-colors shrink-0">
+              <Layers className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="text-xs font-semibold text-navy-900 bg-transparent focus:outline-none cursor-pointer max-w-[110px] sm:max-w-[130px] truncate"
+              >
+                <option value="">All sectors</option>
+                {categoryGroups.map((group) => (
+                  <optgroup key={group.groupLabel} label={group.groupLabel}>
+                    {group.items.map((cat) => (
+                      <option key={cat.key} value={cat.key}>
+                        {cat.label}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </div>
+
+            {/* Work Style Dropdown */}
+            <div className="hidden lg:flex items-center gap-1 rounded-xl border border-slate-200/90 bg-slate-50/80 px-2.5 py-1.5 hover:border-slate-300 transition-colors shrink-0">
+              <Building2 className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+              <select
+                value={selectedWorkStyle}
+                onChange={(e) =>
+                  setSelectedWorkStyle(
+                    e.target.value as "remote" | "hybrid" | "onsite" | "",
+                  )
+                }
+                className="text-xs font-semibold text-navy-900 bg-transparent focus:outline-none cursor-pointer max-w-[100px] truncate"
+              >
+                <option value="">Work style</option>
+                <option value="remote">Remote</option>
+                <option value="hybrid">Hybrid</option>
+                <option value="onsite">On-site</option>
+              </select>
+            </div>
+
+            {/* Reset Filters */}
             {hasActiveFilters && (
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="shrink-0 text-xs font-semibold text-terracotta-700 hover:underline px-2"
+                className="inline-flex shrink-0 items-center gap-1 rounded-xl border border-transparent hover:border-terracotta-200 px-2.5 py-1.5 text-xs font-semibold text-terracotta-700 hover:bg-terracotta-50 transition-colors"
+                title="Reset all filters"
               >
-                Reset
+                <RotateCcw className="h-3 w-3" />
+                <span className="hidden sm:inline">Reset</span>
               </button>
             )}
 
+            {/* Save Search CTA */}
             <button
               type="button"
               onClick={() => {
@@ -1312,48 +1253,13 @@ export function HomeMapShell({
                 setSaveSuccessMessage(null);
                 setShowSaveModal(true);
               }}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition-all shadow-2xs sm:ml-auto"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition-all shadow-2xs"
               title="Save current search criteria and set opportunity alerts"
             >
               <Bookmark className="h-3.5 w-3.5 text-terracotta-700" />
-              <span>Save Search</span>
+              <span className="hidden sm:inline">Save</span>
             </button>
           </div>
-        </div>
-
-        {/* Quick Sector Filter Badges with bespoke illustrated icons */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pt-1 pb-0.5 border-t border-slate-100 no-scrollbar">
-          <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider shrink-0 pl-1">
-            Explore:
-          </span>
-          {QUICK_SECTORS.map((sector) => {
-            const isSelected = selectedCategory === sector.key;
-            return (
-              <button
-                key={sector.key}
-                type="button"
-                onClick={() => {
-                  setSelectedCategory(isSelected ? "" : sector.key);
-                }}
-                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition-all ${
-                  isSelected
-                    ? "border-navy-900 bg-navy-900 text-white shadow-2xs"
-                    : "border-slate-200/90 bg-slate-50/90 text-slate-700 hover:border-slate-300 hover:bg-white"
-                }`}
-              >
-                <span className="relative inline-block h-3.5 w-3.5 shrink-0 overflow-hidden rounded-full">
-                  <Image
-                    src={sector.icon}
-                    alt={sector.label}
-                    width={14}
-                    height={14}
-                    className="h-full w-full object-cover"
-                  />
-                </span>
-                <span>{sector.label}</span>
-              </button>
-            );
-          })}
         </div>
       </div>
 
@@ -1550,268 +1456,12 @@ export function HomeMapShell({
           : `${listEntries.length} employers in view.`}
       </div>
 
-      {/* 2. Docked Detail Panel (when a company is selected) */}
-      {selectedEntry && (
-        <div className="animate-slide-up rounded-2xl border border-surface-border bg-white p-4 sm:p-5 shadow-md">
-          {(() => {
-            const pt =
-              displayedPoints.find((p) => p.slug === selectedEntry.slug) ??
-              points.find((p) => p.slug === selectedEntry.slug);
-
-            return (
-              <>
-                {/* Header Row: Avatar, Title & Metadata */}
-                <div className="flex items-start justify-between gap-3 sm:gap-4">
-                  <div className="flex items-start gap-3 sm:gap-3.5 min-w-0">
-                    {/* Brand Avatar / Real Logo */}
-                    <CompanyBrandMark
-                      slug={selectedEntry.slug}
-                      name={selectedEntry.name}
-                      domain={selectedEntry.domain}
-                      careersUrl={selectedEntry.careersUrl}
-                      size="lg"
-                    />
-
-                    {/* Metadata & Name */}
-                    <div className="flex flex-col gap-0.5 min-w-0">
-                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                        <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-slate-50 px-2.5 py-0.5 text-[10px] font-bold text-slate-800 uppercase tracking-wider shadow-2xs">
-                          <CheckCircle2 className="h-2.5 w-2.5 text-emerald-600 shrink-0" />
-                          Verified Record
-                        </span>
-                        {selectedEntry.hasSponsorshipEvidence ? (
-                          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-slate-50 px-2.5 py-0.5 text-[11px] font-semibold text-slate-800 shadow-2xs">
-                            <Award className="h-3 w-3 text-slate-600 shrink-0" />
-                            Subclass 482 Visa Sponsor
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-slate-50 px-2.5 py-0.5 text-[11px] font-medium text-slate-600">
-                            Standard Employer
-                          </span>
-                        )}
-                        {selectedEntry.activeJobsCount &&
-                          selectedEntry.activeJobsCount > 0 && (
-                            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 shadow-2xs">
-                              <Zap className="h-3 w-3 text-emerald-600 fill-emerald-600 shrink-0" />
-                              {selectedEntry.activeJobsCount} Live{" "}
-                              {selectedEntry.activeJobsCount === 1
-                                ? "Role"
-                                : "Roles"}
-                            </span>
-                          )}
-                        {selectedEntry.primaryCategory && (
-                          <CategoryBadge
-                            category={selectedEntry.primaryCategory}
-                            size="md"
-                          />
-                        )}
-                      </div>
-
-                      <h2 className="font-heading text-lg font-bold tracking-tight text-navy-900 sm:text-2xl mt-0.5 truncate">
-                        {selectedEntry.name}
-                      </h2>
-
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 mt-0.5">
-                        {selectedEntry.city && (
-                          <span className="flex items-center gap-1 font-semibold text-slate-700">
-                            <MapPin className="h-3.5 w-3.5 text-slate-500 shrink-0" />
-                            {HUB_METADATA[selectedEntry.city]?.sa4Code ? (
-                              <Link
-                                href={`/regions/${HUB_METADATA[selectedEntry.city]!.sa4Code}`}
-                                className="hover:text-terracotta-700 underline decoration-slate-300 hover:decoration-terracotta-700 transition-colors"
-                                title={`View ${selectedEntry.city} Regional Opportunity Report`}
-                              >
-                                {selectedEntry.city}, Australia
-                              </Link>
-                            ) : (
-                              `${selectedEntry.city}, Australia`
-                            )}
-                          </span>
-                        )}
-                        {pt && (
-                          <>
-                            <span className="text-slate-300">•</span>
-                            <span className="font-mono text-[11px] text-slate-400">
-                              {Math.abs(pt.lat).toFixed(2)}° S,{" "}
-                              {Math.abs(pt.lng).toFixed(2)}° E
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Close Button */}
-                  <button
-                    type="button"
-                    onClick={() => setSelectedSlug(null)}
-                    aria-label="Close employer details"
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-navy-900 transition-colors"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-
-                {/* 4-Part Auditable Registry Checklist Grid */}
-                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-                  {/* Card 1: ASIC & ABN Registration */}
-                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-slate-50 p-3 transition-colors hover:border-slate-300 shadow-2xs">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                    </div>
-                    <div className="min-w-0">
-                      <span className="block font-heading text-xs font-bold text-navy-900">
-                        Entity Verified
-                      </span>
-                      <span className="block text-[11px] text-slate-500 font-medium truncate">
-                        ABN &amp; ASIC Active
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Card 2: Australian Premises (G-NAF) */}
-                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-slate-50 p-3 transition-colors hover:border-slate-300 shadow-2xs">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
-                      <Building2 className="h-4 w-4 text-slate-700" />
-                    </div>
-                    <div className="min-w-0">
-                      <span className="block font-heading text-xs font-bold text-navy-900">
-                        Physical Premises
-                      </span>
-                      <span className="block text-[11px] text-slate-500 font-medium truncate">
-                        G-NAF Geocoded
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Card 3: Visa Sponsorship Status */}
-                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-slate-50 p-3 transition-colors hover:border-slate-300 shadow-2xs">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-navy-900 border border-slate-200/90 shadow-2xs">
-                      <Award
-                        className={`h-4 w-4 ${selectedEntry.hasSponsorshipEvidence ? "text-terracotta-700" : "text-slate-400"}`}
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <span className="block font-heading text-xs font-bold text-navy-900">
-                        {selectedEntry.hasSponsorshipEvidence
-                          ? "482 Visa Sponsor"
-                          : "Visa Sponsorship"}
-                      </span>
-                      <span
-                        className={`block text-[11px] font-medium truncate ${
-                          selectedEntry.hasSponsorshipEvidence
-                            ? "text-navy-900 font-semibold"
-                            : "text-slate-500"
-                        }`}
-                      >
-                        {selectedEntry.hasSponsorshipEvidence
-                          ? "Substantiated on File"
-                          : "No 482 Record on File"}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Card 4: Live Hiring Demand */}
-                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-slate-50 p-3 transition-colors hover:border-slate-300 shadow-2xs">
-                    <div
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border shadow-2xs ${
-                        selectedEntry.activeJobsCount &&
-                        selectedEntry.activeJobsCount > 0
-                          ? "bg-emerald-600 text-white border-emerald-600"
-                          : "bg-white text-slate-400 border-slate-200/90"
-                      }`}
-                    >
-                      <Zap
-                        className={`h-4 w-4 ${
-                          selectedEntry.activeJobsCount &&
-                          selectedEntry.activeJobsCount > 0
-                            ? "fill-white text-white"
-                            : "text-slate-400"
-                        }`}
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <span className="block font-heading text-xs font-bold text-navy-900">
-                        {selectedEntry.activeJobsCount &&
-                        selectedEntry.activeJobsCount > 0
-                          ? `${selectedEntry.activeJobsCount} Live ${selectedEntry.activeJobsCount === 1 ? "Vacancy" : "Vacancies"}`
-                          : "Hiring Status"}
-                      </span>
-                      <span className="block text-[11px] text-slate-500 font-medium truncate">
-                        {selectedEntry.topRoleFamilies &&
-                        selectedEntry.topRoleFamilies.length > 0
-                          ? selectedEntry.topRoleFamilies.join(", ")
-                          : selectedEntry.activeJobsCount &&
-                              selectedEntry.activeJobsCount > 0
-                            ? "Actively Recruiting"
-                            : "No Live Vacancies"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Actions Row */}
-                <div className="mt-4 flex flex-wrap items-center gap-2.5 pt-3 border-t border-slate-100">
-                  {pt && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setCameraTarget({
-                          center: [pt.lng, pt.lat],
-                          zoom: 14,
-                          timestamp: Date.now(),
-                        });
-                        setShowMapMobile(true);
-                      }}
-                      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl border border-slate-200/90 bg-white px-3.5 py-2 text-xs font-semibold text-navy-900 hover:bg-slate-50 transition-colors shadow-2xs"
-                    >
-                      <MapPin className="h-3.5 w-3.5 text-slate-500" />
-                      Locate on map
-                    </button>
-                  )}
-
-                  {selectedEntry.careersUrl && (
-                    <a
-                      href={selectedEntry.careersUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() =>
-                        trackEvent("careers_link_clicked", {
-                          slug: selectedEntry.slug,
-                        })
-                      }
-                      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl border border-slate-200/90 bg-white px-3.5 py-2 text-xs font-semibold text-navy-900 hover:bg-slate-50 transition-colors shadow-2xs"
-                    >
-                      <span>
-                        {selectedEntry.activeJobsCount &&
-                        selectedEntry.activeJobsCount > 0
-                          ? `View ${selectedEntry.activeJobsCount} open ${selectedEntry.activeJobsCount === 1 ? "role" : "roles"}`
-                          : "Careers portal"}
-                      </span>
-                      <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
-                    </a>
-                  )}
-
-                  <Link
-                    href={`/companies/${selectedEntry.slug}`}
-                    className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl bg-navy-900 px-4 py-2 text-xs font-semibold text-white hover:bg-navy-800 transition-all shadow-xs group sm:ml-auto"
-                  >
-                    <span>View full profile</span>
-                    <ArrowRight className="h-3.5 w-3.5 text-white/80 group-hover:translate-x-0.5 transition-transform" />
-                  </Link>
-                </div>
-              </>
-            );
-          })()}
-        </div>
-      )}
-
-      {/* 3. Synchronized Studio Split: Directory Feed (Left) & Sticky Map (Right) */}
+      {/* 2. Synchronized Studio Split: Directory Feed (Left) & Sticky Map (Right) */}
       <div
         id="directory-content"
         className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start"
       >
-        {/* Left Column (5 of 12): Company Directory Feed */}
+        {/* Left Column (5 of 12): Permanent Company Directory Feed */}
         <div
           className={`lg:col-span-5 flex flex-col gap-2.5 ${
             showMapMobile ? "hidden lg:flex" : "flex"
@@ -1922,7 +1572,7 @@ export function HomeMapShell({
           </div>
 
           {/* Feed Content */}
-          <div className="flex max-h-[660px] flex-col gap-2 overflow-y-auto pr-1 pb-16 lg:pb-0">
+          <div className="flex h-[calc(100vh-240px)] min-h-[440px] max-h-[570px] flex-col gap-2.5 overflow-y-auto pr-2 pb-16 lg:pb-0 custom-scrollbar">
             {searchError && (
               <p className="rounded-xl border border-red-600/40 bg-red-50 p-3 text-xs font-medium text-red-900">
                 Search is temporarily unavailable. Please retry.
@@ -1960,18 +1610,26 @@ export function HomeMapShell({
                   </div>
                 </div>
 
+                {/* Regional Hub Cards */}
                 {displayedHubs.map((hub) => {
                   const isActive = activeHubCity === hub.city;
                   return (
                     <div
                       key={hub.city}
                       onClick={() => handleSelectHub(hub)}
-                      className={`group flex flex-col gap-2.5 rounded-xl border p-3.5 text-left transition-all cursor-pointer ${
+                      className={`group relative flex flex-col gap-2 rounded-xl border p-3.5 text-left transition-all cursor-pointer ${
                         isActive
-                          ? "border-navy-900 bg-slate-50 shadow-xs"
+                          ? "border-navy-900 bg-slate-50 shadow-xs ring-1 ring-navy-900/10"
                           : "border-surface-border bg-white hover:border-slate-300 hover:bg-slate-50/50"
                       }`}
                     >
+                      {/* Active Indicator Strip */}
+                      {isActive && (
+                        <span
+                          aria-hidden="true"
+                          className="absolute left-0 top-2.5 bottom-2.5 w-1 rounded-r-full bg-terracotta-700"
+                        />
+                      )}
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 min-w-0">
                           <span
@@ -2052,7 +1710,7 @@ export function HomeMapShell({
                         className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-navy-900 px-3.5 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition-all shadow-2xs"
                       >
                         <Award className="h-3.5 w-3.5 text-slate-300" />
-                        View all 5 nationwide visa sponsors
+                        View all nationwide visa sponsors
                       </button>
                     )}
                   </div>
@@ -2067,20 +1725,33 @@ export function HomeMapShell({
                         id={`company-card-${entry.slug}`}
                         onClick={() => {
                           handlePointClick(entry.slug);
+                          setShowMapMobile(true);
                           if (pt) {
                             setCameraTarget({
                               center: [pt.lng, pt.lat],
-                              zoom: Math.max(currentZoom ?? 13, 13),
+                              zoom: Math.max(currentZoom ?? 12, 12),
+                              padding:
+                                typeof window !== "undefined" &&
+                                window.innerWidth >= 640
+                                  ? { top: 0, bottom: 0, left: 320, right: 0 }
+                                  : undefined,
                               timestamp: Date.now(),
                             });
                           }
                         }}
-                        className={`group relative flex items-start gap-3 rounded-xl border p-3 text-left transition-all cursor-pointer ${
+                        className={`group relative flex items-start gap-3.5 rounded-xl border p-3.5 text-left transition-all cursor-pointer ${
                           isSelected
-                            ? "border-navy-900 bg-slate-50 shadow-xs"
-                            : "border-surface-border bg-white hover:border-slate-300 hover:shadow-xs"
+                            ? "border-navy-900 bg-slate-50/60 shadow-sm ring-1 ring-navy-900/10"
+                            : "border-slate-200/80 bg-white hover:border-slate-300 hover:shadow-xs hover:bg-slate-50/40"
                         }`}
                       >
+                        {/* Selected Indicator Strip */}
+                        {isSelected && (
+                          <span
+                            aria-hidden="true"
+                            className="absolute left-0 top-2.5 bottom-2.5 w-1 rounded-r-full bg-terracotta-700"
+                          />
+                        )}
                         {/* Company Brand Logo */}
                         <CompanyBrandMark
                           slug={entry.slug}
@@ -2097,6 +1768,11 @@ export function HomeMapShell({
                               {entry.name}
                             </span>
                             <div className="flex items-center gap-1.5 shrink-0">
+                              {isSelected && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-navy-900 text-white px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider shadow-2xs">
+                                  Selected
+                                </span>
+                              )}
                               {entry.activeJobsCount &&
                               entry.activeJobsCount > 0 ? (
                                 <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-800 shadow-2xs">
@@ -2119,9 +1795,7 @@ export function HomeMapShell({
                           <div className="flex items-center gap-1.5 text-xs text-slate-600 mt-1">
                             <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                             <span className="truncate">
-                              {entry.city
-                                ? `${entry.city}, Australia`
-                                : "Australia"}
+                              {formatLocation(entry.city)}
                             </span>
                             {entry.primaryCategory && (
                               <>
@@ -2179,125 +1853,244 @@ export function HomeMapShell({
             showMapMobile ? "block" : "hidden lg:block"
           }`}
         >
-          <div className="relative h-[660px] overflow-hidden rounded-2xl border border-surface-border bg-slate-100 shadow-2xs">
+          <div className="relative h-[calc(100vh-240px)] min-h-[440px] max-h-[570px] overflow-hidden rounded-2xl border border-surface-border bg-slate-100 shadow-2xs">
             <MapCanvas
               points={displayedPoints}
               initialBbox={initialBbox}
               cameraTarget={cameraTarget}
+              selectedSlug={selectedSlug}
               onMoveEnd={handleMoveEnd}
               onPointClick={handlePointClick}
             />
 
+            {/* Bottom-Left Floating Toggle: Search as map moves */}
+            <div className="absolute bottom-3.5 left-3.5 z-10 flex items-center rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-md px-3 py-1.5 shadow-md">
+              <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-semibold text-navy-900">
+                <input
+                  type="checkbox"
+                  checked={searchAsMapMoves}
+                  onChange={(e) => setSearchAsMapMoves(e.target.checked)}
+                  className="h-3.5 w-3.5 rounded border-slate-300 text-terracotta-700 focus:ring-terracotta-700/30 accent-terracotta-700 cursor-pointer"
+                />
+                <span>Search as map moves</span>
+              </label>
+            </div>
+
+            {/* Top-Center Floating Action Button: Search this area */}
+            {hasMovedMapSinceSearch && !searchAsMapMoves && (
+              <div className="absolute top-3.5 left-1/2 -translate-x-1/2 z-10 animate-fade-in">
+                <button
+                  type="button"
+                  onClick={executeBboxSearch}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-terracotta-600 bg-terracotta-700 px-4 py-1.5 text-xs font-bold text-white shadow-lg hover:bg-terracotta-800 active:scale-95 transition-all"
+                >
+                  <Search className="h-3.5 w-3.5" />
+                  <span>Search this area</span>
+                </button>
+              </div>
+            )}
+
             {/* Top-Right Floating Zoom & Recenter Controls */}
-            <div className="absolute top-3.5 right-3.5 z-10 flex flex-col items-center rounded-xl border border-surface-border bg-white/95 backdrop-blur-xs p-1 shadow-xs">
+            <div className="absolute top-3.5 right-3.5 z-10 flex flex-col items-center rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-md p-1 shadow-md">
               <button
                 type="button"
                 onClick={handleZoomIn}
                 aria-label="Zoom in"
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 transition-colors"
+                title="Zoom in"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 hover:text-navy-900 transition-colors"
               >
                 <Plus className="h-4 w-4" />
               </button>
-              <div className="h-px w-5 bg-surface-border my-0.5" />
+              <div className="h-px w-5 bg-slate-200 my-0.5" />
               <button
                 type="button"
                 onClick={handleZoomOut}
                 aria-label="Zoom out"
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 transition-colors"
+                title="Zoom out"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 hover:text-navy-900 transition-colors"
               >
                 <Minus className="h-4 w-4" />
               </button>
-              <div className="h-px w-5 bg-surface-border my-0.5" />
+              <div className="h-px w-5 bg-slate-200 my-0.5" />
               <button
                 type="button"
                 onClick={handleRecenter}
                 aria-label="Recenter Australia"
                 title="Recenter Australia"
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 transition-colors"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 hover:text-navy-900 transition-colors group"
               >
-                <Crosshair className="h-3.5 w-3.5 text-terracotta-700" />
+                <Crosshair className="h-4 w-4 text-terracotta-700 group-hover:scale-110 transition-transform" />
               </button>
             </div>
 
-            {/* Bottom-Left Floating Hub Spotlight Card */}
-            {displayedHubs.length > 0 &&
+            {/* Floating In-Map Company Detail Card */}
+            {selectedEntry &&
               (() => {
-                const spotlightHub = displayedHubs[0]!;
+                const pt =
+                  displayedPoints.find((p) => p.slug === selectedEntry.slug) ??
+                  points.find((p) => p.slug === selectedEntry.slug);
+
                 return (
-                  <div
-                    onClick={() => handleSelectHub(spotlightHub)}
-                    className="absolute bottom-3 left-3 sm:left-4 z-10 flex items-center gap-3 rounded-xl border border-surface-border bg-white/95 backdrop-blur-xs p-2.5 shadow-md hover:border-terracotta-700/60 transition-all cursor-pointer group max-w-xs"
-                  >
-                    <div className="relative h-10 w-12 rounded-lg bg-navy-900 text-white flex items-center justify-center font-mono font-bold text-xs uppercase overflow-hidden shrink-0">
-                      <Image
-                        src="/brand/hero_cartography.jpg"
-                        alt={`${spotlightHub.city} tech cluster`}
-                        fill
-                        className="object-cover opacity-50 mix-blend-luminosity group-hover:scale-110 transition-transform"
-                      />
-                      <span className="relative z-10">
-                        {spotlightHub.city.slice(0, 3).toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="font-heading text-xs font-bold text-navy-900 group-hover:text-terracotta-700 transition-colors truncate">
-                        {spotlightHub.city} Regional Hub
-                      </span>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="font-mono text-[10px] text-slate-500">
-                          {spotlightHub.count} verified employers &gt;
-                        </span>
-                        {spotlightHub.sa4Code && (
-                          <Link
-                            href={`/regions/${spotlightHub.sa4Code}`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="font-mono text-[10px] font-semibold text-terracotta-700 hover:underline flex items-center"
-                            title="View Regional Labour Report"
-                          >
-                            <span>Report</span>
-                            <ArrowUpRight className="h-2.5 w-2.5 ml-0.5" />
-                          </Link>
-                        )}
+                  <div className="absolute top-3 left-3 z-30 animate-slide-down w-[300px] sm:w-[320px] max-w-[calc(100%-24px)] rounded-xl border border-slate-200/90 bg-white/95 backdrop-blur-md p-3 shadow-lg">
+                    {/* Header with Avatar, Title, Location & Close */}
+                    <div className="flex items-start justify-between gap-2.5">
+                      <div className="flex items-start gap-2.5 min-w-0">
+                        <CompanyBrandMark
+                          slug={selectedEntry.slug}
+                          name={selectedEntry.name}
+                          domain={selectedEntry.domain}
+                          careersUrl={selectedEntry.careersUrl}
+                          size="sm"
+                        />
+                        <div className="flex flex-col min-w-0">
+                          <h3 className="font-heading text-sm font-bold tracking-tight text-navy-900 truncate">
+                            {selectedEntry.name}
+                          </h3>
+                          <div className="flex items-center gap-1.5 text-xs text-slate-600 mt-0.5">
+                            {selectedEntry.city && (
+                              <span className="flex items-center gap-1 font-medium text-slate-700 truncate">
+                                <MapPin className="h-3 w-3 text-slate-400 shrink-0" />
+                                <span className="truncate">
+                                  {formatLocation(selectedEntry.city)}
+                                </span>
+                              </span>
+                            )}
+                            {selectedEntry.primaryCategory && (
+                              <>
+                                <span className="text-slate-300">•</span>
+                                <CategoryBadge
+                                  category={selectedEntry.primaryCategory}
+                                  size="sm"
+                                />
+                              </>
+                            )}
+                          </div>
+                        </div>
                       </div>
+
+                      {/* Close Button */}
+                      <button
+                        type="button"
+                        onClick={() => setSelectedSlug(null)}
+                        aria-label="Close employer details"
+                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-navy-900 transition-colors cursor-pointer"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+
+                    {/* Status badges strip */}
+                    <div className="flex flex-wrap items-center gap-1.5 mt-2.5">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-slate-50 px-2 py-0.5 text-[9px] font-bold text-slate-800 uppercase tracking-wider shadow-2xs">
+                        <CheckCircle2 className="h-2.5 w-2.5 text-emerald-600 shrink-0" />
+                        Verified
+                      </span>
+                      {selectedEntry.hasSponsorshipEvidence && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-800 shadow-2xs">
+                          <Award className="h-2.5 w-2.5 text-slate-600 shrink-0" />
+                          482 Sponsor
+                        </span>
+                      )}
+                      {selectedEntry.activeJobsCount &&
+                        selectedEntry.activeJobsCount > 0 && (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-800 shadow-2xs">
+                            <Zap className="h-2.5 w-2.5 text-emerald-600 fill-emerald-600 shrink-0" />
+                            {selectedEntry.activeJobsCount} Live{" "}
+                            {selectedEntry.activeJobsCount === 1
+                              ? "Role"
+                              : "Roles"}
+                          </span>
+                        )}
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="flex items-center gap-2 mt-2.5 pt-2 border-t border-slate-100">
+                      <Link
+                        href={`/companies/${selectedEntry.slug}`}
+                        className="flex-1 inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-lg bg-navy-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-navy-800 transition-colors shadow-2xs group"
+                      >
+                        <span>Full profile</span>
+                        <ArrowRight className="h-3 w-3 text-white/80 group-hover:translate-x-0.5 transition-transform" />
+                      </Link>
+
+                      {selectedEntry.careersUrl && (
+                        <a
+                          href={selectedEntry.careersUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() =>
+                            trackEvent("careers_link_clicked", {
+                              slug: selectedEntry.slug,
+                            })
+                          }
+                          className="inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-lg border border-slate-200/90 bg-white px-2.5 py-1.5 text-xs font-semibold text-navy-900 hover:bg-slate-50 transition-colors shadow-2xs"
+                          title="Open Careers Portal"
+                        >
+                          <span>Careers</span>
+                          <ExternalLink className="h-3 w-3 text-slate-400" />
+                        </a>
+                      )}
+
+                      {pt && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            isFocusingPointRef.current = true;
+                            setCameraTarget({
+                              center: [pt.lng, pt.lat],
+                              zoom: 14,
+                              padding:
+                                typeof window !== "undefined" &&
+                                window.innerWidth >= 640
+                                  ? { top: 0, bottom: 0, left: 320, right: 0 }
+                                  : undefined,
+                              timestamp: Date.now(),
+                            });
+                          }}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200/90 bg-white text-slate-600 hover:bg-slate-50 hover:text-navy-900 transition-colors shadow-2xs shrink-0"
+                          title="Focus marker on map"
+                        >
+                          <Crosshair className="h-3.5 w-3.5 text-terracotta-700" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 );
               })()}
+
           </div>
         </div>
       </div>
 
       {/* Mobile Floating Toggle */}
-      {!selectedEntry && (
-        <div className="fixed inset-x-0 bottom-4 z-20 flex justify-center lg:hidden">
-          <div className="inline-flex rounded-full border border-surface-border bg-navy-950/90 p-1 shadow-xl backdrop-blur-md">
-            <button
-              type="button"
-              onClick={() => setShowMapMobile(false)}
-              aria-pressed={!showMapMobile}
-              className={`rounded-full px-4 py-2 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 transition-colors duration-150 motion-reduce:transition-none ${
-                showMapMobile
-                  ? "text-slate-300 hover:text-white"
-                  : "bg-terracotta-700 text-white shadow-xs"
-              }`}
-            >
-              List ({listEntries.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowMapMobile(true)}
-              aria-pressed={showMapMobile}
-              className={`rounded-full px-4 py-2 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 transition-colors duration-150 motion-reduce:transition-none ${
-                showMapMobile
-                  ? "bg-terracotta-700 text-white shadow-xs"
-                  : "text-slate-300 hover:text-white"
-              }`}
-            >
-              Map view
-            </button>
-          </div>
+      <div className="fixed inset-x-0 bottom-4 z-20 flex justify-center lg:hidden">
+        <div className="inline-flex rounded-full border border-surface-border bg-navy-950/90 p-1 shadow-xl backdrop-blur-md">
+          <button
+            type="button"
+            onClick={() => setShowMapMobile(false)}
+            aria-pressed={!showMapMobile}
+            className={`rounded-full px-4 py-2 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 transition-colors duration-150 motion-reduce:transition-none ${
+              !showMapMobile
+                ? "bg-terracotta-700 text-white shadow-xs"
+                : "text-slate-300 hover:text-white"
+            }`}
+          >
+            List ({listEntries.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowMapMobile(true)}
+            aria-pressed={showMapMobile}
+            className={`rounded-full px-4 py-2 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 transition-colors duration-150 motion-reduce:transition-none ${
+              showMapMobile
+                ? "bg-terracotta-700 text-white shadow-xs"
+                : "text-slate-300 hover:text-white"
+            }`}
+          >
+            Map view
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }

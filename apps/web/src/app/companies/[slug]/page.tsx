@@ -5,13 +5,17 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import {
   ArrowLeft,
+  ArrowRight,
+  Award,
   Calendar,
   CheckCircle2,
   Download,
   ExternalLink,
   Globe,
+  MapPin,
   Share2,
   ShieldCheck,
+  User,
   Zap,
 } from "lucide-react";
 
@@ -21,6 +25,8 @@ import { auth } from "../../../auth";
 import { CareersLink } from "./CareersLink";
 import { WatchCompanyButton } from "./WatchCompanyButton";
 import { ClaimProfileModal } from "./ClaimProfileModal";
+import { CompanyBrandMark } from "../../../components/ui/CompanyBrandMark";
+import { GlobalNavbar } from "../../../components/ui/GlobalNavbar";
 import { getCategoryIconPath } from "../../../lib/category-icons";
 import { MapCanvas, type Bbox } from "../../../components/map/MapCanvas";
 import { trackEvent } from "../../../lib/analytics";
@@ -379,66 +385,143 @@ export default async function CompanyProfilePage({
 
   const session = await auth();
   const userId = session?.user?.id ? Number(session.user.id) : null;
+  const userEmail = session?.user?.email ?? null;
   const isWatching = userId
     ? await isWatchingCompany(getPool(), userId, company.id)
     : false;
 
+  const hasSponsorship = company.sponsorship_evidence.length > 0;
+
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-10 px-6 py-8 sm:px-10 sm:py-12">
-      <header className="flex flex-col gap-4 border-b border-surface-border pb-6">
-        <div className="flex items-center justify-between gap-4">
+    <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-6 px-4 py-6 sm:px-8 sm:py-8">
+      {/* 1. Global Brand Header */}
+      <GlobalNavbar
+        currentPage="companies"
+        userEmail={userEmail}
+        subtitle="National Employer Dossier"
+      />
+
+      {/* 2. Breadcrumb & Status Bar */}
+      <div className="flex items-center justify-between text-xs text-slate-500 font-medium -mt-1">
+        <div className="flex items-center gap-2">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 rounded text-sm font-medium text-terracotta-700 hover:text-terracotta-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2 transition-colors"
+            className="inline-flex items-center gap-1 font-semibold text-terracotta-700 hover:text-terracotta-800 hover:underline"
           >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Back to directory</span>
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back to map directory
           </Link>
-          <div className="flex items-center gap-2">
-            <div className="relative h-6 w-6 overflow-hidden rounded border border-slate-200 shadow-2xs">
-              <Image
-                src="/brand/logo.jpg"
-                alt="Australia Tech Map Logo"
-                width={24}
-                height={24}
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <span
-              suppressHydrationWarning
-              className="font-mono text-xs text-slate-500 tabular-nums"
-            >
-              {lastCheckedLabel.toUpperCase()}:{" "}
-              {new Date(lastCheckedDate).toLocaleDateString("en-AU")}
-            </span>
-          </div>
+          <span className="text-slate-300">•</span>
+          <span>Companies</span>
+          <span className="text-slate-300">•</span>
+          <span className="font-bold text-navy-900 truncate max-w-[200px] sm:max-w-none">
+            {company.display_name}
+          </span>
         </div>
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="space-y-1.5">
-            <h1 className="font-heading text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl text-balance">
-              {company.display_name}
-            </h1>
-            {company.is_claimed ? (
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-900 shadow-2xs">
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
-                <span>Verified Employer Profile</span>
+        <span
+          suppressHydrationWarning
+          className="font-mono text-[11px] text-slate-400 hidden sm:inline"
+        >
+          {lastCheckedLabel.toUpperCase()}:{" "}
+          {new Date(lastCheckedDate).toLocaleDateString("en-AU")}
+        </span>
+      </div>
+
+      {/* 3. Elevated Company Hero Dossier Card */}
+      <section className="relative overflow-hidden rounded-2xl border border-surface-border bg-white p-6 sm:p-8 shadow-2xs">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-0 opacity-[0.06] mix-blend-multiply bg-center bg-cover [mask-image:radial-gradient(ellipse_at_center,black_50%,transparent_95%)]"
+          style={{ backgroundImage: "url('/brand/hero_cartography.jpg')" }}
+        />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="flex items-start gap-4 sm:gap-5 min-w-0">
+            <CompanyBrandMark
+              slug={company.slug}
+              name={company.display_name}
+              domain={company.domain}
+              careersUrl={company.careers_url}
+              size="xl"
+              className="shadow-sm border-slate-200"
+            />
+            <div className="space-y-2 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-navy-900 truncate">
+                  {company.display_name}
+                </h1>
+                {company.is_claimed ? (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-900 shadow-2xs">
+                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
+                    Verified Employer Profile
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-slate-50 px-2.5 py-0.5 text-[11px] font-semibold text-slate-700 shadow-2xs">
+                    <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+                    Registry Indexed
+                  </span>
+                )}
               </div>
-            ) : (
-              <ClaimProfileModal
-                companyId={company.id}
-                companyName={company.display_name}
-                companySlug={company.slug}
-                companyDomain={company.domain}
-                isClaimed={company.is_claimed}
+
+              {/* Company Badges & Tags */}
+              <div className="flex flex-wrap items-center gap-2">
+                {company.domain && (
+                  <a
+                    href={`https://${company.domain}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-navy-900 hover:underline"
+                  >
+                    <Globe className="h-3.5 w-3.5 text-slate-400" />
+                    <span>{company.domain}</span>
+                    <ExternalLink className="h-3 w-3 text-slate-400" />
+                  </a>
+                )}
+                {hasSponsorship && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-slate-200/90 bg-slate-50 px-2.5 py-0.5 font-mono text-[11px] font-semibold text-slate-800 shadow-2xs">
+                    <Award className="h-3 w-3 text-slate-600" />
+                    Subclass 482 Sponsor
+                  </span>
+                )}
+                {company.open_jobs.length > 0 && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 font-mono text-[11px] font-bold text-emerald-800 shadow-2xs">
+                    <Zap className="h-3 w-3 fill-emerald-600 text-emerald-600" />
+                    {company.open_jobs.length} Live{" "}
+                    {company.open_jobs.length === 1 ? "Role" : "Roles"}
+                  </span>
+                )}
+                {company.categories.map((cat) => (
+                  <span
+                    key={cat.key}
+                    className="inline-flex items-center gap-1 rounded-full bg-slate-100/90 px-2.5 py-0.5 text-[11px] font-medium text-slate-600"
+                  >
+                    {cat.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Action CTAs */}
+          <div className="flex items-center gap-2.5 flex-wrap shrink-0">
+            {company.careers_url && (
+              <CareersLink
+                slug={company.slug}
+                careersUrl={company.careers_url}
+                label="Careers Portal"
               />
             )}
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
+            <WatchCompanyButton
+              companyId={company.id}
+              companySlug={company.slug}
+              initialWatching={isWatching}
+              isSignedIn={Boolean(userId)}
+            />
             <a
               href={`/api/og/company/${company.slug}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors"
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors"
               title="View high-resolution shareable card"
             >
               <Share2 className="h-3.5 w-3.5 text-slate-500" />
@@ -447,18 +530,12 @@ export default async function CompanyProfilePage({
             <a
               href="/api/export/companies"
               download
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors"
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors"
               title="Download verified employer CSV dataset"
             >
               <Download className="h-3.5 w-3.5 text-slate-500" />
-              <span>Export CSV</span>
+              <span>Export</span>
             </a>
-            <WatchCompanyButton
-              companyId={company.id}
-              companySlug={company.slug}
-              initialWatching={isWatching}
-              isSignedIn={Boolean(userId)}
-            />
             {!company.is_claimed && (
               <ClaimProfileModal
                 companyId={company.id}
@@ -466,267 +543,479 @@ export default async function CompanyProfilePage({
                 companySlug={company.slug}
                 companyDomain={company.domain}
                 isClaimed={company.is_claimed}
-                triggerLabel="Partner / Claim"
+                triggerLabel="Claim Profile"
                 triggerClassName="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50/80 px-3 py-1.5 text-xs font-semibold text-emerald-900 shadow-2xs hover:bg-emerald-100/80 transition-colors cursor-pointer"
               />
             )}
           </div>
         </div>
-        <dl className="flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs text-slate-600 tabular-nums">
-          <div className="flex items-center gap-1.5">
-            <dt className="text-slate-400">STATUS</dt>
-            <dd className="font-medium text-navy-900">
-              {STATUS_LABELS[company.status] ?? company.status}
-            </dd>
-          </div>
-          {company.domain && (
-            <div className="flex items-center gap-1.5">
-              <dt className="text-slate-400">DOMAIN</dt>
-              <dd className="font-medium text-navy-900 inline-flex items-center gap-1">
-                <Globe className="h-3 w-3 text-slate-400" />
-                {company.domain}
-              </dd>
-            </div>
-          )}
-          <div className="flex items-center gap-1.5">
-            <dt className="text-slate-400">REGISTERED</dt>
-            <dd
-              suppressHydrationWarning
-              className="font-medium text-navy-900 inline-flex items-center gap-1"
-            >
-              <Calendar className="h-3 w-3 text-slate-400" />
-              {new Date(company.created_at).toLocaleDateString("en-AU")}
-            </dd>
-          </div>
-          {company.verified_at && (
-            <div className="flex items-center gap-1.5">
-              <dt className="text-slate-400">VERIFIED</dt>
-              <dd
-                suppressHydrationWarning
-                className="font-medium text-emerald-700 inline-flex items-center gap-1"
-              >
-                <CheckCircle2 className="h-3 w-3 text-emerald-600" />
-                {new Date(company.verified_at).toLocaleDateString("en-AU")}
-              </dd>
-            </div>
-          )}
-        </dl>
-      </header>
-
-      {company.status === "disabled" && (
-        <p className="rounded-lg border border-red-600/40 bg-red-50 p-4 text-sm text-red-900">
-          This employer record has been disabled: {company.disabled_reason}
-        </p>
-      )}
-
-      <section className="flex flex-wrap items-center gap-2.5">
-        {company.categories.map((category) => {
-          const iconPath = getCategoryIconPath(category.label);
-          return (
-            <span
-              key={category.key}
-              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-slate-50 px-3 py-1 font-mono text-xs text-slate-700 shadow-2xs"
-            >
-              {iconPath && (
-                <span className="relative inline-block h-3.5 w-3.5 shrink-0 overflow-hidden rounded-full">
-                  <Image
-                    src={iconPath}
-                    alt={`${category.label} icon`}
-                    width={14}
-                    height={14}
-                    className="h-full w-full object-cover"
-                  />
-                </span>
-              )}
-              {category.label}
-            </span>
-          );
-        })}
-        {company.careers_url && (
-          <CareersLink slug={company.slug} careersUrl={company.careers_url} />
-        )}
       </section>
 
-      {company.research_claim?.reason && (
-        <section className="rounded-lg border border-surface-border bg-slate-50 p-4 text-sm text-navy-900">
-          <p>
-            According to our research
-            {confidenceScore !== null &&
-              ` (confidence: ${company.research_claim.confidence_tier ?? "unknown"})`}
-            , {company.research_claim.reason}
-          </p>
-          {company.research_claim.confidence_note && (
-            <p className="mt-2 text-xs text-slate-600">
-              {company.research_claim.confidence_note}
-            </p>
-          )}
-          {company.research_source_name && (
-            <p className="mt-2 text-xs text-slate-600">
-              Source: {company.research_source_name}
-            </p>
-          )}
-        </section>
-      )}
-
-      {company.locations.length > 0 && (
-        <section>
-          <h2 className="mb-4 font-heading text-lg font-semibold text-navy-900">
-            Locations
-          </h2>
-          <div className="h-72 overflow-hidden rounded-xl border border-surface-border">
-            <MapCanvas
-              points={locationsToPoints(company)}
-              initialBbox={locationsToBbox(company.locations)}
-              interactive={false}
-            />
-          </div>
-        </section>
-      )}
-
-      <section>
-        <h2 className="mb-4 font-heading text-lg font-semibold text-navy-900">
-          Sponsorship evidence
-        </h2>
-        {company.sponsorship_evidence.length === 0 ? (
-          <p className="rounded-lg border border-surface-border bg-slate-50 p-4 text-sm text-slate-600">
-            No evidence found. This is not proof the employer does not sponsor.
-          </p>
-        ) : (
-          <ul className="flex flex-col gap-3">
-            {company.sponsorship_evidence.map((entry, index) => (
-              <li
-                key={`${entry.claimType}-${entry.observedAt}-${index}`}
-                className="rounded-xl border border-surface-border bg-slate-50 p-4 text-sm shadow-2xs"
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <span className="flex items-center gap-2 font-semibold text-navy-900">
-                    <ShieldCheck className="h-4 w-4 shrink-0 text-slate-700" />
-                    {SPONSORSHIP_CLAIM_LABELS[entry.claimType] ??
-                      entry.claimType}
-                  </span>
-                  <span
-                    suppressHydrationWarning
-                    className="font-mono text-xs text-slate-500"
-                  >
-                    {new Date(entry.observedAt).toLocaleDateString("en-AU")}
-                  </span>
-                </div>
-                <div className="mt-2 flex flex-wrap gap-2 font-mono text-[11px]">
-                  <span className="rounded-full border border-slate-300 bg-white px-2 py-1 text-slate-700">
-                    {Math.round(Number(entry.confidence) * 100)}% confidence
-                  </span>
-                  <span className="rounded-full border border-slate-300 bg-white px-2 py-1 text-slate-700">
-                    {EVIDENCE_STATUS_LABELS[entry.status]}
-                  </span>
-                </div>
-                {entry.claimType === "sponsorship_labour_agreement" ? (
-                  <p className="mt-2 text-xs text-slate-600">
-                    {[
-                      entry.claimValue.agreement_type,
-                      entry.claimValue.start_date
-                        ? `from ${String(entry.claimValue.start_date)}`
-                        : null,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}{" "}
-                    · Source:{" "}
-                    <span className="font-medium">
-                      Department of Home Affairs
+      {/* 4. Two-Column Dossier Body */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left / Main Column (8 of 12) */}
+        <div className="lg:col-span-8 flex flex-col gap-8">
+          {/* Active Open Roles Section */}
+          <section className="rounded-2xl border border-surface-border bg-white p-6 shadow-2xs">
+            <div className="flex items-center justify-between mb-5 border-b border-surface-border pb-4">
+              <div>
+                <h2 className="font-heading text-lg font-bold text-navy-900">
+                  Open Positions
+                  {company.open_jobs.length > 0 && (
+                    <span className="ml-2 font-mono text-xs font-normal text-slate-500">
+                      ({company.open_jobs.length} indexed)
                     </span>
-                    , current labour agreements list
-                  </p>
-                ) : (
-                  <p className="mt-2 text-xs text-slate-600">
-                    {String(entry.claimValue.job_title ?? "")}
-                    {typeof entry.claimValue.source_url === "string" && (
-                      <>
-                        {" · "}
-                        <a
-                          href={entry.claimValue.source_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline inline-flex items-center gap-0.5"
-                        >
-                          <span>View source</span>
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
-                      </>
-                    )}
+                  )}
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Real-time vacancies indexed from official monitored careers
+                  infrastructure.
+                </p>
+              </div>
+              {company.careers_url && (
+                <a
+                  href={company.careers_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-terracotta-700 hover:text-terracotta-800 hover:underline"
+                >
+                  <span>All openings</span>
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              )}
+            </div>
+
+            {company.open_jobs.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/70 p-6 text-center">
+                <p className="text-sm font-medium text-slate-700">
+                  No active job postings currently indexed for this employer.
+                </p>
+                {company.careers_url && (
+                  <p className="text-xs text-slate-500 mt-1">
+                    Check their{" "}
+                    <a
+                      href={company.careers_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-terracotta-700 hover:underline"
+                    >
+                      official careers portal
+                    </a>{" "}
+                    for unlisted or directly advertised opportunities.
                   </p>
                 )}
-              </li>
-            ))}
-          </ul>
-        )}
-        <p className="mt-3 text-xs text-slate-600">
-          Important: evidence does not guarantee sponsorship for a specific role
-          or applicant. Always confirm with the employer and official Home
-          Affairs guidance.
-        </p>
-      </section>
-
-      {(company.role_signals.length > 0 ||
-        company.skill_signals.length > 0) && (
-        <section className="rounded-xl border border-surface-border bg-slate-50/70 p-5 shadow-2xs">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-100 text-emerald-800">
-              <Zap className="h-4 w-4 fill-emerald-700 text-emerald-700" />
-            </span>
-            <div>
-              <h2 className="font-heading text-lg font-semibold text-navy-900">
-                Hiring Demand &amp; Skills Landscape
-              </h2>
-              <p className="text-xs text-slate-500">
-                Signals derived from active job vacancies and observed
-                recruitment velocity.
-              </p>
-            </div>
-          </div>
-
-          {/* Role Families Grid */}
-          {company.role_signals.length > 0 && (
-            <div className="mb-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-2">
-                In-Demand Role Disciplines
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-                {company.role_signals.map((signal) => (
-                  <div
-                    key={signal.roleFamily}
-                    className="flex items-center justify-between rounded-lg border border-surface-border bg-white px-3 py-2 text-xs shadow-2xs"
+              </div>
+            ) : (
+              <ul className="flex flex-col gap-3">
+                {company.open_jobs.map((job, index) => (
+                  <li
+                    key={`${job.title}-${job.postedAt ?? index}-${index}`}
+                    className="group rounded-xl border border-slate-200/90 bg-white p-4 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all"
                   >
-                    <div>
-                      <span className="font-semibold text-navy-900 block">
-                        {signal.roleFamily}
-                      </span>
-                      <span className="text-[11px] text-slate-500 font-mono">
-                        {signal.activeJobs} live{" "}
-                        {signal.activeJobs === 1 ? "role" : "roles"}
-                      </span>
-                    </div>
-                    <div>
-                      {signal.sufficient && signal.momentum !== null ? (
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="min-w-0 space-y-1.5 flex-1">
+                        {job.sourceUrl ? (
+                          <a
+                            href={job.sourceUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 font-heading text-base font-bold text-navy-900 hover:text-terracotta-700 transition-colors group"
+                          >
+                            <span className="group-hover:underline">
+                              {job.title}
+                            </span>
+                            <ExternalLink className="h-3.5 w-3.5 text-slate-400 group-hover:text-terracotta-700 transition-colors" />
+                          </a>
+                        ) : (
+                          <h3 className="font-heading text-base font-bold text-navy-900">
+                            {job.title}
+                          </h3>
+                        )}
+
+                        <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                          {job.roleFamily && (
+                            <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-semibold text-slate-700">
+                              {job.roleFamily}
+                            </span>
+                          )}
+                          {SENIORITY_LABELS[job.seniority] && (
+                            <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-medium text-slate-600">
+                              {SENIORITY_LABELS[job.seniority]}
+                            </span>
+                          )}
+                          {REMOTE_TYPE_LABELS[job.remoteType] && (
+                            <span className="rounded bg-sky-50 text-sky-700 border border-sky-200/70 px-2 py-0.5 font-mono text-[10px] font-semibold">
+                              {REMOTE_TYPE_LABELS[job.remoteType]}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {job.postedAt && (
                         <span
-                          className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-bold ${
-                            signal.momentum > 0
-                              ? "bg-emerald-100 text-emerald-800"
-                              : signal.momentum < 0
-                                ? "bg-amber-100 text-amber-800"
-                                : "bg-slate-200 text-slate-700"
-                          }`}
+                          suppressHydrationWarning
+                          className="font-mono text-[11px] text-slate-400 shrink-0"
                         >
-                          {signal.momentum > 0
-                            ? `+${Math.round(signal.momentum * 100)}%`
-                            : `${Math.round(signal.momentum * 100)}%`}
-                        </span>
-                      ) : (
-                        <span
-                          className="rounded-full bg-slate-100 border border-slate-200 px-2 py-0.5 font-mono text-[10px] text-slate-600"
-                          title="Baseline index period (momentum requires >= 14 days observation)"
-                        >
-                          Baseline
+                          {new Date(job.postedAt).toLocaleDateString("en-AU")}
                         </span>
                       )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          {/* Hiring Demand & Skills Landscape */}
+          {(company.role_signals.length > 0 ||
+            company.skill_signals.length > 0) && (
+            <section className="rounded-2xl border border-surface-border bg-slate-50/60 p-6 shadow-2xs">
+              <div className="flex items-center gap-2.5 mb-5 border-b border-surface-border pb-4">
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800">
+                  <Zap className="h-4 w-4 fill-emerald-700 text-emerald-700" />
+                </span>
+                <div>
+                  <h2 className="font-heading text-lg font-bold text-navy-900">
+                    Hiring Demand &amp; Skills Landscape
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Empirical recruitment signals derived from observed job
+                    postings and ATS tracking.
+                  </p>
+                </div>
+              </div>
+
+              {/* Role Disciplines */}
+              {company.role_signals.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-2.5">
+                    Active Role Disciplines &amp; Velocity
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {company.role_signals.map((signal) => (
+                      <div
+                        key={signal.roleFamily}
+                        className="flex items-center justify-between rounded-xl border border-surface-border bg-white px-3.5 py-2.5 text-xs shadow-2xs"
+                      >
+                        <div>
+                          <span className="font-bold text-navy-900 block">
+                            {signal.roleFamily}
+                          </span>
+                          <span className="text-[11px] text-slate-500 font-mono">
+                            {signal.activeJobs} live{" "}
+                            {signal.activeJobs === 1 ? "role" : "roles"}
+                          </span>
+                        </div>
+                        <div>
+                          {signal.sufficient && signal.momentum !== null ? (
+                            <span
+                              className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-bold ${
+                                signal.momentum > 0
+                                  ? "bg-emerald-100 text-emerald-800"
+                                  : signal.momentum < 0
+                                    ? "bg-amber-100 text-amber-800"
+                                    : "bg-slate-200 text-slate-700"
+                              }`}
+                            >
+                              {signal.momentum > 0
+                                ? `+${Math.round(signal.momentum * 100)}%`
+                                : `${Math.round(signal.momentum * 100)}%`}
+                            </span>
+                          ) : (
+                            <span className="rounded-full bg-slate-100 border border-slate-200 px-2 py-0.5 font-mono text-[10px] text-slate-600">
+                              Baseline
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Skills Chips */}
+              {company.skill_signals.length > 0 && (
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-2.5">
+                    Top Required Technologies &amp; Competencies
+                  </h3>
+                  <div className="flex flex-wrap gap-1.5">
+                    {company.skill_signals.slice(0, 16).map((skill) => (
+                      <span
+                        key={skill.skillName}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200/90 bg-white px-2.5 py-1 text-xs font-medium text-slate-800 shadow-2xs"
+                      >
+                        <span>{skill.skillName}</span>
+                        <span className="rounded bg-slate-100 px-1.5 py-0.2 font-mono text-[10px] text-slate-500 font-bold">
+                          {skill.evidenceCount}
+                        </span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* Subclass 482 Visa Sponsorship Evidence Dossier */}
+          <section className="rounded-2xl border border-surface-border bg-white p-6 shadow-2xs">
+            <div className="flex items-center gap-2.5 mb-5 border-b border-surface-border pb-4">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
+                <ShieldCheck className="h-4 w-4 text-amber-700" />
+              </span>
+              <div>
+                <h2 className="font-heading text-lg font-bold text-navy-900">
+                  Subclass 482 Visa Sponsorship Evidence
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Official registry records, Department of Home Affairs data,
+                  and substantiated historical claims.
+                </p>
+              </div>
+            </div>
+
+            {company.sponsorship_evidence.length === 0 ? (
+              <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-5 text-sm text-slate-600">
+                <p>
+                  No active sponsorship evidence indexed for this employer.
+                  Absence of evidence does not mean the employer cannot or will
+                  not sponsor qualified applicants.
+                </p>
+              </div>
+            ) : (
+              <ul className="flex flex-col gap-3">
+                {company.sponsorship_evidence.map((entry, index) => (
+                  <li
+                    key={`${entry.claimType}-${entry.observedAt}-${index}`}
+                    className="rounded-xl border border-surface-border bg-slate-50/70 p-4 text-sm shadow-2xs"
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="flex items-center gap-2 font-bold text-navy-900">
+                        <ShieldCheck className="h-4 w-4 shrink-0 text-terracotta-700" />
+                        {SPONSORSHIP_CLAIM_LABELS[entry.claimType] ??
+                          entry.claimType}
+                      </span>
+                      <span
+                        suppressHydrationWarning
+                        className="font-mono text-xs text-slate-500"
+                      >
+                        {new Date(entry.observedAt).toLocaleDateString("en-AU")}
+                      </span>
+                    </div>
+
+                    <div className="mt-2.5 flex flex-wrap gap-2 font-mono text-[11px]">
+                      <span className="rounded-full border border-slate-200 bg-white px-2.5 py-0.5 font-bold text-slate-700">
+                        {Math.round(Number(entry.confidence) * 100)}% Confidence
+                      </span>
+                      <span className="rounded-full border border-slate-200 bg-white px-2.5 py-0.5 font-medium text-slate-600">
+                        {EVIDENCE_STATUS_LABELS[entry.status]}
+                      </span>
+                    </div>
+
+                    {entry.claimType === "sponsorship_labour_agreement" ? (
+                      <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+                        {[
+                          entry.claimValue.agreement_type,
+                          entry.claimValue.start_date
+                            ? `from ${String(entry.claimValue.start_date)}`
+                            : null,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}{" "}
+                        · Source:{" "}
+                        <span className="font-semibold text-navy-900">
+                          Department of Home Affairs Labour Agreement Register
+                        </span>
+                      </p>
+                    ) : (
+                      <p className="mt-2 text-xs text-slate-600">
+                        {String(entry.claimValue.job_title ?? "")}
+                        {typeof entry.claimValue.source_url === "string" && (
+                          <>
+                            {" · "}
+                            <a
+                              href={entry.claimValue.source_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-terracotta-700 font-semibold hover:underline inline-flex items-center gap-0.5"
+                            >
+                              <span>Inspect Source</span>
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          </>
+                        )}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <p className="mt-4 text-[11px] text-slate-500 leading-relaxed border-t border-slate-100 pt-3">
+              Disclaimer: Verification reflects documented evidence at the
+              observed date. Sponsorship terms, occupational lists, and visa
+              eligibility are subject to employer discretion and Department of
+              Home Affairs regulations.
+            </p>
+          </section>
+
+          {/* Research Claim & Provenance Notes */}
+          {company.research_claim?.reason && (
+            <section className="rounded-2xl border border-surface-border bg-white p-6 shadow-2xs">
+              <h2 className="font-heading text-sm font-bold uppercase tracking-wider text-slate-400 font-mono mb-2">
+                Registry Indexing Notes
+              </h2>
+              <p className="text-sm text-navy-900 leading-relaxed">
+                {company.research_claim.reason}
+              </p>
+              {company.research_claim.confidence_note && (
+                <p className="mt-2 text-xs text-slate-600">
+                  {company.research_claim.confidence_note}
+                </p>
+              )}
+              {company.research_source_name && (
+                <p className="mt-2 text-xs text-slate-400 font-mono">
+                  Primary Source: {company.research_source_name}
+                </p>
+              )}
+            </section>
+          )}
+        </div>
+
+        {/* Right / Sidebar Column (4 of 12) */}
+        <div className="lg:col-span-4 flex flex-col gap-6">
+          {/* Factsheet Card */}
+          <div className="rounded-2xl border border-surface-border bg-white p-6 shadow-2xs space-y-4">
+            <h3 className="font-heading text-sm font-bold text-navy-900 uppercase tracking-wider font-mono border-b border-surface-border pb-3">
+              Company Dossier
+            </h3>
+
+            <dl className="space-y-3 text-xs">
+              <div>
+                <dt className="text-slate-400 font-mono text-[10px] uppercase">
+                  Registry Status
+                </dt>
+                <dd className="font-bold text-navy-900 mt-0.5">
+                  {STATUS_LABELS[company.status] ?? company.status}
+                </dd>
+              </div>
+
+              {company.domain && (
+                <div>
+                  <dt className="text-slate-400 font-mono text-[10px] uppercase">
+                    Official Website
+                  </dt>
+                  <dd className="font-medium text-navy-900 mt-0.5">
+                    <a
+                      href={`https://${company.domain}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-terracotta-700 hover:underline inline-flex items-center gap-1 font-semibold"
+                    >
+                      <span>{company.domain}</span>
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </dd>
+                </div>
+              )}
+
+              <div>
+                <dt className="text-slate-400 font-mono text-[10px] uppercase">
+                  Initial Registration
+                </dt>
+                <dd
+                  suppressHydrationWarning
+                  className="font-medium text-navy-900 mt-0.5 inline-flex items-center gap-1"
+                >
+                  <Calendar className="h-3 w-3 text-slate-400" />
+                  {new Date(company.created_at).toLocaleDateString("en-AU")}
+                </dd>
+              </div>
+
+              {company.verified_at && (
+                <div>
+                  <dt className="text-slate-400 font-mono text-[10px] uppercase">
+                    Last Verified
+                  </dt>
+                  <dd
+                    suppressHydrationWarning
+                    className="font-bold text-emerald-700 mt-0.5 inline-flex items-center gap-1"
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                    {new Date(company.verified_at).toLocaleDateString("en-AU")}
+                  </dd>
+                </div>
+              )}
+
+              {company.categories.length > 0 && (
+                <div>
+                  <dt className="text-slate-400 font-mono text-[10px] uppercase mb-1">
+                    Sectors &amp; Disciplines
+                  </dt>
+                  <dd className="flex flex-wrap gap-1">
+                    {company.categories.map((cat) => {
+                      const iconPath = getCategoryIconPath(cat.label);
+                      return (
+                        <span
+                          key={cat.key}
+                          className="inline-flex items-center gap-1 rounded-md border border-slate-200/90 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-700 shadow-2xs"
+                        >
+                          {iconPath && (
+                            <span className="relative inline-block h-3 w-3 shrink-0 overflow-hidden rounded-full">
+                              <Image
+                                src={iconPath}
+                                alt={`${cat.label} icon`}
+                                width={12}
+                                height={12}
+                                className="h-full w-full object-cover"
+                              />
+                            </span>
+                          )}
+                          <span>{cat.label}</span>
+                        </span>
+                      );
+                    })}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </div>
+
+          {/* Locations & Premises Map Card */}
+          {company.locations.length > 0 && (
+            <div className="rounded-2xl border border-surface-border bg-white p-6 shadow-2xs space-y-4">
+              <div className="flex items-center justify-between border-b border-surface-border pb-3">
+                <h3 className="font-heading text-sm font-bold text-navy-900 uppercase tracking-wider font-mono">
+                  Premises &amp; Geography
+                </h3>
+                <span className="font-mono text-xs text-slate-500">
+                  {company.locations.length}{" "}
+                  {company.locations.length === 1 ? "site" : "sites"}
+                </span>
+              </div>
+
+              <div className="h-48 overflow-hidden rounded-xl border border-slate-200/90 shadow-2xs">
+                <MapCanvas
+                  points={locationsToPoints(company)}
+                  initialBbox={locationsToBbox(company.locations)}
+                  interactive={false}
+                />
+              </div>
+
+              <div className="space-y-2">
+                {company.locations.map((loc, i) => (
+                  <div
+                    key={`${loc.lat}-${loc.lng}-${i}`}
+                    className="flex items-start gap-2 text-xs text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-100"
+                  >
+                    <MapPin className="h-3.5 w-3.5 text-terracotta-700 shrink-0 mt-0.5" />
+                    <div className="min-w-0 flex-1">
+                      <span className="font-semibold text-navy-900 block truncate">
+                        {loc.inputText || "Australian Premises"}
+                      </span>
+                      <span className="text-[10px] font-mono uppercase text-slate-400">
+                        {loc.locationType.replace("_", " ")}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -734,128 +1023,36 @@ export default async function CompanyProfilePage({
             </div>
           )}
 
-          {/* Top In-Demand Skills */}
-          {company.skill_signals.length > 0 && (
-            <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-2">
-                Top Detected Technologies &amp; Capabilities
-              </h3>
-              <div className="flex flex-wrap gap-1.5">
-                {company.skill_signals.slice(0, 15).map((skill) => (
-                  <span
-                    key={skill.skillName}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-800 shadow-2xs"
-                  >
-                    <span>{skill.skillName}</span>
-                    <span className="rounded bg-slate-100 px-1.5 py-0.2 font-mono text-[10px] text-slate-500 font-semibold">
-                      {skill.evidenceCount}
-                    </span>
-                  </span>
-                ))}
+          {/* Claim / Employer Partnership Card */}
+          {!company.is_claimed && (
+            <div className="rounded-2xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50/50 to-white p-6 shadow-2xs space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-100 text-emerald-800">
+                  <ShieldCheck className="h-4 w-4 text-emerald-700" />
+                </span>
+                <h3 className="font-heading text-sm font-bold text-navy-900">
+                  Are you with {company.display_name}?
+                </h3>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Claim your profile to update company coordinates, manage
+                recruitment feeds, and verify subclass 482 sponsorship status.
+              </p>
+              <div className="pt-1">
+                <ClaimProfileModal
+                  companyId={company.id}
+                  companyName={company.display_name}
+                  companySlug={company.slug}
+                  companyDomain={company.domain}
+                  isClaimed={company.is_claimed}
+                  triggerLabel="Claim Profile & Partner"
+                  triggerClassName="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-navy-900 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-slate-800 transition-colors cursor-pointer"
+                />
               </div>
             </div>
           )}
-        </section>
-      )}
-
-      <section>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-heading text-lg font-semibold text-navy-900">
-            Open roles
-            {company.open_jobs.length > 0
-              ? ` (${company.open_jobs.length})`
-              : ""}
-          </h2>
-          {company.careers_url && (
-            <a
-              href={company.careers_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs font-medium text-terracotta-700 hover:underline"
-            >
-              <span>Careers page</span>
-              <ExternalLink className="h-3 w-3" />
-            </a>
-          )}
         </div>
-
-        {company.open_jobs.length === 0 ? (
-          <p className="rounded-lg border border-surface-border p-4 text-sm text-slate-600">
-            No open roles currently indexed for this employer.
-            {company.careers_url && (
-              <>
-                {" "}
-                Check their{" "}
-                <a
-                  href={company.careers_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium text-terracotta-700 underline hover:text-terracotta-800"
-                >
-                  careers page
-                </a>{" "}
-                directly for current openings.
-              </>
-            )}
-          </p>
-        ) : (
-          <ul className="flex flex-col gap-3">
-            {company.open_jobs.map((job, index) => (
-              <li
-                key={`${job.title}-${job.postedAt ?? index}-${index}`}
-                className="flex flex-col gap-2 rounded-lg border border-surface-border bg-white p-4 shadow-2xs transition-colors duration-150 motion-reduce:transition-none hover:border-slate-400"
-              >
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  {job.sourceUrl ? (
-                    <a
-                      href={job.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group inline-flex items-center gap-1.5 rounded text-sm font-semibold text-navy-900 hover:text-terracotta-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
-                    >
-                      <span className="group-hover:underline">{job.title}</span>
-                      <ExternalLink
-                        aria-hidden="true"
-                        className="h-3.5 w-3.5 text-slate-400 group-hover:text-terracotta-700 transition-colors"
-                      />
-                    </a>
-                  ) : (
-                    <span className="text-sm font-semibold text-navy-900">
-                      {job.title}
-                    </span>
-                  )}
-                  {job.postedAt && (
-                    <span
-                      suppressHydrationWarning
-                      className="font-mono text-xs text-slate-500 tabular-nums"
-                    >
-                      {new Date(job.postedAt).toLocaleDateString("en-AU")}
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  {job.roleFamily && (
-                    <span className="rounded bg-slate-100 px-2.5 py-0.5 font-mono text-[11px] text-slate-700">
-                      {job.roleFamily}
-                    </span>
-                  )}
-                  {SENIORITY_LABELS[job.seniority] && (
-                    <span className="rounded bg-slate-100 px-2.5 py-0.5 font-mono text-[11px] text-slate-700">
-                      {SENIORITY_LABELS[job.seniority]}
-                    </span>
-                  )}
-                  {REMOTE_TYPE_LABELS[job.remoteType] && (
-                    <span className="rounded bg-slate-100 px-2.5 py-0.5 font-mono text-[11px] font-medium text-slate-700">
-                      {REMOTE_TYPE_LABELS[job.remoteType]}
-                    </span>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      </div>
     </main>
   );
 }

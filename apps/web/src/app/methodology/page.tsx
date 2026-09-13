@@ -8,6 +8,8 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
+import { auth } from "../../auth";
+import { GlobalNavbar } from "../../components/ui/GlobalNavbar";
 
 export const metadata: Metadata = {
   title: "Methodology & Opportunity Graph Standards — Australia Tech Map",
@@ -16,18 +18,26 @@ export const metadata: Metadata = {
   alternates: { canonical: "/methodology" },
 };
 
-export default function MethodologyPage() {
+export default async function MethodologyPage() {
+  const session = await auth();
+
   return (
-    <main className="mx-auto min-h-screen max-w-4xl px-6 py-10 sm:px-10 sm:py-16">
-      {/* Navigation Header */}
-      <nav className="flex items-center justify-between border-b border-surface-border pb-5">
+    <main className="mx-auto min-h-screen max-w-5xl px-4 py-6 sm:px-8 sm:py-8">
+      <GlobalNavbar
+        currentPage="methodology"
+        userEmail={session?.user?.email}
+        subtitle="Ecosystem Methodology & Standards"
+      />
+
+      {/* Navigation Breadcrumb */}
+      <nav className="mt-4 flex items-center justify-between border-b border-surface-border pb-4">
         <Link
           href="/"
-          className="inline-flex items-center text-sm font-semibold text-slate-700 hover:text-navy-900 transition-colors"
+          className="inline-flex items-center text-xs font-semibold text-slate-600 hover:text-navy-900 transition-colors"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Map
+          <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Back to Map Directory
         </Link>
-        <span className="font-mono text-xs font-bold uppercase tracking-wider text-slate-400">
+        <span className="font-mono text-xs font-semibold uppercase tracking-wider text-slate-400">
           Methodology v1.0 • September 2026
         </span>
       </nav>

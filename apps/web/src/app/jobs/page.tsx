@@ -2,16 +2,26 @@
  * pre-emit critique: P5 H4 E5 S5 R5 V4
  */
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft,
   ArrowUpRight,
-  BriefcaseBusiness,
+  Briefcase,
   Building2,
+  Calendar,
+  Compass,
+  Filter,
+  Globe,
   MapPin,
   Search,
+  Sparkles,
+  User,
 } from "lucide-react";
+import { GlobalNavbar } from "../../components/ui/GlobalNavbar";
 
+import { auth } from "../../auth";
+import { CompanyBrandMark } from "../../components/ui/CompanyBrandMark";
 import { DatabaseNotConfiguredError, getPool } from "../../lib/db";
 import {
   listActiveJobs,
@@ -34,6 +44,14 @@ const WORK_STYLES: Array<{ value: PublicWorkStyle; label: string }> = [
   { value: "flexible_mixed", label: "Flexible" },
   { value: "unknown", label: "Work style not stated" },
 ];
+
+const WORK_STYLE_LABELS: Record<string, string> = {
+  remote: "Remote",
+  hybrid: "Hybrid",
+  onsite: "On-site",
+  flexible_mixed: "Flexible",
+  unknown: "Work style unstated",
+};
 
 const SENIORITY_LABELS: Record<string, string> = {
   junior: "Junior",
@@ -96,209 +114,272 @@ export default async function JobsPage({
     filters.query?.trim() || filters.roleFamily || filters.workStyle,
   );
 
+  const session = await auth();
+  const userEmail = session?.user?.email ?? null;
+
   return (
-    <main className="mx-auto min-h-screen max-w-6xl px-5 py-6 sm:px-8 sm:py-10 lg:px-10">
-      <nav className="flex flex-wrap items-center justify-between gap-3 border-b border-surface-border pb-4">
-        <Link
-          href="/"
-          className="inline-flex min-h-11 items-center whitespace-nowrap text-sm font-semibold text-navy-900 hover:text-terracotta-700 active:text-terracotta-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" /> Directory
-        </Link>
-        <Link
-          href="/opportunities"
-          className="inline-flex min-h-11 items-center whitespace-nowrap text-sm font-semibold text-slate-700 hover:text-navy-900 active:text-terracotta-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
-        >
-          Opportunity Match <ArrowUpRight className="ml-1.5 h-4 w-4" />
-        </Link>
-      </nav>
+    <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-6 px-4 py-6 sm:px-8 sm:py-8">
+      {/* 1. Global Brand Header */}
+      <GlobalNavbar
+        currentPage="jobs"
+        userEmail={userEmail}
+        subtitle="National Live Jobs Registry"
+      />
 
-      <header className="grid gap-5 border-b border-surface-border py-9 sm:py-12 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
-        <div className="min-w-0">
-          <p className="font-mono text-xs font-semibold tracking-[0.12em] text-slate-500">
-            VERIFIED HIRING REGISTRY
-          </p>
-          <h1 className="mt-3 min-w-0 wrap-anywhere font-heading text-4xl font-bold leading-tight tracking-tight text-navy-900 sm:text-5xl">
-            Live technology roles
-          </h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-            Roles are linked to the employer&apos;s official application page.
-            Listings remain visible only while their monitored source reports
-            them as open.
-          </p>
-        </div>
-        <div className="border-l-2 border-terracotta-700 pl-4 text-sm leading-6 text-slate-600">
-          <span className="block font-mono text-xs font-semibold tracking-[0.12em] text-slate-500">
-            CURRENT RESULTS
+      {/* 2. Breadcrumb & Status Bar */}
+      <div className="flex items-center justify-between text-xs text-slate-500 font-medium -mt-1">
+        <div className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1 font-semibold text-terracotta-700 hover:text-terracotta-800 hover:underline"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back to map directory
+          </Link>
+          <span className="text-slate-300">•</span>
+          <span>Jobs</span>
+          <span className="text-slate-300">•</span>
+          <span className="font-bold text-navy-900">
+            {data?.total ?? 0} Live Positions
           </span>
-          <span className="mt-1 block font-heading text-3xl font-bold tabular-nums text-navy-900">
-            {data?.total ?? "—"}
-          </span>
-          <span>open roles matching this view</span>
         </div>
-      </header>
+        <span className="font-mono text-[11px] text-slate-400 hidden sm:inline">
+          Monitored official ATS feeds
+        </span>
+      </div>
 
-      <section className="py-7" aria-labelledby="filter-heading">
-        <h2 id="filter-heading" className="sr-only">
-          Filter live roles
-        </h2>
-        <form className="grid gap-3 rounded-lg border border-surface-border bg-surface p-4 shadow-2xs lg:grid-cols-[minmax(0,1fr)_15rem_12rem_auto] lg:items-end">
-          <label className="grid gap-1.5 text-sm font-semibold text-navy-900">
-            Search role or employer
-            <span className="relative">
-              <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-500" />
-              <input
-                type="search"
-                name="q"
-                defaultValue={filters.query}
-                maxLength={120}
-                placeholder="e.g. platform engineer"
-                className="min-h-11 w-full rounded border border-slate-300 bg-white py-2 pr-3 pl-9 text-sm font-normal text-navy-900 placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pacific-700 focus-visible:ring-offset-2"
-              />
-            </span>
-          </label>
-          <label className="grid gap-1.5 text-sm font-semibold text-navy-900">
-            Role family
-            <select
-              name="role_family"
-              defaultValue={filters.roleFamily}
-              className="min-h-11 rounded border border-slate-300 bg-white px-3 text-sm font-normal text-navy-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pacific-700 focus-visible:ring-offset-2"
-            >
-              <option value="">All role families</option>
-              {data?.roleFamilies.map((family) => (
-                <option key={family.key} value={family.key}>
-                  {family.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="grid gap-1.5 text-sm font-semibold text-navy-900">
-            Work style
-            <select
-              name="work_style"
-              defaultValue={filters.workStyle}
-              className="min-h-11 rounded border border-slate-300 bg-white px-3 text-sm font-normal text-navy-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pacific-700 focus-visible:ring-offset-2"
-            >
-              <option value="">Any work style</option>
-              {WORK_STYLES.map((style) => (
-                <option key={style.value} value={style.value}>
-                  {style.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className="flex min-h-11 items-end gap-3">
-            <button
-              type="submit"
-              className="inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded bg-terracotta-700 px-4 text-sm font-semibold text-white hover:bg-terracotta-800 active:bg-terracotta-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
-            >
-              Apply filters
-            </button>
-            {activeFilters ? (
-              <Link
-                href="/jobs"
-                className="inline-flex min-h-11 items-center whitespace-nowrap text-sm font-semibold text-slate-700 underline decoration-slate-300 underline-offset-4 hover:text-navy-900 hover:decoration-terracotta-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
-              >
-                Clear
-              </Link>
-            ) : null}
+      {/* 3. Hero Header & Filter Form */}
+      <section className="relative overflow-hidden rounded-2xl border border-surface-border bg-white p-6 sm:p-8 shadow-2xs">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-0 opacity-[0.05] mix-blend-multiply bg-center bg-cover [mask-image:radial-gradient(ellipse_at_center,black_50%,transparent_95%)]"
+          style={{ backgroundImage: "url('/brand/hero_cartography.jpg')" }}
+        />
+
+        <div className="relative z-10 space-y-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
+                <span className="font-mono text-xs font-bold text-emerald-800 tracking-wider uppercase">
+                  Active Hiring Index
+                </span>
+              </div>
+              <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-navy-900">
+                Live Australian Technology Roles
+              </h1>
+              <p className="mt-2 max-w-2xl text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Direct vacancies substantiated from official careers pages of
+                verified tech employers and subclass 482 visa sponsors nationwide.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-slate-200/90 bg-slate-50 p-3.5 text-right shrink-0">
+              <span className="font-mono text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
+                Active Openings
+              </span>
+              <span className="font-heading text-2xl font-black text-navy-900 tabular-nums">
+                {data?.total ?? "—"}
+              </span>
+              <span className="block text-[11px] font-medium text-slate-500 mt-0.5">
+                roles currently indexed
+              </span>
+            </div>
           </div>
-        </form>
+
+          {/* Search & Filter Form */}
+          <form className="grid gap-3 rounded-xl border border-slate-200/90 bg-slate-50/70 p-3 sm:p-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_auto] lg:items-end">
+            <div>
+              <label className="block text-xs font-bold text-navy-900 mb-1.5">
+                Search role or employer
+              </label>
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <input
+                  type="search"
+                  name="q"
+                  defaultValue={filters.query}
+                  maxLength={120}
+                  placeholder="e.g. Platform Engineer, Canva, Sydney"
+                  className="w-full rounded-xl border border-slate-200 bg-white py-2 pr-3 pl-9 text-xs font-medium text-navy-900 placeholder:text-slate-400 focus:border-navy-900 focus:outline-none focus:ring-2 focus:ring-navy-900/15"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-navy-900 mb-1.5">
+                Role family
+              </label>
+              <select
+                name="role_family"
+                defaultValue={filters.roleFamily}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-navy-900 focus:border-navy-900 focus:outline-none focus:ring-2 focus:ring-navy-900/15 cursor-pointer"
+              >
+                <option value="">All role families</option>
+                {data?.roleFamilies.map((family) => (
+                  <option key={family.key} value={family.key}>
+                    {family.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-navy-900 mb-1.5">
+                Work style
+              </label>
+              <select
+                name="work_style"
+                defaultValue={filters.workStyle}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-navy-900 focus:border-navy-900 focus:outline-none focus:ring-2 focus:ring-navy-900/15 cursor-pointer"
+              >
+                <option value="">Any work style</option>
+                {WORK_STYLES.map((style) => (
+                  <option key={style.value} value={style.value}>
+                    {style.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2 pt-1 lg:pt-0">
+              <button
+                type="submit"
+                className="flex-1 lg:flex-none inline-flex items-center justify-center rounded-xl bg-navy-900 px-5 py-2 text-xs font-bold text-white shadow-xs hover:bg-slate-800 transition-colors"
+              >
+                Apply Filters
+              </button>
+              {activeFilters && (
+                <Link
+                  href="/jobs"
+                  className="rounded-xl border border-surface-border bg-white px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+                >
+                  Clear
+                </Link>
+              )}
+            </div>
+          </form>
+        </div>
       </section>
 
-      {error ? (
-        <section className="border-l-2 border-terracotta-700 bg-terracotta-50 px-5 py-6 text-sm leading-6 text-terracotta-900">
+      {error && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-900">
           {error}
-        </section>
-      ) : null}
+        </div>
+      )}
 
-      {data?.truncated ? (
-        <p className="mb-4 border-l-2 border-ochre-600 bg-ochre-50 px-4 py-3 text-sm leading-6 text-ochre-900">
-          Showing the first 100 of {data.total} matching roles. Refine the
-          filters to narrow this registry view.
-        </p>
-      ) : null}
+      {data?.truncated && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
+          Showing the first 100 of {data.total} matching roles. Refine your
+          filters to view specific sectors or locations.
+        </div>
+      )}
 
+      {/* 4. Live Roles Cards Listing */}
       {data && data.jobs.length > 0 ? (
-        <ol className="divide-y divide-surface-border border-y border-surface-border">
+        <div className="space-y-3">
           {data.jobs.map((job) => {
             const postedLabel = formatDate(job.postedAt);
             return (
-              <li
+              <div
                 key={job.id}
-                className="grid gap-4 py-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                className="group rounded-2xl border border-slate-200/90 bg-white p-5 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all flex flex-col md:flex-row md:items-center justify-between gap-5"
               >
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-600">
-                    <Building2 className="h-4 w-4 shrink-0 text-pacific-700" />
-                    <Link
-                      href={`/companies/${job.companySlug}`}
-                      className="font-semibold text-navy-900 hover:text-terracotta-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
-                    >
-                      {job.companyName}
-                    </Link>
-                    {job.locationText ? (
-                      <span className="inline-flex items-center gap-1 text-slate-500">
-                        <MapPin className="h-3.5 w-3.5" /> {job.locationText}
+                <div className="flex items-start gap-4 min-w-0">
+                  <CompanyBrandMark
+                    slug={job.companySlug}
+                    name={job.companyName}
+                    size="md"
+                    className="shrink-0 mt-0.5"
+                  />
+                  <div className="space-y-1.5 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap text-xs text-slate-500">
+                      <Link
+                        href={`/companies/${job.companySlug}`}
+                        className="font-bold text-navy-900 hover:text-terracotta-700 hover:underline transition-colors"
+                      >
+                        {job.companyName}
+                      </Link>
+                      {job.locationText && (
+                        <>
+                          <span className="text-slate-300">•</span>
+                          <span className="inline-flex items-center gap-1">
+                            <MapPin className="h-3 w-3 text-slate-400" />
+                            {job.locationText}
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    <h2 className="font-heading text-base sm:text-lg font-bold text-navy-900 truncate group-hover:text-terracotta-700 transition-colors">
+                      <a
+                        href={job.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline"
+                      >
+                        {job.title}
+                      </a>
+                    </h2>
+
+                    <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                      {job.roleFamily && (
+                        <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-semibold text-slate-700">
+                          {job.roleFamily}
+                        </span>
+                      )}
+                      {SENIORITY_LABELS[job.seniority] && (
+                        <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-medium text-slate-600">
+                          {SENIORITY_LABELS[job.seniority]}
+                        </span>
+                      )}
+                      {WORK_STYLE_LABELS[job.workStyle] && (
+                        <span className="rounded bg-sky-50 text-sky-700 border border-sky-200/70 px-2 py-0.5 font-mono text-[10px] font-semibold">
+                          {WORK_STYLE_LABELS[job.workStyle]}
+                        </span>
+                      )}
+                      <span className="font-mono text-[11px] text-slate-400 ml-1">
+                        {postedLabel
+                          ? `Posted ${postedLabel}`
+                          : `Observed ${formatDate(job.firstSeenAt)}`}
                       </span>
-                    ) : null}
-                  </div>
-                  <h2 className="mt-2 wrap-anywhere font-heading text-xl font-bold tracking-tight text-navy-900">
-                    {job.title}
-                  </h2>
-                  <div className="mt-2 flex flex-wrap gap-2 text-xs font-medium text-slate-600">
-                    {job.roleFamily ? (
-                      <span className="rounded border border-pacific-100 bg-pacific-50 px-2 py-1 text-pacific-900">
-                        {job.roleFamily}
-                      </span>
-                    ) : null}
-                    <span className="rounded border border-slate-200 bg-slate-50 px-2 py-1">
-                      {SENIORITY_LABELS[job.seniority] ?? job.seniority}
-                    </span>
-                    <span className="rounded border border-slate-200 bg-slate-50 px-2 py-1">
-                      {workStyleLabel(job.workStyle)}
-                    </span>
-                    <span className="font-mono text-[11px] leading-7 text-slate-500">
-                      {postedLabel
-                        ? `Posted ${postedLabel}`
-                        : `Observed ${formatDate(job.firstSeenAt)}`}
-                    </span>
+                    </div>
                   </div>
                 </div>
-                <a
-                  href={job.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Apply for ${job.title} at ${job.companyName} on the employer site`}
-                  className="inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded border border-navy-800 px-4 text-sm font-semibold text-navy-900 hover:border-terracotta-700 hover:text-terracotta-700 active:border-terracotta-900 active:text-terracotta-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
-                >
-                  Apply on employer site{" "}
-                  <ArrowUpRight className="ml-2 h-4 w-4" />
-                </a>
-              </li>
+
+                <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
+                  <a
+                    href={job.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-xl bg-terracotta-700 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-terracotta-800 active:scale-95 transition-all"
+                  >
+                    <span>Apply on careers page</span>
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </a>
+                </div>
+              </div>
             );
           })}
-        </ol>
+        </div>
       ) : data && !error ? (
-        <section className="grid min-h-64 place-items-center border border-dashed border-surface-border bg-surface px-6 py-12 text-center">
-          <div className="max-w-md">
-            <BriefcaseBusiness className="mx-auto h-7 w-7 text-slate-500" />
-            <h2 className="mt-3 font-heading text-xl font-bold text-navy-900">
-              No live roles match this view
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              Try a broader role, employer name, or work-style filter. We only
-              list roles still reported as open by their monitored source.
-            </p>
-            {activeFilters ? (
-              <Link
-                href="/jobs"
-                className="mt-4 inline-flex min-h-11 items-center whitespace-nowrap text-sm font-semibold text-terracotta-700 underline decoration-terracotta-300 underline-offset-4 hover:text-terracotta-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 focus-visible:ring-offset-2"
-              >
-                Reset filters
-              </Link>
-            ) : null}
-          </div>
+        <section className="rounded-2xl border border-dashed border-slate-200 bg-white p-12 text-center shadow-2xs">
+          <Briefcase className="mx-auto h-9 w-9 text-slate-400" />
+          <h2 className="mt-3 font-heading text-lg font-bold text-navy-900">
+            No live roles match this view
+          </h2>
+          <p className="mt-1.5 text-xs text-slate-500 max-w-sm mx-auto">
+            Try adjusting your search terms, role family, or work style filters
+            to explore more vacancies.
+          </p>
+          {activeFilters && (
+            <Link
+              href="/jobs"
+              className="mt-4 inline-flex items-center gap-1 rounded-xl bg-navy-900 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-slate-800 transition-colors"
+            >
+              Reset all filters
+            </Link>
+          )}
         </section>
       ) : null}
     </main>
