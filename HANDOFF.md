@@ -18,7 +18,7 @@
 ## Checkpoint
 
 - **Implementation branch:** `main`
-- **Current implementation checkpoint:** In flight (ready to commit under bulk autonomous delivery lane).
+- **Current implementation checkpoint:** `ff59c08` (committed under bulk autonomous delivery lane).
 - **Working-tree status at checkpoint:** Clean.
 - **Remote:** Synchronizing with `origin/main`.
 
