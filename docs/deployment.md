@@ -18,9 +18,13 @@ This workflow is deliberately **manual** (`workflow_dispatch`, not triggered on 
 
 ## Web deployment (Vercel)
 
-Connect the GitHub repository to Vercel directly (vercel.com → Add New → Project → import this repo) rather than hand-rolling a custom deploy workflow. Vercel's own GitHub integration is the "repeatable deployment" mechanism here: every PR gets an automatic preview deployment, every merge to `main` deploys to production, with zero custom CI code required. This matches the Vercel Pro decision already recorded in `ARCHITECTURE_DECISIONS.md` §3.4 — set the project to the Pro plan/team when connecting, not Hobby, per that ADR's reasoning (Hobby's terms are non-commercial-only).
+The live project is already established and connected on Vercel:
+- **Project Dashboard**: [https://vercel.com/ittogethers-projects/aus-tech-map-web](https://vercel.com/ittogethers-projects/aus-tech-map-web)
+- **Scope / Team**: `ittogethers-projects`
+- **Project Name**: `aus-tech-map-web`
+- **Connected Repository**: `jeevanshah/AusTechMap` (`main` branch)
 
-Vercel auto-detects the Next.js app at `apps/web` in this monorepo; if it doesn't, set the project's root directory to `apps/web` explicitly in its dashboard settings.
+Vercel's GitHub integration automatically triggers a deployment on every push to `main` and creates preview deployments for PRs. Environment variables (`DATABASE_URL`, `AUTH_SECRET`, `NEXT_PUBLIC_APP_URL`, and OAuth credentials) are managed in the project's Settings → Environment Variables.
 
 ## Worker deployment
 

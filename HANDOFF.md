@@ -20,9 +20,10 @@
 ## Checkpoint
 
 - **Implementation branch:** `main`
-- **Current implementation checkpoint:** `ff59c08` (committed under bulk autonomous delivery lane).
+- **Current implementation checkpoint:** `a7acaf7` (committed and pushed to `origin/main`).
 - **Working-tree status at checkpoint:** Clean.
-- **Remote:** Synchronizing with `origin/main`.
+- **Remote:** Synchronized with `origin/main`.
+- **Live Vercel Project:** [https://vercel.com/ittogethers-projects/aus-tech-map-web](https://vercel.com/ittogethers-projects/aus-tech-map-web) (Scope: `ittogethers-projects`, Project: `aus-tech-map-web`).
 
 ## Geographic evidence and cleanup — 10 September 2026
 
