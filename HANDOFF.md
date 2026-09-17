@@ -5,15 +5,17 @@
 ## Switch
 
 - **Current Implementer / Integrator:** Codex — operating per `AGENTS.md` orchestration / bulk autonomous delivery lane.
-- **Updated at:** 2026-09-13
-- **Reason:** Visual Account Dashboard (/account): Watchlists & Saved Searches Management: Built interactive management interface inside `/account` for users to view, pause, adjust email alert frequencies (instant, daily digest, weekly, never), and delete saved searches and watched employers/regions; added 1-click pause & resume toggles, segmented pill frequency switcher, batch controls (Pause All / Resume All), per-item notification muting, career memo notes, top KPI overview metrics strip, and 12 unit tests.
-- **Task / issue:** Visual Account Dashboard (`/account`): Watchlists & Saved Searches Management.
-- **Acceptance criteria (this checkpoint):** Full interactive management for saved searches and watchlists; 1-click pause/resume; segmented frequency switcher; batch pause/resume; per-item notification mute; career notes; 100% test pass rate (194/194 tests).
-- **Latest completed delivery:** Overhauled `AccountView.tsx` with top KPI metrics banner, Resend digest schedule callout, and batch action controls.
-- **Latest completed delivery:** Interactive saved searches cards with 1-click pause/resume, segmented frequency switcher (`Paused`, `Daily`, `Weekly`, `Instant`), filter badges, and direct "Run on Map" link.
-- **Latest completed delivery:** Watchlists management with sub-tab filtering (`All`, `Employers`, `Regional Hubs`), notification muting, and private career memo notes.
-- **Latest completed delivery:** Added server actions `pauseAllSavedSearchesAction`, `resumeAllSavedSearchesAction`, `updateWatchlistNotesAction`, and `toggleWatchlistMuteAction` with 12 unit tests.
-- **Production state:** **1,007 canonical companies**, **155 active verified ATS sources**, **1,130 live Australian jobs**, **110 active hiring employers**, 2,718 evidence records, 25 database migrations applied, 194 web tests passing (40 suites), clean TypeScript check, 0 whitespace errors.
+- **Updated at:** 2026-09-17
+- **Reason:** Authentication Upgrade: Google & GitHub OAuth Providers + Hallmark Redesign (/sign-in & /verify-request): Upgraded Auth.js v5 with Google and GitHub OAuth providers with allowDangerousEmailAccountLinking alongside Resend email magic link; full Hallmark visual redesign of /sign-in (split-layout with value proposition, branded OAuth buttons with React 19 transitions, passwordless magic link form) and /verify-request (confirmation card with expiry guidance and retry links); open-redirect protection with callback URL sanitization; 13 new unit tests across 2 new test suites.
+- **Task / issue:** Authentication system expansion & Hallmark redesign (§4.1).
+- **Acceptance criteria (this checkpoint):** Google and GitHub OAuth providers configured; zero stored passwords (APP 11 compliant); Hallmark UI redesign of /sign-in and /verify-request; sanitized callbackUrl; 100% test pass rate (207/207 tests).
+- **Latest completed delivery:** Google and GitHub OAuth configured in `apps/web/src/auth.ts` with `allowDangerousEmailAccountLinking: true`.
+- **Latest completed delivery:** Branded client component `OAuthButtons.tsx` with official Google & GitHub marks and pending transitions.
+- **Latest completed delivery:** Passwordless magic link form `MagicLinkForm.tsx` with email normalization and state feedback.
+- **Latest completed delivery:** Split-layout Hallmark redesign in `/sign-in` with ecosystem value proposition and error banners.
+- **Latest completed delivery:** Hallmark confirmation card in `/verify-request` with 10-minute expiry guidance.
+- **Latest completed delivery:** Strict open-redirect sanitization helper `callback-url.ts` and server action `signInWithProvider`.
+- **Production state:** **1,007 canonical companies**, **155 active verified ATS sources**, **1,130 live Australian jobs**, **110 active hiring employers**, 2,718 evidence records, 25 database migrations applied, 207 web tests passing (42 suites), clean TypeScript check, 0 whitespace errors.
 
 ## Checkpoint
 

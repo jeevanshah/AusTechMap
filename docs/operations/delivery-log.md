@@ -1,5 +1,33 @@
 # Autonomous delivery log
 
+## 2026-09-17 - Authentication Upgrade: Google & GitHub OAuth Providers + Hallmark Redesign (/sign-in & /verify-request)
+
+- **Scope & Highlights**:
+  1. **Multi-Provider Zero-Password Authentication**:
+     - Upgraded Auth.js v5 (`next-auth@beta`) in `apps/web/src/auth.ts` with Google OAuth (`GoogleProvider`) and GitHub OAuth (`GitHubProvider`) alongside Resend email magic link.
+     - Set `allowDangerousEmailAccountLinking: true` so candidates and developers can authenticate seamlessly across providers with matching verified emails.
+     - Preserved APP 11 compliance with a zero-password architecture (no stored passwords, no credential stuffing vulnerability surface).
+     - Maintained role-aware database adapter (`RoleAwareAdapter`), RBAC gates (`user`, `reviewer`, `admin`), and staff MFA TOTP controls.
+  2. **Hallmark UI/UX Redesign for `/sign-in`**:
+     - Modern split grid layout with ecosystem value proposition highlights: Saved Market Searches, Employer & Hub Watchlists, Proactive Intelligence Alerts, and Zero-Password Privacy guarantees.
+     - Branded OAuth buttons component (`OAuthButtons.tsx`) with official Google multicolored G mark and GitHub Octocat mark, featuring React 19 transition pending states and micro-interactions.
+     - Passwordless magic link form component (`MagicLinkForm.tsx`) with email normalization, mail icon, autofocus, and smooth pending transition state.
+     - Comprehensive error banner support for Auth.js URL error parameters (`OAuthAccountNotLinked`, `OAuthSignin`, `Verification`, etc.).
+  3. **Hallmark UI/UX Redesign for `/verify-request`**:
+     - Clean centered verification status card with mail dispatch icon, 10-minute expiry warning, and single-use security badge.
+     - Return action buttons allowing users to try an alternative provider or navigate back to the Map Explorer.
+  4. **Security & Open-Redirect Hardening**:
+     - Extracted and hardened `sanitizeCallbackUrl` in `apps/web/src/lib/auth/callback-url.ts` to strictly validate relative redirection paths and block open-redirect vectors (`//evil.com`, `/\evil.com`).
+     - Added server action `signInWithProvider` in `apps/web/src/app/(auth)/sign-in/actions.ts`.
+- **Verification Evidence**:
+  - Web unit tests: **207 passed** across 42 test files (0 failures).
+  - New test coverage: 10 tests in `apps/web/src/app/(auth)/sign-in/actions.test.ts` and 3 tests in `apps/web/src/lib/auth/callback-url.test.ts`.
+  - TypeScript check: `npm run typecheck --prefix apps/web` exited with **0 errors**.
+  - Production build: `npm run build --prefix apps/web` completed with **0 errors**, compiling dynamic `/sign-in` and static `/verify-request`.
+  - Live server check: HTTP 200 on `/sign-in` and `/verify-request`.
+  - `git diff --check` passed cleanly.
+
+
 ## 2026-09-13 - Visual Account Dashboard (/account): Watchlists & Saved Searches Management
 
 - **Scope & Highlights**:

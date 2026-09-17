@@ -1,4 +1,6 @@
 import NextAuth from "next-auth";
+import GitHub from "next-auth/providers/github";
+import Google from "next-auth/providers/google";
 import Resend from "next-auth/providers/resend";
 
 import { getPool } from "./lib/db";
@@ -8,13 +10,10 @@ import {
   USER_SESSION_MAX_AGE_S,
 } from "./lib/auth/session-policy";
 
-// V1's public sign-in method (ARCHITECTURE_DECISIONS.md §4.1): a one-use
-// Resend email magic link that expires after 10 minutes -- overriding the
-// provider's own 24h default. `from` is the Resend sandbox sender until a
-// real account/verified domain exists (only delivers to the account
-// owner's own address) -- a deliberate, named interim state, same pattern
-// as this project's Nominatim-before-G-NAF precedent. Swap only the `from`
-// value the day a real domain is verified; nothing else changes.
+// V1's public sign-in methods (ARCHITECTURE_DECISIONS.md §4.1):
+// - Google & GitHub OAuth for instant 1-click candidate & developer identity
+// - A one-use Resend email magic link that expires after 10 minutes (fallback)
+// `from` is the Resend sandbox sender until a real verified domain exists.
 const MAGIC_LINK_MAX_AGE_S = 10 * 60;
 const RESEND_FROM = process.env.AUTH_RESEND_FROM ?? "onboarding@resend.dev";
 
@@ -22,6 +21,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   adapter: RoleAwareAdapter(getPool()),
   providers: [
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
+      allowDangerousEmailAccountLinking: true,
+    }),
+    GitHub({
+      clientId: process.env.AUTH_GITHUB_ID,
+      clientSecret: process.env.AUTH_GITHUB_SECRET,
+      allowDangerousEmailAccountLinking: true,
+    }),
     Resend({
       apiKey: process.env.AUTH_RESEND_KEY,
       from: RESEND_FROM,

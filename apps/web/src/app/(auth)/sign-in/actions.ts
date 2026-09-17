@@ -6,6 +6,7 @@ import { signIn } from "../../../auth";
 import { getPool } from "../../../lib/db";
 import { currentClientIp } from "../../../lib/request-ip";
 import { checkRateLimit } from "../../../lib/rate-limit";
+import { sanitizeCallbackUrl } from "../../../lib/auth/callback-url";
 
 const EMAIL_LIMIT = 5;
 const IP_LIMIT = 20;
@@ -14,6 +15,36 @@ const LOCK_SECONDS = 15 * 60;
 
 function normaliseEmail(raw: string): string {
   return raw.trim().toLowerCase();
+}
+
+/**
+ * Initiates OAuth sign-in with Google or GitHub.
+ * Invokes Auth.js signIn, which issues a NEXT_REDIRECT to the provider's authorization screen.
+ */
+export async function signInWithProvider(
+  providerOrFormData: "google" | "github" | FormData,
+  maybeCallbackUrl?: string,
+): Promise<void> {
+  let provider: "google" | "github";
+  let callbackUrl: string | undefined;
+
+  if (typeof providerOrFormData === "string") {
+    provider = providerOrFormData;
+    callbackUrl = maybeCallbackUrl;
+  } else {
+    const rawProvider = providerOrFormData.get("provider");
+    if (rawProvider !== "google" && rawProvider !== "github") {
+      throw new Error("Invalid provider");
+    }
+    provider = rawProvider;
+    const rawCallbackUrl = providerOrFormData.get("callbackUrl");
+    if (typeof rawCallbackUrl === "string") {
+      callbackUrl = rawCallbackUrl;
+    }
+  }
+
+  const target = sanitizeCallbackUrl(callbackUrl);
+  await signIn(provider, { redirectTo: target });
 }
 
 /**
@@ -45,8 +76,10 @@ export async function requestMagicLink(formData: FormData): Promise<void> {
     lockSeconds: LOCK_SECONDS,
   });
 
+  const callbackUrl = sanitizeCallbackUrl(formData.get("callbackUrl"));
+
   if (emailCheck.allowed && ipCheck.allowed) {
-    await signIn("resend", { email, redirect: false });
+    await signIn("resend", { email, redirectTo: callbackUrl, redirect: false });
   }
   // Same redirect regardless of the real outcome -- no account-existence
   // or rate-limit-state signal leaks to the caller.

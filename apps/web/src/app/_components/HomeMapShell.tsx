@@ -1094,18 +1094,6 @@ export function HomeMapShell({
     ? searchResultsToListEntries(searchResults ?? [])
     : pointsToListEntries(points);
 
-  const availableRoleFamilies = useMemo(() => {
-    const set = new Set<string>();
-    for (const entry of rawListEntries) {
-      if (entry.topRoleFamilies) {
-        for (const rf of entry.topRoleFamilies) {
-          set.add(rf);
-        }
-      }
-    }
-    return Array.from(set).sort();
-  }, [rawListEntries]);
-
   const hiringCount = useMemo(
     () => rawListEntries.filter((e) => (e.activeJobsCount ?? 0) > 0).length,
     [rawListEntries],
@@ -1260,7 +1248,6 @@ export function HomeMapShell({
     setCameraTarget({
       center: [133.7751, -25.2744],
       zoom: 4,
-      timestamp: Date.now(),
     });
   };
 
@@ -1272,7 +1259,6 @@ export function HomeMapShell({
       setCameraTarget({
         center: [133.7751, -25.2744],
         zoom: 4,
-        timestamp: Date.now(),
       });
       if (typeof window !== "undefined") {
         const url = new URL(window.location.href);
@@ -1286,7 +1272,6 @@ export function HomeMapShell({
     setCameraTarget({
       center: hub.center,
       zoom: hub.zoom,
-      timestamp: Date.now(),
     });
     setQuery("");
     handleTabChange("companies");
@@ -1731,7 +1716,6 @@ export function HomeMapShell({
                     setCameraTarget({
                       center: [133.7751, -25.2744],
                       zoom: 4,
-                      timestamp: Date.now(),
                     });
                     if (typeof window !== "undefined") {
                       const url = new URL(window.location.href);
