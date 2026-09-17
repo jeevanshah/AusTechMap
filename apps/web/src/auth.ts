@@ -58,16 +58,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async signIn({ user }) {
       // §4.1: role/status come from the database, never trusted from the
-      // provider payload. A brand-new user has no id yet (status defaults
-      // to 'active' at creation) -- only a returning, disabled/pending-
+      // provider payload. A brand-new user has no database record yet (status
+      // defaults to 'active' at creation) -- only a returning, disabled/pending-
       // deletion account is rejected here.
-      if (!user.id) return true;
-      const result = await getPool().query<{ status: string }>(
-        "SELECT status FROM users WHERE id = $1",
-        [user.id],
-      );
-      const status = result.rows[0]?.status;
-      return status !== "disabled" && status !== "deletion_pending";
+      // Lookup by lower(email) rather than user.id because OAuth providers pass
+      // a string subject ID (e.g. Google's 21+ digit sub) which overflows
+      // PostgreSQL's 64-bit bigint id column.
+      const email = user.email?.trim().toLowerCase();
+      if (!email) return true;
+
+      try {
+        const result = await getPool().query<{ status: string }>(
+          "SELECT status FROM users WHERE lower(email) = $1",
+          [email],
+        );
+        if (result.rows.length === 0) return true;
+        const status = result.rows[0]?.status;
+        return status !== "disabled" && status !== "deletion_pending";
+      } catch (err) {
+        console.error("signIn callback error checking account status:", err);
+        return false;
+      }
     },
     async session({ session, user }) {
       // @auth/core's session action spreads the raw DB session row (from
