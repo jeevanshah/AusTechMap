@@ -71,10 +71,10 @@ export async function listWatchlist(
      ) research ON true
      LEFT JOIN LATERAL (
        SELECT cat_inner.label
-       FROM company_categories cc_inner
-       JOIN categories cat_inner ON cat_inner.id = cc_inner.category_id
-       WHERE cc_inner.company_id = c.id
-       ORDER BY cc_inner.is_primary DESC, cc_inner.created_at ASC
+       FROM company_category_links ccl_inner
+       JOIN categories cat_inner ON cat_inner.id = ccl_inner.category_id
+       WHERE ccl_inner.company_id = c.id
+       ORDER BY ccl_inner.confidence DESC, ccl_inner.created_at ASC
        LIMIT 1
      ) cat ON true
      LEFT JOIN regions r ON (w.region_id = r.id OR (w.sa4_code IS NOT NULL AND r.code = w.sa4_code AND r.region_type = 'sa4'))
