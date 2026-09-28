@@ -19,6 +19,7 @@ This workflow is deliberately **manual** (`workflow_dispatch`, not triggered on 
 ## Web deployment (Vercel)
 
 The live project is already established and connected on Vercel:
+
 - **Project Dashboard**: [https://vercel.com/ittogethers-projects/aus-tech-map-web](https://vercel.com/ittogethers-projects/aus-tech-map-web)
 - **Scope / Team**: `ittogethers-projects`
 - **Project Name**: `aus-tech-map-web`

@@ -81,7 +81,11 @@ describe("retentionActions", () => {
         updatedAt: "2026-09-08T00:00:00Z",
       });
 
-      const res = await saveSearchAction("DevOps Melbourne", { hubCity: "Melbourne" }, "weekly");
+      const res = await saveSearchAction(
+        "DevOps Melbourne",
+        { hubCity: "Melbourne" },
+        "weekly",
+      );
       expect(res.success).toBe(true);
       expect(res.search?.name).toBe("DevOps Melbourne");
     });
@@ -136,7 +140,10 @@ describe("retentionActions", () => {
 
     it("updateWatchlistNotesAction updates custom note memo", async () => {
       vi.mocked(updateWatchlistNotes).mockResolvedValue(true);
-      const res = await updateWatchlistNotesAction("entry-uuid", "Spoke with hiring manager");
+      const res = await updateWatchlistNotesAction(
+        "entry-uuid",
+        "Spoke with hiring manager",
+      );
       expect(res.success).toBe(true);
     });
 

@@ -24,7 +24,7 @@ MIGRATIONS_DIRECTORY = REPOSITORY_ROOT / "db" / "migrations"
 def test_repository_migrations_are_contiguous_and_cover_foundation_contracts() -> None:
     migrations = discover_migrations(MIGRATIONS_DIRECTORY)
 
-    assert [migration.version for migration in migrations] == list(range(1, 26))
+    assert [migration.version for migration in migrations] == list(range(1, 27))
     combined_sql = "\n".join(migration.sql for migration in migrations)
     assert "CREATE EXTENSION IF NOT EXISTS postgis" in combined_sql
     assert "CREATE TABLE users" in combined_sql
@@ -58,6 +58,7 @@ def test_repository_migrations_are_contiguous_and_cover_foundation_contracts() -
     assert "CREATE TABLE regional_labor_observations" in combined_sql
     assert "CREATE TABLE region_opportunity_scores" in combined_sql
     assert "reject_regional_intelligence_mutation" in combined_sql
+    assert "CREATE TABLE job_applications" in combined_sql
 
 
 def test_discovery_rejects_a_gap_in_versions(tmp_path: Path) -> None:
@@ -84,7 +85,7 @@ def test_migrations_apply_idempotently_to_postgis() -> None:
     first_application = apply_migrations(database_url, MIGRATIONS_DIRECTORY)
     second_application = apply_migrations(database_url, MIGRATIONS_DIRECTORY)
 
-    assert [migration.version for migration in first_application] in (list(range(1, 26)), [])
+    assert [migration.version for migration in first_application] in (list(range(1, 27)), [])
     assert second_application == ()
 
     with psycopg.connect(database_url) as connection:

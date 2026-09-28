@@ -62,7 +62,9 @@ export function OAuthButtons({ callbackUrl = "/account" }: OAuthButtonsProps) {
             />
           </svg>
         )}
-        <span>{isGooglePending ? "Connecting to Google..." : "Continue with Google"}</span>
+        <span>
+          {isGooglePending ? "Connecting to Google..." : "Continue with Google"}
+        </span>
       </button>
 
       {/* GitHub Button */}
@@ -88,7 +90,9 @@ export function OAuthButtons({ callbackUrl = "/account" }: OAuthButtonsProps) {
             />
           </svg>
         )}
-        <span>{isGitHubPending ? "Connecting to GitHub..." : "Continue with GitHub"}</span>
+        <span>
+          {isGitHubPending ? "Connecting to GitHub..." : "Continue with GitHub"}
+        </span>
       </button>
     </div>
   );

@@ -24,10 +24,7 @@ import { redirect } from "next/navigation";
 import { signIn } from "../../../auth";
 import { checkRateLimit } from "../../../lib/rate-limit";
 import { sanitizeCallbackUrl } from "../../../lib/auth/callback-url";
-import {
-  signInWithProvider,
-  requestMagicLink,
-} from "./actions";
+import { signInWithProvider, requestMagicLink } from "./actions";
 
 describe("sanitizeCallbackUrl", () => {
   it("allows standard valid relative paths", () => {
@@ -81,7 +78,9 @@ describe("signInWithProvider", () => {
     const formData = new FormData();
     formData.append("provider", "facebook");
 
-    await expect(signInWithProvider(formData)).rejects.toThrow("Invalid provider");
+    await expect(signInWithProvider(formData)).rejects.toThrow(
+      "Invalid provider",
+    );
   });
 });
 
@@ -133,6 +132,8 @@ describe("requestMagicLink", () => {
     const formData = new FormData();
     formData.append("email", "   ");
 
-    await expect(requestMagicLink(formData)).rejects.toThrow("Email is required");
+    await expect(requestMagicLink(formData)).rejects.toThrow(
+      "Email is required",
+    );
   });
 });

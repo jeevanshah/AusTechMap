@@ -374,7 +374,4 @@ def is_australian_location(location_text: str | None) -> bool:
 
     # Australian city matches (e.g. "Sydney", "Melbourne") when no foreign markers
     has_city = bool(_AUSTRALIAN_CITY_PATTERNS.search(cleaned))
-    if has_city and not has_explicit_foreign:
-        return True
-
-    return False
+    return bool(has_city and not has_explicit_foreign)

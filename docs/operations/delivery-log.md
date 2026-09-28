@@ -45,7 +45,6 @@
   - Live server check: HTTP 200 on `/sign-in` and `/verify-request`.
   - `git diff --check` passed cleanly.
 
-
 ## 2026-09-13 - Visual Account Dashboard (/account): Watchlists & Saved Searches Management
 
 - **Scope & Highlights**:

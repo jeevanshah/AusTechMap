@@ -29,8 +29,8 @@ export default function NotFound() {
         </h1>
 
         <p className="mt-3 text-sm leading-relaxed text-slate-600">
-          The registry record, directory listing, or ecosystem page you are looking for
-          may have been moved or does not exist.
+          The registry record, directory listing, or ecosystem page you are
+          looking for may have been moved or does not exist.
         </p>
 
         {/* Primary Action */}

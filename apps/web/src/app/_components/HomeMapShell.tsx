@@ -236,7 +236,7 @@ const HUB_METADATA: Record<string, HubMeta> = {
   },
   Townsville: {
     state: "QLD",
-    center: [146.8169, -19.2590],
+    center: [146.8169, -19.259],
     zoom: 12,
     tag: "North Queensland Clean Energy, Defence & Marine",
     icon: Zap,
@@ -477,8 +477,6 @@ export function formatLocation(city: string | null | undefined): string {
   }
   return `${trimmed}, Australia`;
 }
-
-
 
 function CategoryBadge({
   category,
@@ -1861,7 +1859,8 @@ export function HomeMapShell({
                       No regional hubs matching &ldquo;{query}&rdquo;
                     </p>
                     <p className="text-xs text-slate-500 mt-1 max-w-xs leading-relaxed">
-                      Try searching by state (e.g. WA, NSW, QLD), city name, or technology sector.
+                      Try searching by state (e.g. WA, NSW, QLD), city name, or
+                      technology sector.
                     </p>
                     <button
                       type="button"
@@ -2323,7 +2322,6 @@ export function HomeMapShell({
                   </div>
                 );
               })()}
-
           </div>
         </div>
       </div>

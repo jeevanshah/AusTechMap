@@ -93,7 +93,9 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
                 Evidence-backed intelligence, personalized to you.
               </h1>
               <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                Sign in to customize your ecosystem view, save high-signal market queries, and track hiring velocity across Australia&apos;s leading technology companies.
+                Sign in to customize your ecosystem view, save high-signal
+                market queries, and track hiring velocity across
+                Australia&apos;s leading technology companies.
               </p>
             </div>
 
@@ -108,7 +110,8 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
                     Saved Market Searches
                   </span>
                   <span className="text-xs text-slate-500 leading-relaxed">
-                    Bookmark bespoke geographic, industry, and role filters with one-click access.
+                    Bookmark bespoke geographic, industry, and role filters with
+                    one-click access.
                   </span>
                 </div>
               </div>
@@ -122,7 +125,8 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
                     Employer & Hub Watchlists
                   </span>
                   <span className="text-xs text-slate-500 leading-relaxed">
-                    Monitor growth signals and vacancy surges across 1,800+ verified employers.
+                    Monitor growth signals and vacancy surges across 1,800+
+                    verified employers.
                   </span>
                 </div>
               </div>
@@ -136,7 +140,8 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
                     Proactive Intelligence Alerts
                   </span>
                   <span className="text-xs text-slate-500 leading-relaxed">
-                    Receive weekly vacancy digests and ecosystem reports straight to your inbox.
+                    Receive weekly vacancy digests and ecosystem reports
+                    straight to your inbox.
                   </span>
                 </div>
               </div>
@@ -183,7 +188,8 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
               {/* Privacy & Zero Password Guarantee */}
               <div className="mt-6 pt-4 border-t border-slate-100 text-center">
                 <p className="text-[11px] leading-normal text-slate-400">
-                  No passwords stored or required &middot; Australian Privacy Principles compliant.
+                  No passwords stored or required &middot; Australian Privacy
+                  Principles compliant.
                 </p>
               </div>
             </div>
@@ -193,7 +199,8 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
 
       {/* Minimal Footer */}
       <footer className="border-t border-surface-border bg-white px-4 py-4 text-center text-xs text-slate-400">
-        &copy; {new Date().getFullYear()} Australia Tech Map &middot; Evidence-backed technology opportunity intelligence.
+        &copy; {new Date().getFullYear()} Australia Tech Map &middot;
+        Evidence-backed technology opportunity intelligence.
       </footer>
     </div>
   );

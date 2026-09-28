@@ -362,10 +362,7 @@ export function MapCanvas({
           north = 89.9;
         }
       }
-      onMoveEndRef.current?.(
-        { west, south, east, north },
-        zoom,
-      );
+      onMoveEndRef.current?.({ west, south, east, north }, zoom);
     });
 
     return () => {

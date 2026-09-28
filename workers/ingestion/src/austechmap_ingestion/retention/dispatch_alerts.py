@@ -14,7 +14,7 @@ Guarantees:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, UTC
+
 import psycopg
 
 
@@ -41,7 +41,7 @@ def dispatch_alerts(
     if frequency not in ("all", "instant", "daily", "weekly"):
         raise ValueError(f"Invalid frequency filter: {frequency}")
 
-    with psycopg.connect(database_url) as conn:
+    with psycopg.connect(database_url) as conn:  # noqa: SIM117
         with conn.cursor() as cur:
             # 1. Match company watchlists against material company events
             cur.execute("""
@@ -51,19 +51,32 @@ def dispatch_alerts(
                         e.id AS event_id,
                         e.event_type,
                         e.payload,
-                        COALESCE(e.payload ->> 'companyName', c.display_name, 'Company') AS company_name,
+                        COALESCE(
+                            e.payload ->> 'companyName',
+                            c.display_name,
+                            'Company'
+                        ) AS company_name,
                         COALESCE(e.payload ->> 'companySlug', c.slug, '') AS company_slug,
                         e.payload ->> 'title' AS job_title,
                         e.payload ->> 'remoteType' AS remote_type,
                         e.payload ->> 'agreementType' AS agreement_type
                     FROM events e
                     JOIN watchlists w ON w.entity_type = 'company' 
-                      AND (w.company_id::text = e.entity_id OR w.company_id::text = (e.payload ->> 'companyId'))
+                      AND (
+                          w.company_id::text = e.entity_id
+                          OR w.company_id::text = (e.payload ->> 'companyId')
+                      )
                     LEFT JOIN companies c ON c.id = w.company_id
-                    WHERE e.event_type IN ('job.first_seen', 'sponsorship.evidence_added', 'company.updated')
+                    WHERE e.event_type IN (
+                        'job.first_seen',
+                        'sponsorship.evidence_added',
+                        'company.updated'
+                    )
                 ),
                 deliveries AS (
-                    INSERT INTO notification_deliveries (user_id, event_id, channel, delivery_window, status)
+                    INSERT INTO notification_deliveries (
+                        user_id, event_id, channel, delivery_window, status
+                    )
                     SELECT 
                         cm.user_id,
                         cm.event_id,
@@ -75,22 +88,42 @@ def dispatch_alerts(
                     RETURNING user_id, event_id
                 ),
                 inserted_alerts AS (
-                    INSERT INTO user_alerts (user_id, alert_type, title, message, link, entity_type, entity_id)
+                    INSERT INTO user_alerts (
+                        user_id, alert_type, title, message, link,
+                        entity_type, entity_id
+                    )
                     SELECT 
                         d.user_id,
                         CASE 
                             WHEN cm.event_type = 'job.first_seen' THEN 'new_job'
-                            WHEN cm.event_type = 'sponsorship.evidence_added' THEN 'sponsorship_change'
+                            WHEN cm.event_type = 'sponsorship.evidence_added'
+                                THEN 'sponsorship_change'
                             ELSE 'company_update'
                         END,
                         CASE 
-                            WHEN cm.event_type = 'job.first_seen' THEN CONCAT(cm.company_name, ' posted a new role')
-                            WHEN cm.event_type = 'sponsorship.evidence_added' THEN CONCAT(cm.company_name, ' added visa sponsorship evidence')
+                            WHEN cm.event_type = 'job.first_seen'
+                                THEN CONCAT(cm.company_name, ' posted a new role')
+                            WHEN cm.event_type = 'sponsorship.evidence_added'
+                                THEN CONCAT(
+                                    cm.company_name,
+                                    ' added visa sponsorship evidence'
+                                )
                             ELSE CONCAT(cm.company_name, ' update')
                         END,
                         CASE 
-                            WHEN cm.event_type = 'job.first_seen' THEN CONCAT(cm.job_title, COALESCE(CONCAT(' (', cm.remote_type, ')'), ''))
-                            WHEN cm.event_type = 'sponsorship.evidence_added' THEN CONCAT('Approved Labour Agreement: ', COALESCE(cm.agreement_type, 'Home Affairs Accredited'))
+                            WHEN cm.event_type = 'job.first_seen'
+                                THEN CONCAT(
+                                    cm.job_title,
+                                    COALESCE(CONCAT(' (', cm.remote_type, ')'), '')
+                                )
+                            WHEN cm.event_type = 'sponsorship.evidence_added'
+                                THEN CONCAT(
+                                    'Approved Labour Agreement: ',
+                                    COALESCE(
+                                        cm.agreement_type,
+                                        'Home Affairs Accredited'
+                                    )
+                                )
                             ELSE 'Observed material change in company data'
                         END,
                         CONCAT('/companies/', cm.company_slug),
@@ -102,7 +135,9 @@ def dispatch_alerts(
                 )
                 SELECT count(*) FROM inserted_alerts;
             """)
-            watchlist_alerts = cur.fetchone()[0]
+            watchlist_result = cur.fetchone()
+            assert watchlist_result is not None
+            watchlist_alerts = watchlist_result[0]
 
             # 2. Match saved searches against job.first_seen events
             # Apply frequency filtering and throttling
@@ -127,8 +162,20 @@ def dispatch_alerts(
                       {freq_filter}
                       AND (
                           ss.alert_frequency = 'instant'
-                          OR (ss.alert_frequency = 'daily' AND (ss.last_alerted_at IS NULL OR ss.last_alerted_at < now() - INTERVAL '24 hours'))
-                          OR (ss.alert_frequency = 'weekly' AND (ss.last_alerted_at IS NULL OR ss.last_alerted_at < now() - INTERVAL '7 days'))
+                          OR (
+                              ss.alert_frequency = 'daily'
+                              AND (
+                                  ss.last_alerted_at IS NULL
+                                  OR ss.last_alerted_at < now() - INTERVAL '24 hours'
+                              )
+                          )
+                          OR (
+                              ss.alert_frequency = 'weekly'
+                              AND (
+                                  ss.last_alerted_at IS NULL
+                                  OR ss.last_alerted_at < now() - INTERVAL '7 days'
+                              )
+                          )
                       )
                       AND (
                           (ss.filters ->> 'roleFamily') IS NULL 
@@ -141,7 +188,9 @@ def dispatch_alerts(
                       )
                 ),
                 deliveries AS (
-                    INSERT INTO notification_deliveries (user_id, event_id, channel, delivery_window, status)
+                    INSERT INTO notification_deliveries (
+                        user_id, event_id, channel, delivery_window, status
+                    )
                     SELECT 
                         cm.user_id,
                         cm.event_id,
@@ -153,7 +202,10 @@ def dispatch_alerts(
                     RETURNING user_id, event_id
                 ),
                 inserted_alerts AS (
-                    INSERT INTO user_alerts (user_id, alert_type, title, message, link, entity_type, entity_id)
+                    INSERT INTO user_alerts (
+                        user_id, alert_type, title, message, link,
+                        entity_type, entity_id
+                    )
                     SELECT 
                         d.user_id,
                         'saved_search_match',
@@ -174,7 +226,9 @@ def dispatch_alerts(
                 )
                 SELECT count(*) FROM inserted_alerts;
             """)
-            saved_search_alerts = cur.fetchone()[0]
+            saved_search_result = cur.fetchone()
+            assert saved_search_result is not None
+            saved_search_alerts = saved_search_result[0]
 
             if dry_run:
                 conn.rollback()

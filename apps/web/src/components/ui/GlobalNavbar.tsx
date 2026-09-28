@@ -1,15 +1,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { ReactNode } from "react";
-import { User, LogIn, Sparkles, MapPin, Briefcase, BookOpen } from "lucide-react";
+import {
+  User,
+  LogIn,
+  Sparkles,
+  MapPin,
+  Briefcase,
+  BookOpen,
+} from "lucide-react";
 
 export type NavActivePage =
-  | "map"
-  | "jobs"
-  | "opportunities"
-  | "methodology"
-  | "regions"
-  | "companies";
+  "map" | "jobs" | "opportunities" | "methodology" | "regions" | "companies";
 
 export interface GlobalNavbarProps {
   currentPage?: NavActivePage;

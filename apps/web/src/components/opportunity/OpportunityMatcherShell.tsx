@@ -305,10 +305,7 @@ export function OpportunityMatcherShell({
           <span className="text-navy-900 cursor-default border-b-2 border-terracotta-700 pb-0.5">
             Opportunity Match
           </span>
-          <Link
-            href="/jobs"
-            className="hover:text-navy-900 transition-colors"
-          >
+          <Link href="/jobs" className="hover:text-navy-900 transition-colors">
             Live Jobs
           </Link>
           <Link
@@ -718,7 +715,10 @@ export function OpportunityMatcherShell({
                       {/* Card Header: Score, Name, Meta, Watch Button */}
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex items-start gap-3.5">
-                          <CompanyBrandMark name={match.companyName} size="md" />
+                          <CompanyBrandMark
+                            name={match.companyName}
+                            size="md"
+                          />
                           <div className="space-y-1">
                             <div className="flex items-center gap-2 flex-wrap">
                               <Link
@@ -727,34 +727,34 @@ export function OpportunityMatcherShell({
                               >
                                 {match.companyName}
                               </Link>
-                            {match.primaryCategory && (
-                              <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700">
-                                {match.primaryCategory}
-                              </span>
-                            )}
-                            {match.hqCity && (
-                              <span className="inline-flex items-center gap-1 text-xs text-slate-500 font-medium">
-                                <MapPin className="h-3 w-3 text-slate-400" />
-                                {match.hqCity}
-                              </span>
-                            )}
-                            {match.isRegional && (
-                              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-800">
-                                Regional Hub
-                              </span>
+                              {match.primaryCategory && (
+                                <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-700">
+                                  {match.primaryCategory}
+                                </span>
+                              )}
+                              {match.hqCity && (
+                                <span className="inline-flex items-center gap-1 text-xs text-slate-500 font-medium">
+                                  <MapPin className="h-3 w-3 text-slate-400" />
+                                  {match.hqCity}
+                                </span>
+                              )}
+                              {match.isRegional && (
+                                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-800">
+                                  Regional Hub
+                                </span>
+                              )}
+                            </div>
+
+                            {match.sponsorshipSummary && (
+                              <div className="inline-flex items-center gap-1 text-xs font-semibold text-terracotta-800 bg-terracotta-50 border border-terracotta-200 rounded-md px-2 py-0.5">
+                                <ShieldCheck className="h-3.5 w-3.5 text-terracotta-700" />
+                                <span>{match.sponsorshipSummary}</span>
+                              </div>
                             )}
                           </div>
-
-                          {match.sponsorshipSummary && (
-                            <div className="inline-flex items-center gap-1 text-xs font-semibold text-terracotta-800 bg-terracotta-50 border border-terracotta-200 rounded-md px-2 py-0.5">
-                              <ShieldCheck className="h-3.5 w-3.5 text-terracotta-700" />
-                              <span>{match.sponsorshipSummary}</span>
-                            </div>
-                          )}
                         </div>
-                      </div>
 
-                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3">
                           {/* Match Score Badge */}
                           <div
                             className={`flex flex-col items-center justify-center rounded-xl px-3 py-1.5 border shadow-2xs ${

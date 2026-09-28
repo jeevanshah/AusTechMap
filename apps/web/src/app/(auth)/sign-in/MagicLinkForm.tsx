@@ -8,7 +8,9 @@ interface MagicLinkFormProps {
   callbackUrl?: string;
 }
 
-export function MagicLinkForm({ callbackUrl = "/account" }: MagicLinkFormProps) {
+export function MagicLinkForm({
+  callbackUrl = "/account",
+}: MagicLinkFormProps) {
   const [isPending, startTransition] = useTransition();
   const [email, setEmail] = useState("");
 

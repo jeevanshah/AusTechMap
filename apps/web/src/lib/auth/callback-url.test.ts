@@ -4,7 +4,9 @@ import { sanitizeCallbackUrl } from "./callback-url";
 describe("sanitizeCallbackUrl", () => {
   it("allows standard relative URLs", () => {
     expect(sanitizeCallbackUrl("/account")).toBe("/account");
-    expect(sanitizeCallbackUrl("/account/watchlist")).toBe("/account/watchlist");
+    expect(sanitizeCallbackUrl("/account/watchlist")).toBe(
+      "/account/watchlist",
+    );
     expect(sanitizeCallbackUrl("/jobs?q=engineer")).toBe("/jobs?q=engineer");
   });
 

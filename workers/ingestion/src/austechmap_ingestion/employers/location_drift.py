@@ -9,7 +9,6 @@ high concentration in another state, flags the discrepancy for review
 
 from __future__ import annotations
 
-import re
 import uuid
 from dataclasses import dataclass
 from typing import Any, cast
@@ -20,7 +19,17 @@ from psycopg.types.json import Jsonb
 from austechmap_ingestion.hiring.normalisation import is_australian_location
 
 STATE_PATTERNS: dict[str, tuple[str, ...]] = {
-    "NSW": ("nsw", "new south wales", "sydney", "barangaroo", "north sydney", "surry hills", "pyrmont", "macquarie park", "parramatta"),
+    "NSW": (
+        "nsw",
+        "new south wales",
+        "sydney",
+        "barangaroo",
+        "north sydney",
+        "surry hills",
+        "pyrmont",
+        "macquarie park",
+        "parramatta",
+    ),
     "VIC": ("vic", "victoria", "melbourne", "cremorne", "richmond", "southbank", "docklands"),
     "QLD": ("qld", "queensland", "brisbane", "gold coast", "sunshine coast", "fortitude valley"),
     "WA": ("wa", "western australia", "perth", "subiaco", "west perth", "east perth"),
@@ -57,7 +66,13 @@ def _detect_state(text: str | None) -> str | None:
         return None
     cleaned = text.lower()
     for state, keywords in STATE_PATTERNS.items():
-        if any(f" {kw} " in f" {cleaned} " or f",{kw}" in cleaned or f" {kw}," in cleaned for kw in [state.lower()] + list(keywords[:2])):
+        state_keywords = [state.lower(), *keywords[:2]]
+        if any(
+            f" {keyword} " in f" {cleaned} "
+            or f",{keyword}" in cleaned
+            or f" {keyword}," in cleaned
+            for keyword in state_keywords
+        ):
             return state
     return None
 
@@ -139,7 +154,8 @@ def detect_location_drift(
 
                     if enqueue_review:
                         reason = (
-                            f"Potential headquarters location drift: recorded head office in {home_state}, "
+                            "Potential headquarters location drift: recorded head office "
+                            f"in {home_state}, "
                             f"but 0% of {total_au_jobs} active AU jobs are in {home_state} "
                             f"({count} jobs located in {most_common_state})."
                         )

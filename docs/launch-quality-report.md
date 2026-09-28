@@ -13,18 +13,18 @@ Australia Tech Map has completed its **Phase 8 Production Hardening, Security, O
 
 ### Readiness Scorecard
 
-| Dimension                    | Target Gate                   | Current Status                                                                   | Verdict         |
-| :--------------------------- | :---------------------------- | :------------------------------------------------------------------------------- | :-------------- |
-| **Launch Cohort Volume**     | >= 1,000 launch employers     | **1,007 active canonical companies** in Neon across all Australian states        | **PASSED**      |
-| **Geographic Precision**     | > 95% mapped locations        | **95.83%** (965 / 1,007 employers with verified street addresses & SA4 keys)     | **PASSED**      |
-| **Data Provenance**          | > 98% sourced records         | **100.0%** (2,717 immutable evidence records, 0 ungrounded claims)               | **PASSED**      |
-| **Duplicate Rate**           | < 1.0% duplicate rate         | **0.0%** (0 duplicate domains/slugs, 0 unresolved duplicates)                    | **PASSED**      |
-| **Active ATS Sources**       | Structured ATS monitoring     | **97 active verified sources** across Lever, Ashby, Greenhouse, and Workable     | **PASSED**      |
-| **Sponsorship Evidence**     | 100% inspectable claims       | **100.0%** (Home Affairs accredited sponsor citations with timestamps)           | **PASSED**      |
-| **Golden Discovery Queries** | 100% relevance score          | **11 / 11 queries Grade 3 (100%)**, 0 hard constraint violations                 | **PASSED**      |
-| **Query Latency**            | p95 < 150ms                   | **72ms** average search/match latency; **175ms** DB roundtrip to Neon AWS Sydney | **PASSED**      |
-| **Security & Privacy**       | Strict CSP, HSTS, MFA, APP 11 | Complete (CSP, HSTS, rate limiting, SSRF guard, TOTP MFA, automated erasure)     | **PASSED**      |
-| **Health & Observability**   | Deep diagnostic checks        | `/api/health?deep=true` and `/admin/monitoring` live and operational             | **PASSED**      |
+| Dimension                    | Target Gate                   | Current Status                                                                   | Verdict    |
+| :--------------------------- | :---------------------------- | :------------------------------------------------------------------------------- | :--------- |
+| **Launch Cohort Volume**     | >= 1,000 launch employers     | **1,007 active canonical companies** in Neon across all Australian states        | **PASSED** |
+| **Geographic Precision**     | > 95% mapped locations        | **95.83%** (965 / 1,007 employers with verified street addresses & SA4 keys)     | **PASSED** |
+| **Data Provenance**          | > 98% sourced records         | **100.0%** (2,717 immutable evidence records, 0 ungrounded claims)               | **PASSED** |
+| **Duplicate Rate**           | < 1.0% duplicate rate         | **0.0%** (0 duplicate domains/slugs, 0 unresolved duplicates)                    | **PASSED** |
+| **Active ATS Sources**       | Structured ATS monitoring     | **97 active verified sources** across Lever, Ashby, Greenhouse, and Workable     | **PASSED** |
+| **Sponsorship Evidence**     | 100% inspectable claims       | **100.0%** (Home Affairs accredited sponsor citations with timestamps)           | **PASSED** |
+| **Golden Discovery Queries** | 100% relevance score          | **11 / 11 queries Grade 3 (100%)**, 0 hard constraint violations                 | **PASSED** |
+| **Query Latency**            | p95 < 150ms                   | **72ms** average search/match latency; **175ms** DB roundtrip to Neon AWS Sydney | **PASSED** |
+| **Security & Privacy**       | Strict CSP, HSTS, MFA, APP 11 | Complete (CSP, HSTS, rate limiting, SSRF guard, TOTP MFA, automated erasure)     | **PASSED** |
+| **Health & Observability**   | Deep diagnostic checks        | `/api/health?deep=true` and `/admin/monitoring` live and operational             | **PASSED** |
 
 ---
 

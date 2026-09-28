@@ -1,6 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { MailCheck, ArrowLeft, Clock, ShieldCheck, RefreshCw } from "lucide-react";
+import {
+  MailCheck,
+  ArrowLeft,
+  Clock,
+  ShieldCheck,
+  RefreshCw,
+} from "lucide-react";
 
 export default function VerifyRequestPage() {
   return (
@@ -54,7 +60,8 @@ export default function VerifyRequestPage() {
             Check your email inbox
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-slate-600">
-            We&apos;ve sent a one-time sign-in link to your email address. Click the link in the message to access your account immediately.
+            We&apos;ve sent a one-time sign-in link to your email address. Click
+            the link in the message to access your account immediately.
           </p>
 
           {/* Security guidance card */}
@@ -68,7 +75,8 @@ export default function VerifyRequestPage() {
               <span>Single-use link with zero stored credentials</span>
             </div>
             <p className="text-[11px] text-slate-500 pt-1 border-t border-slate-200/60">
-              Didn&apos;t receive it? Check your spam or promotions folder, or allow a minute for network transit.
+              Didn&apos;t receive it? Check your spam or promotions folder, or
+              allow a minute for network transit.
             </p>
           </div>
 
@@ -94,7 +102,8 @@ export default function VerifyRequestPage() {
 
       {/* Minimal Footer */}
       <footer className="border-t border-surface-border bg-white px-4 py-4 text-center text-xs text-slate-400">
-        &copy; {new Date().getFullYear()} Australia Tech Map &middot; Evidence-backed technology opportunity intelligence.
+        &copy; {new Date().getFullYear()} Australia Tech Map &middot;
+        Evidence-backed technology opportunity intelligence.
       </footer>
     </div>
   );
