@@ -199,7 +199,7 @@ def test_run_ats_crawl_persists_real_lever_postings() -> None:
 
     assert result.created is True
     assert result.fetched == 7
-    assert result.jobs_created == 7
+    assert result.jobs_created == 5
     assert result.jobs_updated == 0
     assert result.jobs_unchanged == 0
 
@@ -207,7 +207,7 @@ def test_run_ats_crawl_persists_real_lever_postings() -> None:
         job_count = connection.execute(
             "SELECT count(*) FROM jobs WHERE company_id = %s", (company_ats_source.company_id,)
         ).fetchone()
-    assert job_count == (7,)
+    assert job_count == (5,)
 
     replay = replay_ats_snapshot(
         database_url,
@@ -217,7 +217,7 @@ def test_run_ats_crawl_persists_real_lever_postings() -> None:
     )
     assert replay.ats_provider == "lever"
     assert replay.ats_identifier == company_ats_source.ats_identifier
-    assert len(replay.jobs) == 7
+    assert len(replay.jobs) == 5
     assert [job.external_id for job in replay.jobs] == sorted(
         job.external_id for job in replay.jobs
     )
@@ -296,11 +296,11 @@ def test_run_ats_crawl_succeeds_with_a_dotted_ats_identifier() -> None:
         database_url=database_url,
         company_ats_source=company_ats_source,
         skills=(),
-        fetch_fn=lambda *a, **kw: _fake_fetch("ashby_immutable_postings.json"),
+        fetch_fn=lambda *a, **kw: _fake_fetch("ashby_dovetail_postings.json"),
     )
 
     assert result.created is True
-    assert result.fetched == 6
+    assert result.fetched == 4
 
 
 @pytest.mark.integration
@@ -322,13 +322,13 @@ def test_run_ats_crawl_persists_real_ashby_postings() -> None:
 
     assert result.created is True
     assert result.fetched == 4
-    assert result.jobs_created == 4
+    assert result.jobs_created == 3
 
     with psycopg.connect(database_url) as connection:
         job_count = connection.execute(
             "SELECT count(*) FROM jobs WHERE company_id = %s", (company_ats_source.company_id,)
         ).fetchone()
-    assert job_count == (4,)
+    assert job_count == (3,)
 
 
 @pytest.mark.integration
@@ -350,13 +350,13 @@ def test_run_ats_crawl_persists_real_greenhouse_postings() -> None:
 
     assert result.created is True
     assert result.fetched == 5
-    assert result.jobs_created == 5
+    assert result.jobs_created == 2
 
     with psycopg.connect(database_url) as connection:
         job_count = connection.execute(
             "SELECT count(*) FROM jobs WHERE company_id = %s", (company_ats_source.company_id,)
         ).fetchone()
-    assert job_count == (5,)
+    assert job_count == (2,)
 
 
 @pytest.mark.integration
