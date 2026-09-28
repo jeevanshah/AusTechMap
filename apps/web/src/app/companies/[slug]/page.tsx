@@ -5,7 +5,6 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import {
   ArrowLeft,
-  ArrowRight,
   Award,
   Calendar,
   CheckCircle2,
@@ -15,7 +14,6 @@ import {
   MapPin,
   Share2,
   ShieldCheck,
-  User,
   Zap,
 } from "lucide-react";
 
@@ -116,21 +114,6 @@ interface CompanyProfileRow {
   is_claimed?: boolean;
   claimed_at?: string | null;
 }
-
-const SENIORITY_LABELS: Record<string, string> = {
-  junior: "Junior",
-  mid: "Mid-level",
-  senior: "Senior",
-  staff_principal: "Staff / Principal",
-  management: "Management",
-};
-
-const REMOTE_TYPE_LABELS: Record<string, string> = {
-  onsite: "On-site",
-  hybrid: "Hybrid",
-  remote: "Remote",
-  flexible_mixed: "Flexible",
-};
 
 const SPONSORSHIP_CLAIM_LABELS: Record<SponsorshipClaimType, string> = {
   sponsorship_current_explicit: "Current explicit evidence",
@@ -380,9 +363,6 @@ export default async function CompanyProfilePage({
     ? "Last checked"
     : "Added";
   const lastCheckedDate = company.research_observed_at ?? company.created_at;
-  const confidenceScore = company.research_confidence
-    ? Number(company.research_confidence)
-    : null;
 
   const session = await auth();
   const userId = session?.user?.id ? Number(session.user.id) : null;

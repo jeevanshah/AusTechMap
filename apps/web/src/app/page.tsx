@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Building2, Compass, MapPin, ShieldCheck, User } from "lucide-react";
+import { Building2, Compass, MapPin, ShieldCheck } from "lucide-react";
 import type { MapCompanyPoint, RegionalHub } from "@austechmap/contracts";
 
 import { auth } from "../auth";

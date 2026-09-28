@@ -2,21 +2,13 @@
  * pre-emit critique: P5 H4 E5 S5 R5 V4
  */
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft,
   ArrowUpRight,
   Briefcase,
-  Building2,
-  Calendar,
-  Compass,
-  Filter,
-  Globe,
   MapPin,
   Search,
-  Sparkles,
-  User,
 } from "lucide-react";
 import { GlobalNavbar } from "../../components/ui/GlobalNavbar";
 
@@ -80,10 +72,6 @@ function formatDate(value: string | null): string | null {
     year: "numeric",
     timeZone: "Australia/Sydney",
   }).format(new Date(value));
-}
-
-function workStyleLabel(style: PublicWorkStyle): string {
-  return WORK_STYLES.find((entry) => entry.value === style)?.label ?? style;
 }
 
 export default async function JobsPage({
@@ -170,7 +158,8 @@ export default async function JobsPage({
               </h1>
               <p className="mt-2 max-w-2xl text-xs sm:text-sm text-slate-600 leading-relaxed">
                 Direct vacancies substantiated from official careers pages of
-                verified tech employers and subclass 482 visa sponsors nationwide.
+                verified tech employers and subclass 482 visa sponsors
+                nationwide.
               </p>
             </div>
 
@@ -312,8 +301,13 @@ export default async function JobsPage({
         <div className="flex items-center justify-between text-xs text-slate-600 font-medium px-1">
           <div className="flex items-center gap-2">
             <span>
-              Showing <strong className="text-navy-900 font-bold">{data.jobs.length}</strong> of{" "}
-              <strong className="text-navy-900 font-bold">{data.total}</strong> active verified roles
+              Showing{" "}
+              <strong className="text-navy-900 font-bold">
+                {data.jobs.length}
+              </strong>{" "}
+              of{" "}
+              <strong className="text-navy-900 font-bold">{data.total}</strong>{" "}
+              active verified roles
             </span>
             {activeFilters && (
               <span className="rounded-full bg-terracotta-50 border border-terracotta-200 px-2 py-0.5 text-[10px] font-bold text-terracotta-800">

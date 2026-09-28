@@ -1,5 +1,23 @@
 # Autonomous delivery log
 
+## 2026-09-28 - Code & Lint Polish: Resolve Unused Imports and Variables Across Web Workspace
+
+- **Scope & Highlights**:
+  1. **Clean Code & Lint Polish**:
+     - `ClaimProfileModal.tsx`: removed unused `ExternalLink` icon and ensured `isClaimed` guard is called after all React Hooks to strictly respect the Rules of Hooks.
+     - `CompanyRolesList.tsx`: removed unused `Filter` icon.
+     - `apps/web/src/app/companies/[slug]/page.tsx`: removed unused `ArrowRight`, `User` icons, obsolete `SENIORITY_LABELS` and `REMOTE_TYPE_LABELS`, and unused `confidenceScore` variable.
+     - `apps/web/src/app/jobs/page.tsx`: removed unused `Image` from `next/image`, unused icon imports (`Building2`, `Calendar`, `Compass`, `Filter`, `Globe`, `Sparkles`, `User`), and unused `workStyleLabel` function.
+     - `apps/web/src/app/page.tsx`: removed unused `User` icon.
+     - Formatted all updated files with Prettier.
+- **Verification Evidence**:
+  - Web unit tests: **207 passed** across 42 test files (0 failures).
+  - Contracts tests: **46 passed** across 10 test files (0 failures).
+  - Total automated test suite: **253 / 253 passed**.
+  - TypeScript check: `npm run typecheck` exited with **0 errors**.
+  - ESLint check: `npm run lint` exited with **0 errors, 0 warnings**.
+  - `git diff --check` passed cleanly with 0 whitespace errors.
+
 ## 2026-09-17 - Authentication Upgrade: Google & GitHub OAuth Providers + Hallmark Redesign (/sign-in & /verify-request)
 
 - **Scope & Highlights**:

@@ -9,7 +9,6 @@ import {
   Sparkles,
   Database,
   Loader2,
-  ExternalLink,
 } from "lucide-react";
 import { submitEmployerClaimAction } from "../../corrections/actions";
 
@@ -23,7 +22,8 @@ interface ClaimProfileModalProps {
   triggerLabel?: string;
 }
 
-type ClaimTypeOption = "profile_verification" | "employer_pro" | "data_partnership";
+type ClaimTypeOption =
+  "profile_verification" | "employer_pro" | "data_partnership";
 
 export function ClaimProfileModal({
   companyId,
@@ -35,7 +35,9 @@ export function ClaimProfileModal({
   triggerLabel,
 }: ClaimProfileModalProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [claimType, setClaimType] = useState<ClaimTypeOption>("profile_verification");
+  const [claimType, setClaimType] = useState<ClaimTypeOption>(
+    "profile_verification",
+  );
   const [claimantName, setClaimantName] = useState("");
   const [claimantEmail, setClaimantEmail] = useState("");
   const [claimantRole, setClaimantRole] = useState("");
@@ -62,7 +64,10 @@ export function ClaimProfileModal({
   }, [isOpen]);
 
   const cleanCompanyDomain = companyDomain
-    ? companyDomain.toLowerCase().replace(/^www\./, "").trim()
+    ? companyDomain
+        .toLowerCase()
+        .replace(/^www\./, "")
+        .trim()
     : null;
 
   const emailDomain = claimantEmail.includes("@")
@@ -71,8 +76,9 @@ export function ClaimProfileModal({
 
   const isDomainMatch = Boolean(
     cleanCompanyDomain &&
-      emailDomain &&
-      (emailDomain === cleanCompanyDomain || emailDomain.endsWith("." + cleanCompanyDomain))
+    emailDomain &&
+    (emailDomain === cleanCompanyDomain ||
+      emailDomain.endsWith("." + cleanCompanyDomain)),
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -113,6 +119,10 @@ export function ClaimProfileModal({
     setError(null);
     setSuccessData(null);
   };
+
+  if (isClaimed) {
+    return null;
+  }
 
   return (
     <>
@@ -160,34 +170,46 @@ export function ClaimProfileModal({
                     Inquiry Received
                   </h3>
                   <p className="text-sm text-slate-600 max-w-md mx-auto">
-                    Your request for <strong>{companyName}</strong> has been logged in our verification queue.
+                    Your request for <strong>{companyName}</strong> has been
+                    logged in our verification queue.
                   </p>
                 </div>
 
                 <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-4 text-left text-xs space-y-2 max-w-md mx-auto">
                   <div className="flex justify-between">
-                    <span className="text-slate-500 font-medium">Claim ID:</span>
-                    <span className="font-mono text-slate-700">{successData.claimId.slice(0, 8)}...</span>
+                    <span className="text-slate-500 font-medium">
+                      Claim ID:
+                    </span>
+                    <span className="font-mono text-slate-700">
+                      {successData.claimId.slice(0, 8)}...
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-500 font-medium">Work Domain:</span>
+                    <span className="text-slate-500 font-medium">
+                      Work Domain:
+                    </span>
                     {successData.domainMatched ? (
                       <span className="inline-flex items-center gap-1 text-emerald-700 font-semibold bg-emerald-100/60 px-2 py-0.5 rounded-full">
                         <CheckCircle2 className="h-3 w-3" />
                         Verified @{cleanCompanyDomain}
                       </span>
                     ) : (
-                      <span className="text-amber-700 font-medium">Manual review required</span>
+                      <span className="text-amber-700 font-medium">
+                        Manual review required
+                      </span>
                     )}
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-500 font-medium">Status:</span>
-                    <span className="text-slate-700 font-medium">Pending Staff Review (~24–48h)</span>
+                    <span className="text-slate-700 font-medium">
+                      Pending Staff Review (~24–48h)
+                    </span>
                   </div>
                 </div>
 
                 <p className="text-xs text-slate-500">
-                  Our talent team will verify your role and reach out to {claimantEmail}.
+                  Our talent team will verify your role and reach out to{" "}
+                  {claimantEmail}.
                 </p>
 
                 <div className="pt-2">
@@ -213,7 +235,9 @@ export function ClaimProfileModal({
                     Claim Profile & Partner With Us
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-600">
-                    Verify this profile for <strong>{companyName}</strong>, upgrade to Employer Pro, or inquire about workforce data partnerships.
+                    Verify this profile for <strong>{companyName}</strong>,
+                    upgrade to Employer Pro, or inquire about workforce data
+                    partnerships.
                   </p>
                 </div>
 
@@ -283,7 +307,8 @@ export function ClaimProfileModal({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div className="space-y-1">
                     <label className="text-xs font-semibold text-slate-700">
-                      Your Full Name <span className="text-terracotta-600">*</span>
+                      Your Full Name{" "}
+                      <span className="text-terracotta-600">*</span>
                     </label>
                     <input
                       type="text"
@@ -297,7 +322,8 @@ export function ClaimProfileModal({
 
                   <div className="space-y-1">
                     <label className="text-xs font-semibold text-slate-700">
-                      Work Role / Title <span className="text-terracotta-600">*</span>
+                      Work Role / Title{" "}
+                      <span className="text-terracotta-600">*</span>
                     </label>
                     <input
                       type="text"
@@ -334,16 +360,22 @@ export function ClaimProfileModal({
                     onChange={(e) => setClaimantEmail(e.target.value)}
                     className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-600"
                   />
-                  {cleanCompanyDomain && !isDomainMatch && claimantEmail.includes("@") && (
-                    <p className="text-[11px] text-amber-700">
-                      Note: Using your corporate email (@{cleanCompanyDomain}) enables faster verification.
-                    </p>
-                  )}
+                  {cleanCompanyDomain &&
+                    !isDomainMatch &&
+                    claimantEmail.includes("@") && (
+                      <p className="text-[11px] text-amber-700">
+                        Note: Using your corporate email (@{cleanCompanyDomain})
+                        enables faster verification.
+                      </p>
+                    )}
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-slate-700">
-                    LinkedIn or Verification Link <span className="text-slate-400 font-normal">(Optional)</span>
+                    LinkedIn or Verification Link{" "}
+                    <span className="text-slate-400 font-normal">
+                      (Optional)
+                    </span>
                   </label>
                   <input
                     type="url"
@@ -356,7 +388,10 @@ export function ClaimProfileModal({
 
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-slate-700">
-                    Notes or Requested Changes <span className="text-slate-400 font-normal">(Optional)</span>
+                    Notes or Requested Changes{" "}
+                    <span className="text-slate-400 font-normal">
+                      (Optional)
+                    </span>
                   </label>
                   <textarea
                     rows={2}
@@ -398,8 +433,8 @@ export function ClaimProfileModal({
                           {claimType === "profile_verification"
                             ? "Submit Verification Claim"
                             : claimType === "employer_pro"
-                            ? "Request Employer Pro"
-                            : "Submit Partnership Inquiry"}
+                              ? "Request Employer Pro"
+                              : "Submit Partnership Inquiry"}
                         </span>
                       </>
                     )}

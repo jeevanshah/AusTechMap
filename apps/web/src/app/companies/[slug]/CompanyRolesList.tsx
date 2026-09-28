@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ExternalLink, Search, X, Briefcase, Filter } from "lucide-react";
+import { ExternalLink, Search, X, Briefcase } from "lucide-react";
 
 export interface CompanyJobItem {
   title: string;
@@ -58,17 +58,28 @@ export function CompanyRolesList({
   const filteredJobs = useMemo(() => {
     const q = query.trim().toLowerCase();
     return jobs.filter((job) => {
-      if (selectedRoleFamily !== "all" && job.roleFamily !== selectedRoleFamily) {
+      if (
+        selectedRoleFamily !== "all" &&
+        job.roleFamily !== selectedRoleFamily
+      ) {
         return false;
       }
       if (q) {
         const matchesTitle = job.title.toLowerCase().includes(q);
-        const matchesFamily = job.roleFamily?.toLowerCase().includes(q) ?? false;
-        const matchesSeniority =
-          (SENIORITY_LABELS[job.seniority] ?? "").toLowerCase().includes(q);
-        const matchesRemote =
-          (REMOTE_TYPE_LABELS[job.remoteType] ?? "").toLowerCase().includes(q);
-        if (!matchesTitle && !matchesFamily && !matchesSeniority && !matchesRemote) {
+        const matchesFamily =
+          job.roleFamily?.toLowerCase().includes(q) ?? false;
+        const matchesSeniority = (SENIORITY_LABELS[job.seniority] ?? "")
+          .toLowerCase()
+          .includes(q);
+        const matchesRemote = (REMOTE_TYPE_LABELS[job.remoteType] ?? "")
+          .toLowerCase()
+          .includes(q);
+        if (
+          !matchesTitle &&
+          !matchesFamily &&
+          !matchesSeniority &&
+          !matchesRemote
+        ) {
           return false;
         }
       }
@@ -165,7 +176,8 @@ export function CompanyRolesList({
       {(query || selectedRoleFamily !== "all") && (
         <div className="flex items-center justify-between text-xs text-slate-500 px-1">
           <span>
-            Showing <strong className="text-navy-900">{filteredJobs.length}</strong> of{" "}
+            Showing{" "}
+            <strong className="text-navy-900">{filteredJobs.length}</strong> of{" "}
             {jobs.length} positions
           </span>
           <button
