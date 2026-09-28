@@ -217,7 +217,9 @@ def test_run_ats_crawl_persists_real_lever_postings() -> None:
     )
     assert replay.ats_provider == "lever"
     assert replay.ats_identifier == company_ats_source.ats_identifier
-    assert len(replay.jobs) == 5
+    # Replay reconstructs the complete immutable source snapshot; the
+    # Australian geography gate is applied only when persisting live jobs.
+    assert len(replay.jobs) == 7
     assert [job.external_id for job in replay.jobs] == sorted(
         job.external_id for job in replay.jobs
     )
