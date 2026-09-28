@@ -14,7 +14,9 @@ import { GlobalNavbar } from "../../components/ui/GlobalNavbar";
 
 import { auth } from "../../auth";
 import { CompanyBrandMark } from "../../components/ui/CompanyBrandMark";
+import { SaveJobButton } from "../../components/jobs/SaveJobButton";
 import { DatabaseNotConfiguredError, getPool } from "../../lib/db";
+import { listSavedJobIds } from "../../lib/queries/jobApplications";
 import {
   listActiveJobs,
   type ActiveJobFilters,
@@ -104,6 +106,12 @@ export default async function JobsPage({
 
   const session = await auth();
   const userEmail = session?.user?.email ?? null;
+  const userId = session?.user?.id ? Number(session.user.id) : null;
+  const signedIn = userId !== null && Number.isSafeInteger(userId);
+  let savedJobIds = new Set<string>();
+  if (signedIn && userId !== null) {
+    savedJobIds = await listSavedJobIds(getPool(), userId);
+  }
 
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-6 px-4 py-6 sm:px-8 sm:py-8">
@@ -399,6 +407,11 @@ export default async function JobsPage({
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
+                  <SaveJobButton
+                    jobId={job.id}
+                    initiallySaved={savedJobIds.has(job.id)}
+                    signedIn={signedIn}
+                  />
                   <a
                     href={job.sourceUrl}
                     target="_blank"

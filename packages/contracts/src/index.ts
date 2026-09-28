@@ -347,6 +347,67 @@ export const UserAlertsResponseSchema = z.object({
 
 export type UserAlertsResponse = z.infer<typeof UserAlertsResponseSchema>;
 
+// --- Applicant Velocity P2: Private Job Vault & Application Tracker ---
+
+export const JobApplicationStatusSchema = z.enum([
+  "saved",
+  "applied",
+  "interviewing",
+  "offer",
+  "rejected",
+  "withdrawn",
+]);
+export type JobApplicationStatus = z.infer<typeof JobApplicationStatusSchema>;
+
+export const JobVaultSkillSchema = z.object({
+  key: z.string().min(1),
+  label: z.string().min(1),
+});
+export type JobVaultSkill = z.infer<typeof JobVaultSkillSchema>;
+
+export const JobVaultSnapshotSchema = z.object({
+  version: z.literal(1),
+  jobTitle: z.string().min(1),
+  companyName: z.string().min(1),
+  companySlug: z.string().min(1),
+  roleFamily: z.string().nullable(),
+  seniority: z.string().min(1),
+  employmentType: z.string().nullable(),
+  workStyle: z.string().min(1),
+  locationText: z.string().nullable(),
+  salaryMin: z.number().nullable(),
+  salaryMax: z.number().nullable(),
+  salaryPeriod: z.string().nullable(),
+  graduateRole: z.boolean(),
+  internshipRole: z.boolean(),
+  sponsorshipExplicit: z.boolean().nullable(),
+  sourceUrl: z.string().url(),
+  descriptionText: z.string().nullable(),
+  postedAt: z.string().nullable(),
+  firstSeenAt: z.string(),
+  lastSeenAt: z.string(),
+  capturedAt: z.string(),
+  skills: z.array(JobVaultSkillSchema),
+});
+export type JobVaultSnapshot = z.infer<typeof JobVaultSnapshotSchema>;
+
+export const JobApplicationSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.number().int(),
+  jobId: z.string().uuid(),
+  status: JobApplicationStatusSchema,
+  snapshot: JobVaultSnapshotSchema,
+  notes: z.string().nullable(),
+  savedAt: z.string(),
+  statusChangedAt: z.string(),
+  appliedAt: z.string().nullable(),
+  interviewingAt: z.string().nullable(),
+  offerAt: z.string().nullable(),
+  closedAt: z.string().nullable(),
+  updatedAt: z.string(),
+});
+export type JobApplication = z.infer<typeof JobApplicationSchema>;
+
 // --- Phase 7: Opportunity Match & Explainability Engine ---
 
 export const OpportunityExperienceBandSchema = z.enum([

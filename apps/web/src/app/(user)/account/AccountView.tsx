@@ -10,6 +10,7 @@ import {
   BellOff,
   BellRing,
   Bookmark,
+  BriefcaseBusiness,
   Building2,
   Calendar,
   Check,
@@ -30,10 +31,13 @@ import {
 } from "lucide-react";
 import type {
   AlertFrequency,
+  JobApplication,
   SavedSearch,
   UserAlert,
   WatchlistEntry,
 } from "@austechmap/contracts";
+
+import { ApplicationVaultPanel } from "./ApplicationVaultPanel";
 
 import {
   deleteSavedSearchAction,
@@ -54,12 +58,14 @@ interface AccountViewProps {
     role: string;
     mfaVerifiedAt?: Date | null;
   };
+  initialApplications: JobApplication[];
   initialSavedSearches: SavedSearch[];
   initialWatchlist: WatchlistEntry[];
   initialAlerts: { unreadCount: number; alerts: UserAlert[] };
 }
 
-type TabType = "searches" | "watchlist" | "alerts" | "security";
+type TabType =
+  "applications" | "searches" | "watchlist" | "alerts" | "security";
 type WatchlistFilterType = "all" | "employers" | "regions";
 
 interface WatchlistNoteMeta {
@@ -82,11 +88,12 @@ function parseWatchlistNotes(rawNotes?: string | null): WatchlistNoteMeta {
 
 export function AccountView({
   user,
+  initialApplications,
   initialSavedSearches,
   initialWatchlist,
   initialAlerts,
 }: AccountViewProps) {
-  const [activeTab, setActiveTab] = useState<TabType>("searches");
+  const [activeTab, setActiveTab] = useState<TabType>("applications");
   const [watchlistSubTab, setWatchlistSubTab] =
     useState<WatchlistFilterType>("all");
 
@@ -262,7 +269,9 @@ export function AccountView({
         const updatedMeta: WatchlistNoteMeta = { ...meta, muted: newMuted };
         const serialized = JSON.stringify(updatedMeta);
         setWatchlist((prev) =>
-          prev.map((w) => (w.id === entry.id ? { ...w, notes: serialized } : w)),
+          prev.map((w) =>
+            w.id === entry.id ? { ...w, notes: serialized } : w,
+          ),
         );
         showToast(
           newMuted
@@ -401,7 +410,8 @@ export function AccountView({
                 )}
               </div>
               <p className="mt-1 text-xs text-slate-500">
-                Personal intelligence dashboard · Saved searches, employer watchlists, and delivery preferences.
+                Private Job Vault, application progress, saved searches, and
+                opportunity alerts.
               </p>
             </div>
           </div>
@@ -502,9 +512,7 @@ export function AccountView({
             <span className="font-heading text-2xl font-bold text-navy-900">
               {watchedRegions.length}
             </span>
-            <span className="text-[11px] font-medium text-slate-500">
-              hubs
-            </span>
+            <span className="text-[11px] font-medium text-slate-500">hubs</span>
           </div>
           <div className="mt-1 text-[10px] text-slate-400">
             Regional opportunity index
@@ -595,7 +603,23 @@ export function AccountView({
       )}
 
       {/* Primary Tabs Navigation */}
-      <div className="mb-6 flex border-b border-surface-border">
+      <div className="mb-6 flex overflow-x-auto border-b border-surface-border">
+        <button
+          type="button"
+          onClick={() => setActiveTab("applications")}
+          className={`flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-xs font-bold transition-colors ${
+            activeTab === "applications"
+              ? "border-navy-900 text-navy-900"
+              : "border-transparent text-slate-500 hover:text-slate-800"
+          }`}
+        >
+          <BriefcaseBusiness className="h-4 w-4" />
+          <span>Job Vault</span>
+          <span className="ml-1 rounded-full bg-slate-100 px-2 py-0.5 font-mono text-[10px]">
+            {initialApplications.length}
+          </span>
+        </button>
+
         <button
           type="button"
           onClick={() => setActiveTab("searches")}
@@ -666,7 +690,12 @@ export function AccountView({
 
       {/* Tab Contents */}
       <div className="space-y-6">
-        {/* TAB 1: SAVED SEARCHES MANAGEMENT */}
+        {/* TAB 1: JOB VAULT & APPLICATION TRACKER */}
+        {activeTab === "applications" && (
+          <ApplicationVaultPanel initialApplications={initialApplications} />
+        )}
+
+        {/* TAB 2: SAVED SEARCHES MANAGEMENT */}
         {activeTab === "searches" && (
           <div>
             {savedSearches.length === 0 ? (
@@ -741,16 +770,22 @@ export function AccountView({
                               Created{" "}
                               {new Date(search.createdAt).toLocaleDateString(
                                 "en-AU",
-                                { day: "numeric", month: "short", year: "numeric" },
+                                {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                },
                               )}
                             </span>
                             {search.lastAlertedAt ? (
                               <span>
                                 · Last alert:{" "}
-                                {new Date(search.lastAlertedAt).toLocaleDateString(
-                                  "en-AU",
-                                  { day: "numeric", month: "short" },
-                                )}
+                                {new Date(
+                                  search.lastAlertedAt,
+                                ).toLocaleDateString("en-AU", {
+                                  day: "numeric",
+                                  month: "short",
+                                })}
                               </span>
                             ) : (
                               <span>· No alerts sent yet</span>
@@ -764,7 +799,11 @@ export function AccountView({
                             type="button"
                             onClick={() => handleTogglePauseSearch(search)}
                             disabled={isPending}
-                            title={isPaused ? "Resume email alerts" : "Pause email alerts"}
+                            title={
+                              isPaused
+                                ? "Resume email alerts"
+                                : "Pause email alerts"
+                            }
                             className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold shadow-2xs transition-colors ${
                               isPaused
                                 ? "border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
@@ -786,7 +825,9 @@ export function AccountView({
 
                           <button
                             type="button"
-                            onClick={() => handleDeleteSearch(search.id, search.name)}
+                            onClick={() =>
+                              handleDeleteSearch(search.id, search.name)
+                            }
                             disabled={isPending}
                             title="Delete saved search"
                             className="rounded-lg border border-transparent p-1.5 text-slate-400 hover:border-red-200 hover:bg-red-50 hover:text-red-700 transition-colors"
@@ -857,7 +898,9 @@ export function AccountView({
                           <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50/80 p-0.5 text-xs">
                             <button
                               type="button"
-                              onClick={() => handleUpdateFrequency(search.id, "never")}
+                              onClick={() =>
+                                handleUpdateFrequency(search.id, "never")
+                              }
                               disabled={isPending}
                               className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition-all ${
                                 search.alertFrequency === "never"
@@ -869,7 +912,9 @@ export function AccountView({
                             </button>
                             <button
                               type="button"
-                              onClick={() => handleUpdateFrequency(search.id, "daily")}
+                              onClick={() =>
+                                handleUpdateFrequency(search.id, "daily")
+                              }
                               disabled={isPending}
                               className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition-all ${
                                 search.alertFrequency === "daily"
@@ -881,7 +926,9 @@ export function AccountView({
                             </button>
                             <button
                               type="button"
-                              onClick={() => handleUpdateFrequency(search.id, "weekly")}
+                              onClick={() =>
+                                handleUpdateFrequency(search.id, "weekly")
+                              }
                               disabled={isPending}
                               className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition-all ${
                                 search.alertFrequency === "weekly"
@@ -893,7 +940,9 @@ export function AccountView({
                             </button>
                             <button
                               type="button"
-                              onClick={() => handleUpdateFrequency(search.id, "instant")}
+                              onClick={() =>
+                                handleUpdateFrequency(search.id, "instant")
+                              }
                               disabled={isPending}
                               className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition-all ${
                                 search.alertFrequency === "instant"
@@ -997,7 +1046,8 @@ export function AccountView({
             ) : (
               <div className="space-y-8">
                 {/* SECTION: WATCHED EMPLOYERS */}
-                {(watchlistSubTab === "all" || watchlistSubTab === "employers") && (
+                {(watchlistSubTab === "all" ||
+                  watchlistSubTab === "employers") && (
                   <div>
                     <div className="mb-3 flex items-center justify-between">
                       <h3 className="font-heading text-xs font-bold uppercase tracking-wider text-slate-500">
@@ -1026,7 +1076,9 @@ export function AccountView({
                                   <div className="flex items-start gap-3 min-w-0">
                                     {/* Monogram Avatar */}
                                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 border border-slate-200 text-navy-900 font-heading text-sm font-bold">
-                                      {(w.company?.name ?? "C").slice(0, 2).toUpperCase()}
+                                      {(w.company?.name ?? "C")
+                                        .slice(0, 2)
+                                        .toUpperCase()}
                                     </div>
                                     <div className="min-w-0">
                                       <Link
@@ -1048,9 +1100,15 @@ export function AccountView({
                                   <div className="flex items-center gap-1 shrink-0">
                                     <button
                                       type="button"
-                                      onClick={() => handleToggleWatchlistMute(w)}
+                                      onClick={() =>
+                                        handleToggleWatchlistMute(w)
+                                      }
                                       disabled={isPending}
-                                      title={isMuted ? "Unmute updates" : "Mute updates"}
+                                      title={
+                                        isMuted
+                                          ? "Unmute updates"
+                                          : "Mute updates"
+                                      }
                                       className={`rounded-lg p-1.5 transition-colors ${
                                         isMuted
                                           ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
@@ -1111,7 +1169,9 @@ export function AccountView({
                                     <div className="flex flex-col gap-2">
                                       <textarea
                                         value={noteDraft}
-                                        onChange={(e) => setNoteDraft(e.target.value)}
+                                        onChange={(e) =>
+                                          setNoteDraft(e.target.value)
+                                        }
                                         placeholder="Add private note (e.g. Applied for role, Spoke with recruiter)..."
                                         rows={2}
                                         className="w-full rounded border border-slate-300 bg-white p-2 text-xs text-navy-900 focus:outline-none focus:ring-1 focus:ring-navy-900"
@@ -1149,7 +1209,8 @@ export function AccountView({
                                             meta.memo
                                           ) : (
                                             <span className="text-slate-400 italic">
-                                              Click to add private career note...
+                                              Click to add private career
+                                              note...
                                             </span>
                                           )}
                                         </span>
@@ -1163,10 +1224,13 @@ export function AccountView({
                               <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
                                 <span className="text-[10px] font-mono text-slate-400">
                                   Watching since{" "}
-                                  {new Date(w.createdAt).toLocaleDateString("en-AU", {
-                                    month: "short",
-                                    year: "numeric",
-                                  })}
+                                  {new Date(w.createdAt).toLocaleDateString(
+                                    "en-AU",
+                                    {
+                                      month: "short",
+                                      year: "numeric",
+                                    },
+                                  )}
                                 </span>
                                 <Link
                                   href={`/companies/${w.company?.slug ?? ""}`}
@@ -1185,7 +1249,8 @@ export function AccountView({
                 )}
 
                 {/* SECTION: WATCHED REGIONAL HUBS */}
-                {(watchlistSubTab === "all" || watchlistSubTab === "regions") && (
+                {(watchlistSubTab === "all" ||
+                  watchlistSubTab === "regions") && (
                   <div>
                     <div className="mb-3 flex items-center justify-between">
                       <h3 className="font-heading text-xs font-bold uppercase tracking-wider text-slate-500">
@@ -1215,16 +1280,23 @@ export function AccountView({
                                       ABS SA4 {w.sa4Code ?? w.region?.code}
                                     </span>
                                     <h4 className="font-heading text-sm font-bold text-navy-900 truncate">
-                                      {w.region?.name ?? `SA4 Region ${w.sa4Code}`}
+                                      {w.region?.name ??
+                                        `SA4 Region ${w.sa4Code}`}
                                     </h4>
                                   </div>
 
                                   <div className="flex items-center gap-1 shrink-0">
                                     <button
                                       type="button"
-                                      onClick={() => handleToggleWatchlistMute(w)}
+                                      onClick={() =>
+                                        handleToggleWatchlistMute(w)
+                                      }
                                       disabled={isPending}
-                                      title={isMuted ? "Unmute updates" : "Mute updates"}
+                                      title={
+                                        isMuted
+                                          ? "Unmute updates"
+                                          : "Mute updates"
+                                      }
                                       className={`rounded-lg p-1.5 transition-colors ${
                                         isMuted
                                           ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
@@ -1258,7 +1330,8 @@ export function AccountView({
                                 {w.region?.opportunityScore !== undefined && (
                                   <div className="mt-3 inline-flex items-center gap-2 rounded-lg bg-slate-50 border border-slate-200/80 px-2.5 py-1">
                                     <span className="font-mono text-xs font-bold text-navy-900">
-                                      Score: {w.region.opportunityScore ?? "N/A"}
+                                      Score:{" "}
+                                      {w.region.opportunityScore ?? "N/A"}
                                     </span>
                                     <span className="text-[10px] text-slate-500">
                                       Regional Labour Index
@@ -1402,7 +1475,7 @@ export function AccountView({
           </div>
         )}
 
-        {/* TAB 4: PRIVACY & DATA */}
+        {/* TAB 5: PRIVACY & DATA */}
         {activeTab === "security" && (
           <div className="rounded-xl border border-surface-border bg-white p-6 shadow-2xs space-y-6">
             <div>
@@ -1411,9 +1484,11 @@ export function AccountView({
               </h3>
               <p className="mt-1 text-xs text-slate-600 leading-relaxed max-w-2xl">
                 Australia Tech Map follows APP 11 standards: personal data is
-                collected solely to power your saved searches, watchlists, and
-                delivery preferences. You hold full control to delete your
-                account and immediately purge all associated state at any time.
+                collected solely to power your Job Vault, application tracker,
+                saved searches, watchlists, and delivery preferences. Tracker
+                data is private to your account and is never shared with
+                employers. You hold full control to delete your account and
+                purge all associated state at any time.
               </p>
             </div>
 
@@ -1424,9 +1499,9 @@ export function AccountView({
                     Delete Account &amp; Purge Personal Data
                   </h4>
                   <p className="mt-0.5 text-xs text-slate-500">
-                    Permanently disable your account, purge saved searches,
-                    watchlists, and undelivered alerts, and record a tombstone
-                    audit ledger.
+                    Permanently disable your account, purge Job Vault entries,
+                    application notes, saved searches, watchlists, and
+                    undelivered alerts, and record a tombstone audit ledger.
                   </p>
                 </div>
                 <Link

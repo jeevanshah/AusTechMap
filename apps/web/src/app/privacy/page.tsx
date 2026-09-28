@@ -88,13 +88,14 @@ export default function PrivacyPage() {
           <div className="flex items-center gap-3 text-navy-900">
             <Trash2 className="h-5 w-5 text-terracotta-700" />
             <h2 className="font-heading text-2xl font-bold">
-              APP 11 Automated Account Deletion
+              APP 11-Aligned Account Deletion
             </h2>
           </div>
           <p className="text-sm leading-relaxed text-slate-600">
-            Under Australian Privacy Principle 11 (Security of Personal
-            Information), you possess an absolute right to have your personal
-            data permanently destroyed when no longer needed.
+            Australia Tech Map follows an APP 11-aligned process for destroying
+            or de-identifying personal information when it is no longer needed.
+            This describes our technical policy; it is not legal advice or a
+            claim that the business is necessarily an APP entity.
           </p>
           <div className="rounded-xl border border-slate-100 bg-slate-50 p-5 space-y-3 text-xs leading-relaxed text-slate-700">
             <p className="font-bold text-slate-900">
@@ -106,16 +107,22 @@ export default function PrivacyPage() {
             </p>
             <ul className="list-disc pl-5 space-y-1.5 text-slate-600">
               <li>
-                Your user record and email address are immediately and
-                permanently erased from the PostgreSQL database.
+                Your account is immediately disabled, active sessions are
+                revoked, and unused sign-in verification links are invalidated.
               </li>
               <li>
-                All associated MFA credentials, encryption keys, and active
-                sessions are terminated instantly.
+                Within 24 hours, the erasure job removes direct identifiers and
+                user-owned product data. A de-identified user row remains only
+                where required for audit attribution.
               </li>
               <li>
-                Your saved search queries, customized alert frequencies, and
+                Your private Job Vault snapshots, tracker statuses, notes, saved
+                search queries, customised alert frequencies, and
                 company/regional watchlists are irreversibly deleted.
+              </li>
+              <li>
+                Encrypted backups expire within 35 days. Any restore must replay
+                the external deletion ledger before traffic resumes.
               </li>
               <li>
                 A cryptographically sealed, recipient-encrypted tombstone
@@ -132,17 +139,28 @@ export default function PrivacyPage() {
             Candidate & Employer Data Boundaries
           </h2>
           <p className="text-sm leading-relaxed text-slate-600">
-            Australia Tech Map indexes public, organizational technology
-            employment data — not individuals:
+            Australia Tech Map primarily indexes public organisational
+            technology employment data. Signed-in users may also choose to keep
+            a private Job Vault and application tracker.
           </p>
           <div className="space-y-2 text-xs text-slate-600">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
               <span>
-                <strong>No Candidate Resumes:</strong> We do not store or
-                process candidate CVs or job applications. All job links direct
-                users directly to the employer’s official ATS application
-                system.
+                <strong>No Candidate Resumes or Application Submission:</strong>{" "}
+                We do not store or process candidate CVs, receive application
+                answers, or submit applications. Employer application links open
+                the employer’s official ATS in a separate action.
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+              <span>
+                <strong>Optional Private Job Vault:</strong> If a signed-in user
+                explicitly saves a role, we retain a private snapshot of that
+                public listing, their chosen progress status, and any notes they
+                add. This data is not shared with employers and is purged when
+                the entry or account is deleted.
               </span>
             </div>
             <div className="flex items-center gap-2">

@@ -819,6 +819,21 @@ Scores are derived products, not canonical truth. Persist methodology_version, i
 
 **V1 should primarily model organisations, public job listings and aggregate labour-market information. Avoid collecting individual employee profiles, personal contact data or applicant data unless a later product requirement explicitly justifies it and a privacy/legal review is completed.**
 
+#### 12.4.1 Post-V1/next requirement: private Job Vault (application tracker)
+
+**Status: post-V1/next, privacy-reviewed.** A logged-in user may opt in to a private "Job Vault" that tracks jobs the user is personally pursuing (saved job, application status, system-recorded status timestamps, optional free-text notes), addressing a validated user need to track applications without turning the platform into a job board or CV/application-submission product.
+
+> [!NOTE]
+> **Privacy review (internal, non-legal):** This is an internal product privacy assessment aligned to Australian Privacy Principle 11 (security/retention of personal information) reasoning, not legal advice and not a claim that the business is necessarily an APP entity. Re-review before implementation if scope changes.
+
+- **Purpose/justification**: Give users a private, evidence-linked record of jobs they are pursuing on the platform they already discover jobs on, driving retention without collecting anything beyond what the user explicitly chooses to save.
+- **Data minimisation**: Store only (a) a registry-derived public job snapshot (the same public job/employer fields already in `jobs`/`companies`, copied at save time so the vault survives a source job going stale or being removed), (b) a user-set status (e.g. saved, applied, interviewing, offer, rejected, withdrawn), (c) timestamps, and (d) optional free-text notes. Do not collect or store a CV, résumé, application answers, cover letter, or any applicant submission; do not scrape or import from third-party ATS/job-board accounts; never share vault contents with the employer or any third party.
+- **Explicit user action**: Vault entries are created only by an explicit user action (e.g. "Save to Job Vault") on a job the user is already viewing; nothing is added automatically or inferred from browsing behaviour.
+- **User-scoped access**: Vault entries are owned by and visible only to the creating user; access must be enforced with an ownership check on every read/write (`user_id` match), not by UI/navigation hiding alone, consistent with §4.1's `401`/`403` enforcement pattern.
+- **Deletion lifecycle**: Users may delete an individual vault entry at any time, taking effect immediately. Vault entries are also in scope for the account-erasure lifecycle in ARCHITECTURE_DECISIONS.md §4.1: deletion completes within 24 hours of a confirmed account-deletion request via the same per-domain erasure-hook registry, and any copy retained in encrypted backups expires within the existing 35-day backup window.
+- **Notes warning**: The notes field is free text entered by the user; the product must display a clear warning not to enter sensitive information (e.g. health, immigration status, salary details of others, or other special-category data) in notes, since notes are stored as plain user content rather than structured, minimised fields.
+- **Implementation requirement**: Any implementation of this feature must use per-request ownership checks (never trust a client-supplied user ID) and must register with the erasure-hook registry so vault data is included in account deletion without a separate, easily-missed deletion path.
+
 ## 13. Testing, Observability and Reliability
 
 ### 13.1 Test layers
@@ -995,6 +1010,7 @@ Post-V1 expansion should deepen intelligence or monetisation without diluting th
 | **Expansion** | **Trigger** |
 | :--- | :--- |
 | Natural-language structured search | Users repeatedly express complex combinations that are cumbersome with filters; LLM translates intent into canonical filters only |
+| Private Job Vault / application tracker (§12.4.1) | Opt-in, user-scoped tracking of jobs the user is personally pursuing; privacy-reviewed and data-minimised per §12.4.1, implemented only with ownership checks and erasure-hook coverage from ARCHITECTURE_DECISIONS.md §4.1 |
 | Verified / enhanced employer products | Employers request claims, corrections, employer branding or recruitment visibility |
 | Recruiter / workforce intelligence | Historical hiring dataset becomes sufficiently deep and reliable for paid market analysis |
 | University / council / government dashboards | Regional coverage and labour-market joins are credible enough for institutional use |

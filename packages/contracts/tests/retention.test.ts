@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   CreateSavedSearchRequestSchema,
+  JobApplicationSchema,
+  JobApplicationStatusSchema,
+  JobVaultSnapshotSchema,
   SavedSearchSchema,
   ToggleWatchlistRequestSchema,
   UserAlertSchema,
@@ -103,5 +106,53 @@ describe("Phase 7 Retention Contracts", () => {
     const parsed = UserAlertSchema.parse(alert);
     expect(parsed.alertType).toBe("sponsorship_change");
     expect(parsed.readAt).toBeNull();
+  });
+
+  it("validates an immutable job vault snapshot and application state", () => {
+    const snapshot = JobVaultSnapshotSchema.parse({
+      version: 1,
+      jobTitle: "Senior Platform Engineer",
+      companyName: "Example Tech",
+      companySlug: "example-tech",
+      roleFamily: "Software Engineering",
+      seniority: "senior",
+      employmentType: "Full-time",
+      workStyle: "hybrid",
+      locationText: "Sydney NSW",
+      salaryMin: 150000,
+      salaryMax: 180000,
+      salaryPeriod: "year",
+      graduateRole: false,
+      internshipRole: false,
+      sponsorshipExplicit: null,
+      sourceUrl: "https://careers.example.com/jobs/123",
+      descriptionText: "Build reliable platform services.",
+      postedAt: "2026-09-20T00:00:00Z",
+      firstSeenAt: "2026-09-20T01:00:00Z",
+      lastSeenAt: "2026-09-28T01:00:00Z",
+      capturedAt: "2026-09-28T02:00:00Z",
+      skills: [{ key: "postgresql", label: "PostgreSQL" }],
+    });
+
+    const application = JobApplicationSchema.parse({
+      id: "123e4567-e89b-12d3-a456-426614174010",
+      userId: 42,
+      jobId: "123e4567-e89b-12d3-a456-426614174011",
+      status: "saved",
+      snapshot,
+      notes: null,
+      savedAt: "2026-09-28T02:00:00Z",
+      statusChangedAt: "2026-09-28T02:00:00Z",
+      appliedAt: null,
+      interviewingAt: null,
+      offerAt: null,
+      closedAt: null,
+      updatedAt: "2026-09-28T02:00:00Z",
+    });
+
+    expect(application.snapshot.skills[0]?.key).toBe("postgresql");
+    expect(JobApplicationStatusSchema.safeParse("drafting").success).toBe(
+      false,
+    );
   });
 });

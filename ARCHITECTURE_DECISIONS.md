@@ -209,6 +209,26 @@ This is a technical baseline, not a claim that the business is necessarily an AP
 the OAIC APP 11 principle of destroying or de-identifying personal information when no longer needed
 and documenting reasonable technical and organisational steps.
 
+**Job Vault data lifecycle (post-V1/next feature, PRODUCT_SPEC.md §12.4.1)**
+
+The opt-in private Job Vault/application tracker is the one post-V1 feature that stores user-entered
+personal content (self-written notes) rather than only platform-observed facts, so it inherits this
+section's account-deletion contract rather than a separate one:
+
+- Every vault-entry read/write requires an ownership check against the authenticated session's user
+  ID (never a client-supplied ID), enforced in the server action/route handler and again in the
+  domain/service operation, matching this section's existing authorisation pattern.
+- Vault data (job snapshot, status, timestamps, notes) is registered with the per-domain erasure-hook
+  registry described above, so it is deleted as part of the same 24-hour account-deletion job rather
+  than a bespoke path that can be missed.
+- Vault data in encrypted backups is subject to the same 35-day backup expiry as the rest of user data
+  in step 5 above; no extended retention applies to notes.
+- Individual, per-entry deletion (independent of full account deletion) takes effect immediately and
+  is not subject to the 24-hour SLA, which applies only to full account erasure.
+- As above, this is an internal product privacy assessment aligned to OAIC APP 11 principles
+  (destroy/de-identify personal information when no longer needed), not legal advice and not a claim
+  that the business is necessarily an APP entity.
+
 ### 4.2 Import-run scheduling and failure recovery
 
 Execution is **at least once**. Exactly-once business effects come from idempotency keys, unique
