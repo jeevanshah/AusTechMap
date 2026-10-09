@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ExternalLink, Search, X, Briefcase } from "lucide-react";
+import { jobFreshness } from "../../../lib/jobs/freshness";
 
 export interface CompanyJobItem {
   title: string;
@@ -258,9 +259,14 @@ export function CompanyRolesList({
                   {job.postedAt && (
                     <span
                       suppressHydrationWarning
-                      className="font-mono text-[11px] text-slate-400"
+                      className={`font-mono text-[11px] ${
+                        jobFreshness(job)?.kind === "new"
+                          ? "font-bold text-emerald-800"
+                          : "text-slate-400"
+                      }`}
                     >
-                      {new Date(job.postedAt).toLocaleDateString("en-AU")}
+                      {jobFreshness(job)?.label ??
+                        new Date(job.postedAt).toLocaleDateString("en-AU")}
                     </span>
                   )}
                   {job.sourceUrl && (

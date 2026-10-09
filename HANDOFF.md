@@ -25,6 +25,13 @@
 - **Remote:** Synchronized with `origin/main`.
 - **Live Vercel Project:** [https://vercel.com/ittogethers-projects/aus-tech-map-web](https://vercel.com/ittogethers-projects/aus-tech-map-web) (Scope: `ittogethers-projects`, Project: `aus-tech-map-web`).
 
+## Applicant Velocity P3 — freshness badges and early alerts — in progress, 9 October 2026
+
+> Written by Claude (backup-implementer mode, user-directed). Delivered as three branches/PRs; Codex remains integrator and reviewer. Plan: three PRs — **A** freshness badges (no migration), **B** make the alert pipeline safe (migration 0028, privacy, email), **C** scheduled crawl + retention automation (workflows; needs the user's go-ahead to enable). The blueprint's "first to apply" wording is deliberately **not** promised: no ATS exposes applicant counts, crawls were manual with a 24h minimum interval, and `first_seen_at` is our crawl time (a new employer's backlog looks new). The feature claims only "Posted today / N days ago" (day granularity, ATS `posted_at` only) and, later, deduped opt-out-able alerts.
+
+- **PR A (branch `feat/p3-freshness-badges`):** `apps/web/src/lib/jobs/freshness.ts` (+test) — Sydney calendar days, `postedAt` only, null for missing/future/impossible dates, never falls back to `firstSeenAt`; badges on `/jobs` and the company roles list; `/jobs?fresh=7` filter via `listActiveJobs({postedWithinDays})` (verified on a real Postgres engine; undated jobs are excluded from the filter by design). No migration. Not browser-verified (no local database).
+- **Still to do:** PR B and PR C per the plan; nothing in B/C is applied to production.
+
 ## Applicant Velocity P1 — CV/profile intake — 9 October 2026
 
 > Written by Claude, which implemented this change on the user's explicit instruction (backup-implementer mode for this one change). Codex remains integrator. This is **not** an implementer switch, so the "Switch" and "Checkpoint" blocks above are unchanged. The earlier Applicant Velocity P2 (private Job Vault) was built by Codex in `2b56baa` and is already on `main`.

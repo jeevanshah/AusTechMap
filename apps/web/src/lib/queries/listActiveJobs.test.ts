@@ -42,6 +42,7 @@ describe("listActiveJobs", () => {
       "software-engineering",
       "hybrid",
       100,
+      null,
     ]);
     expect(result).toMatchObject({
       total: 103,
@@ -55,6 +56,20 @@ describe("listActiveJobs", () => {
       ],
       roleFamilies: [{ key: "software-engineering" }],
     });
+  });
+
+  it("passes a valid posted-within window and ignores out-of-range values", async () => {
+    const run = async (postedWithinDays: number | undefined) => {
+      const query = vi.fn().mockResolvedValue({ rows: [] });
+      await listActiveJobs({ query } as unknown as Pool, { postedWithinDays });
+      return query.mock.calls[0]?.[1]?.[4];
+    };
+
+    expect(await run(7)).toBe(7);
+    expect(await run(undefined)).toBeNull();
+    expect(await run(0)).toBeNull();
+    expect(await run(91)).toBeNull();
+    expect(await run(2.5)).toBeNull();
   });
 
   it("returns an empty, non-truncated page when no active jobs match", async () => {

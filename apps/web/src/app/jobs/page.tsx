@@ -16,6 +16,7 @@ import { auth } from "../../auth";
 import { CompanyBrandMark } from "../../components/ui/CompanyBrandMark";
 import { SaveJobButton } from "../../components/jobs/SaveJobButton";
 import { DatabaseNotConfiguredError, getPool } from "../../lib/db";
+import { jobFreshness } from "../../lib/jobs/freshness";
 import { listSavedJobIds } from "../../lib/queries/jobApplications";
 import {
   listActiveJobs,
@@ -66,6 +67,13 @@ function parseWorkStyle(value: string): PublicWorkStyle | undefined {
     : undefined;
 }
 
+/** `?fresh=7` -> only roles posted in the last 7 days. Unknown values are ignored. */
+const FRESH_WINDOW_DAYS = 7;
+
+function parseFresh(value: string): number | undefined {
+  return value === String(FRESH_WINDOW_DAYS) ? FRESH_WINDOW_DAYS : undefined;
+}
+
 function formatDate(value: string | null): string | null {
   if (!value) return null;
   return new Intl.DateTimeFormat("en-AU", {
@@ -86,6 +94,7 @@ export default async function JobsPage({
     query: firstValue(params.q),
     roleFamily: firstValue(params.role_family),
     workStyle: parseWorkStyle(firstValue(params.work_style)),
+    postedWithinDays: parseFresh(firstValue(params.fresh)),
   };
 
   let data: Awaited<ReturnType<typeof listActiveJobs>> | null = null;
@@ -101,7 +110,10 @@ export default async function JobsPage({
   }
 
   const activeFilters = Boolean(
-    filters.query?.trim() || filters.roleFamily || filters.workStyle,
+    filters.query?.trim() ||
+    filters.roleFamily ||
+    filters.workStyle ||
+    filters.postedWithinDays,
   );
 
   const session = await auth();
@@ -240,6 +252,18 @@ export default async function JobsPage({
             </div>
 
             <div className="flex items-center gap-2 pt-1 lg:pt-0">
+              <label className="inline-flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-navy-900">
+                <input
+                  type="checkbox"
+                  name="fresh"
+                  value={FRESH_WINDOW_DAYS}
+                  defaultChecked={
+                    filters.postedWithinDays === FRESH_WINDOW_DAYS
+                  }
+                  className="h-4 w-4 rounded border-slate-300 accent-emerald-700"
+                />
+                Posted in last {FRESH_WINDOW_DAYS} days
+              </label>
               <button
                 type="submit"
                 className="flex-1 lg:flex-none inline-flex items-center justify-center rounded-xl bg-navy-900 px-5 py-2 text-xs font-bold text-white shadow-xs hover:bg-slate-800 transition-colors"
@@ -276,7 +300,7 @@ export default async function JobsPage({
               {data.roleFamilies.slice(0, 8).map((rf) => (
                 <Link
                   key={rf.key}
-                  href={`/jobs?role_family=${encodeURIComponent(rf.key)}${filters.query ? `&q=${encodeURIComponent(filters.query)}` : ""}${filters.workStyle ? `&work_style=${encodeURIComponent(filters.workStyle)}` : ""}`}
+                  href={`/jobs?role_family=${encodeURIComponent(rf.key)}${filters.query ? `&q=${encodeURIComponent(filters.query)}` : ""}${filters.workStyle ? `&work_style=${encodeURIComponent(filters.workStyle)}` : ""}${filters.postedWithinDays ? `&fresh=${filters.postedWithinDays}` : ""}`}
                   className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
                     filters.roleFamily === rf.key
                       ? "bg-navy-900 text-white shadow-2xs font-bold"
@@ -339,6 +363,7 @@ export default async function JobsPage({
         <div className="space-y-3">
           {data.jobs.map((job) => {
             const postedLabel = formatDate(job.postedAt);
+            const freshness = jobFreshness(job);
             return (
               <div
                 key={job.id}
@@ -397,11 +422,25 @@ export default async function JobsPage({
                           {WORK_STYLE_LABELS[job.workStyle]}
                         </span>
                       )}
-                      <span className="font-mono text-[11px] text-slate-400 ml-1">
-                        {postedLabel
-                          ? `Posted ${postedLabel}`
-                          : `Observed ${formatDate(job.firstSeenAt)}`}
-                      </span>
+                      {freshness && (
+                        <span
+                          className={`rounded border px-2 py-0.5 font-mono text-[10px] font-bold ${
+                            freshness.kind === "new"
+                              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                              : "border-slate-200 bg-white text-slate-600"
+                          }`}
+                        >
+                          {freshness.kind === "new" ? "New · " : ""}
+                          {freshness.label}
+                        </span>
+                      )}
+                      {!freshness && (
+                        <span className="font-mono text-[11px] text-slate-400 ml-1">
+                          {postedLabel
+                            ? `Posted ${postedLabel}`
+                            : `Observed ${formatDate(job.firstSeenAt)}`}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

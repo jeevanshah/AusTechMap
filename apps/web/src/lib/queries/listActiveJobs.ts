@@ -7,6 +7,8 @@ export interface ActiveJobFilters {
   query?: string;
   roleFamily?: string;
   workStyle?: PublicWorkStyle;
+  /** Only jobs the ATS reports as posted within this many days (1-90). */
+  postedWithinDays?: number;
 }
 
 export interface ActiveJobRecord {
@@ -74,6 +76,13 @@ export async function listActiveJobs(
   const query = normalizeQuery(filters.query);
   const roleFamily = filters.roleFamily?.trim().slice(0, 120) ?? "";
   const workStyle = filters.workStyle ?? null;
+  const postedWithinDays =
+    filters.postedWithinDays !== undefined &&
+    Number.isInteger(filters.postedWithinDays) &&
+    filters.postedWithinDays >= 1 &&
+    filters.postedWithinDays <= 90
+      ? filters.postedWithinDays
+      : null;
 
   const [jobResult, roleFamilyResult] = await Promise.all([
     pool.query<JobRow>(
@@ -103,9 +112,13 @@ export async function listActiveJobs(
          )
          AND ($2::text = '' OR rf.key = $2)
          AND ($3::work_style IS NULL OR j.remote_type = $3)
+         AND (
+           $5::int IS NULL
+           OR j.posted_at >= now() - ($5::int * interval '1 day')
+         )
        ORDER BY j.posted_at DESC NULLS LAST, j.first_seen_at DESC, j.id ASC
        LIMIT $4`,
-      [query, roleFamily, workStyle, MAX_PUBLIC_JOBS],
+      [query, roleFamily, workStyle, MAX_PUBLIC_JOBS, postedWithinDays],
     ),
     pool.query<RoleFamilyRow>(
       `SELECT DISTINCT rf.key, rf.label
