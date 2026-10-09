@@ -229,6 +229,42 @@ section's account-deletion contract rather than a separate one:
   (destroy/de-identify personal information when no longer needed), not legal advice and not a claim
   that the business is necessarily an APP entity.
 
+**Candidate profile data lifecycle (post-V1/next feature, PRODUCT_SPEC.md §12.4.2)**
+
+The opt-in CV/profile intake stores user-confirmed structured preferences (role family, experience
+band, skill keys, work-style, locations) in `candidate_profiles`, one row per user. It inherits this
+section's account-deletion contract and adds a stronger constraint on the source document: **the CV
+never reaches the server.**
+
+- The PDF is read entirely in the user's browser (`unpdf`, a serverless build of PDF.js, loaded on
+  demand, plus a deterministic keyword/alias matcher against the role-family/skill taxonomy the page
+  already holds; no LLM or third-party API). No server receives, parses, logs, or stores the file or its
+  text; the only thing sent is the structured profile the user reviewed and confirmed.
+- **Why not parse on the server (decision record):** the first implementation parsed uploads in a Server
+  Action. Independent review showed PDF.js runs in-process as a "fake worker", is driven by microtasks,
+  and cannot be cancelled: a ~100KB crafted PDF kept the Node event loop busy for minutes, the
+  `Promise.race` timeout never fired, and any free account could stall or exhaust an instance. Isolating
+  it (a worker thread or separate function) could not be verified against Vercel's runtime from the
+  development environment. Moving the parse to the browser removes the attack surface outright, removes
+  the need to raise `serverActions.bodySizeLimit` (left at Next.js's default), removes the Vercel request
+  body ceiling as a concern, and gives a stronger privacy statement. Verified in Chromium (Edge 154)
+  against a production build under the app's real CSP. The cost: a hostile PDF can only slow the
+  uploader's own tab, and very old browsers without `Promise.withResolvers` cannot read PDFs (they get a
+  friendly message).
+- Nothing is persisted until the user confirms the review screen. `saveCandidateProfileAction` is the
+  only writer: it schema-validates its argument (bounded counts and lengths from
+  `CANDIDATE_PROFILE_LIMITS` in `@austechmap/contracts`), keeps only role-family and skill keys that
+  exist in the taxonomy, de-duplicates, and the database re-enforces the bounds with CHECK constraints in
+  migration 0027, so the table can only ever hold short structured values (never free text).
+- Every read/write is scoped by the authenticated session's user ID (never a client-supplied ID).
+- `candidate_profiles` is registered in the per-domain erasure hook (`eraseUserRetentionData`) and is
+  deleted by the same 24-hour account-deletion job. Users can also delete the profile at any time,
+  effective immediately. Backups follow the 35-day expiry in step 5 above. **Deploy ordering:** the hourly
+  deletion workflow runs `main`'s code against the production database, so migration 0027 must be applied
+  before this code merges to `main`.
+- As above, this is an internal product privacy assessment aligned to OAIC APP 11 principles, not legal
+  advice and not a claim that the business is necessarily an APP entity.
+
 ### 4.2 Import-run scheduling and failure recovery
 
 Execution is **at least once**. Exactly-once business effects come from idempotency keys, unique

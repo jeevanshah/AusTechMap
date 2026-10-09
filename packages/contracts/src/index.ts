@@ -759,3 +759,78 @@ export const SponsoredPlacementSchema = z.object({
   updatedAt: z.string().optional(),
 });
 export type SponsoredPlacement = z.infer<typeof SponsoredPlacementSchema>;
+
+// --- Applicant Velocity P1: CV/Profile Intake (candidate profile) ---
+
+export const CandidateProfileSourceSchema = z.enum(["resume_upload", "manual"]);
+export type CandidateProfileSource = z.infer<
+  typeof CandidateProfileSourceSchema
+>;
+
+export const CandidateProfileSkillSchema = z.object({
+  key: z.string().min(1),
+  label: z.string().min(1),
+});
+export type CandidateProfileSkill = z.infer<typeof CandidateProfileSkillSchema>;
+
+export const CandidateProfileSchema = z.object({
+  userId: z.number().int(),
+  roleFamilyKey: z.string().nullable(),
+  roleFamilyLabel: z.string().nullable(),
+  experienceBand: OpportunityExperienceBandSchema,
+  skills: z.array(CandidateProfileSkillSchema),
+  workStyle: OpportunityWorkStyleSchema,
+  workStyleRequired: z.boolean(),
+  locations: z.array(z.string()),
+  source: CandidateProfileSourceSchema,
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+export type CandidateProfile = z.infer<typeof CandidateProfileSchema>;
+
+// Ephemeral extraction result -- structured fields only. Never carries raw
+// extracted resume text or snippets; see PRODUCT_SPEC.md §12.4.2.
+export const CandidateProfileSuggestionSchema = z.object({
+  roleFamilyKey: z.string().nullable(),
+  roleFamilyLabel: z.string().nullable(),
+  experienceBand: OpportunityExperienceBandSchema,
+  skills: z.array(CandidateProfileSkillSchema),
+  workStyle: OpportunityWorkStyleSchema,
+  workStyleRequired: z.boolean(),
+});
+export type CandidateProfileSuggestion = z.infer<
+  typeof CandidateProfileSuggestionSchema
+>;
+
+// Bounds on what a saved profile may hold, so the table only ever contains
+// short structured values (never free text). Migration 0027 enforces the
+// counts and total lengths again in the database.
+export const CANDIDATE_PROFILE_LIMITS = {
+  maxSkills: 50,
+  maxLocations: 20,
+  maxKeyChars: 64,
+  maxLocationChars: 80,
+} as const;
+
+export const SaveCandidateProfileInputSchema = z.object({
+  roleFamilyKey: z
+    .string()
+    .min(1)
+    .max(CANDIDATE_PROFILE_LIMITS.maxKeyChars)
+    .nullable(),
+  experienceBand: OpportunityExperienceBandSchema,
+  skillKeys: z
+    .array(z.string().min(1).max(CANDIDATE_PROFILE_LIMITS.maxKeyChars))
+    .max(CANDIDATE_PROFILE_LIMITS.maxSkills),
+  workStyle: OpportunityWorkStyleSchema,
+  workStyleRequired: z.boolean(),
+  locations: z
+    .array(
+      z.string().trim().min(1).max(CANDIDATE_PROFILE_LIMITS.maxLocationChars),
+    )
+    .max(CANDIDATE_PROFILE_LIMITS.maxLocations),
+  source: CandidateProfileSourceSchema.default("resume_upload"),
+});
+export type SaveCandidateProfileInput = z.infer<
+  typeof SaveCandidateProfileInputSchema
+>;

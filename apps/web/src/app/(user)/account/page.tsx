@@ -8,6 +8,11 @@ import { listJobApplications } from "../../../lib/queries/jobApplications";
 import { listSavedSearches } from "../../../lib/queries/savedSearches";
 import { listWatchlist } from "../../../lib/queries/watchlists";
 import { listUserAlerts } from "../../../lib/queries/userAlerts";
+import { getCandidateProfile } from "../../../lib/queries/candidateProfiles";
+import {
+  listActiveSkills,
+  listRoleFamilies,
+} from "../../../lib/queries/taxonomy";
 import { AccountView } from "./AccountView";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +20,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "My Account · Australia Tech Map",
   description:
-    "Manage your private Job Vault, application progress, saved searches, employer watchlists, and opportunity alerts.",
+    "Manage your candidate profile, private Job Vault, application progress, saved searches, employer watchlists, and opportunity alerts.",
   robots: { index: false },
 };
 
@@ -31,13 +36,32 @@ export default async function AccountPage() {
   }
 
   const pool = getPool();
-  const [applications, savedSearches, watchlist, alertsData] =
-    await Promise.all([
-      listJobApplications(pool, actor.id),
-      listSavedSearches(pool, actor.id),
-      listWatchlist(pool, actor.id),
-      listUserAlerts(pool, actor.id),
-    ]);
+  const [
+    applications,
+    savedSearches,
+    watchlist,
+    alertsData,
+    candidateProfile,
+    roleFamilies,
+    taxonomySkills,
+  ] = await Promise.all([
+    listJobApplications(pool, actor.id),
+    listSavedSearches(pool, actor.id),
+    listWatchlist(pool, actor.id),
+    listUserAlerts(pool, actor.id),
+    // The profile panel is an add-on: if its table is unavailable (e.g. a
+    // deploy that lands before migration 0027), don't take down the Job
+    // Vault, alerts, and everything else on this page.
+    getCandidateProfile(pool, actor.id).catch((error: unknown) => {
+      console.error(
+        "getCandidateProfile failed:",
+        error instanceof Error ? error.name : "unknown error",
+      );
+      return null;
+    }),
+    listRoleFamilies(pool),
+    listActiveSkills(pool),
+  ]);
 
   return (
     <main className="min-h-screen bg-canvas">
@@ -47,6 +71,9 @@ export default async function AccountPage() {
         initialSavedSearches={savedSearches}
         initialWatchlist={watchlist}
         initialAlerts={alertsData}
+        initialCandidateProfile={candidateProfile}
+        roleFamilies={roleFamilies}
+        taxonomySkills={taxonomySkills}
       />
     </main>
   );

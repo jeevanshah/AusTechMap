@@ -31,13 +31,16 @@ import {
 } from "lucide-react";
 import type {
   AlertFrequency,
+  CandidateProfile,
   JobApplication,
   SavedSearch,
   UserAlert,
   WatchlistEntry,
 } from "@austechmap/contracts";
 
+import type { RoleFamilyRow, SkillRow } from "../../../lib/queries/taxonomy";
 import { ApplicationVaultPanel } from "./ApplicationVaultPanel";
+import { CandidateProfilePanel } from "./CandidateProfilePanel";
 
 import {
   deleteSavedSearchAction,
@@ -62,10 +65,13 @@ interface AccountViewProps {
   initialSavedSearches: SavedSearch[];
   initialWatchlist: WatchlistEntry[];
   initialAlerts: { unreadCount: number; alerts: UserAlert[] };
+  initialCandidateProfile: CandidateProfile | null;
+  roleFamilies: RoleFamilyRow[];
+  taxonomySkills: SkillRow[];
 }
 
 type TabType =
-  "applications" | "searches" | "watchlist" | "alerts" | "security";
+  "profile" | "applications" | "searches" | "watchlist" | "alerts" | "security";
 type WatchlistFilterType = "all" | "employers" | "regions";
 
 interface WatchlistNoteMeta {
@@ -92,8 +98,13 @@ export function AccountView({
   initialSavedSearches,
   initialWatchlist,
   initialAlerts,
+  initialCandidateProfile,
+  roleFamilies,
+  taxonomySkills,
 }: AccountViewProps) {
   const [activeTab, setActiveTab] = useState<TabType>("applications");
+  const [candidateProfile, setCandidateProfile] =
+    useState<CandidateProfile | null>(initialCandidateProfile);
   const [watchlistSubTab, setWatchlistSubTab] =
     useState<WatchlistFilterType>("all");
 
@@ -410,8 +421,8 @@ export function AccountView({
                 )}
               </div>
               <p className="mt-1 text-xs text-slate-500">
-                Private Job Vault, application progress, saved searches, and
-                opportunity alerts.
+                Candidate profile, private Job Vault, application progress,
+                saved searches, and opportunity alerts.
               </p>
             </div>
           </div>
@@ -606,6 +617,22 @@ export function AccountView({
       <div className="mb-6 flex overflow-x-auto border-b border-surface-border">
         <button
           type="button"
+          onClick={() => setActiveTab("profile")}
+          className={`flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-xs font-bold transition-colors ${
+            activeTab === "profile"
+              ? "border-navy-900 text-navy-900"
+              : "border-transparent text-slate-500 hover:text-slate-800"
+          }`}
+        >
+          <User className="h-4 w-4" />
+          <span>My Profile</span>
+          {!candidateProfile && (
+            <span className="ml-1 h-1.5 w-1.5 rounded-full bg-terracotta-600" />
+          )}
+        </button>
+
+        <button
+          type="button"
           onClick={() => setActiveTab("applications")}
           className={`flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-xs font-bold transition-colors ${
             activeTab === "applications"
@@ -690,6 +717,16 @@ export function AccountView({
 
       {/* Tab Contents */}
       <div className="space-y-6">
+        {/* TAB 0: CANDIDATE PROFILE (CV INTAKE) */}
+        {activeTab === "profile" && (
+          <CandidateProfilePanel
+            initialProfile={initialCandidateProfile}
+            roleFamilies={roleFamilies}
+            skills={taxonomySkills}
+            onProfileChange={setCandidateProfile}
+          />
+        )}
+
         {/* TAB 1: JOB VAULT & APPLICATION TRACKER */}
         {activeTab === "applications" && (
           <ApplicationVaultPanel initialApplications={initialApplications} />
