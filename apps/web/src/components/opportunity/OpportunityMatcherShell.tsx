@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 import type {
   AlertFrequency,
+  CandidateProfile,
+  CandidateProfileSuggestion,
   OpportunityExperienceBand,
   OpportunityMatchPreferences,
   OpportunityMatchResponse,
@@ -31,6 +33,13 @@ import type {
 
 import { PromotedOpportunityCard } from "./PromotedOpportunityCard";
 import { CompanyBrandMark } from "../ui/CompanyBrandMark";
+import { ResumeIntakeCard } from "../profile/ResumeIntakeCard";
+import { ResumeReviewPanel } from "../profile/ResumeReviewPanel";
+import {
+  applyCandidateProfile,
+  mergeSuggestionWithProfile,
+} from "../../lib/profile/preferences";
+import type { RoleFamilyRow, SkillRow } from "../../lib/queries/taxonomy";
 import { matchOpportunitiesAction } from "../../app/actions/opportunityActions";
 import {
   saveSearchAction,
@@ -87,6 +96,9 @@ interface OpportunityMatcherShellProps {
   initialPromotedPlacements?: SponsoredPlacement[];
   user: { id: number; email: string } | null;
   watchedCompanyIds: string[];
+  initialCandidateProfile: CandidateProfile | null;
+  roleFamilies: RoleFamilyRow[];
+  taxonomySkills: SkillRow[];
 }
 
 export function OpportunityMatcherShell({
@@ -95,6 +107,9 @@ export function OpportunityMatcherShell({
   initialPromotedPlacements,
   user,
   watchedCompanyIds: initialWatched,
+  initialCandidateProfile,
+  roleFamilies,
+  taxonomySkills,
 }: OpportunityMatcherShellProps) {
   const router = useRouter();
   const [preferences, setPreferences] =
@@ -116,6 +131,23 @@ export function OpportunityMatcherShell({
 
   // Skill input state
   const [skillInput, setSkillInput] = useState("");
+
+  // CV/profile intake state
+  const [savedProfile, setSavedProfile] = useState<CandidateProfile | null>(
+    initialCandidateProfile,
+  );
+  const [pendingSuggestion, setPendingSuggestion] =
+    useState<CandidateProfileSuggestion | null>(null);
+
+  // The DB taxonomy can hold role families this page's friendlier hardcoded
+  // labels don't list (e.g. "quality"); show them too so a saved profile's role
+  // is always a visible, selectable chip.
+  const roleOptions = [
+    ...ROLE_FAMILIES,
+    ...roleFamilies
+      .filter((family) => !ROLE_FAMILIES.some((rf) => rf.key === family.key))
+      .map((family) => ({ key: family.key, label: family.label })),
+  ];
 
   // Save search modal state
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
@@ -392,6 +424,36 @@ export function OpportunityMatcherShell({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Intake Sidebar / Controls (4 cols on lg) */}
           <div className="lg:col-span-4 space-y-6">
+            {user &&
+              (pendingSuggestion ? (
+                <ResumeReviewPanel
+                  suggestion={pendingSuggestion}
+                  roleFamilies={roleFamilies}
+                  skills={taxonomySkills}
+                  initialLocations={savedProfile?.locations ?? []}
+                  onCancel={() => setPendingSuggestion(null)}
+                  onSaved={(profile) => {
+                    const updated = applyCandidateProfile(preferences, profile);
+                    setPreferences(updated);
+                    runMatch(updated);
+                    setSavedProfile(profile);
+                    setPendingSuggestion(null);
+                  }}
+                />
+              ) : (
+                <ResumeIntakeCard
+                  hasExistingProfile={savedProfile !== null}
+                  taxonomy={{ roleFamilies, skills: taxonomySkills }}
+                  onParsed={(suggestion) =>
+                    setPendingSuggestion(
+                      savedProfile
+                        ? mergeSuggestionWithProfile(suggestion, savedProfile)
+                        : suggestion,
+                    )
+                  }
+                />
+              ))}
+
             <div className="rounded-2xl border border-surface-border bg-white p-5 shadow-2xs space-y-6">
               <div className="flex items-center justify-between border-b border-surface-border pb-3">
                 <span className="flex items-center gap-1.5 font-bold text-sm text-navy-900">
@@ -412,7 +474,7 @@ export function OpportunityMatcherShell({
                   Role Family (30% Weight)
                 </label>
                 <div className="flex flex-wrap gap-1.5">
-                  {ROLE_FAMILIES.map((rf) => {
+                  {roleOptions.map((rf) => {
                     const isSelected = preferences.roleFamily === rf.key;
                     return (
                       <button

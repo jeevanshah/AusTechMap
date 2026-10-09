@@ -810,7 +810,7 @@ Scores are derived products, not canonical truth. Persist methodology_version, i
 
 - Record licence/terms metadata for every bulk data source.
 - Attribute official/open datasets as required by their licences.
-- Do not make unauthorised scraping of LinkedIn, SEEK or other third-party sites the foundation of the platform.
+- Do not make unauthorised scraping of LinkedIn, SEEK or other third-party sites the foundation of the platform. CV-upload-based candidate intake (§12.4.2) is the only sanctioned way to populate a candidate profile — LinkedIn/GitHub profile import is explicitly out of scope.
 - Prefer employer first-party sources, government/open datasets and permitted structured feeds.
 - Provide a correction/removal process for employer profile data.
 - Keep migration information clearly informational and link users to official Home Affairs sources for authoritative requirements.
@@ -833,6 +833,23 @@ Scores are derived products, not canonical truth. Persist methodology_version, i
 - **Deletion lifecycle**: Users may delete an individual vault entry at any time, taking effect immediately. Vault entries are also in scope for the account-erasure lifecycle in ARCHITECTURE_DECISIONS.md §4.1: deletion completes within 24 hours of a confirmed account-deletion request via the same per-domain erasure-hook registry, and any copy retained in encrypted backups expires within the existing 35-day backup window.
 - **Notes warning**: The notes field is free text entered by the user; the product must display a clear warning not to enter sensitive information (e.g. health, immigration status, salary details of others, or other special-category data) in notes, since notes are stored as plain user content rather than structured, minimised fields.
 - **Implementation requirement**: Any implementation of this feature must use per-request ownership checks (never trust a client-supplied user ID) and must register with the erasure-hook registry so vault data is included in account deletion without a separate, easily-missed deletion path.
+
+#### 12.4.2 Post-V1/next requirement: CV/Profile intake (candidate profile)
+
+**Status: post-V1/next, privacy-reviewed.** A logged-in user may optionally upload a resume/CV (PDF) so the platform can pre-fill Opportunity Match preferences (role family, skills, experience band, work-style preference) instead of manually selecting every chip. This is the only sanctioned candidate-intake mechanism in v1; LinkedIn/GitHub profile scraping is explicitly out of scope, consistent with §12.3's ban on unauthorised scraping of LinkedIn or other third-party sites.
+
+> [!NOTE]
+> **Privacy review (internal, non-legal):** as §12.4.1, an internal product privacy assessment aligned to Australian Privacy Principle 11 reasoning, not legal advice. Re-review before implementation if scope changes.
+
+- **Purpose/justification**: Replace manual Opportunity Match chip-picking with a faster, user-confirmed starting point derived from a CV the user already has, without turning the platform into a CV/application-submission product or a store of applicant data.
+- **Client-side processing (the CV never leaves the device)**: the chosen PDF is read entirely in the user's browser — text extraction plus a deterministic keyword/alias matcher against the role-family/skill taxonomy supplied by the page (no LLM call, no third-party API). The file and its text are never transmitted to, processed by, or stored on any server, object store (R2), log, or database table; the server only ever receives the structured profile the user reviews and confirms. This also means the platform never has to parse untrusted PDFs server-side (PDF.js runs in-process and cannot be cancelled, so a crafted file could otherwise stall a server instance).
+- **Validation**: in the browser, only PDF content (validated by file signature, not MIME type) up to 5MB and 15 pages is accepted, and only the first 100,000 characters of extracted text are examined, so a crafted file can at worst slow the uploader's own tab. On the server, saving a profile re-validates everything it receives: the payload is schema-checked (bounded counts and lengths, so the table only ever holds short structured values — never free text), role-family and skill keys must exist in the taxonomy, and the database enforces the same bounds with CHECK constraints. Failures return a generic message and log only the error's name.
+- **Explicit confirmation gate**: every inferred field (role family) and skill is shown to the user as an editable, pre-checked suggestion; nothing is sent to or persisted by the server until the user explicitly confirms (or edits, then confirms) on a review screen. Closing the review screen without confirming saves nothing. Re-uploading a CV replaces the suggested skills but keeps saved values the new CV cannot supply (locations, and role/experience/work style when none is detected), so it never silently wipes them.
+- **Data minimisation on save**: only the user-confirmed structured fields are stored in `candidate_profiles` — role family, experience band, skill keys, work-style preference/requirement, and location labels. No CV, résumé, extracted text, or any other application material is ever stored, mirroring §12.4.1's "do not collect or store a CV, résumé" principle.
+- **Explicit user action**: a profile is created or replaced only by an explicit upload-and-confirm action; nothing is inferred from browsing behaviour. Editing a saved profile without re-uploading is not offered in v1 (the `manual` source value is reserved for it).
+- **User-scoped access**: a candidate profile is owned by and visible only to the creating user (one row per user), enforced with an ownership check (`user_id` match) on every read/write, per §4.1's enforcement pattern.
+- **Deletion lifecycle**: Users may delete their candidate profile at any time from `/account`, taking effect immediately. The profile is also in scope for the account-erasure lifecycle in ARCHITECTURE_DECISIONS.md §4.1: deletion completes within 24 hours of a confirmed account-deletion request via the same per-domain erasure-hook registry used by §12.4.1's Job Vault, and any copy in encrypted backups expires within the existing 35-day backup window. Because the source PDF never reached the server, there is no separate file/object to purge on deletion.
+- **Implementation requirement**: any implementation must (a) perform PDF reading and matching entirely client-side, with no code path that transmits the file or its text to the server; (b) accept only the structured, schema-validated profile on the server and use per-request ownership checks for every read/write of `candidate_profiles`; (c) register the table with the erasure-hook registry.
 
 ## 13. Testing, Observability and Reliability
 
@@ -1011,6 +1028,7 @@ Post-V1 expansion should deepen intelligence or monetisation without diluting th
 | :--- | :--- |
 | Natural-language structured search | Users repeatedly express complex combinations that are cumbersome with filters; LLM translates intent into canonical filters only |
 | Private Job Vault / application tracker (§12.4.1) | Opt-in, user-scoped tracking of jobs the user is personally pursuing; privacy-reviewed and data-minimised per §12.4.1, implemented only with ownership checks and erasure-hook coverage from ARCHITECTURE_DECISIONS.md §4.1 |
+| CV/profile intake (§12.4.2) | Opt-in PDF read entirely in the user's browser and matched deterministically to pre-fill Opportunity Match; only user-confirmed structured fields are sent and stored, never the file or its text; privacy-reviewed per §12.4.2 with ownership checks and erasure-hook coverage from ARCHITECTURE_DECISIONS.md §4.1 |
 | Verified / enhanced employer products | Employers request claims, corrections, employer branding or recruitment visibility |
 | Recruiter / workforce intelligence | Historical hiring dataset becomes sufficiently deep and reliable for paid market analysis |
 | University / council / government dashboards | Regional coverage and labour-market joins are credible enough for institutional use |

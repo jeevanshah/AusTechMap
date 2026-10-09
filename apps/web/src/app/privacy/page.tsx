@@ -116,9 +116,10 @@ export default function PrivacyPage() {
                 where required for audit attribution.
               </li>
               <li>
-                Your private Job Vault snapshots, tracker statuses, notes, saved
-                search queries, customised alert frequencies, and
-                company/regional watchlists are irreversibly deleted.
+                Your private Job Vault snapshots, tracker statuses, notes,
+                candidate profile, saved search queries, customised alert
+                frequencies, and company/regional watchlists are irreversibly
+                deleted.
               </li>
               <li>
                 Encrypted backups expire within 35 days. Any restore must replay
@@ -141,16 +142,21 @@ export default function PrivacyPage() {
           <p className="text-sm leading-relaxed text-slate-600">
             Australia Tech Map primarily indexes public organisational
             technology employment data. Signed-in users may also choose to keep
-            a private Job Vault and application tracker.
+            a private Job Vault and application tracker, and a private candidate
+            profile that pre-fills Opportunity Match.
           </p>
           <div className="space-y-2 text-xs text-slate-600">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
               <span>
-                <strong>No Candidate Resumes or Application Submission:</strong>{" "}
-                We do not store or process candidate CVs, receive application
-                answers, or submit applications. Employer application links open
-                the employer’s official ATS in a separate action.
+                <strong>No Resume Upload or Application Submission:</strong> We
+                never receive or store candidate CVs. If you choose to analyse a
+                PDF CV to pre-fill Opportunity Match, it is read entirely in
+                your own browser to suggest your role, skills, and experience
+                level — the file and its text are never uploaded to our servers.
+                We do not receive application answers or submit applications.
+                Employer application links open the employer’s official ATS in a
+                separate action.
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -161,6 +167,19 @@ export default function PrivacyPage() {
                 public listing, their chosen progress status, and any notes they
                 add. This data is not shared with employers and is purged when
                 the entry or account is deleted.
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+              <span>
+                <strong>Optional Candidate Profile:</strong> If you review and
+                confirm the suggestions from a CV analysis, only those
+                structured details — role family, experience level, skills,
+                work-style, and location preferences — are sent to us and kept
+                to pre-fill Opportunity Match. Nothing is sent or saved until
+                you press Confirm &amp; Save. It is private to you, never shared
+                with employers, and purged when you delete the profile or your
+                account.
               </span>
             </div>
             <div className="flex items-center gap-2">

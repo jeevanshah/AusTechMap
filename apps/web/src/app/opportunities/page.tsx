@@ -1,11 +1,22 @@
 import type { Metadata } from "next";
-import type { OpportunityMatchPreferences } from "@austechmap/contracts";
+import type {
+  CandidateProfile,
+  OpportunityMatchPreferences,
+} from "@austechmap/contracts";
 
 import { auth } from "../../auth";
 import { getPool } from "../../lib/db";
 import { matchOpportunities } from "../../lib/opportunity/matcher";
 import { getActiveSponsoredPlacements } from "../../lib/commercial/sponsored";
 import { listWatchlist } from "../../lib/queries/watchlists";
+import { applyCandidateProfile } from "../../lib/profile/preferences";
+import { getCandidateProfile } from "../../lib/queries/candidateProfiles";
+import {
+  listActiveSkills,
+  listRoleFamilies,
+  type RoleFamilyRow,
+  type SkillRow,
+} from "../../lib/queries/taxonomy";
 import { OpportunityMatcherShell } from "../../components/opportunity/OpportunityMatcherShell";
 
 export const dynamic = "force-dynamic";
@@ -35,6 +46,11 @@ export default async function OpportunitiesPage() {
   const userId = session?.user?.id ? Number(session.user.id) : null;
 
   let watchedCompanyIds: string[] = [];
+  let initialPreferences = DEFAULT_PREFERENCES;
+  let candidateProfile: CandidateProfile | null = null;
+  // Only signed-in users see the CV card, so only they need the taxonomy.
+  let roleFamilies: RoleFamilyRow[] = [];
+  let taxonomySkills: SkillRow[] = [];
   if (userId) {
     try {
       const watchlist = await listWatchlist(pool, userId);
@@ -44,12 +60,33 @@ export default async function OpportunitiesPage() {
     } catch {
       watchedCompanyIds = [];
     }
+
+    try {
+      candidateProfile = await getCandidateProfile(pool, userId);
+      if (candidateProfile) {
+        initialPreferences = applyCandidateProfile(
+          DEFAULT_PREFERENCES,
+          candidateProfile,
+        );
+      }
+    } catch {
+      // Fall back to DEFAULT_PREFERENCES if the profile can't be loaded.
+    }
+
+    try {
+      [roleFamilies, taxonomySkills] = await Promise.all([
+        listRoleFamilies(pool),
+        listActiveSkills(pool),
+      ]);
+    } catch {
+      // The page works without the CV card if the taxonomy can't be loaded.
+    }
   }
 
   const [initialResponse, initialPromotedPlacements] = await Promise.all([
-    matchOpportunities(pool, DEFAULT_PREFERENCES),
+    matchOpportunities(pool, initialPreferences),
     getActiveSponsoredPlacements(pool, {
-      roleFamily: DEFAULT_PREFERENCES.roleFamily,
+      roleFamily: initialPreferences.roleFamily,
     }),
   ]);
 
@@ -63,10 +100,13 @@ export default async function OpportunitiesPage() {
   return (
     <OpportunityMatcherShell
       initialResponse={initialResponse}
-      initialPreferences={DEFAULT_PREFERENCES}
+      initialPreferences={initialPreferences}
       initialPromotedPlacements={initialPromotedPlacements}
       user={safeUser}
       watchedCompanyIds={watchedCompanyIds}
+      initialCandidateProfile={candidateProfile}
+      roleFamilies={roleFamilies}
+      taxonomySkills={taxonomySkills}
     />
   );
 }

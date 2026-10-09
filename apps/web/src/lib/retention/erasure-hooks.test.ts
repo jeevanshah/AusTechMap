@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { eraseUserRetentionData } from "./erasure-hooks";
 
 describe("eraseUserRetentionData", () => {
-  it("purges job applications, saved searches, watchlists, and alerts", async () => {
+  it("purges job applications, saved searches, watchlists, alerts, and the candidate profile", async () => {
     const executedQueries: Array<{ sql: string; values: unknown[] }> = [];
     const pool = {
       query: vi.fn().mockImplementation((sql: string, values: unknown[]) => {
@@ -15,7 +15,7 @@ describe("eraseUserRetentionData", () => {
 
     await eraseUserRetentionData(pool, 42);
 
-    expect(executedQueries).toHaveLength(4);
+    expect(executedQueries).toHaveLength(5);
     expect(executedQueries[0]?.sql).toContain(
       "DELETE FROM job_applications WHERE user_id = $1",
     );
@@ -32,5 +32,9 @@ describe("eraseUserRetentionData", () => {
       "DELETE FROM user_alerts WHERE user_id = $1",
     );
     expect(executedQueries[3]?.values).toEqual([42]);
+    expect(executedQueries[4]?.sql).toContain(
+      "DELETE FROM candidate_profiles WHERE user_id = $1",
+    );
+    expect(executedQueries[4]?.values).toEqual([42]);
   });
 });
