@@ -362,13 +362,16 @@ def test_run_ats_crawl_persists_real_greenhouse_postings() -> None:
 
 
 @pytest.mark.integration
-def test_run_ats_crawl_is_idempotent_at_the_run_level_on_the_same_day() -> None:
+def test_run_ats_crawl_is_idempotent_at_the_run_level_within_a_slot() -> None:
     database_url = _database_url()
     suffix = uuid.uuid4().hex
     company_ats_source = _setup_company_ats_source(database_url, suffix, "lever", "immutable")
     repository = JobRepository(database_url)
     store = FilesystemSnapshotStore(Path(tempfile.gettempdir()) / f"pipeline-test-{suffix}")
     fetch_fn = lambda *a, **kw: _fake_fetch("lever_immutable_postings.json")  # noqa: E731
+    # Fixed clock: the run key is scoped to a 6-hour UTC slot, so two real-clock
+    # calls could straddle a slot boundary and flake.
+    crawl_time = datetime(2026, 1, 1, 1, 0, tzinfo=UTC)
 
     first = run_ats_crawl(
         repository,
@@ -377,6 +380,7 @@ def test_run_ats_crawl_is_idempotent_at_the_run_level_on_the_same_day() -> None:
         company_ats_source=company_ats_source,
         skills=(),
         fetch_fn=fetch_fn,
+        now=crawl_time,
     )
     second = run_ats_crawl(
         repository,
@@ -385,11 +389,24 @@ def test_run_ats_crawl_is_idempotent_at_the_run_level_on_the_same_day() -> None:
         company_ats_source=company_ats_source,
         skills=(),
         fetch_fn=fetch_fn,
+        now=crawl_time + timedelta(minutes=30),
+    )
+    later_slot = run_ats_crawl(
+        repository,
+        store,
+        database_url=database_url,
+        company_ats_source=company_ats_source,
+        skills=(),
+        fetch_fn=fetch_fn,
+        now=crawl_time + timedelta(hours=7),
     )
 
     assert first.created is True
     assert second.created is False
     assert second.run_id == first.run_id
+    # A later slot the same day gets its own crawl (sub-daily freshness).
+    assert later_slot.created is True
+    assert later_slot.run_id != first.run_id
 
 
 @pytest.mark.integration

@@ -75,12 +75,39 @@ If a company shuts down or requests delisting:
 
 ### C. Pausing Notification Email Digests
 
-To halt outgoing email digests without shutting down web traffic:
+To halt outgoing email digests without shutting down web traffic, use any of these (fastest first):
 
-- Set environment variable `RESEND_API_KEY=""` or run the retention runner in dry-run mode:
+- Set the repository variable `RETENTION_EMAIL_ENABLED` to anything other than `true` (scheduled runs then pass `--skip-email`: in-app alerts keep working, nothing is emailed).
+- Set `RETENTION_PIPELINE_ENABLED` to anything other than `true` to stop the whole scheduled pipeline.
+- Locally, `--skip-email` skips email; `--dry-run` runs every step in a transaction that is always rolled back and reports what _would_ happen (it writes and sends nothing).
   ```bash
   node --env-file=.env apps/web/scripts/run-retention-pipeline.mjs --dry-run
   ```
+- With no `AUTH_RESEND_KEY` or no `AUTH_SECRET` the sender refuses to send and records nothing.
+
+### D. Scheduled crawl and alert pipeline (P3)
+
+Two GitHub Actions workflows, both **off until you switch them on** (merging them changes nothing):
+
+| Workflow                | Switch (repository variable)      | What it does                                                                                                                                                                                                                                     |
+| :---------------------- | :-------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Crawl due ATS sources` | `SCHEDULED_CRAWL_ENABLED=true`    | Every 2 hours runs `crawl-jobs --due`; only boards whose 6-hour interval (24h for boards that returned no jobs) has elapsed are fetched. Manual dispatch still needs the `CRAWL_DUE_SOURCES` confirmation.                                       |
+| `Retention pipeline`    | `RETENTION_PIPELINE_ENABLED=true` | After each successful crawl: derive events, write in-app alerts, send instant emails. 21:05 UTC daily: daily digests. 21:35 UTC Sunday: weekly digests. Email only if `RETENTION_EMAIL_ENABLED=true`. Manual runs default to dry run + no email. |
+
+Required secrets (environment `production`): `DATABASE_URL`, `AUTH_SECRET` (**must equal the web app's `AUTH_SECRET`**, because it signs the unsubscribe links the web app verifies), `AUTH_RESEND_KEY`, `AUTH_RESEND_FROM`. Repository variable `NEXT_PUBLIC_APP_URL` supplies the links in emails.
+
+Recommended rollout: (1) apply migration 0028; (2) run `Retention pipeline` manually with the defaults (dry run) and read the counts; (3) set `SCHEDULED_CRAWL_ENABLED=true` and watch a day of runs; (4) set `RETENTION_PIPELINE_ENABLED=true` (in-app alerts only); (5) verify a sending domain in Resend, set `AUTH_RESEND_FROM`, then `RETENTION_EMAIL_ENABLED=true`. Until a domain is verified the Resend sandbox sender only delivers to the account owner.
+
+Freshness read-out (how long after an employer posts a role do we show it):
+
+```sql
+SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY first_seen_at - posted_at) AS median,
+       percentile_cont(0.95) WITHIN GROUP (ORDER BY first_seen_at - posted_at) AS p95
+FROM jobs WHERE posted_at IS NOT NULL AND first_seen_at >= now() - interval '14 days'
+  AND first_seen_at > posted_at;
+```
+
+Only sources with exact post times (Greenhouse, Ashby, SmartRecruiters) are meaningful here; date-only sources inflate it by up to a day. GitHub may delay scheduled runs by 10-30+ minutes and disables them after 60 days without repository activity, so "within hours" is the honest promise, not minutes.
 
 ---
 

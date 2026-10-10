@@ -2,12 +2,12 @@ import {
   jobMatchesProfile,
   type JobForMatch,
   type ProfileForMatch,
-} from "../profile/jobMatch";
+} from "../profile/jobMatch.ts";
 import {
   ALERT_EVENT_MAX_AGE_HOURS,
   IN_APP_ALERTS_PER_USER_PER_RUN,
   type Queryable,
-} from "./policy";
+} from "./policy.ts";
 
 /** Delivery window that marks "this event matched this user's profile". */
 export const PROFILE_DELIVERY_WINDOW = "profile";

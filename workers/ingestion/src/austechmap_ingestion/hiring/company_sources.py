@@ -34,8 +34,11 @@ ATS_PROVIDERS: tuple[AtsProvider, ...] = (
 )
 AtsSourceStatus = Literal["active", "paused", "quarantined", "disabled"]
 
-ACTIVE_BOARD_INTERVAL = timedelta(hours=24)
-EMPTY_BOARD_INTERVAL = timedelta(hours=72)
+# Freshness SLA (P3): an active board is re-crawled every 6 hours, so a new role
+# is normally seen within about 6 hours plus the scheduler's polling gap. Boards
+# that returned no jobs are checked daily instead of hourly-ish.
+ACTIVE_BOARD_INTERVAL = timedelta(hours=6)
+EMPTY_BOARD_INTERVAL = timedelta(hours=24)
 TERMINAL_FAILURE_INTERVAL = timedelta(hours=24)
 QUARANTINE_THRESHOLD = 3
 JOB_COUNT_BASELINE_SIZE = 3

@@ -1,6 +1,14 @@
 name: Crawl due ATS sources
 
+# Scheduled runs are OFF until the repository variable SCHEDULED_CRAWL_ENABLED is
+# set to 'true' (Settings > Secrets and variables > Actions > Variables), so
+# merging this file changes nothing by itself. `--due` only crawls boards whose
+# interval (hiring/company_sources.py, 6h for active boards) has elapsed, so a
+# 2-hourly poll is cheap. GitHub may delay scheduled runs by 10-30+ minutes and
+# disables them after 60 days without repository activity.
 on:
+  schedule:
+    - cron: "17 */2 * * *"
   workflow_dispatch:
     inputs:
       confirmation:
@@ -18,6 +26,7 @@ concurrency:
 jobs:
   crawl:
     name: Controlled due-source crawl
+    if: github.event_name == 'workflow_dispatch' || vars.SCHEDULED_CRAWL_ENABLED == 'true'
     runs-on: ubuntu-latest
     environment: production
     env:
@@ -31,6 +40,7 @@ jobs:
       R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
     steps:
       - name: Require explicit crawl confirmation
+        if: github.event_name == 'workflow_dispatch'
         run: test "$CONFIRMATION" = "CRAWL_DUE_SOURCES"
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v5

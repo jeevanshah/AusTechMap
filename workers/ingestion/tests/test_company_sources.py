@@ -297,3 +297,33 @@ def test_job_count_collapse_is_recorded_and_audited_after_three_crawls() -> None
 
     assert metric == (10, 22, 3, "median_previous_3_successful_crawls_v1", True)
     assert audit == ("ats_source_job_count_anomaly_detected", "10", "22")
+
+
+def test_crawl_idempotency_key_is_scoped_to_a_slot_not_a_whole_day() -> None:
+    from datetime import UTC, datetime, timedelta, timezone
+
+    from austechmap_ingestion.hiring.company_sources import ACTIVE_BOARD_INTERVAL
+    from austechmap_ingestion.hiring.pipeline import (
+        CRAWL_KEY_SLOT_HOURS,
+        crawl_idempotency_key,
+    )
+
+    # The slot must not be longer than the board interval, or a due board would
+    # find its own earlier run still "claiming" the key and be skipped.
+    assert timedelta(hours=CRAWL_KEY_SLOT_HOURS) <= ACTIVE_BOARD_INTERVAL
+
+    morning = datetime(2026, 10, 10, 1, 30, tzinfo=UTC)
+    same_slot = datetime(2026, 10, 10, 5, 59, tzinfo=UTC)
+    next_slot = datetime(2026, 10, 10, 6, 0, tzinfo=UTC)
+    evening = datetime(2026, 10, 10, 19, 0, tzinfo=UTC)
+
+    key = crawl_idempotency_key("greenhouse", "acme", morning)
+    assert key == "greenhouse:acme:2026-10-10T00"
+    assert crawl_idempotency_key("greenhouse", "acme", same_slot) == key
+    assert crawl_idempotency_key("greenhouse", "acme", next_slot) != key
+    assert crawl_idempotency_key("greenhouse", "acme", evening) == "greenhouse:acme:2026-10-10T03"
+    # Provider scoping is preserved.
+    assert crawl_idempotency_key("lever", "acme", morning) != key
+    # Non-UTC input is normalised to UTC (Sydney 12:00 AEDT is 01:00 UTC).
+    sydney = datetime(2026, 10, 10, 12, 0, tzinfo=timezone(timedelta(hours=11)))
+    assert crawl_idempotency_key("greenhouse", "acme", sydney) == key

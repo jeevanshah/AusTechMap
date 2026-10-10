@@ -272,6 +272,15 @@ never reaches the server.**
   **Deploy ordering:** the email sender and the `/account` profile read the new column and table, so apply
   0028 before merging this code to `main` (the account page tolerates a missing table; the scheduled
   pipeline does not).
+- **Scheduling for P3 (stop-gap, GitHub Actions, per §3.2):** active boards are re-crawled every 6 hours
+  (`ACTIVE_BOARD_INTERVAL`; boards that returned no jobs every 24h) and the ATS crawl run's idempotency
+  key is scoped to a 6-hour UTC slot (`CRAWL_KEY_SLOT_HOURS`) instead of a whole day, because a day-wide key
+  let one succeeded run block every later crawl and made a sub-daily interval impossible. The crawl
+  workflow polls every 2 hours and the retention workflow runs after each successful crawl
+  (`workflow_run`), plus daily and weekly digest crons. Both are gated by repository variables so merging
+  them enables nothing. This raises raw-snapshot volume in R2 roughly fourfold (small but cost-incurring;
+  confirm the bucket's lifecycle rules). GitHub scheduled runs can be delayed and are disabled after 60
+  days of repository inactivity; the planned Railway cron removes both limits.
 - As above, this is an internal product privacy assessment aligned to OAIC APP 11 principles, not legal
   advice and not a claim that the business is necessarily an APP entity.
 

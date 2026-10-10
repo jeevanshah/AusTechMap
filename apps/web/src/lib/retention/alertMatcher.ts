@@ -1,8 +1,8 @@
-import type { Queryable } from "./policy";
+import type { Queryable } from "./policy.ts";
 import {
   ALERT_EVENT_MAX_AGE_HOURS,
   IN_APP_ALERTS_PER_USER_PER_RUN,
-} from "./policy";
+} from "./policy.ts";
 
 export interface MatcherStats {
   watchlistAlertsCreated: number;

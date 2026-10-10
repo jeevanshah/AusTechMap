@@ -4,11 +4,12 @@
  * Phase 7 Retention Pipeline Runner
  *
  * Usage:
- *   node --env-file=apps/web/.env.local apps/web/scripts/run-retention-pipeline.mjs [--dry-run] [--frequency=instant|daily|weekly|all]
+ *   node --env-file=apps/web/.env.local apps/web/scripts/run-retention-pipeline.mjs [--dry-run] [--skip-email] [--frequency=instant|daily|weekly|all]
  *
  * --dry-run runs every step inside one transaction that is always rolled
  * back: it reports what WOULD be derived, alerted and emailed, writes nothing
- * and sends nothing. Scheduled runs pass a single --frequency so each email
+ * and sends nothing. --skip-email runs derive and in-app matching only (use
+ * until a sending domain is verified). Scheduled runs pass a single --frequency so each email
  * window is processed once; "all" runs instant, daily and weekly.
  */
 
@@ -26,6 +27,7 @@ if (!databaseUrl) {
 
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
+const skipEmail = args.includes("--skip-email");
 const freqArg =
   args.find((a) => a.startsWith("--frequency="))?.split("=")[1] || "all";
 const FREQUENCIES = ["instant", "daily", "weekly"];
@@ -66,6 +68,10 @@ async function run(db) {
 `);
 
   // 3. Email digests
+  if (skipEmail) {
+    console.log("3. Email digests skipped (--skip-email).");
+    return false;
+  }
   let failed = false;
   const frequencies = freqArg === "all" ? FREQUENCIES : [freqArg];
   for (const frequency of frequencies) {

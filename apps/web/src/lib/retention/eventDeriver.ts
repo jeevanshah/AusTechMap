@@ -1,9 +1,9 @@
-import type { Queryable } from "./policy";
+import type { Queryable } from "./policy.ts";
 import {
   ALERT_EVENT_MAX_AGE_HOURS,
   BASELINE_GRACE_MINUTES,
   DERIVE_POSTED_MAX_AGE_DAYS,
-} from "./policy";
+} from "./policy.ts";
 
 export interface EventDerivationStats {
   jobsDerived: number;

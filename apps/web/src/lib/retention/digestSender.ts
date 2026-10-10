@@ -1,11 +1,14 @@
-import type { Queryable } from "./policy";
-import { createUnsubscribeToken, unsubscribeSecret } from "./unsubscribeToken";
+import type { Queryable } from "./policy.ts";
+import {
+  createUnsubscribeToken,
+  unsubscribeSecret,
+} from "./unsubscribeToken.ts";
 import type { DigestItem } from "@austechmap/contracts";
 import {
   DIGEST_LOOKBACK_HOURS,
   DIGEST_MAX_ITEMS,
   INSTANT_EMAILS_PER_DAY,
-} from "./policy";
+} from "./policy.ts";
 
 export interface DigestOptions {
   frequency: "daily" | "weekly" | "instant";

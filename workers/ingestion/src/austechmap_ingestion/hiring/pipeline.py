@@ -46,6 +46,19 @@ from austechmap_ingestion.hiring.workable import fetch_workable_postings
 from austechmap_ingestion.jobs import JobRepository, RunStatus, SnapshotRecord
 from austechmap_ingestion.storage import SnapshotStore
 
+# The crawl run's idempotency key is scoped to a UTC time slot, not a whole day.
+# A day-wide key let one succeeded run block every later crawl that day, which
+# made a sub-daily board interval (company_sources.ACTIVE_BOARD_INTERVAL)
+# impossible. Keep this no longer than the board interval.
+CRAWL_KEY_SLOT_HOURS = 6
+
+
+def crawl_idempotency_key(provider: str, identifier: str, crawl_time: datetime) -> str:
+    """Run key for one board in one UTC crawl slot (see CRAWL_KEY_SLOT_HOURS)."""
+    utc = crawl_time.astimezone(UTC)
+    slot = utc.hour // CRAWL_KEY_SLOT_HOURS
+    return f"{provider}:{identifier}:{utc.date().isoformat()}T{slot:02d}"
+
 
 @dataclass(frozen=True)
 class AtsCrawlResult:
@@ -106,7 +119,7 @@ def run_ats_crawl(
         # a company can move from SmartRecruiters to Lever while both boards
         # use the identifier "mable".  Provider-scoping prevents the new
         # board from being mistaken for the old board's same-day crawl.
-        idempotency_key=f"{provider}:{identifier}:{crawl_time.date().isoformat()}",
+        idempotency_key=crawl_idempotency_key(provider, identifier, crawl_time),
         source_id=crawl_source_id,
         payload={"ats_provider": provider, "ats_identifier": identifier},
         scheduled_for=crawl_time,

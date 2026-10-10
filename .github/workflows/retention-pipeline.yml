@@ -1,0 +1,96 @@
+name: Retention pipeline
+
+# Derives change events, writes in-app alerts and (optionally) sends email
+# digests. Safe by default: nothing automatic happens until the repository
+# variable RETENTION_PIPELINE_ENABLED is 'true', and email additionally needs
+# RETENTION_EMAIL_ENABLED = 'true' (set it only once Resend has a verified
+# sending domain; until then in-app alerts only). Manual runs default to a
+# rolled-back dry run.
+#
+# Triggers
+#   - after every successful "Crawl due ATS sources" run: derive + match +
+#     instant emails, so new roles surface within hours of being crawled;
+#   - 21:05 UTC daily (~8am Sydney): daily digests;
+#   - 21:35 UTC Sunday (~Monday morning Sydney): weekly digests.
+# GitHub may delay scheduled runs and disables them after 60 days without
+# repository activity; ARCHITECTURE_DECISIONS.md plans a move to a managed cron.
+on:
+  workflow_run:
+    workflows: ["Crawl due ATS sources"]
+    types: [completed]
+  schedule:
+    - cron: "5 21 * * *"
+    - cron: "35 21 * * 0"
+  workflow_dispatch:
+    inputs:
+      frequency:
+        description: Email frequency to process
+        type: choice
+        options: [instant, daily, weekly, all]
+        default: instant
+      dry_run:
+        description: Roll everything back; report only
+        type: boolean
+        default: true
+      skip_email:
+        description: Derive and write in-app alerts only
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: retention-pipeline
+  cancel-in-progress: false
+
+jobs:
+  run:
+    name: Derive, alert, send
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (vars.RETENTION_PIPELINE_ENABLED == 'true' &&
+       (github.event_name == 'schedule' ||
+        (github.event_name == 'workflow_run' &&
+         github.event.workflow_run.conclusion == 'success')))
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Run the retention pipeline
+        working-directory: apps/web
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
+          INPUT_FREQUENCY: ${{ inputs.frequency }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+          INPUT_SKIP_EMAIL: ${{ inputs.skip_email }}
+          EMAIL_ENABLED: ${{ vars.RETENTION_EMAIL_ENABLED }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          AUTH_RESEND_KEY: ${{ secrets.AUTH_RESEND_KEY }}
+          AUTH_RESEND_FROM: ${{ secrets.AUTH_RESEND_FROM }}
+          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
+        run: |
+          set -euo pipefail
+          args=()
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            args+=("--frequency=$INPUT_FREQUENCY")
+            [ "$INPUT_DRY_RUN" = "true" ] && args+=("--dry-run")
+            [ "$INPUT_SKIP_EMAIL" = "true" ] && args+=("--skip-email")
+          else
+            case "$EVENT_NAME:$SCHEDULE" in
+              schedule:"5 21 * * *")  args+=("--frequency=daily") ;;
+              schedule:"35 21 * * 0") args+=("--frequency=weekly") ;;
+              workflow_run:*)         args+=("--frequency=instant") ;;
+              *) echo "Unrecognised trigger: $EVENT_NAME $SCHEDULE" >&2; exit 1 ;;
+            esac
+            [ "$EMAIL_ENABLED" = "true" ] || args+=("--skip-email")
+          fi
+          echo "Running: node scripts/run-retention-pipeline.mjs ${args[*]}"
+          node scripts/run-retention-pipeline.mjs "${args[@]}"
