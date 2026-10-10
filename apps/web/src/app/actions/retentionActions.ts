@@ -23,6 +23,7 @@ import {
   updateWatchlistNotes,
 } from "../../lib/queries/watchlists";
 import { markAlertRead, markAllAlertsRead } from "../../lib/queries/userAlerts";
+import { clearUserUnsubscribe } from "../../lib/queries/emailSuppressions";
 
 export async function saveSearchAction(
   name: string,
@@ -288,5 +289,24 @@ export async function toggleWatchlistMuteAction(
           ? error.message
           : "Failed to update watchlist alert preferences",
     };
+  }
+}
+
+/** Lets a user who unsubscribed from alert email turn it back on (explicit opt-in). */
+export async function resumeEmailAlertsAction(): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  try {
+    const actor = await requireUser();
+    await clearUserUnsubscribe(getPool(), actor.id);
+    revalidatePath("/account");
+    return { success: true };
+  } catch (error) {
+    console.error(
+      "resumeEmailAlertsAction failed:",
+      error instanceof Error ? error.name : "unknown error",
+    );
+    return { success: false, error: "Could not turn alert emails back on." };
   }
 }

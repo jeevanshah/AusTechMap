@@ -9,7 +9,9 @@ import {
   vi,
 } from "vitest";
 import { deriveChangeEvents } from "./eventDeriver";
+import { verifyUnsubscribeToken } from "./unsubscribeToken";
 import { matchEventsToSubscribers } from "./alertMatcher";
+import { matchEventsToProfiles } from "./profileAlertMatcher";
 import {
   escapeHtml,
   groupDigestEvents,
@@ -22,6 +24,8 @@ import {
   seedCompany,
   seedJob,
   seedJobEvent,
+  seedProfile,
+  seedRoleFamily,
   seedUser,
   type RetentionTestDb,
 } from "./retentionTestDb";
@@ -43,7 +47,9 @@ afterAll(async () => {
 beforeEach(async () => {
   await db.exec(
     `TRUNCATE notification_deliveries, user_alerts, events, saved_searches,
-              watchlists, jobs, role_families, companies, users RESTART IDENTITY CASCADE`,
+              email_suppressions, candidate_profiles,
+              watchlists, job_skill_links, skills, jobs, role_families, companies, users
+              RESTART IDENTITY CASCADE`,
   );
 });
 
@@ -253,6 +259,7 @@ describe("email digests", () => {
 
   beforeEach(() => {
     vi.stubEnv("AUTH_RESEND_KEY", "re_test_key");
+    vi.stubEnv("AUTH_SECRET", "test-secret-value-that-is-long-enough");
   });
 
   it("records nothing and reports an error when no API key is configured", async () => {
@@ -270,6 +277,71 @@ describe("email digests", () => {
     expect(result.emailsSent).toBe(0);
     expect(result.errors[0]).toMatch(/not configured/);
     expect(await count("notification_deliveries")).toBe(0);
+  });
+
+  it("refuses to send without a signing secret (no unsubscribe link, no email)", async () => {
+    vi.stubEnv("AUTH_SECRET", "");
+    const { company } = await dailySubscriber();
+    await seedJobEvent(db, {
+      companyId: company,
+      companySlug: "acme",
+      title: "T",
+      hoursAgo: 1,
+    });
+    const fetchImpl = okFetch();
+    const result = await sendEmailDigests(ctx.q, {
+      frequency: "daily",
+      fetchImpl,
+    });
+    expect(result.emailsSent).toBe(0);
+    expect(result.errors[0]).toMatch(/AUTH_SECRET/);
+    expect(fetchImpl).not.toHaveBeenCalled();
+    expect(await count("notification_deliveries")).toBe(0);
+  });
+
+  it("never emails a suppressed user and includes a working one-click unsubscribe link otherwise", async () => {
+    const { company, user } = await dailySubscriber();
+    await seedJobEvent(db, {
+      companyId: company,
+      companySlug: "acme",
+      title: "T",
+      hoursAgo: 1,
+    });
+    const fetchImpl = okFetch();
+
+    await db.query(
+      "INSERT INTO email_suppressions (user_id, reason) VALUES ($1, 'unsubscribed')",
+      [user],
+    );
+    const blocked = await sendEmailDigests(ctx.q, {
+      frequency: "daily",
+      fetchImpl,
+    });
+    expect(blocked.usersProcessed).toBe(0);
+    expect(fetchImpl).not.toHaveBeenCalled();
+
+    await db.query("DELETE FROM email_suppressions");
+    const sent = await sendEmailDigests(ctx.q, {
+      frequency: "daily",
+      fetchImpl,
+    });
+    expect(sent.emailsSent).toBe(1);
+    const body = JSON.parse(
+      String(
+        (fetchImpl as unknown as ReturnType<typeof vi.fn>).mock.calls[0]?.[1]
+          ?.body,
+      ),
+    );
+    const header: string = body.headers["List-Unsubscribe"];
+    expect(header).toMatch(/^<https?:\/\/[^>]+\/api\/unsubscribe\?t=\d+\./);
+    expect(body.headers["List-Unsubscribe-Post"]).toBe(
+      "List-Unsubscribe=One-Click",
+    );
+    expect(body.html).toContain("/unsubscribe?t=");
+    const token = new URL(header.slice(1, -1)).searchParams.get("t");
+    expect(
+      verifyUnsubscribeToken(token, "test-secret-value-that-is-long-enough"),
+    ).toBe(user);
   });
 
   it("dry run counts what would be sent and records nothing", async () => {
@@ -592,5 +664,137 @@ describe("digest rendering", () => {
       "B is hiring: Z",
     ]);
     expect(groups[0]?.eventIds).toEqual(["1", "3"]);
+  });
+});
+
+describe("profile alerts (opt-in)", () => {
+  async function setup() {
+    const company = await seedCompany(db, "acme", "Acme");
+    const role = await seedRoleFamily(db, "software-engineering");
+    const user = await seedUser(db, "p@example.test");
+    return { company, role, user };
+  }
+
+  it("records seniority and skills on derived events", async () => {
+    const { company, role } = await setup();
+    await seedJob(db, {
+      companyId: company,
+      title: "base",
+      firstSeenHoursAgo: 10,
+    });
+    await seedJob(db, {
+      companyId: company,
+      title: "New",
+      firstSeenHoursAgo: 1,
+      roleFamilyId: role,
+      seniority: "senior",
+      skills: ["typescript", "react"],
+    });
+    await deriveChangeEvents(ctx.q);
+    const r = await db.query<{ p: { seniority: string; skillKeys: string[] } }>(
+      "SELECT payload AS p FROM events",
+    );
+    expect(r.rows[0]?.p).toMatchObject({
+      seniority: "senior",
+      skillKeys: ["react", "typescript"],
+    });
+  });
+
+  it("alerts only opted-in users, only for matching fresh roles, and is replay-safe", async () => {
+    const { company, role, user } = await setup();
+    const other = await seedUser(db, "off@example.test");
+    await seedProfile(db, user, {
+      roleFamilyId: role,
+      skillKeys: ["typescript"],
+      alertFrequency: "daily",
+    });
+    await seedProfile(db, other, {
+      roleFamilyId: role,
+      alertFrequency: "never",
+    });
+
+    await seedJobEvent(db, {
+      companyId: company,
+      companySlug: "acme",
+      companyName: "Acme",
+      title: "Match",
+      hoursAgo: 1,
+      roleFamilyKey: "software-engineering",
+      skillKeys: ["typescript"],
+      key: "m",
+    });
+    await seedJobEvent(db, {
+      companyId: company,
+      companySlug: "acme",
+      title: "Wrong role",
+      hoursAgo: 1,
+      roleFamilyKey: "data",
+      key: "w",
+    });
+    await seedJobEvent(db, {
+      companyId: company,
+      companySlug: "acme",
+      title: "Too old",
+      hoursAgo: 24 * 6,
+      roleFamilyKey: "software-engineering",
+      skillKeys: ["typescript"],
+      key: "o",
+    });
+
+    const stats = await matchEventsToProfiles(ctx.q);
+    expect(stats).toEqual({ profilesConsidered: 1, alertsCreated: 1 });
+    const alerts = await db.query<{ user_id: string; title: string }>(
+      "SELECT user_id, title FROM user_alerts",
+    );
+    expect(alerts.rows).toHaveLength(1);
+    expect(Number(alerts.rows[0]?.user_id)).toBe(user);
+    expect(alerts.rows[0]?.title).toBe("Acme has a role matching your profile");
+
+    expect((await matchEventsToProfiles(ctx.q)).alertsCreated).toBe(0);
+  });
+
+  it("emails matched roles to the frequency the profile chose, and never to unsubscribed users", async () => {
+    vi.stubEnv("AUTH_RESEND_KEY", "re_test_key");
+    vi.stubEnv("AUTH_SECRET", "test-secret-value-that-is-long-enough");
+    const { company, role, user } = await setup();
+    await seedProfile(db, user, {
+      roleFamilyId: role,
+      alertFrequency: "daily",
+    });
+    await seedJobEvent(db, {
+      companyId: company,
+      companySlug: "acme",
+      companyName: "Acme",
+      title: "Match",
+      hoursAgo: 1,
+      roleFamilyKey: "software-engineering",
+      key: "m",
+    });
+    await matchEventsToProfiles(ctx.q);
+
+    const fetchImpl = vi.fn(
+      async () => new Response("{}", { status: 200 }),
+    ) as unknown as typeof fetch;
+
+    // A daily profile is not emailed by the instant run...
+    expect(
+      (await sendEmailDigests(ctx.q, { frequency: "instant", fetchImpl }))
+        .emailsSent,
+    ).toBe(0);
+    // ...but is by the daily digest, unless unsubscribed.
+    await db.query(
+      "INSERT INTO email_suppressions (user_id, reason) VALUES ($1, 'unsubscribed')",
+      [user],
+    );
+    expect(
+      (await sendEmailDigests(ctx.q, { frequency: "daily", fetchImpl }))
+        .emailsSent,
+    ).toBe(0);
+    await db.query("DELETE FROM email_suppressions");
+    const sent = await sendEmailDigests(ctx.q, {
+      frequency: "daily",
+      fetchImpl,
+    });
+    expect(sent).toMatchObject({ emailsSent: 1, eventsDelivered: 1 });
   });
 });

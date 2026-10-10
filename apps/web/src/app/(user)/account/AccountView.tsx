@@ -49,6 +49,7 @@ import {
   pauseAllSavedSearchesAction,
   removeWatchlistEntryAction,
   resumeAllSavedSearchesAction,
+  resumeEmailAlertsAction,
   toggleWatchlistMuteAction,
   updateSavedSearchFrequencyAction,
   updateWatchlistNotesAction,
@@ -68,6 +69,9 @@ interface AccountViewProps {
   initialCandidateProfile: CandidateProfile | null;
   roleFamilies: RoleFamilyRow[];
   taxonomySkills: SkillRow[];
+  initialTab?: TabType;
+  /** The user used the one-click unsubscribe: alert email is suppressed. */
+  emailUnsubscribed?: boolean;
 }
 
 type TabType =
@@ -101,8 +105,13 @@ export function AccountView({
   initialCandidateProfile,
   roleFamilies,
   taxonomySkills,
+  initialTab,
+  emailUnsubscribed = false,
 }: AccountViewProps) {
-  const [activeTab, setActiveTab] = useState<TabType>("applications");
+  const [activeTab, setActiveTab] = useState<TabType>(
+    initialTab ?? "applications",
+  );
+  const [emailsOff, setEmailsOff] = useState<boolean>(emailUnsubscribed);
   const [candidateProfile, setCandidateProfile] =
     useState<CandidateProfile | null>(initialCandidateProfile);
   const [watchlistSubTab, setWatchlistSubTab] =
@@ -735,6 +744,31 @@ export function AccountView({
         {/* TAB 2: SAVED SEARCHES MANAGEMENT */}
         {activeTab === "searches" && (
           <div>
+            {emailsOff && (
+              <div className="mb-4 flex flex-col gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-900 sm:flex-row sm:items-center sm:justify-between">
+                <p>
+                  Alert emails are off because you unsubscribed. In-app alerts
+                  still work.
+                </p>
+                <button
+                  type="button"
+                  disabled={isPending}
+                  onClick={() =>
+                    startTransition(async () => {
+                      const result = await resumeEmailAlertsAction();
+                      if (result.success) setEmailsOff(false);
+                      else
+                        setActionError(
+                          result.error ?? "Could not update email alerts.",
+                        );
+                    })
+                  }
+                  className="inline-flex min-h-9 shrink-0 items-center justify-center rounded-lg bg-navy-900 px-3 py-1.5 font-bold text-white hover:bg-slate-800 disabled:opacity-60"
+                >
+                  Turn alert emails back on
+                </button>
+              </div>
+            )}
             {savedSearches.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-surface-border bg-white p-12 text-center">
                 <Bookmark className="mx-auto h-8 w-8 text-slate-400" />

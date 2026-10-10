@@ -773,6 +773,14 @@ export const CandidateProfileSkillSchema = z.object({
 });
 export type CandidateProfileSkill = z.infer<typeof CandidateProfileSkillSchema>;
 
+// Opt-in alerts for new roles matching the confirmed profile (default 'never').
+export const ProfileAlertFrequencySchema = z.enum([
+  "never",
+  "daily",
+  "instant",
+]);
+export type ProfileAlertFrequency = z.infer<typeof ProfileAlertFrequencySchema>;
+
 export const CandidateProfileSchema = z.object({
   userId: z.number().int(),
   roleFamilyKey: z.string().nullable(),
@@ -783,6 +791,7 @@ export const CandidateProfileSchema = z.object({
   workStyleRequired: z.boolean(),
   locations: z.array(z.string()),
   source: CandidateProfileSourceSchema,
+  alertFrequency: ProfileAlertFrequencySchema,
   createdAt: z.string(),
   updatedAt: z.string(),
 });

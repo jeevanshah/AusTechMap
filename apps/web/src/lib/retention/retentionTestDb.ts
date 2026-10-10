@@ -33,6 +33,10 @@ const PARENT_STUBS = `
     key TEXT NOT NULL,
     label TEXT NOT NULL
   );
+  CREATE TABLE skills (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    key TEXT UNIQUE NOT NULL
+  );
   CREATE TABLE jobs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     company_id UUID NOT NULL REFERENCES companies(id),
@@ -40,11 +44,18 @@ const PARENT_STUBS = `
     title TEXT NOT NULL,
     role_family_id UUID REFERENCES role_families(id),
     remote_type work_style NOT NULL DEFAULT 'unknown',
+    seniority TEXT NOT NULL DEFAULT 'unknown',
     location_text TEXT,
     source_url TEXT NOT NULL DEFAULT 'https://example.test/job',
     posted_at TIMESTAMPTZ,
     first_seen_at TIMESTAMPTZ NOT NULL,
     expired_at TIMESTAMPTZ
+  );
+  CREATE TABLE job_skill_links (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    job_id UUID NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
+    skill_id UUID NOT NULL REFERENCES skills(id),
+    UNIQUE (job_id, skill_id)
   );
   CREATE TABLE evidence (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -73,6 +84,8 @@ export async function createRetentionTestDb(): Promise<RetentionTestDb> {
   for (const file of [
     "0017_saved_searches_and_watchlists.sql",
     "0018_change_events_and_notification_delivery.sql",
+    "0027_candidate_profiles.sql",
+    "0028_email_suppressions_and_profile_alerts.sql",
   ]) {
     await db.exec(readFileSync(resolve(MIGRATIONS, file), "utf8"));
   }
@@ -124,12 +137,14 @@ export async function seedJob(
     source?: string;
     roleFamilyId?: string | null;
     remoteType?: string;
+    seniority?: string;
+    skills?: string[];
   },
 ): Promise<string> {
   const r = await db.query<{ id: string }>(
     `INSERT INTO jobs (company_id, source_system, title, role_family_id, remote_type,
-                       posted_at, first_seen_at)
-     VALUES ($1, $2, $3, $4, $5::work_style,
+                       seniority, posted_at, first_seen_at)
+     VALUES ($1, $2, $3, $4, $5::work_style, $8,
              CASE WHEN $6::numeric IS NULL THEN NULL
                   ELSE now() - ($6::numeric * interval '1 day') END,
              now() - ($7::numeric * interval '1 hour'))
@@ -142,9 +157,21 @@ export async function seedJob(
       job.remoteType ?? "hybrid",
       job.postedDaysAgo ?? null,
       job.firstSeenHoursAgo,
+      job.seniority ?? "unknown",
     ],
   );
-  return String(r.rows[0]?.id);
+  const jobId = String(r.rows[0]?.id);
+  for (const key of job.skills ?? []) {
+    await db.query(
+      "INSERT INTO skills (key) VALUES ($1) ON CONFLICT (key) DO NOTHING",
+      [key],
+    );
+    await db.query(
+      "INSERT INTO job_skill_links (job_id, skill_id) SELECT $1, id FROM skills WHERE key = $2",
+      [jobId, key],
+    );
+  }
+  return jobId;
 }
 
 /** Inserts a job.first_seen event directly (bypassing the deriver). */
@@ -158,6 +185,9 @@ export async function seedJobEvent(
     hoursAgo: number;
     roleFamilyKey?: string | null;
     remoteType?: string;
+    seniority?: string;
+    skillKeys?: string[];
+    locationText?: string | null;
     key?: string;
   },
 ): Promise<string> {
@@ -175,9 +205,42 @@ export async function seedJobEvent(
         title: event.title,
         roleFamilyKey: event.roleFamilyKey ?? null,
         remoteType: event.remoteType ?? "hybrid",
+        seniority: event.seniority ?? "senior",
+        skillKeys: event.skillKeys ?? [],
+        locationText: event.locationText ?? null,
       }),
       event.hoursAgo,
     ],
   );
   return String(r.rows[0]?.id);
+}
+
+export async function seedProfile(
+  db: PGlite,
+  userId: number,
+  profile: {
+    roleFamilyId?: string | null;
+    experienceBand?: string;
+    skillKeys?: string[];
+    workStyle?: string;
+    workStyleRequired?: boolean;
+    locations?: string[];
+    alertFrequency?: "never" | "daily" | "instant";
+  },
+): Promise<void> {
+  await db.query(
+    `INSERT INTO candidate_profiles (user_id, role_family_id, experience_band, skill_keys,
+                                     work_style, work_style_required, locations, alert_frequency)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    [
+      userId,
+      profile.roleFamilyId ?? null,
+      profile.experienceBand ?? "senior",
+      profile.skillKeys ?? [],
+      profile.workStyle ?? "any",
+      profile.workStyleRequired ?? false,
+      profile.locations ?? [],
+      profile.alertFrequency ?? "never",
+    ],
+  );
 }

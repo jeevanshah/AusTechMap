@@ -9,6 +9,7 @@ import { listSavedSearches } from "../../../lib/queries/savedSearches";
 import { listWatchlist } from "../../../lib/queries/watchlists";
 import { listUserAlerts } from "../../../lib/queries/userAlerts";
 import { getCandidateProfile } from "../../../lib/queries/candidateProfiles";
+import { getEmailSuppression } from "../../../lib/queries/emailSuppressions";
 import {
   listActiveSkills,
   listRoleFamilies,
@@ -24,7 +25,22 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export default async function AccountPage() {
+const ACCOUNT_TABS = [
+  "profile",
+  "applications",
+  "searches",
+  "watchlist",
+  "alerts",
+  "security",
+] as const;
+
+export default async function AccountPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const { tab } = await searchParams;
+  const initialTab = ACCOUNT_TABS.find((t) => t === tab);
   let actor;
   try {
     actor = await requireUser();
@@ -44,6 +60,7 @@ export default async function AccountPage() {
     candidateProfile,
     roleFamilies,
     taxonomySkills,
+    emailSuppression,
   ] = await Promise.all([
     listJobApplications(pool, actor.id),
     listSavedSearches(pool, actor.id),
@@ -61,6 +78,14 @@ export default async function AccountPage() {
     }),
     listRoleFamilies(pool),
     listActiveSkills(pool),
+    // Like the profile, tolerate a deploy that lands before migration 0028.
+    getEmailSuppression(pool, actor.id).catch((error: unknown) => {
+      console.error(
+        "getEmailSuppression failed:",
+        error instanceof Error ? error.name : "unknown error",
+      );
+      return null;
+    }),
   ]);
 
   return (
@@ -74,6 +99,8 @@ export default async function AccountPage() {
         initialCandidateProfile={candidateProfile}
         roleFamilies={roleFamilies}
         taxonomySkills={taxonomySkills}
+        initialTab={initialTab}
+        emailUnsubscribed={emailSuppression === "unsubscribed"}
       />
     </main>
   );

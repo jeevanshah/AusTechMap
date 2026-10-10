@@ -7,7 +7,11 @@ describe("Notification Failure Handling & Backlog Recovery", () => {
 
   beforeEach(() => {
     vi.resetModules();
-    process.env = { ...originalEnv, AUTH_RESEND_KEY: "re_test_mock_api_key" };
+    process.env = {
+      ...originalEnv,
+      AUTH_RESEND_KEY: "re_test_mock_api_key",
+      AUTH_SECRET: "test-secret-value-that-is-long-enough",
+    };
     vi.restoreAllMocks();
   });
 

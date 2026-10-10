@@ -1,4 +1,5 @@
 import type { Queryable } from "./policy";
+import { createUnsubscribeToken, unsubscribeSecret } from "./unsubscribeToken";
 import type { DigestItem } from "@austechmap/contracts";
 import {
   DIGEST_LOOKBACK_HOURS,
@@ -231,6 +232,9 @@ export function groupDigestEvents(events: DigestEvent[]): DigestGroup[] {
  * - Daily/weekly: one digest per user per window; instant: capped per day.
  * - Delivery rows are written only after Resend accepted the email. A dry run
  *   or a missing API key records nothing.
+ * - Users in email_suppressions (unsubscribed/bounced/complaint) are never
+ *   emailed, and every email carries a signed one-click unsubscribe link plus
+ *   List-Unsubscribe headers; without AUTH_SECRET nothing is sent.
  * - Muted watchlist entries are skipped. Watchlist events travel in the daily
  *   digest (watchlists have no frequency of their own).
  */
@@ -260,6 +264,14 @@ export async function sendEmailDigests(
   if (!dryRun && !resendApiKey) {
     result.errors.push(
       "AUTH_RESEND_KEY is not configured; no emails were sent and nothing was recorded as delivered.",
+    );
+    return result;
+  }
+
+  const secret = unsubscribeSecret();
+  if (!dryRun && !secret) {
+    result.errors.push(
+      "AUTH_SECRET is not configured; refusing to send emails without a working unsubscribe link.",
     );
     return result;
   }
@@ -313,6 +325,27 @@ export async function sendEmailDigests(
         AND ($2::text IS NULL OR u.email = $2)
         AND e.occurred_at >= $4::timestamptz - ($5::int * interval '1 hour')
         AND (w.notes IS NULL OR w.notes !~ '"muted"\\s*:\\s*true')
+
+      UNION
+
+      -- Roles that matched the user's opted-in candidate profile (matched once by
+      -- profileAlertMatcher, which records window 'profile'); the profile's own
+      -- frequency (daily/instant) decides which run emails them.
+      SELECT
+        u.id AS user_id,
+        u.email AS user_email,
+        e.id AS event_id,
+        e.event_type,
+        e.payload,
+        e.occurred_at
+      FROM users u
+      JOIN candidate_profiles cp ON cp.user_id = u.id AND cp.alert_frequency = $1
+      JOIN notification_deliveries pd ON pd.user_id = u.id
+        AND pd.channel = 'in_app'
+        AND pd.delivery_window = 'profile'
+      JOIN events e ON e.id = pd.event_id
+      WHERE ($2::text IS NULL OR u.email = $2)
+        AND e.occurred_at >= $4::timestamptz - ($5::int * interval '1 hour')
     )
     SELECT
       ce.user_id,
@@ -328,6 +361,9 @@ export async function sendEmailDigests(
       ) AS events
     FROM candidate_events ce
     WHERE NOT EXISTS (
+        SELECT 1 FROM email_suppressions es WHERE es.user_id = ce.user_id
+      )
+      AND NOT EXISTS (
         SELECT 1 FROM notification_deliveries nd
         WHERE nd.user_id = ce.user_id
           AND nd.event_id = ce.event_id
@@ -384,12 +420,8 @@ export async function sendEmailDigests(
       continue;
     }
 
-    const html = renderDigestHtml({
-      frequency,
-      items,
-      unsubscribeUrl: `${appUrl}/account?tab=searches`,
-      appUrl,
-    });
+    const unsubscribeUrl = `${appUrl}/unsubscribe?t=${createUnsubscribeToken(Number(userRow.user_id), secret ?? "")}`;
+    const html = renderDigestHtml({ frequency, items, unsubscribeUrl, appUrl });
     const plural = items.length === 1 ? "" : "s";
 
     try {
@@ -409,6 +441,10 @@ export async function sendEmailDigests(
                 ? `New tech role match: ${items.length} update${plural}`
                 : `Daily Tech Opportunity Digest: ${items.length} update${plural}`,
           html,
+          headers: {
+            "List-Unsubscribe": `<${unsubscribeUrl.replace("/unsubscribe?", "/api/unsubscribe?")}>`,
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+          },
         }),
       });
 

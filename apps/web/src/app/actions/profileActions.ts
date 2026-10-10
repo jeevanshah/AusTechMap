@@ -1,7 +1,10 @@
 "use server";
 
 import type { CandidateProfile } from "@austechmap/contracts";
-import { SaveCandidateProfileInputSchema } from "@austechmap/contracts";
+import {
+  ProfileAlertFrequencySchema,
+  SaveCandidateProfileInputSchema,
+} from "@austechmap/contracts";
 import { revalidatePath } from "next/cache";
 
 import { UnauthenticatedError } from "../../lib/auth/errors";
@@ -9,6 +12,7 @@ import { requireUser } from "../../lib/auth/require-role";
 import { getPool } from "../../lib/db";
 import {
   deleteCandidateProfile,
+  setProfileAlertFrequency,
   upsertCandidateProfile,
 } from "../../lib/queries/candidateProfiles";
 import { listActiveSkills, listRoleFamilies } from "../../lib/queries/taxonomy";
@@ -113,6 +117,44 @@ export async function deleteCandidateProfileAction(): Promise<{
         "deleteCandidateProfileAction",
         error,
         "Failed to delete your profile.",
+      ),
+    };
+  }
+}
+
+/**
+ * Opt in or out of alerts for new roles matching the saved profile. Explicit,
+ * per-user, off by default; email delivery additionally respects unsubscribe.
+ */
+export async function setProfileAlertFrequencyAction(
+  rawFrequency: unknown,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const actor = await requireUser();
+    const parsed = ProfileAlertFrequencySchema.safeParse(rawFrequency);
+    if (!parsed.success) {
+      return { success: false, error: "Choose never, daily or instant." };
+    }
+    const updated = await setProfileAlertFrequency(
+      getPool(),
+      actor.id,
+      parsed.data,
+    );
+    if (!updated) {
+      return {
+        success: false,
+        error: "Save your profile before turning on alerts.",
+      };
+    }
+    revalidatePath("/account");
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: actionError(
+        "setProfileAlertFrequencyAction",
+        error,
+        "Failed to update profile alerts.",
       ),
     };
   }

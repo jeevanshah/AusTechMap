@@ -1,5 +1,6 @@
 import type {
   CandidateProfile,
+  ProfileAlertFrequency,
   SaveCandidateProfileInput,
 } from "@austechmap/contracts";
 import { CandidateProfileSchema } from "@austechmap/contracts";
@@ -15,6 +16,7 @@ interface CandidateProfileRow {
   work_style_required: boolean;
   locations: string[];
   source: string;
+  alert_frequency: string;
   created_at: Date | string;
   updated_at: Date | string;
 }
@@ -34,6 +36,7 @@ function mapProfile(row: CandidateProfileRow): CandidateProfile {
     workStyleRequired: row.work_style_required,
     locations: row.locations,
     source: row.source,
+    alertFrequency: row.alert_frequency,
     createdAt: timestamp(row.created_at),
     updatedAt: timestamp(row.updated_at),
   });
@@ -66,6 +69,7 @@ const PROFILE_SELECT = `
     cp.work_style_required,
     cp.locations,
     cp.source,
+    cp.alert_frequency,
     cp.created_at,
     cp.updated_at
   FROM candidate_profiles cp
@@ -132,6 +136,19 @@ export async function deleteCandidateProfile(
   const result = await pool.query(
     "DELETE FROM candidate_profiles WHERE user_id = $1",
     [userId],
+  );
+  return (result.rowCount ?? 0) === 1;
+}
+
+/** Returns false when the user has no saved profile (nothing to alert on). */
+export async function setProfileAlertFrequency(
+  pool: Pool,
+  userId: number,
+  frequency: ProfileAlertFrequency,
+): Promise<boolean> {
+  const result = await pool.query(
+    "UPDATE candidate_profiles SET alert_frequency = $2 WHERE user_id = $1",
+    [userId, frequency],
   );
   return (result.rowCount ?? 0) === 1;
 }

@@ -15,6 +15,7 @@
 import { Pool } from "pg";
 import { deriveChangeEvents } from "../src/lib/retention/eventDeriver.ts";
 import { matchEventsToSubscribers } from "../src/lib/retention/alertMatcher.ts";
+import { matchEventsToProfiles } from "../src/lib/retention/profileAlertMatcher.ts";
 import { sendEmailDigests } from "../src/lib/retention/digestSender.ts";
 
 const databaseUrl = process.env.DATABASE_URL;
@@ -57,6 +58,12 @@ async function run(db) {
     `   - Saved search alerts created: ${alertStats.savedSearchAlertsCreated}`,
   );
   console.log(`   Total new in-app alerts: ${alertStats.totalAlertsCreated}\n`);
+
+  console.log("2b. Matching new roles to opted-in candidate profiles...");
+  const profileStats = await matchEventsToProfiles(db);
+  console.log(`   - Profiles considered: ${profileStats.profilesConsidered}`);
+  console.log(`   - Profile alerts created: ${profileStats.alertsCreated}
+`);
 
   // 3. Email digests
   let failed = false;

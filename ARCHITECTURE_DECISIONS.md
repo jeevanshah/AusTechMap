@@ -262,6 +262,16 @@ never reaches the server.**
   effective immediately. Backups follow the 35-day expiry in step 5 above. **Deploy ordering:** the hourly
   deletion workflow runs `main`'s code against the production database, so migration 0027 must be applied
   before this code merges to `main`.
+- **Profile alerts and email suppression (P3, migration 0028):** `candidate_profiles.alert_frequency`
+  (`never` default, `daily`, `instant`) is the user's explicit opt-in for alerts about newly found roles
+  matching their profile (a second disclosed use of the profile, see the privacy page and
+  PRODUCT_SPEC.md §12.4.2). `email_suppressions` records users who unsubscribed (or bounced/complained);
+  it cascades on user deletion, so erasure needs no extra hook. The one-click unsubscribe route
+  (`/api/unsubscribe`, POST only so scanners and prefetchers cannot unsubscribe anyone) is authorised by an
+  HMAC token over the user id signed with `AUTH_SECRET`; the sender refuses to send without a secret.
+  **Deploy ordering:** the email sender and the `/account` profile read the new column and table, so apply
+  0028 before merging this code to `main` (the account page tolerates a missing table; the scheduled
+  pipeline does not).
 - As above, this is an internal product privacy assessment aligned to OAIC APP 11 principles, not legal
   advice and not a claim that the business is necessarily an APP entity.
 

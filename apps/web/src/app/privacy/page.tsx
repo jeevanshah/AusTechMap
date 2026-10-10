@@ -185,6 +185,19 @@ export default function PrivacyPage() {
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
               <span>
+                <strong>Optional Profile Alerts:</strong> Off by default. If you
+                turn them on from your Candidate Profile, we compare your saved
+                profile with roles we newly find on employer careers pages and
+                notify you in the app and, if you have not unsubscribed, by
+                email. This is the only extra use of your profile. Every alert
+                email has a one-click unsubscribe link, we cap how many emails
+                we send, and you can switch alerts off at any time. Alert emails
+                are sent through our email provider (Resend).
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+              <span>
                 <strong>Public Registry Attribution:</strong> Company legal
                 names, ABNs, and premises coordinates are acquired under
                 official Australian Government open data licences (Geoscape

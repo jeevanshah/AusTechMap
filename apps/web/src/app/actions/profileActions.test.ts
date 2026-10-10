@@ -63,6 +63,7 @@ const SAVED_PROFILE = {
   workStyleRequired: false,
   locations: [],
   source: "resume_upload" as const,
+  alertFrequency: "never" as const,
   createdAt: "2026-10-09T00:00:00Z",
   updatedAt: "2026-10-09T00:00:00Z",
 };

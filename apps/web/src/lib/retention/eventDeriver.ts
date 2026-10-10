@@ -42,6 +42,16 @@ export async function deriveChangeEvents(
           'roleFamilyKey', rf.key,
           'roleFamilyLabel', rf.label,
           'remoteType', j.remote_type::text,
+          'seniority', j.seniority::text,
+          'skillKeys', COALESCE(
+            (
+              SELECT jsonb_agg(s.key ORDER BY s.key)
+              FROM job_skill_links jsl
+              JOIN skills s ON s.id = jsl.skill_id
+              WHERE jsl.job_id = j.id
+            ),
+            '[]'::jsonb
+          ),
           'locationText', j.location_text,
           'sourceUrl', j.source_url
         ),

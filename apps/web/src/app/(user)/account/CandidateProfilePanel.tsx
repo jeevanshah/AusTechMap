@@ -3,13 +3,17 @@
 import type {
   CandidateProfile,
   CandidateProfileSuggestion,
+  ProfileAlertFrequency,
 } from "@austechmap/contracts";
 import { ShieldCheck, Trash2, User } from "lucide-react";
 import { useState, useTransition } from "react";
 
 import { mergeSuggestionWithProfile } from "../../../lib/profile/preferences";
 import type { RoleFamilyRow, SkillRow } from "../../../lib/queries/taxonomy";
-import { deleteCandidateProfileAction } from "../../actions/profileActions";
+import {
+  deleteCandidateProfileAction,
+  setProfileAlertFrequencyAction,
+} from "../../actions/profileActions";
 import { ResumeIntakeCard } from "../../../components/profile/ResumeIntakeCard";
 import { ResumeReviewPanel } from "../../../components/profile/ResumeReviewPanel";
 
@@ -43,6 +47,35 @@ export function CandidateProfilePanel({
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const changeAlerts = (frequency: ProfileAlertFrequency) => {
+    if (!profile) return;
+    const previous = profile.alertFrequency;
+    setError(null);
+    setMessage(null);
+    setProfile({ ...profile, alertFrequency: frequency });
+    startTransition(async () => {
+      try {
+        const result = await setProfileAlertFrequencyAction(frequency);
+        if (result.success) {
+          onProfileChange?.({ ...profile, alertFrequency: frequency });
+          setMessage(
+            frequency === "never"
+              ? "Profile alerts turned off."
+              : "Profile alerts turned on.",
+          );
+        } else {
+          setProfile({ ...profile, alertFrequency: previous });
+          setError(result.error ?? "Could not update profile alerts");
+        }
+      } catch {
+        setProfile({ ...profile, alertFrequency: previous });
+        setError(
+          "We couldn't update profile alerts. Please check your connection and try again.",
+        );
+      }
+    });
+  };
 
   const removeProfile = () => {
     if (
@@ -179,6 +212,35 @@ export function CandidateProfilePanel({
                 {loc}
               </span>
             ))}
+          </div>
+
+          <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5">
+            <label
+              htmlFor="profile-alert-frequency"
+              className="block text-xs font-bold text-navy-900"
+            >
+              Alert me about new roles that match this profile
+            </label>
+            <select
+              id="profile-alert-frequency"
+              value={profile.alertFrequency}
+              disabled={isPending}
+              onChange={(event) =>
+                changeAlerts(event.target.value as ProfileAlertFrequency)
+              }
+              className="mt-1.5 w-full max-w-xs cursor-pointer rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-navy-900 focus:border-navy-900 focus:outline-none focus:ring-2 focus:ring-navy-900/15"
+            >
+              <option value="never">Off</option>
+              <option value="daily">Daily digest</option>
+              <option value="instant">As soon as we spot them</option>
+            </select>
+            <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
+              Off by default. We compare your saved profile with roles we newly
+              find on employer careers pages and tell you here and by email.
+              &quot;As soon as&quot; means within hours of our next check, not
+              minutes, and at most three emails a day. Every email has a
+              one-click unsubscribe.
+            </p>
           </div>
 
           {profile.skills.length > 0 && (
