@@ -16,8 +16,16 @@ const BASE_URL = process.env.TEST_BASE_URL || "http://localhost:3000";
 const ENDPOINTS = [
   { name: "Shallow Health Check", path: "/api/health", method: "GET" },
   { name: "Categories Metadata", path: "/api/categories", method: "GET" },
-  { name: "Trigram Company Search", path: "/api/search/companies?q=Atlassian", method: "GET" },
-  { name: "Opportunity Match Engine", path: "/api/opportunities/match?roleFamilies=software_engineering", method: "GET" },
+  {
+    name: "Trigram Company Search",
+    path: "/api/search/companies?q=Atlassian",
+    method: "GET",
+  },
+  {
+    name: "Opportunity Match Engine",
+    path: "/api/opportunities/match?roleFamilies=software_engineering",
+    method: "GET",
+  },
 ];
 
 function calculatePercentile(sortedArray, percentile) {
@@ -51,19 +59,27 @@ async function runWorker(endpoint, numRequests) {
   return { latencies, errorCount };
 }
 
-async function benchmarkEndpoint(endpoint, totalRequests = 50, concurrency = 10) {
-  process.stdout.write(`   Benchmarking ${endpoint.name.padEnd(28)} (${totalRequests} reqs, c=${concurrency})... `);
+async function benchmarkEndpoint(
+  endpoint,
+  totalRequests = 50,
+  concurrency = 10,
+) {
+  process.stdout.write(
+    `   Benchmarking ${endpoint.name.padEnd(28)} (${totalRequests} reqs, c=${concurrency})... `,
+  );
   const requestsPerWorker = Math.floor(totalRequests / concurrency);
   const overallStart = performance.now();
 
   const workerPromises = Array.from({ length: concurrency }, () =>
-    runWorker(endpoint, requestsPerWorker)
+    runWorker(endpoint, requestsPerWorker),
   );
 
   const workerResults = await Promise.all(workerPromises);
   const overallDurationMs = performance.now() - overallStart;
 
-  const allLatencies = workerResults.flatMap((r) => r.latencies).sort((a, b) => a - b);
+  const allLatencies = workerResults
+    .flatMap((r) => r.latencies)
+    .sort((a, b) => a - b);
   const totalErrors = workerResults.reduce((acc, r) => acc + r.errorCount, 0);
 
   const sum = allLatencies.reduce((acc, val) => acc + val, 0);
@@ -94,17 +110,23 @@ async function benchmarkEndpoint(endpoint, totalRequests = 50, concurrency = 10)
 }
 
 async function main() {
-  console.log("================================================================");
+  console.log(
+    "================================================================",
+  );
   console.log(" Australia Tech Map — API Concurrency & Load Benchmark");
   console.log(` Target Server: ${BASE_URL}`);
-  console.log("================================================================\n");
+  console.log(
+    "================================================================\n",
+  );
 
   // Verify server connectivity
   try {
     const probe = await fetch(`${BASE_URL}/api/health`);
     if (!probe.ok) throw new Error(`Status ${probe.status}`);
   } catch {
-    console.error(`ERROR: Server at ${BASE_URL} is not reachable. Ensure 'npm run start -w apps/web' is running.`);
+    console.error(
+      `ERROR: Server at ${BASE_URL} is not reachable. Ensure 'npm run start -w apps/web' is running.`,
+    );
     process.exit(1);
   }
 
@@ -114,13 +136,19 @@ async function main() {
     results.push(result);
   }
 
-  console.log("\n================================================================");
-  console.log(" Benchmark Results Summary");
-  console.log("================================================================");
   console.log(
-    " Endpoint                     | Success |   RPS   | Avg (ms) | p50 (ms) | p95 (ms) | p99 (ms)"
+    "\n================================================================",
   );
-  console.log("------------------------------+---------+---------+----------+----------+----------+---------");
+  console.log(" Benchmark Results Summary");
+  console.log(
+    "================================================================",
+  );
+  console.log(
+    " Endpoint                     | Success |   RPS   | Avg (ms) | p50 (ms) | p95 (ms) | p99 (ms)",
+  );
+  console.log(
+    "------------------------------+---------+---------+----------+----------+----------+---------",
+  );
 
   for (const r of results) {
     const name = r.name.padEnd(28);
@@ -130,15 +158,23 @@ async function main() {
     const p50 = `${r.p50}ms`.padStart(8);
     const p95 = `${r.p95}ms`.padStart(8);
     const p99 = `${r.p99}ms`.padStart(7);
-    console.log(` ${name} | ${success} | ${rps} | ${avg} | ${p50} | ${p95} | ${p99}`);
+    console.log(
+      ` ${name} | ${success} | ${rps} | ${avg} | ${p50} | ${p95} | ${p99}`,
+    );
   }
-  console.log("================================================================\n");
+  console.log(
+    "================================================================\n",
+  );
 
   const allPassed = results.every((r) => r.errorCount === 0 && r.p95 < 250);
   if (allPassed) {
-    console.log(">> VERDICT: ALL ENDPOINTS PASSED P95 LATENCY & CONCURRENCY SLA (< 250ms)\n");
+    console.log(
+      ">> VERDICT: ALL ENDPOINTS PASSED P95 LATENCY & CONCURRENCY SLA (< 250ms)\n",
+    );
   } else {
-    console.warn(">> VERDICT: WARNING - SOME ENDPOINTS EXCEEDED LATENCY TARGETS\n");
+    console.warn(
+      ">> VERDICT: WARNING - SOME ENDPOINTS EXCEEDED LATENCY TARGETS\n",
+    );
   }
 }
 

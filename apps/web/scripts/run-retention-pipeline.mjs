@@ -4,7 +4,12 @@
  * Phase 7 Retention Pipeline Runner
  *
  * Usage:
- *   node --env-file=apps/web/.env.local apps/web/scripts/run-retention-pipeline.mjs [--dry-run] [--frequency=daily|weekly|all]
+ *   node --env-file=apps/web/.env.local apps/web/scripts/run-retention-pipeline.mjs [--dry-run] [--frequency=instant|daily|weekly|all]
+ *
+ * --dry-run runs every step inside one transaction that is always rolled
+ * back: it reports what WOULD be derived, alerted and emailed, writes nothing
+ * and sends nothing. Scheduled runs pass a single --frequency so each email
+ * window is processed once; "all" runs instant, daily and weekly.
  */
 
 import { Pool } from "pg";
@@ -20,18 +25,23 @@ if (!databaseUrl) {
 
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
-const freqArg = args.find((a) => a.startsWith("--frequency="))?.split("=")[1] || "all";
+const freqArg =
+  args.find((a) => a.startsWith("--frequency="))?.split("=")[1] || "all";
+const FREQUENCIES = ["instant", "daily", "weekly"];
+
+if (freqArg !== "all" && !FREQUENCIES.includes(freqArg)) {
+  console.error(
+    `Error: unknown --frequency=${freqArg} (use instant, daily, weekly or all).`,
+  );
+  process.exit(1);
+}
 
 const pool = new Pool({ connectionString: databaseUrl });
 
-async function main() {
-  console.log("=== Australia Tech Map Retention Pipeline ===");
-  console.log(`Mode: ${dryRun ? "DRY RUN (no emails dispatched)" : "LIVE"}`);
-  console.log(`Frequency target: ${freqArg}\n`);
-
+async function run(db) {
   // 1. Derive Change Events
   console.log("1. Deriving change events from observations...");
-  const eventStats = await deriveChangeEvents(pool);
+  const eventStats = await deriveChangeEvents(db);
   console.log(`   - Jobs derived: ${eventStats.jobsDerived}`);
   console.log(`   - Sponsorship derived: ${eventStats.sponsorshipDerived}`);
   console.log(`   - Locations derived: ${eventStats.locationsDerived}`);
@@ -39,36 +49,58 @@ async function main() {
 
   // 2. Match Events to Subscribers
   console.log("2. Matching events to active watchlists and saved searches...");
-  const alertStats = await matchEventsToSubscribers(pool);
-  console.log(`   - Watchlist alerts created: ${alertStats.watchlistAlertsCreated}`);
-  console.log(`   - Saved search alerts created: ${alertStats.savedSearchAlertsCreated}`);
+  const alertStats = await matchEventsToSubscribers(db);
+  console.log(
+    `   - Watchlist alerts created: ${alertStats.watchlistAlertsCreated}`,
+  );
+  console.log(
+    `   - Saved search alerts created: ${alertStats.savedSearchAlertsCreated}`,
+  );
   console.log(`   Total new in-app alerts: ${alertStats.totalAlertsCreated}\n`);
 
-  // 3. Dispatch Email Digests
-  if (freqArg === "daily" || freqArg === "all") {
-    console.log("3a. Processing DAILY email digests...");
-    const dailyRes = await sendEmailDigests(pool, { frequency: "daily", dryRun });
-    console.log(`   - Users processed: ${dailyRes.usersProcessed}`);
-    console.log(`   - Emails sent: ${dailyRes.emailsSent}`);
-    console.log(`   - Events delivered: ${dailyRes.eventsDelivered}`);
-    if (dailyRes.errors.length > 0) {
-      console.warn(`   ! Errors: ${dailyRes.errors.join("; ")}`);
+  // 3. Email digests
+  let failed = false;
+  const frequencies = freqArg === "all" ? FREQUENCIES : [freqArg];
+  for (const frequency of frequencies) {
+    console.log(`3. Processing ${frequency.toUpperCase()} email digests...`);
+    const res = await sendEmailDigests(db, { frequency, dryRun });
+    console.log(`   - Users processed: ${res.usersProcessed}`);
+    console.log(`   - Emails sent: ${res.emailsSent}`);
+    if (dryRun)
+      console.log(`   - Emails that would be sent: ${res.emailsWouldSend}`);
+    console.log(`   - Events delivered: ${res.eventsDelivered}`);
+    if (res.errors.length > 0) {
+      console.warn(`   ! Errors: ${res.errors.join("; ")}`);
+      failed = true;
     }
   }
+  return failed;
+}
 
-  if (freqArg === "weekly" || freqArg === "all") {
-    console.log("\n3b. Processing WEEKLY email digests...");
-    const weeklyRes = await sendEmailDigests(pool, { frequency: "weekly", dryRun });
-    console.log(`   - Users processed: ${weeklyRes.usersProcessed}`);
-    console.log(`   - Emails sent: ${weeklyRes.emailsSent}`);
-    console.log(`   - Events delivered: ${weeklyRes.eventsDelivered}`);
-    if (weeklyRes.errors.length > 0) {
-      console.warn(`   ! Errors: ${weeklyRes.errors.join("; ")}`);
+async function main() {
+  console.log("=== Australia Tech Map Retention Pipeline ===");
+  console.log(
+    `Mode: ${dryRun ? "DRY RUN (rolled back; nothing written or sent)" : "LIVE"}`,
+  );
+  console.log(`Frequency target: ${freqArg}\n`);
+
+  let failed;
+  if (dryRun) {
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      failed = await run(client);
+    } finally {
+      await client.query("ROLLBACK");
+      client.release();
     }
+  } else {
+    failed = await run(pool);
   }
 
   console.log("\n=== Retention Pipeline Complete ===");
   await pool.end();
+  if (failed) process.exitCode = 1;
 }
 
 main().catch((err) => {

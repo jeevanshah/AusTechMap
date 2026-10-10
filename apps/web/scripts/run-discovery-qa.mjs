@@ -1,7 +1,7 @@
 /**
  * run-discovery-qa.mjs
  * End-to-End Desktop & Mobile Discovery Journeys QA Suite
- * 
+ *
  * Verifies the 4 critical discovery journeys defined in PRODUCT_SPEC.md §2.3:
  *  - Journey A: Opportunity Discovery (Role + Skills + Work Style + Score Breakdown)
  *  - Journey B: Sponsorship Discovery (Evidence Links + Regional Flags)
@@ -60,30 +60,67 @@ async function runJourneyA() {
   });
   const latency = Math.round(performance.now() - t0);
 
-  assert(matchRes.status === 200, `POST /api/opportunities/match returned HTTP 200 (latency: ${latency}ms)`);
-  assert(latency < 300, `Opportunity match p95 target met (< 300ms, actual: ${latency}ms)`);
+  assert(
+    matchRes.status === 200,
+    `POST /api/opportunities/match returned HTTP 200 (latency: ${latency}ms)`,
+  );
+  assert(
+    latency < 300,
+    `Opportunity match p95 target met (< 300ms, actual: ${latency}ms)`,
+  );
 
   const matchData = await matchRes.json();
-  assert(Array.isArray(matchData.matches) && matchData.matches.length > 0, `Returned ${matchData.matches?.length} ranked matches`);
+  assert(
+    Array.isArray(matchData.matches) && matchData.matches.length > 0,
+    `Returned ${matchData.matches?.length} ranked matches`,
+  );
 
   const first = matchData.matches?.[0];
   if (first) {
-    assert(typeof first.matchScore === "number" && first.matchScore >= 0 && first.matchScore <= 100, `Match score is transparent (score: ${first.matchScore}/100)`);
-    assert(first.scoreComponents && typeof first.scoreComponents.roleFit === "number", `Detailed 6-factor score components present (roleFit: ${first.scoreComponents?.roleFit})`);
-    assert(Array.isArray(first.topReasons) && first.topReasons.length > 0, `Human-readable match explanation present ("${first.topReasons[0]}")`);
-    assert(Array.isArray(first.sampleActiveRoles) && first.sampleActiveRoles.length > 0, `Active roles verified with source URLs (found: ${first.sampleActiveRoles.length})`);
+    assert(
+      typeof first.matchScore === "number" &&
+        first.matchScore >= 0 &&
+        first.matchScore <= 100,
+      `Match score is transparent (score: ${first.matchScore}/100)`,
+    );
+    assert(
+      first.scoreComponents &&
+        typeof first.scoreComponents.roleFit === "number",
+      `Detailed 6-factor score components present (roleFit: ${first.scoreComponents?.roleFit})`,
+    );
+    assert(
+      Array.isArray(first.topReasons) && first.topReasons.length > 0,
+      `Human-readable match explanation present ("${first.topReasons[0]}")`,
+    );
+    assert(
+      Array.isArray(first.sampleActiveRoles) &&
+        first.sampleActiveRoles.length > 0,
+      `Active roles verified with source URLs (found: ${first.sampleActiveRoles.length})`,
+    );
   }
 
   // Mobile and Desktop rendering of company profile
   const targetSlug = first?.companySlug || "atlassian";
-  for (const [platform, ua] of [["Desktop", DESKTOP_UA], ["Mobile", MOBILE_UA]]) {
+  for (const [platform, ua] of [
+    ["Desktop", DESKTOP_UA],
+    ["Mobile", MOBILE_UA],
+  ]) {
     const pageRes = await fetch(`${BASE_URL}/companies/${targetSlug}`, {
       headers: { "User-Agent": ua },
     });
-    assert(pageRes.status === 200, `${platform} company profile /companies/${targetSlug} returned HTTP 200`);
+    assert(
+      pageRes.status === 200,
+      `${platform} company profile /companies/${targetSlug} returned HTTP 200`,
+    );
     const html = await pageRes.text();
-    assert(html.includes("viewport") && html.includes("width=device-width"), `${platform} profile has responsive viewport meta tag`);
-    assert(html.includes("Careers") || html.includes("careers"), `${platform} profile provides inspectable careers link`);
+    assert(
+      html.includes("viewport") && html.includes("width=device-width"),
+      `${platform} profile has responsive viewport meta tag`,
+    );
+    assert(
+      html.includes("Careers") || html.includes("careers"),
+      `${platform} profile provides inspectable careers link`,
+    );
   }
 }
 
@@ -94,23 +131,40 @@ async function runJourneyB() {
 
   const mapRes = await fetch(
     `${BASE_URL}/api/map/companies?bbox=110,-45,155,-10&zoom=4&sponsorship=true`,
-    { headers: { "User-Agent": DESKTOP_UA } }
+    { headers: { "User-Agent": DESKTOP_UA } },
   );
-  assert(mapRes.status === 200, "GET /api/map/companies?sponsorship=true returned HTTP 200");
+  assert(
+    mapRes.status === 200,
+    "GET /api/map/companies?sponsorship=true returned HTTP 200",
+  );
 
   const mapData = await mapRes.json();
-  assert(Array.isArray(mapData.points) && mapData.points.length > 0, `Found ${mapData.points.length} sponsorship-verified employers on map`);
+  assert(
+    Array.isArray(mapData.points) && mapData.points.length > 0,
+    `Found ${mapData.points.length} sponsorship-verified employers on map`,
+  );
 
-  const allHaveEvidence = mapData.points.every((p) => p.hasSponsorshipEvidence === true);
-  assert(allHaveEvidence, "100% of returned sponsorship points have verified evidence flag (0 hallucinated claims)");
+  const allHaveEvidence = mapData.points.every(
+    (p) => p.hasSponsorshipEvidence === true,
+  );
+  assert(
+    allHaveEvidence,
+    "100% of returned sponsorship points have verified evidence flag (0 hallucinated claims)",
+  );
 
   // Inspect evidence profile for Atlassian
   const profileRes = await fetch(`${BASE_URL}/companies/atlassian`, {
     headers: { "User-Agent": MOBILE_UA },
   });
   const html = await profileRes.text();
-  assert(html.includes("Sponsorship") || html.includes("Labour Agreement"), "Mobile profile displays explicit sponsorship evidence category");
-  assert(!html.includes("Inferred"), "Zero unsupported boolean claims without underlying proof");
+  assert(
+    html.includes("Sponsorship") || html.includes("Labour Agreement"),
+    "Mobile profile displays explicit sponsorship evidence category",
+  );
+  assert(
+    !html.includes("Inferred"),
+    "Zero unsupported boolean claims without underlying proof",
+  );
 }
 
 async function runJourneyC() {
@@ -121,27 +175,54 @@ async function runJourneyC() {
   const regRes = await fetch(`${BASE_URL}/api/regions/111/opportunity`, {
     headers: { "User-Agent": DESKTOP_UA },
   });
-  assert(regRes.status === 200, "GET /api/regions/111/opportunity (Newcastle) returned HTTP 200");
+  assert(
+    regRes.status === 200,
+    "GET /api/regions/111/opportunity (Newcastle) returned HTTP 200",
+  );
 
   const regData = await regRes.json();
-  assert(regData.region?.name === "Newcastle and Lake Macquarie", `Identified correct ASGS SA4 region: ${regData.region?.name}`);
-  assert(Array.isArray(regData.employers) && regData.employers.length > 0, `Regional tech employers listed: ${regData.employers.length} employers`);
-  assert(regData.score?.sufficiency !== undefined, "Score includes transparent data sufficiency evaluation");
+  assert(
+    regData.region?.name === "Newcastle and Lake Macquarie",
+    `Identified correct ASGS SA4 region: ${regData.region?.name}`,
+  );
+  assert(
+    Array.isArray(regData.employers) && regData.employers.length > 0,
+    `Regional tech employers listed: ${regData.employers.length} employers`,
+  );
+  assert(
+    regData.score?.sufficiency !== undefined,
+    "Score includes transparent data sufficiency evaluation",
+  );
 
   // Verify responsive region page rendering
-  for (const [platform, ua] of [["Desktop", DESKTOP_UA], ["Mobile", MOBILE_UA]]) {
+  for (const [platform, ua] of [
+    ["Desktop", DESKTOP_UA],
+    ["Mobile", MOBILE_UA],
+  ]) {
     const pageRes = await fetch(`${BASE_URL}/regions/111`, {
       headers: { "User-Agent": ua },
     });
-    assert(pageRes.status === 200, `${platform} region page /regions/111 returned HTTP 200`);
+    assert(
+      pageRes.status === 200,
+      `${platform} region page /regions/111 returned HTTP 200`,
+    );
     const html = await pageRes.text();
-    assert(html.includes("Newcastle"), `${platform} page contains region headline and ecosystem details`);
+    assert(
+      html.includes("Newcastle"),
+      `${platform} page contains region headline and ecosystem details`,
+    );
   }
 
   // Dynamic OpenGraph card for social sharing
   const ogRes = await fetch(`${BASE_URL}/api/og/region/111`);
-  assert(ogRes.status === 200, "Dynamic regional OpenGraph preview /api/og/region/111 returned HTTP 200");
-  assert(ogRes.headers.get("content-type")?.includes("image/png"), "OpenGraph card returns image/png");
+  assert(
+    ogRes.status === 200,
+    "Dynamic regional OpenGraph preview /api/og/region/111 returned HTTP 200",
+  );
+  assert(
+    ogRes.headers.get("content-type")?.includes("image/png"),
+    "OpenGraph card returns image/png",
+  );
 }
 
 async function runJourneyD() {
@@ -152,16 +233,22 @@ async function runJourneyD() {
   // Check health and migration status for notification pipeline
   const healthRes = await fetch(`${BASE_URL}/api/health?deep=true`);
   const healthData = await healthRes.json();
-  assert(healthData.status === "ok", "Database and health diagnostics report status ok");
   assert(
-    healthData.diagnostics?.latestMigration === "0018_change_events_and_notification_delivery.sql",
-    `Event derivation & notification delivery migration active: ${healthData.diagnostics?.latestMigration}`
+    healthData.status === "ok",
+    "Database and health diagnostics report status ok",
+  );
+  assert(
+    healthData.diagnostics?.latestMigration ===
+      "0018_change_events_and_notification_delivery.sql",
+    `Event derivation & notification delivery migration active: ${healthData.diagnostics?.latestMigration}`,
   );
 
   // Check static trust & compliance endpoints
   const trustPages = ["/methodology", "/privacy", "/corrections"];
   for (const page of trustPages) {
-    const res = await fetch(`${BASE_URL}${page}`, { headers: { "User-Agent": MOBILE_UA } });
+    const res = await fetch(`${BASE_URL}${page}`, {
+      headers: { "User-Agent": MOBILE_UA },
+    });
     assert(res.status === 200, `Mobile trust page ${page} returns HTTP 200`);
     const csp = res.headers.get("content-security-policy");
     assert(!!csp, `${page} serves strict Content-Security-Policy header`);
@@ -169,7 +256,9 @@ async function runJourneyD() {
 }
 
 async function main() {
-  console.log(`Starting AusTechMap Critical Discovery Journeys QA Suite against ${BASE_URL}...`);
+  console.log(
+    `Starting AusTechMap Critical Discovery Journeys QA Suite against ${BASE_URL}...`,
+  );
   const start = performance.now();
 
   await runJourneyA();
@@ -179,7 +268,9 @@ async function main() {
 
   const duration = ((performance.now() - start) / 1000).toFixed(2);
   console.log("\n=======================================================");
-  console.log(`QA DISCOVERY JOURNEYS RESULTS: ${passedCount} PASSED | ${failedCount} FAILED (${duration}s)`);
+  console.log(
+    `QA DISCOVERY JOURNEYS RESULTS: ${passedCount} PASSED | ${failedCount} FAILED (${duration}s)`,
+  );
   console.log("=======================================================\n");
 
   if (failedCount > 0) {

@@ -1,4 +1,8 @@
-import type { Pool } from "pg";
+import type { Queryable } from "./policy";
+import {
+  ALERT_EVENT_MAX_AGE_HOURS,
+  IN_APP_ALERTS_PER_USER_PER_RUN,
+} from "./policy";
 
 export interface MatcherStats {
   watchlistAlertsCreated: number;
@@ -11,9 +15,13 @@ export interface MatcherStats {
  * Enforces PRODUCT_SPEC.md Appendix D.3:
  * - Replay-safe: deduplicated via notification_deliveries (user_id, event_id, channel, delivery_window).
  * - Never delivers duplicate alerts for the same event and delivery window.
+ * Safety (PRODUCT_SPEC §18.5): only events from the last
+ * ALERT_EVENT_MAX_AGE_HOURS are considered (history never alerts), muted
+ * watchlist entries and saved searches set to 'never' are skipped, and each
+ * user receives at most IN_APP_ALERTS_PER_USER_PER_RUN alerts per run.
  */
 export async function matchEventsToSubscribers(
-  pool: Pool,
+  pool: Queryable,
 ): Promise<MatcherStats> {
   // 1. Match company-watched events (jobs, sponsorship)
   const watchlistCompanyQuery = `
@@ -27,11 +35,23 @@ export async function matchEventsToSubscribers(
         e.payload ->> 'companySlug' AS company_slug,
         e.payload ->> 'title' AS job_title,
         e.payload ->> 'remoteType' AS remote_type,
-        e.payload ->> 'agreementType' AS agreement_type
+        e.payload ->> 'agreementType' AS agreement_type,
+        ROW_NUMBER() OVER (
+          PARTITION BY w.user_id ORDER BY e.occurred_at DESC, e.id
+        ) AS rn
       FROM events e
       JOIN watchlists w ON w.entity_type = 'company' 
         AND w.company_id::text = (e.payload ->> 'companyId')
       WHERE e.event_type IN ('job.first_seen', 'sponsorship.evidence_added')
+        AND e.occurred_at >= now() - ($1::int * interval '1 hour')
+        AND (w.notes IS NULL OR w.notes !~ '"muted"\\s*:\\s*true')
+        AND NOT EXISTS (
+          SELECT 1 FROM notification_deliveries nd
+          WHERE nd.user_id = w.user_id
+            AND nd.event_id = e.id
+            AND nd.channel = 'in_app'
+            AND nd.delivery_window = 'instant'
+        )
     ),
     deliveries AS (
       INSERT INTO notification_deliveries (user_id, event_id, channel, delivery_window, status)
@@ -42,6 +62,7 @@ export async function matchEventsToSubscribers(
         'instant',
         'sent'
       FROM candidate_matches cm
+      WHERE cm.rn <= $2
       ON CONFLICT (user_id, event_id, channel, delivery_window) DO NOTHING
       RETURNING user_id, event_id
     ),
@@ -74,7 +95,10 @@ export async function matchEventsToSubscribers(
     SELECT count(*)::text as count FROM inserted_alerts;
   `;
 
-  const compResult = await pool.query<{ count: string }>(watchlistCompanyQuery);
+  const compResult = await pool.query<{ count: string }>(
+    watchlistCompanyQuery,
+    [ALERT_EVENT_MAX_AGE_HOURS, IN_APP_ALERTS_PER_USER_PER_RUN],
+  );
   const watchlistAlertsCreated = Number(compResult.rows[0]?.count ?? 0);
 
   // 2. Match saved searches for job.first_seen events
@@ -88,10 +112,21 @@ export async function matchEventsToSubscribers(
         e.payload ->> 'companyName' AS company_name,
         e.payload ->> 'companySlug' AS company_slug,
         e.payload ->> 'title' AS job_title,
-        e.payload ->> 'remoteType' AS remote_type
+        e.payload ->> 'remoteType' AS remote_type,
+        ROW_NUMBER() OVER (
+          PARTITION BY ss.user_id ORDER BY e.occurred_at DESC, e.id
+        ) AS rn
       FROM events e
-      JOIN saved_searches ss ON true
+      JOIN saved_searches ss ON ss.alert_frequency <> 'never'
       WHERE e.event_type = 'job.first_seen'
+        AND e.occurred_at >= now() - ($1::int * interval '1 hour')
+        AND NOT EXISTS (
+          SELECT 1 FROM notification_deliveries nd
+          WHERE nd.user_id = ss.user_id
+            AND nd.event_id = e.id
+            AND nd.channel = 'in_app'
+            AND nd.delivery_window = CONCAT('saved_search:', ss.id)
+        )
         AND (
           (ss.filters ->> 'roleFamily') IS NULL 
           OR (ss.filters ->> 'roleFamily') = (e.payload ->> 'roleFamilyKey')
@@ -111,8 +146,9 @@ export async function matchEventsToSubscribers(
         CONCAT('saved_search:', cm.saved_search_id),
         'sent'
       FROM candidate_matches cm
+      WHERE cm.rn <= $2
       ON CONFLICT (user_id, event_id, channel, delivery_window) DO NOTHING
-      RETURNING user_id, event_id
+      RETURNING user_id, event_id, delivery_window
     ),
     inserted_alerts AS (
       INSERT INTO user_alerts (user_id, alert_type, title, message, link, entity_type, entity_id)
@@ -125,13 +161,18 @@ export async function matchEventsToSubscribers(
         'company',
         cm.company_slug
       FROM deliveries d
-      JOIN candidate_matches cm ON cm.user_id = d.user_id AND cm.event_id = d.event_id
+      JOIN candidate_matches cm ON cm.user_id = d.user_id
+        AND cm.event_id = d.event_id
+        AND CONCAT('saved_search:', cm.saved_search_id) = d.delivery_window
       RETURNING id
     )
     SELECT count(*)::text as count FROM inserted_alerts;
   `;
 
-  const searchResult = await pool.query<{ count: string }>(savedSearchQuery);
+  const searchResult = await pool.query<{ count: string }>(savedSearchQuery, [
+    ALERT_EVENT_MAX_AGE_HOURS,
+    IN_APP_ALERTS_PER_USER_PER_RUN,
+  ]);
   const savedSearchAlertsCreated = Number(searchResult.rows[0]?.count ?? 0);
 
   return {

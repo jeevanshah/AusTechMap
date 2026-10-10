@@ -45,11 +45,14 @@ describe("Notification Failure Handling & Backlog Recovery", () => {
 
         if (queryText.includes("INSERT INTO notification_deliveries")) {
           if (params) {
-            insertedDeliveries.push({
-              userId: Number(params[0]),
-              eventId: String(params[1]),
-              windowKey: String(params[2]),
-            });
+            // One statement per email: [userId, windowKey, eventIds[]].
+            for (const eventId of params[2] as string[]) {
+              insertedDeliveries.push({
+                userId: Number(params[0]),
+                eventId,
+                windowKey: String(params[1]),
+              });
+            }
           }
           return Promise.resolve({ rowCount: 1 });
         }
@@ -100,9 +103,9 @@ describe("Notification Failure Handling & Backlog Recovery", () => {
     expect(result.emailsSent).toBe(0);
     expect(result.eventsDelivered).toBe(0);
     expect(result.errors.length).toBe(1);
-    expect(result.errors[0]).toContain(
-      "Internal Server Error from mail gateway",
-    );
+    // The status is reported; the provider body (may echo the recipient) is not.
+    expect(result.errors[0]).toContain("HTTP 500");
+    expect(result.errors[0]).not.toContain("mail gateway");
 
     // CRITICAL: Event must NOT be recorded in notification_deliveries so backlog can be recovered
     expect(insertedDeliveries.length).toBe(0);
@@ -142,7 +145,8 @@ describe("Notification Failure Handling & Backlog Recovery", () => {
     expect(result.emailsSent).toBe(0);
     expect(result.eventsDelivered).toBe(0);
     expect(result.errors.length).toBe(1);
-    expect(result.errors[0]).toContain("Connection reset by peer");
+    expect(result.errors[0]).toContain("Failed to send a digest");
+    expect(result.errors[0]).not.toContain("Connection reset by peer");
     expect(insertedDeliveries.length).toBe(0);
   });
 
@@ -259,7 +263,8 @@ describe("Notification Failure Handling & Backlog Recovery", () => {
     expect(result.emailsSent).toBe(1);
     expect(result.eventsDelivered).toBe(1);
     expect(result.errors.length).toBe(1);
-    expect(result.errors[0]).toContain("Unprocessable recipient domain");
+    expect(result.errors[0]).toContain("HTTP 422");
+    expect(result.errors[0]).not.toContain("Unprocessable recipient domain");
 
     // Only user 2's event recorded as delivered
     expect(insertedDeliveries.length).toBe(1);

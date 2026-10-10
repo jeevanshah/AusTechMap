@@ -1,4 +1,9 @@
-import type { Pool } from "pg";
+import type { Queryable } from "./policy";
+import {
+  ALERT_EVENT_MAX_AGE_HOURS,
+  BASELINE_GRACE_MINUTES,
+  DERIVE_POSTED_MAX_AGE_DAYS,
+} from "./policy";
 
 export interface EventDerivationStats {
   jobsDerived: number;
@@ -13,10 +18,14 @@ export interface EventDerivationStats {
  * Adheres to PRODUCT_SPEC.md Appendix D.2.
  */
 export async function deriveChangeEvents(
-  pool: Pool,
+  pool: Queryable,
 ): Promise<EventDerivationStats> {
-  // 1. Derive job.first_seen events
-  const jobResult = await pool.query<{ count: string }>(`
+  // 1. Derive job.first_seen events.
+  // Only genuinely new roles: recent, not a repost of an old posting, and not
+  // part of the source's baseline crawl (first_seen_at is OUR crawl time, so a
+  // newly onboarded employer's whole backlog would otherwise look new).
+  const jobResult = await pool.query<{ count: string }>(
+    `
     WITH inserted AS (
       INSERT INTO events (event_type, entity_type, entity_id, dedupe_key, payload, occurred_at, event_version)
       SELECT 
@@ -42,11 +51,28 @@ export async function deriveChangeEvents(
       JOIN companies c ON c.id = j.company_id
       LEFT JOIN role_families rf ON rf.id = j.role_family_id
       WHERE j.expired_at IS NULL
+        AND j.first_seen_at >= now() - ($1::int * interval '1 hour')
+        AND (
+          j.posted_at IS NULL
+          OR j.posted_at >= now() - ($2::int * interval '1 day')
+        )
+        AND j.first_seen_at > (
+          SELECT MIN(base.first_seen_at)
+          FROM jobs base
+          WHERE base.company_id = j.company_id
+            AND base.source_system = j.source_system
+        ) + ($3::int * interval '1 minute')
       ON CONFLICT (dedupe_key) DO NOTHING
       RETURNING id
     )
     SELECT count(*)::text as count FROM inserted;
-  `);
+  `,
+    [
+      ALERT_EVENT_MAX_AGE_HOURS,
+      DERIVE_POSTED_MAX_AGE_DAYS,
+      BASELINE_GRACE_MINUTES,
+    ],
+  );
   const jobsDerived = Number(jobResult.rows[0]?.count ?? 0);
 
   // 2. Derive sponsorship.evidence_added events
