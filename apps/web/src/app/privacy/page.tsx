@@ -179,7 +179,10 @@ export default function PrivacyPage() {
                 to pre-fill Opportunity Match. Nothing is sent or saved until
                 you press Confirm &amp; Save. It is private to you, never shared
                 with employers, and purged when you delete the profile or your
-                account.
+                account. When you view jobs while signed in, we compare your
+                saved profile skills with each posting&apos;s skills on our
+                server to show how you match; nothing is stored or sent
+                elsewhere.
               </span>
             </div>
             <div className="flex items-center gap-2">

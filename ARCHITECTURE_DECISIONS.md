@@ -257,6 +257,13 @@ never reaches the server.**
   exist in the taxonomy, de-duplicates, and the database re-enforces the bounds with CHECK constraints in
   migration 0027, so the table can only ever hold short structured values (never free text).
 - Every read/write is scoped by the authenticated session's user ID (never a client-supplied ID).
+- **P4 skill-fit view, and why it is not an LLM tailoring assistant (decision record):** the blueprint's
+  "tailoring assistant" would send CV text to an AI provider, which contradicts this section's guarantee that
+  the CV never leaves the device, and a generative model can invent experience, defeating "evidence-grounded".
+  P4 is therefore a deterministic server-side comparison of the user's confirmed profile skill keys with the
+  skills already extracted for each job (`job_skill_links`, with the title-vs-description confidence as
+  evidence). No new table, no new stored data, no third-party call. A generative rewrite remains a possible
+  future opt-in; it needs a provider decision, a cost cap and a privacy review first.
 - `candidate_profiles` is registered in the per-domain erasure hook (`eraseUserRetentionData`) and is
   deleted by the same 24-hour account-deletion job. Users can also delete the profile at any time,
   effective immediately. Backups follow the 35-day expiry in step 5 above. **Deploy ordering:** the hourly

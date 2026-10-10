@@ -15,8 +15,12 @@ import { GlobalNavbar } from "../../components/ui/GlobalNavbar";
 import { auth } from "../../auth";
 import { CompanyBrandMark } from "../../components/ui/CompanyBrandMark";
 import { SaveJobButton } from "../../components/jobs/SaveJobButton";
+import { SkillFitPanel } from "../../components/jobs/SkillFitPanel";
 import { DatabaseNotConfiguredError, getPool } from "../../lib/db";
+import { computeSkillFit, type SkillFit } from "../../lib/jobs/skillFit";
+import { getCandidateProfile } from "../../lib/queries/candidateProfiles";
 import { listSavedJobIds } from "../../lib/queries/jobApplications";
+import { listJobSkills } from "../../lib/queries/jobSkills";
 import {
   listActiveJobs,
   type ActiveJobFilters,
@@ -109,8 +113,33 @@ export default async function JobsPage({
   const userId = session?.user?.id ? Number(session.user.id) : null;
   const signedIn = userId !== null && Number.isSafeInteger(userId);
   let savedJobIds = new Set<string>();
+  let hasProfile = false;
+  const skillFits = new Map<string, SkillFit>();
   if (signedIn && userId !== null) {
     savedJobIds = await listSavedJobIds(getPool(), userId);
+
+    // "How you match" is an add-on: if the profile or skill lookup fails (e.g.
+    // a table is unavailable), the job list itself must still render.
+    try {
+      const profile = await getCandidateProfile(getPool(), userId);
+      hasProfile = profile !== null;
+      if (profile && profile.skills.length > 0 && data) {
+        const profileKeys = profile.skills.map((skill) => skill.key);
+        const jobSkills = await listJobSkills(
+          getPool(),
+          data.jobs.map((job) => job.id),
+        );
+        for (const job of data.jobs) {
+          const fit = computeSkillFit(jobSkills.get(job.id) ?? [], profileKeys);
+          if (fit) skillFits.set(job.id, fit);
+        }
+      }
+    } catch (caught) {
+      console.error(
+        "skill fit unavailable:",
+        caught instanceof Error ? caught.name : "unknown error",
+      );
+    }
   }
 
   return (
@@ -334,6 +363,18 @@ export default async function JobsPage({
         </div>
       )}
 
+      {signedIn && !hasProfile && (
+        <div className="rounded-xl border border-sky-200 bg-sky-50/70 p-3 text-xs text-slate-700">
+          Add your candidate profile to see how your skills match each role.{" "}
+          <Link
+            href="/account"
+            className="font-semibold text-terracotta-700 hover:underline"
+          >
+            Set up your profile
+          </Link>
+        </div>
+      )}
+
       {/* 4. Live Roles Cards Listing */}
       {data && data.jobs.length > 0 ? (
         <div className="space-y-3">
@@ -403,6 +444,9 @@ export default async function JobsPage({
                           : `Observed ${formatDate(job.firstSeenAt)}`}
                       </span>
                     </div>
+                    {skillFits.get(job.id) && (
+                      <SkillFitPanel fit={skillFits.get(job.id)!} />
+                    )}
                   </div>
                 </div>
 

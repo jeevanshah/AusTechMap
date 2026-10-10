@@ -25,6 +25,15 @@
 - **Remote:** Synchronized with `origin/main`.
 - **Live Vercel Project:** [https://vercel.com/ittogethers-projects/aus-tech-map-web](https://vercel.com/ittogethers-projects/aus-tech-map-web) (Scope: `ittogethers-projects`, Project: `aus-tech-map-web`).
 
+## Applicant Velocity P4 — "How you match" skill fit — 10 October 2026
+
+> Written by Claude (backup-implementer mode, user-directed). Branch `feat/p4-skill-fit`, **off `main`** and independent of the unmerged P3 branches; expect a small merge conflict in `apps/web/src/app/jobs/page.tsx` with P3-A (the freshness badge) for whoever merges second. Pushed, not merged, no migration.
+
+- **What it is (and is not):** the blueprint's "evidence-grounded tailoring assistant" was built as a deterministic skill-fit view, not an LLM, because sending CV text to an AI provider would break the published promise that the CV never leaves the device, and a model can invent experience. Decision record: ARCHITECTURE_DECISIONS §4.1. If a generative rewrite is wanted later it is an opt-in needing a provider decision, cost cap and privacy review.
+- **Behaviour:** on `/jobs`, a signed-in user with a saved profile gets a collapsed "How you match" panel per job: skills from the posting that are in their profile (with evidence: named in the job title / found in the job description, from the extraction confidence 0.7/0.5), up to three to lead with, and posting skills not in their profile ("not in your profile", never "you lack"), plus a footer saying posting skills are auto-extracted and may be incomplete, it is not a hiring prediction, and the CV is never seen. No score. Nothing is shown when the posting has no extracted skills or the profile has none; signed-in users without a profile get one banner. A failure in the lookup never breaks the job list.
+- **Files:** `lib/jobs/skillFit.ts` (pure; a test pins the mirrored worker confidences), `lib/queries/jobSkills.ts`, `components/jobs/SkillFitPanel.tsx` (native `<details>`, no client JS), `app/jobs/page.tsx`, one sentence on the privacy page, PRODUCT_SPEC §12.4.2, ADR §4.1, plan.
+- **Verified:** unit tests, a jsdom test of the panel, the SQL on a real Postgres engine (PGlite; inactive skills excluded, ordering, NUMERIC arrives as a string and is converted), full battery. **Not verified:** a real browser with real data (no local database); company-page role lists do not have the panel (client component without skill data) — follow-up.
+
 ## Applicant Velocity P1 — CV/profile intake — 9 October 2026
 
 > Written by Claude, which implemented this change on the user's explicit instruction (backup-implementer mode for this one change). Codex remains integrator. This is **not** an implementer switch, so the "Switch" and "Checkpoint" blocks above are unchanged. The earlier Applicant Velocity P2 (private Job Vault) was built by Codex in `2b56baa` and is already on `main`.
