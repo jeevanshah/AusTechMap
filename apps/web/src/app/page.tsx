@@ -144,14 +144,12 @@ export default async function Home() {
         userEmail={user?.email}
         subtitle="Search wider. Choose smarter."
         extraRightAction={
-          <a
-            href="https://github.com/jeeva/AusTechMap"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/corrections"
             className="inline-flex items-center gap-1.5 rounded-lg bg-terracotta-700 hover:bg-terracotta-800 active:scale-95 text-white px-3 py-1.5 text-xs font-semibold shadow-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-700 shrink-0"
           >
-            <span>+ Add company</span>
-          </a>
+            <span>Suggest company</span>
+          </Link>
         }
       />
 

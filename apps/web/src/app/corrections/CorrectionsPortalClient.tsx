@@ -59,9 +59,9 @@ export function CorrectionsPortalClient({
           </h2>
         </div>
         <p className="text-sm leading-relaxed text-slate-600">
-          Tell us about an inaccurate location, careers link, category, or
-          sponsorship record. We review supporting evidence before changing a
-          public company record.
+          Tell us about a company we should add or an inaccurate location,
+          careers link, category, or sponsorship record. We review supporting
+          evidence before changing a public company record.
         </p>
       </header>
 
@@ -114,7 +114,9 @@ export function CorrectionsPortalClient({
               <option value="category_mismatch">
                 Industry category is incorrect
               </option>
-              <option value="other">Other data inconsistency</option>
+              <option value="other">
+                Suggest a missing company or another data issue
+              </option>
             </select>
           </div>
 
@@ -182,7 +184,7 @@ export function CorrectionsPortalClient({
 
         <div className="space-y-1.5">
           <label htmlFor="details" className="font-semibold text-slate-800">
-            What needs correcting?{" "}
+            What needs correcting or adding?{" "}
             <span className="font-normal text-slate-500">
               (minimum 10 characters)
             </span>
@@ -190,7 +192,7 @@ export function CorrectionsPortalClient({
           <textarea
             id="details"
             rows={4}
-            placeholder="Explain what is inaccurate, what should replace it, and why..."
+            placeholder="For a new company, include its name, website, and why it belongs in the directory..."
             value={details}
             onChange={(e) => setDetails(e.target.value)}
             required
