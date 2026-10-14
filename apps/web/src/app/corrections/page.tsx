@@ -9,9 +9,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Data Corrections, Claims & Employer Updates",
+  title: "Report a Data Issue",
   description:
-    "Official workflow for Australian technology employers and workforce organizations to claim, correct, or update company profiles and evidence.",
+    "Report inaccurate Australian technology employer data, careers links, locations, categories, or sponsorship evidence.",
   alternates: { canonical: "/corrections" },
 };
 
@@ -62,17 +62,16 @@ export default async function CorrectionsPage() {
         <header className="space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-1 font-mono text-xs font-semibold text-sky-800">
             <FileText className="h-3.5 w-3.5" />
-            <span>Employer Integrity Portal</span>
+            <span>Data Quality Portal</span>
           </div>
           <h1 className="font-heading text-4xl font-extrabold tracking-tight text-navy-900 sm:text-5xl">
-            Profile Corrections & Employer Claims
+            Help keep RoleWide accurate
           </h1>
           <p className="text-lg leading-relaxed text-slate-600">
             We are committed to maintaining the most accurate graph of
-            Australian technology employment. If your organization’s profile
-            requires updates to office locations, careers portals, or visa
-            sponsorship status, we provide a rapid, human-reviewed verification
-            process.
+            Australian technology employment. If you find an inaccurate office
+            location, careers link, category, or sponsorship record, send the
+            supporting details for human review.
           </p>
         </header>
 
@@ -95,8 +94,8 @@ export default async function CorrectionsPage() {
               Careers & ATS Portals
             </h2>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Connect official Greenhouse, Lever, Workday, or custom careers
-              feeds to ensure active roles appear within 24 hours.
+              Report a broken or outdated Greenhouse, Lever, Workday, or custom
+              careers link so we can verify and update it.
             </p>
           </div>
 
@@ -112,7 +111,7 @@ export default async function CorrectionsPage() {
           </div>
         </section>
 
-        {/* Interactive Claims & Corrections Submission Portal */}
+        {/* Data-correction submission portal */}
         <CorrectionsPortalClient companies={companies} />
 
         {/* Verification Standards */}
@@ -127,9 +126,8 @@ export default async function CorrectionsPage() {
           </p>
           <ul className="list-disc pl-5 text-xs text-slate-600 space-y-2 leading-relaxed">
             <li>
-              <strong>Authorised Domain Email:</strong> Submissions must
-              originate from an email address matching the company’s primary
-              operating domain (e.g. <code>jane@atlassian.com</code>).
+              <strong>Evidence first:</strong> Official supporting links are
+              strongly preferred and help us verify a proposed correction.
             </li>
             <li>
               <strong>Official Address Corroboration:</strong> Premises
@@ -142,9 +140,9 @@ export default async function CorrectionsPage() {
               ID and timestamp.
             </li>
             <li>
-              <strong>Separation Guarantee:</strong> Employer-provided claims
-              never overwrite independent platform observations; both are
-              displayed with distinct provenance tags.
+              <strong>Evidence integrity:</strong> A report never overwrites
+              independent platform observations without a staff review and an
+              auditable record of the decision.
             </li>
           </ul>
         </section>

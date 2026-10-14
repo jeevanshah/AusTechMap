@@ -22,7 +22,6 @@ import type { MapCompanyPoint } from "@austechmap/contracts";
 import { auth } from "../../../auth";
 import { CareersLink } from "./CareersLink";
 import { WatchCompanyButton } from "./WatchCompanyButton";
-import { ClaimProfileModal } from "./ClaimProfileModal";
 import { CompanyBrandMark } from "../../../components/ui/CompanyBrandMark";
 import { GlobalNavbar } from "../../../components/ui/GlobalNavbar";
 import { CompanyRolesList } from "./CompanyRolesList";
@@ -517,17 +516,6 @@ export default async function CompanyProfilePage({
               <Download className="h-3.5 w-3.5 text-slate-500" />
               <span>Export</span>
             </a>
-            {!company.is_claimed && (
-              <ClaimProfileModal
-                companyId={company.id}
-                companyName={company.display_name}
-                companySlug={company.slug}
-                companyDomain={company.domain}
-                isClaimed={company.is_claimed}
-                triggerLabel="Claim Profile"
-                triggerClassName="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50/80 px-3 py-1.5 text-xs font-semibold text-emerald-900 shadow-2xs hover:bg-emerald-100/80 transition-colors cursor-pointer"
-              />
-            )}
           </div>
         </div>
       </section>
@@ -926,35 +914,6 @@ export default async function CompanyProfilePage({
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
-          )}
-
-          {/* Claim / Employer Partnership Card */}
-          {!company.is_claimed && (
-            <div className="rounded-2xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50/50 to-white p-6 shadow-2xs space-y-3">
-              <div className="flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-100 text-emerald-800">
-                  <ShieldCheck className="h-4 w-4 text-emerald-700" />
-                </span>
-                <h3 className="font-heading text-sm font-bold text-navy-900">
-                  Are you with {company.display_name}?
-                </h3>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Claim your profile to update company coordinates, manage
-                recruitment feeds, and verify subclass 482 sponsorship status.
-              </p>
-              <div className="pt-1">
-                <ClaimProfileModal
-                  companyId={company.id}
-                  companyName={company.display_name}
-                  companySlug={company.slug}
-                  companyDomain={company.domain}
-                  isClaimed={company.is_claimed}
-                  triggerLabel="Claim Profile & Partner"
-                  triggerClassName="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-navy-900 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-slate-800 transition-colors cursor-pointer"
-                />
               </div>
             </div>
           )}

@@ -97,7 +97,7 @@ Make Australia's technology-employment landscape legible and actionable. A user 
 | International candidate | Which employers have credible sponsorship evidence? | Evidence filters + source viewer |
 | Regional mover | Where are strong technology opportunities outside the obvious capitals? | Regional Opportunity Score + map + employer density |
 | Graduate / intern | Which employers run early-career programs? | Graduate and internship filters |
-| Employer | How do we become discoverable to qualified technology talent? | Claimed profile + employer analytics (commercial phase) |
+| Employer | How do we become discoverable to qualified technology talent? | Accurate public listing; enhanced employer products are a later commercial phase |
 | Recruiter / institution | Where is technology hiring changing, and which employers/regions are gaining momentum? | Longitudinal intelligence + dashboards/API (commercial phase) |
 
 ### 2.3 Core user journeys
@@ -152,7 +152,7 @@ Save "Cloud Engineer + Regional + Sponsorship Evidence"
 | Hiring Momentum | IN - BETA | Derived from observation history only after minimum data sufficiency thresholds |
 | Regional Tech Opportunity Score | IN - BETA | Published methodology; suppress when data is insufficient |
 | Saved searches / alerts | IN | New-job, employer-change, sponsorship-evidence and regional alerts with dedupe/caps |
-| Employer claim / corrections | LIMITED | Verify employer-supplied facts while preserving independent observations separately |
+| Data corrections | LIMITED | Public reports for inaccurate company data; employer profile claims are deferred until a staffed onboarding workflow exists |
 | Shareable insight cards | IN | Generate sourced, timestamped regional/employer insights for organic distribution |
 
 ### 3.2 Product principles
@@ -1105,7 +1105,7 @@ The user habit loop is discovery -> save -> monitor -> material change -> return
 
 ### 18.6 Employer claims and community contributions
 
-Employer-claimed facts, user contributions and platform observations are distinct namespaces. A verified employer may correct its careers URL, offices, programs and supplied tech stack, but cannot rewrite independent job-history or sponsorship observations. Community corrections require a source where feasible and move through moderation before publication.
+Employer-claimed facts, user contributions and platform observations are distinct namespaces. Public employer-profile claiming is deliberately deferred at launch: no public claim or partnership CTA is shown until RoleWide has a staffed onboarding, notification, and fulfilment workflow. Community corrections remain available and require a source where feasible; they move through moderation before publication. A future verified employer may correct its careers URL, offices, programs and supplied tech stack, but cannot rewrite independent job-history or sponsorship observations.
 
 ### 18.7 Monetisation architecture
 
