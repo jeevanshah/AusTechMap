@@ -118,7 +118,7 @@ describe("CSV Export Endpoints & Institutional Controls", () => {
       expect(csvText).toContain("Atlassian");
       expect(csvText).toContain("Skilled Refugee Pilot");
       expect(csvText).not.toContain(
-        "# AusTechMap Institutional Intelligence Export",
+        "# RoleWide Institutional Intelligence Export",
       );
     });
 
@@ -157,7 +157,7 @@ describe("CSV Export Endpoints & Institutional Controls", () => {
       expect(response.status).toBe(200);
       const csvText = await response.text();
       expect(csvText).toContain(
-        "# AusTechMap Institutional Intelligence Export (Licensed to: analyst@csiro.au",
+        "# RoleWide Institutional Intelligence Export (Licensed to: analyst@csiro.au",
       );
       expect(csvText).toContain("ABN,ACN,Active Evidence Count");
       expect(csvText).toContain("80158929938");
@@ -208,7 +208,7 @@ describe("CSV Export Endpoints & Institutional Controls", () => {
       expect(response.status).toBe(200);
       const csvText = await response.text();
       expect(csvText).toContain(
-        "# AusTechMap Institutional Regional Intelligence Export",
+        "# RoleWide Institutional Regional Intelligence Export",
       );
       expect(csvText).toContain(
         "Employer Depth Score,Vacancies Score,Momentum Score",

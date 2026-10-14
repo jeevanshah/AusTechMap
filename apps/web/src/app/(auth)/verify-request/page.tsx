@@ -8,6 +8,8 @@ import {
   RefreshCw,
 } from "lucide-react";
 
+import { BrandWordmark } from "../../../components/ui/BrandWordmark";
+
 export default function VerifyRequestPage() {
   return (
     <div className="flex min-h-screen flex-col bg-canvas">
@@ -20,17 +22,15 @@ export default function VerifyRequestPage() {
           >
             <div className="relative h-8 w-8 overflow-hidden rounded-lg border border-surface-border shadow-2xs">
               <Image
-                src="/brand/logo.jpg"
-                alt="Australia Tech Map Logo"
+                src="/brand/rolewide-mark.svg"
+                alt="RoleWide logo"
                 width={32}
                 height={32}
                 className="h-full w-full object-cover"
                 priority
               />
             </div>
-            <span className="font-heading text-sm font-bold tracking-tight">
-              Australia Tech Map
-            </span>
+            <BrandWordmark className="font-heading text-sm font-bold tracking-tight" />
           </Link>
 
           <Link
@@ -102,8 +102,8 @@ export default function VerifyRequestPage() {
 
       {/* Minimal Footer */}
       <footer className="border-t border-surface-border bg-white px-4 py-4 text-center text-xs text-slate-400">
-        &copy; {new Date().getFullYear()} Australia Tech Map &middot;
-        Evidence-backed technology opportunity intelligence.
+        &copy; {new Date().getFullYear()} RoleWide &middot; Evidence-backed
+        technology opportunity intelligence.
       </footer>
     </div>
   );

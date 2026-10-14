@@ -76,10 +76,10 @@ export async function generateMetadata({
       description: `Evidence-backed technology employers, active roles, labour signals and migration context for ${opportunity.region.name}.`,
       alternates: { canonical: `/regions/${opportunity.region.code}` },
       openGraph: {
-        title: `${opportunity.region.name} Tech Ecosystem — Australia Tech Map`,
+        title: `${opportunity.region.name} Tech Ecosystem — RoleWide`,
         description: `Evidence-backed technology employers, active roles, labour signals and migration context for ${opportunity.region.name}.`,
         url: `/regions/${opportunity.region.code}`,
-        siteName: "Australia Tech Map",
+        siteName: "RoleWide",
         images: [
           {
             url: ogImageUrl,
@@ -92,13 +92,13 @@ export async function generateMetadata({
       },
       twitter: {
         card: "summary_large_image",
-        title: `${opportunity.region.name} Tech Ecosystem — Australia Tech Map`,
+        title: `${opportunity.region.name} Tech Ecosystem — RoleWide`,
         description: `Evidence-backed technology employers, active roles, labour signals and migration context for ${opportunity.region.name}.`,
         images: [ogImageUrl],
       },
     };
   } catch {
-    return { title: "Australia Tech Map" };
+    return { title: "RoleWide" };
   }
 }
 
@@ -516,9 +516,9 @@ export default async function RegionPage({
 
       <footer className="border-t border-surface-border py-6 font-mono text-xs leading-5 text-slate-500">
         <p>
-          Australia Tech Map regional record · ASGS SA4 {region.code} · employer
-          and job counts come from mapped first-party observations · NERO and
-          IVI remain separately versioned · score components are retained for
+          RoleWide regional record · ASGS SA4 {region.code} · employer and job
+          counts come from mapped first-party observations · NERO and IVI remain
+          separately versioned · score components are retained for
           reproducibility.
         </p>
       </footer>

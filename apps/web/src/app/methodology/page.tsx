@@ -12,9 +12,9 @@ import { auth } from "../../auth";
 import { GlobalNavbar } from "../../components/ui/GlobalNavbar";
 
 export const metadata: Metadata = {
-  title: "Methodology & Opportunity Graph Standards — Australia Tech Map",
+  title: "Methodology & Opportunity Graph Standards",
   description:
-    "Scientific methodology, scoring models, regional classification, and data verification standards governing Australia Tech Map.",
+    "Scientific methodology, scoring models, regional classification, and data verification standards governing RoleWide.",
   alternates: { canonical: "/methodology" },
 };
 
@@ -53,10 +53,10 @@ export default async function MethodologyPage() {
             Methodology & Opportunity Graph Architecture
           </h1>
           <p className="text-lg leading-relaxed text-slate-600">
-            Australia Tech Map models the real geographic and professional
-            technology economy of Australia. This document specifies the
-            deterministic algorithms, government datasets, and evidence
-            verification standards that power the platform.
+            RoleWide models the real geographic and professional technology
+            economy of Australia. This document specifies the deterministic
+            algorithms, government datasets, and evidence verification standards
+            that power the platform.
           </p>
         </header>
 
@@ -198,9 +198,9 @@ export default async function MethodologyPage() {
               Honest Zero-Result Guarantee
             </span>
             If a query targets specific roles or skills and no company matches
-            or the score falls below 40, Australia Tech Map returns an honest
-            empty state with filter guidance rather than hallucinating unrelated
-            employers (Golden Query GQ-24 compliant).
+            or the score falls below 40, RoleWide returns an honest empty state
+            with filter guidance rather than hallucinating unrelated employers
+            (Golden Query GQ-24 compliant).
           </div>
         </section>
 
@@ -274,9 +274,8 @@ export default async function MethodologyPage() {
             </div>
           </div>
           <p className="text-xs text-slate-500 italic mt-3">
-            Disclaimer: Australia Tech Map is not a registered migration agent.
-            Employer sponsorship data does not guarantee individual visa
-            eligibility.
+            Disclaimer: RoleWide is not a registered migration agent. Employer
+            sponsorship data does not guarantee individual visa eligibility.
           </p>
         </section>
       </article>

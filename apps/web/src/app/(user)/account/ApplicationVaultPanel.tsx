@@ -187,9 +187,9 @@ export function ApplicationVaultPanel({
             </h3>
             <p className="mt-1 max-w-3xl text-xs leading-relaxed text-slate-600">
               Each entry is an immutable snapshot of the verified employer
-              listing at the moment you saved it. Australia Tech Map never
-              submits an application or shares your tracker status and notes
-              with employers.
+              listing at the moment you saved it. RoleWide never submits an
+              application or shares your tracker status and notes with
+              employers.
             </p>
           </div>
         </div>

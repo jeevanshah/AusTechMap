@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
+
+import { BrandWordmark } from "../ui/BrandWordmark";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
@@ -312,17 +314,15 @@ export function OpportunityMatcherShell({
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="relative h-8 w-8 overflow-hidden rounded-lg border border-slate-200/80 shadow-2xs transition-transform group-hover:scale-105">
               <Image
-                src="/brand/logo.jpg"
-                alt="Australia Tech Map"
+                src="/brand/rolewide-mark.svg"
+                alt="RoleWide"
                 fill
                 className="object-cover"
                 sizes="32px"
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-sm text-navy-900 leading-none">
-                Australia Tech Map
-              </span>
+              <BrandWordmark className="font-bold text-sm text-navy-900 leading-none" />
               <span className="text-[10px] text-slate-500 font-mono mt-0.5">
                 Opportunity Engine
               </span>

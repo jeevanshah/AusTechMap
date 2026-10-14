@@ -80,7 +80,7 @@ export async function GET(
     console.error("Failed to load company for OG card:", err);
   }
 
-  const name = row ? row.display_name : "Australia Tech Map";
+  const name = row ? row.display_name : "RoleWide";
   const category = row?.primary_category || "Technology Employer";
   const city = row?.city || "Australia";
   const activeJobs = row?.active_jobs_count ?? 0;
@@ -134,7 +134,7 @@ export async function GET(
               boxShadow: "0 0 20px rgba(2, 132, 199, 0.4)",
             }}
           >
-            AU
+            RW
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <span
@@ -145,7 +145,7 @@ export async function GET(
                 color: "#e2e8f0",
               }}
             >
-              AUSTRALIA TECH MAP
+              ROLEWIDE
             </span>
             <span
               style={{
@@ -387,7 +387,7 @@ export async function GET(
         }}
       >
         <span>Methodology v1.0 • Verified primary sources & Home Affairs</span>
-        <span>austechmap.com/companies/{slug}</span>
+        <span>rolewide.com/companies/{slug}</span>
       </div>
     </div>,
     {

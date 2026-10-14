@@ -1520,12 +1520,12 @@ export function AccountView({
                 Australian Privacy Principles &amp; Data Control
               </h3>
               <p className="mt-1 text-xs text-slate-600 leading-relaxed max-w-2xl">
-                Australia Tech Map follows APP 11 standards: personal data is
-                collected solely to power your Job Vault, application tracker,
-                saved searches, watchlists, and delivery preferences. Tracker
-                data is private to your account and is never shared with
-                employers. You hold full control to delete your account and
-                purge all associated state at any time.
+                RoleWide follows APP 11 standards: personal data is collected
+                solely to power your Job Vault, application tracker, saved
+                searches, watchlists, and delivery preferences. Tracker data is
+                private to your account and is never shared with employers. You
+                hold full control to delete your account and purge all
+                associated state at any time.
               </p>
             </div>
 

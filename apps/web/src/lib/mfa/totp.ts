@@ -23,7 +23,7 @@ export function totpProvisioningUri(params: {
   issuer?: string;
 }): string {
   const totp = new TOTP({
-    issuer: params.issuer ?? "AusTechMap",
+    issuer: params.issuer ?? "RoleWide",
     label: params.accountEmail,
     secret: params.secret,
     algorithm: ALGORITHM,

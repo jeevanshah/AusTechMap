@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Data Corrections, Claims & Employer Updates — Australia Tech Map",
+  title: "Data Corrections, Claims & Employer Updates",
   description:
     "Official workflow for Australian technology employers and workforce organizations to claim, correct, or update company profiles and evidence.",
   alternates: { canonical: "/corrections" },

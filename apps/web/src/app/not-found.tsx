@@ -9,8 +9,8 @@ export default function NotFound() {
         {/* Brand Mark */}
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl border border-surface-border bg-white shadow-2xs">
           <Image
-            src="/brand/logo.jpg"
-            alt="Australia Tech Map Logo"
+            src="/brand/rolewide-mark.svg"
+            alt="RoleWide logo"
             width={64}
             height={64}
             className="h-full w-full object-cover"

@@ -10,6 +10,8 @@ import {
   BookOpen,
 } from "lucide-react";
 
+import { BrandWordmark } from "./BrandWordmark";
+
 export type NavActivePage =
   "map" | "jobs" | "opportunities" | "methodology" | "regions" | "companies";
 
@@ -24,7 +26,7 @@ export interface GlobalNavbarProps {
 export function GlobalNavbar({
   currentPage,
   userEmail,
-  subtitle = "National Tech Ecosystem",
+  subtitle = "Search wider. Choose smarter.",
   showVerifiedBadge = true,
   extraRightAction,
 }: GlobalNavbarProps) {
@@ -37,8 +39,8 @@ export function GlobalNavbar({
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl border border-surface-border shadow-2xs bg-white group-hover:scale-105 active:scale-95 transition-transform">
               <Image
-                src="/brand/logo.jpg"
-                alt="Australia Tech Map Logo"
+                src="/brand/rolewide-mark.svg"
+                alt="RoleWide logo"
                 width={40}
                 height={40}
                 className="h-full w-full object-cover"
@@ -46,9 +48,7 @@ export function GlobalNavbar({
               />
             </div>
             <div className="flex flex-col min-w-0">
-              <span className="font-heading text-base font-bold tracking-tight text-navy-900 leading-none">
-                Australia Tech Map
-              </span>
+              <BrandWordmark className="font-heading text-base font-bold tracking-tight text-navy-900 leading-none" />
               <span className="text-xs text-slate-500 font-medium mt-1 truncate">
                 {subtitle}
               </span>

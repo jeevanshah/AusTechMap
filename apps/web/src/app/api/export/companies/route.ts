@@ -153,10 +153,10 @@ export async function GET(request: Request) {
     // Watermark comments for institutional / licensed downloads
     if (isInstitutional) {
       csvRows.push(
-        `# AusTechMap Institutional Intelligence Export (Licensed to: ${user?.email ?? "Staff"}, Generated: ${new Date().toISOString()})`,
+        `# RoleWide Institutional Intelligence Export (Licensed to: ${user?.email ?? "Staff"}, Generated: ${new Date().toISOString()})`,
       );
       csvRows.push(
-        "# Notice: Data governed by Australia Tech Map Institutional Terms and Source Attribution Registers.",
+        "# Notice: Data governed by RoleWide Institutional Terms and Source Attribution Registers.",
       );
     }
 
@@ -191,7 +191,7 @@ export async function GET(request: Request) {
         r.verified_at
           ? new Date(r.verified_at).toISOString().split("T")[0]
           : "",
-        `https://austechmap.com/companies/${r.slug}`,
+        `https://rolewide.com/companies/${r.slug}`,
       );
 
       csvRows.push(row.map(escapeCsvField).join(","));
@@ -222,7 +222,7 @@ export async function GET(request: Request) {
       status: 200,
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="austechmap-companies-${dateStr}.csv"`,
+        "Content-Disposition": `attachment; filename="rolewide-companies-${dateStr}.csv"`,
         "Cache-Control": "no-cache",
       },
     });

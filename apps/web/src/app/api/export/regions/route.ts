@@ -89,10 +89,10 @@ export async function GET() {
 
     if (isInstitutional) {
       csvRows.push(
-        `# AusTechMap Institutional Regional Intelligence Export (Licensed to: ${user?.email ?? "Staff"}, Generated: ${new Date().toISOString()})`,
+        `# RoleWide Institutional Regional Intelligence Export (Licensed to: ${user?.email ?? "Staff"}, Generated: ${new Date().toISOString()})`,
       );
       csvRows.push(
-        "# Notice: Data governed by Australia Tech Map Institutional Terms and Source Attribution Registers.",
+        "# Notice: Data governed by RoleWide Institutional Terms and Source Attribution Registers.",
       );
     }
 
@@ -149,7 +149,7 @@ export async function GET() {
         );
       }
 
-      row.push(`https://austechmap.com/regions/${r.code}`);
+      row.push(`https://rolewide.com/regions/${r.code}`);
 
       csvRows.push(row.map(escapeCsvField).join(","));
     }
@@ -175,7 +175,7 @@ export async function GET() {
       status: 200,
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="austechmap-regions-${dateStr}.csv"`,
+        "Content-Disposition": `attachment; filename="rolewide-regions-${dateStr}.csv"`,
         "Cache-Control": "no-cache",
       },
     });

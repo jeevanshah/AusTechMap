@@ -310,7 +310,7 @@ export function CorrectionsPortalClient({
             <p className="text-xs text-slate-600 leading-relaxed">
               Found an inaccurate office location, broken careers link, or
               outdated sponsorship status? Report it here with corroborating
-              links to ensure Australia Tech Map remains 100% verifiable.
+              links to ensure RoleWide remains 100% verifiable.
             </p>
           </header>
 

@@ -18,7 +18,7 @@ import { AccountView } from "./AccountView";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "My Account · Australia Tech Map",
+  title: "My Account",
   description:
     "Manage your candidate profile, private Job Vault, application progress, saved searches, employer watchlists, and opportunity alerts.",
   robots: { index: false },

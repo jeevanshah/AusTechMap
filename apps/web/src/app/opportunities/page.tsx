@@ -22,7 +22,7 @@ import { OpportunityMatcherShell } from "../../components/opportunity/Opportunit
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Opportunity Match · Australia Tech Map",
+  title: "Opportunity Match",
   description:
     "Evidence-based Opportunity Matching across Australian technology employers. Sourced role, skill, location, and visa sponsorship alignment.",
 };

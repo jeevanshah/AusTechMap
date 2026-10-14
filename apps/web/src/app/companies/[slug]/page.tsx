@@ -289,13 +289,13 @@ export async function generateMetadata({
   try {
     company = await loadCompany(slug);
   } catch {
-    return { title: "Australia Tech Map" };
+    return { title: "RoleWide" };
   }
-  if (!company) return { title: "Australia Tech Map" };
+  if (!company) return { title: "RoleWide" };
 
   const description = company.research_claim?.reason
     ? company.research_claim.reason.slice(0, 150)
-    : `${company.display_name} on Australia Tech Map.`;
+    : `${company.display_name} on RoleWide.`;
 
   const ogImageUrl = `/api/og/company/${company.slug}`;
 
@@ -308,7 +308,7 @@ export async function generateMetadata({
       title: `${company.display_name} — Australian Tech Intelligence`,
       description,
       url: `/companies/${company.slug}`,
-      siteName: "Australia Tech Map",
+      siteName: "RoleWide",
       images: [
         {
           url: ogImageUrl,

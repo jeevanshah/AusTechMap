@@ -90,7 +90,7 @@ export async function GET(
               boxShadow: "0 0 20px rgba(13, 148, 136, 0.4)",
             }}
           >
-            AU
+            RW
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <span
@@ -101,7 +101,7 @@ export async function GET(
                 color: "#e2e8f0",
               }}
             >
-              AUSTRALIA TECH MAP
+              ROLEWIDE
             </span>
             <span
               style={{
@@ -385,7 +385,7 @@ export async function GET(
         <span>
           Methodology v1.0 • ABS ASGS 2021 & Sourced Migration Evidence
         </span>
-        <span>austechmap.com/regions/{code}</span>
+        <span>rolewide.com/regions/{code}</span>
       </div>
     </div>,
     {

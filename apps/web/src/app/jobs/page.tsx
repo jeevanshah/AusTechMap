@@ -30,7 +30,7 @@ import {
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Live tech jobs · Australia Tech Map",
+  title: "Live tech jobs",
   description:
     "Current technology roles sourced from verified Australian employer careers pages.",
 };

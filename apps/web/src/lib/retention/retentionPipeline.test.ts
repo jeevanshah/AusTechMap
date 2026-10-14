@@ -22,15 +22,15 @@ describe("Phase 7 Retention Pipeline & Digest Engine", () => {
     const html = renderDigestHtml({
       frequency: "weekly",
       items: sampleItems,
-      unsubscribeUrl: "https://austechmap.com.au/account?tab=preferences",
-      appUrl: "https://austechmap.com.au",
+      unsubscribeUrl: "https://rolewide.com/account?tab=preferences",
+      appUrl: "https://rolewide.com",
     });
 
     expect(html).toContain("<!DOCTYPE html>");
     expect(html).toContain("Weekly Australian Tech Opportunity Digest");
     expect(html).toContain("Atlassian posted 3 new roles");
     expect(html).toContain("Canva added visa sponsorship evidence");
-    expect(html).toContain("https://austechmap.com.au/account?tab=preferences");
+    expect(html).toContain("https://rolewide.com/account?tab=preferences");
     expect(html).toContain("#c2410c"); // Terracotta accent color
     expect(html).toContain("#0f172a"); // Navy ink header
   });
@@ -39,8 +39,8 @@ describe("Phase 7 Retention Pipeline & Digest Engine", () => {
     const html = renderDigestHtml({
       frequency: "daily",
       items: sampleItems,
-      unsubscribeUrl: "https://austechmap.com.au/account?tab=preferences",
-      appUrl: "https://austechmap.com.au",
+      unsubscribeUrl: "https://rolewide.com/account?tab=preferences",
+      appUrl: "https://rolewide.com",
     });
 
     expect(html).toContain("Daily Australian Tech Opportunity Digest");

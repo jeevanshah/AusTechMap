@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Building2, Compass, MapPin, ShieldCheck } from "lucide-react";
@@ -12,6 +13,10 @@ import { fetchMapCompanies } from "../lib/queries/mapCompanies";
 import { listRegionalHubs } from "../lib/queries/listRegionalHubs";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 // Matches resolved_locations' own Australian-bounds CHECK constraint
 // (db/migrations/0006) -- the initial viewport before the user pans.
@@ -137,7 +142,7 @@ export default async function Home() {
       <GlobalNavbar
         currentPage="map"
         userEmail={user?.email}
-        subtitle="People. Companies. Opportunities."
+        subtitle="Search wider. Choose smarter."
         extraRightAction={
           <a
             href="https://github.com/jeeva/AusTechMap"
@@ -279,11 +284,9 @@ export default async function Home() {
 
       <footer className="mt-8 border-t border-surface-border pt-6 pb-10 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-500 font-mono">
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-navy-900">
-            Australia Tech Map
-          </span>
+          <span className="font-semibold text-navy-900">RoleWide</span>
           <span>•</span>
-          <span>National Opportunity Graph</span>
+          <span>Search wider. Choose smarter.</span>
         </div>
         <div className="flex items-center gap-5 flex-wrap font-sans text-xs text-slate-600">
           <Link

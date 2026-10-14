@@ -1,0 +1,15 @@
+# This is a monorepo. Upload only the Next.js app, its workspace dependency,
+# and the manifests Vercel needs to install and build it.
+/*
+!apps
+!apps/web/**
+!packages
+!packages/contracts/**
+!package.json
+!package-lock.json
+!tsconfig.base.json
+
+# The allowlist above would otherwise re-include generated local artefacts.
+apps/web/.next/
+apps/web/node_modules/
+apps/web/.env.local

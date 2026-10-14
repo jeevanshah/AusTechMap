@@ -48,7 +48,7 @@ export function renderDigestHtml(params: {
           ${item.description}
         </p>
         <a href="${item.link.startsWith("http") ? item.link : `${appUrl}${item.link}`}" style="font-size: 12px; font-weight: 600; color: #c2410c; text-decoration: none;">
-          View details on Australia Tech Map &rarr;
+          View details on RoleWide &rarr;
         </a>
       </td>
     </tr>
@@ -70,8 +70,8 @@ export function renderDigestHtml(params: {
       <td style="background-color: #0f172a; padding: 24px; text-align: left;">
         <table role="presentation" border="0" cellspacing="0" cellpadding="0">
           <tr>
-            <td style="background-color: #c2410c; color: #ffffff; font-weight: 800; font-size: 14px; width: 32px; height: 32px; text-align: center; border-radius: 6px;">AU</td>
-            <td style="padding-left: 12px; color: #ffffff; font-size: 16px; font-weight: 700;">Australia Tech Map</td>
+            <td style="background-color: #c2410c; color: #ffffff; font-weight: 800; font-size: 14px; width: 32px; height: 32px; text-align: center; border-radius: 6px;">RW</td>
+            <td style="padding-left: 12px; color: #ffffff; font-size: 16px; font-weight: 700;">RoleWide</td>
           </tr>
         </table>
         <h1 style="color: #ffffff; font-size: 20px; font-weight: 700; margin: 16px 0 4px 0;">${headline}</h1>
@@ -99,7 +99,7 @@ export function renderDigestHtml(params: {
     <!-- Footer -->
     <tr>
       <td style="background-color: #f1f5f9; padding: 18px 24px; font-size: 11px; color: #64748b; border-top: 1px solid #e2e8f0; line-height: 1.5;">
-        You received this email because you saved searches or watched employers on Australia Tech Map.<br>
+        You received this email because you saved searches or watched employers on RoleWide.<br>
         <a href="${unsubscribeUrl}" style="color: #64748b; text-decoration: underline;">Manage notification preferences or unsubscribe</a>.
       </td>
     </tr>

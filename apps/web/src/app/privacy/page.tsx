@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy & APP 11 Data Protection — Australia Tech Map",
+  title: "Privacy Policy & APP 11 Data Protection",
   description:
     "Australian Privacy Principles (APP) compliance, zero-tracking browsing, and automated account deletion policy.",
   alternates: { canonical: "/privacy" },
@@ -43,10 +43,9 @@ export default function PrivacyPage() {
             Privacy Policy & Data Protection Standards
           </h1>
           <p className="text-lg leading-relaxed text-slate-600">
-            Australia Tech Map is dedicated to transparency, radical data
-            minimisation, and respect for user sovereignty. We believe
-            technology opportunity intelligence should never require personal
-            surveillance.
+            RoleWide is dedicated to transparency, radical data minimisation,
+            and respect for user sovereignty. We believe technology opportunity
+            intelligence should never require personal surveillance.
           </p>
         </header>
 
@@ -92,8 +91,8 @@ export default function PrivacyPage() {
             </h2>
           </div>
           <p className="text-sm leading-relaxed text-slate-600">
-            Australia Tech Map follows an APP 11-aligned process for destroying
-            or de-identifying personal information when it is no longer needed.
+            RoleWide follows an APP 11-aligned process for destroying or
+            de-identifying personal information when it is no longer needed.
             This describes our technical policy; it is not legal advice or a
             claim that the business is necessarily an APP entity.
           </p>
@@ -140,10 +139,10 @@ export default function PrivacyPage() {
             Candidate & Employer Data Boundaries
           </h2>
           <p className="text-sm leading-relaxed text-slate-600">
-            Australia Tech Map primarily indexes public organisational
-            technology employment data. Signed-in users may also choose to keep
-            a private Job Vault and application tracker, and a private candidate
-            profile that pre-fills Opportunity Match.
+            RoleWide primarily indexes public organisational technology
+            employment data. Signed-in users may also choose to keep a private
+            Job Vault and application tracker, and a private candidate profile
+            that pre-fills Opportunity Match.
           </p>
           <div className="space-y-2 text-xs text-slate-600">
             <div className="flex items-center gap-2">
