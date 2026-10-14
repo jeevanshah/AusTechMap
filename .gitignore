@@ -49,3 +49,5 @@ backups/
 # Superseded source/conversion artifacts retained locally
 Australia_Tech_Map_Production_Implementation_Plan_UPDATED.docx
 extracted_doc.txt
+
+.vercel
